@@ -347,29 +347,28 @@ const NotificationHandler = ({ toast }) => {
   const connection = signalRConnectionManager.getConnection();
 
   useEffect(() => {
-    connection.on("ReceiveNotification", (message) => {
-      console.log(message);
-      // toast.current.show({
-      //   severity: "success",
-      //   summary: message,
-      //   sticky: true,
-      //   content: (props) => (
-      //     <div
-      //       className="flex flex-column"
-      //       style={{ flex: "1", justifyContent: "start" }}
-      //     >
-      //       <Link
-      //         to={"/"}
-      //         style={{ alignSelf: "start", color: "#1ea97c" }}
-      //         onClick={() => toast.current.clear()}
-      //       >
-      //         <div className="font-medium text-lg my-3 text-900" style={{}}>
-      //           {props.message.summary}
-      //         </div>
-      //       </Link>
-      //     </div>
-      //   ),
-      // });
+    connection.on("ReceiveNotification", (message, route) => {
+      toast.current.show({
+        severity: "success",
+        summary: message,
+        sticky: true,
+        content: (props) => (
+          <div
+            className="flex flex-column"
+            style={{ flex: "1", justifyContent: "start" }}
+          >
+            <Link
+              to={route}
+              style={{ alignSelf: "start", color: "#1ea97c" }}
+              onClick={() => toast.current.clear()}
+            >
+              <div className="font-medium text-lg my-3 text-900" style={{}}>
+                {props.message.summary}
+              </div>
+            </Link>
+          </div>
+        ),
+      });
     });
     connection.on("ReceiveAllNotification", (message) => {
       toast.current.show(message);

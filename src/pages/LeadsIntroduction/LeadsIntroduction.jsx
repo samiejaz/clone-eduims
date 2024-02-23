@@ -66,8 +66,10 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
 
   const [filters, setFilters] = useState({
     Status: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    VoucherDate: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CompanyName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    LeadSourceTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ContactPersonName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ContactPersonMobileNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
   const user = useUserData();
@@ -77,9 +79,6 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
     queryFn: () => fetchAllLeadIntroductions(user.userID),
     initialData: [],
   });
-  // let data = [{ LeadIntroductionID: 1 }];
-  // let isLoading = false;
-  // let isFetching = false;
 
   const deleteMutation = useMutation({
     mutationFn: deleteLeadIntroductionByID,

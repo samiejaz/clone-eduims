@@ -54,9 +54,10 @@ export function BusinessUnitDetail() {
   } = useDeleteModal(handleDelete);
 
   const [filters, setFilters] = useState({
-    FirstName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    LastName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    Address: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    LandlineNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    MobileNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     Email: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
@@ -109,10 +110,10 @@ export function BusinessUnitDetail() {
       ) : (
         <>
           <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">BusinessUnits</h2>
+            <h2 className="text-center my-auto">Business Units</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
               <Button
-                label="Add New BusinessUnit"
+                label="Add New Business Unit"
                 icon="pi pi-plus"
                 type="button"
                 className="rounded"
@@ -156,7 +157,7 @@ export function BusinessUnitDetail() {
               filter
               filterPlaceholder="Search by company"
               sortable
-              header="Company"
+              header="Business Unit"
               style={{ minWidth: "20rem" }}
             ></Column>
             <Column
@@ -197,7 +198,7 @@ export function BusinessUnitDetail() {
 }
 
 export function BusinessUnitForm({ pagesTitle, mode }) {
-  document.title = "BusinessUnit Entry";
+  document.title = "Business Unit Entry";
 
   const queryClient = useQueryClient();
   const imageRef = useRef();
@@ -216,13 +217,19 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
     formState: { isDirty },
   } = useForm({
     defaultValues: {
-      FirstName: "",
-      LastName: "",
-      Email: "",
-      Password: "",
       BusinessUnitName: "",
-      InActive: "",
-      DepartmentID: [],
+      Address: "",
+      LandlineNo: "",
+      MobileNo: "",
+      Email: "",
+      Website: "",
+      AuthorityPersonName: "",
+      AuthorityPersonNo: "",
+      AuthorityPersonEmail: "",
+      NTNno: "",
+      STRNo: "",
+      Description: "",
+      InActive: false,
     },
   });
 
@@ -238,28 +245,34 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
       try {
         setValue(
           "BusinessUnitName",
-          BusinessUnitData?.data[0]?.BusinessUnitName
+          BusinessUnitData?.data[0]?.BusinessUnitName ?? undefined
         );
-        setValue("Address", BusinessUnitData?.data[0]?.Address);
-        setValue("LandlineNo", BusinessUnitData?.data[0]?.LandlineNo);
-        setValue("MobileNo", BusinessUnitData?.data[0]?.MobileNo);
-        setValue("Email", BusinessUnitData?.data[0]?.Email);
-        setValue("Website", BusinessUnitData?.data[0]?.Website);
+        setValue("Address", BusinessUnitData?.data[0]?.Address ?? undefined);
+        setValue(
+          "LandlineNo",
+          BusinessUnitData?.data[0]?.LandlineNo ?? undefined
+        );
+        setValue("MobileNo", BusinessUnitData?.data[0]?.MobileNo ?? undefined);
+        setValue("Email", BusinessUnitData?.data[0]?.Email ?? undefined);
+        setValue("Website", BusinessUnitData?.data[0]?.Website ?? undefined);
         setValue(
           "AuthorityPersonName",
-          BusinessUnitData?.data[0]?.AuthorityPersonName
+          BusinessUnitData?.data[0]?.AuthorityPersonName ?? undefined
         );
         setValue(
           "AuthorityPersonNo",
-          BusinessUnitData?.data[0]?.AuthorityPersonNo
+          BusinessUnitData?.data[0]?.AuthorityPersonNo ?? undefined
         );
         setValue(
           "AuthorityPersonEmail",
-          BusinessUnitData?.data[0]?.AuthorityPersonEmail
+          BusinessUnitData?.data[0]?.AuthorityPersonEmail ?? undefined
         );
-        setValue("NTNno", BusinessUnitData?.data[0]?.NTNno);
-        setValue("STRNo", BusinessUnitData?.data[0]?.STRNo);
-        setValue("Description", BusinessUnitData?.data[0]?.Description);
+        setValue("NTNno", BusinessUnitData?.data[0]?.NTNno ?? undefined);
+        setValue("STRNo", BusinessUnitData?.data[0]?.STRNo ?? undefined);
+        setValue(
+          "Description",
+          BusinessUnitData?.data[0]?.Description ?? undefined
+        );
         setValue("InActive", BusinessUnitData?.data[0]?.InActive);
 
         setValue("PrimaryColor", {

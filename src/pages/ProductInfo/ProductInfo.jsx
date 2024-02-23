@@ -209,7 +209,6 @@ export function ProductInfoForm({ pagesTitle, mode }) {
 
   useEffect(() => {
     if (ProductInfoID !== undefined && ProductInfoData.data.data?.length > 0) {
-      console.log(ProductInfoID, ProductInfoData);
       if (ProductInfoData?.data.data[0]?.ProductInfoID !== 0) {
         setValue(
           "ProductCategoryID",

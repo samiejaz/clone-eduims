@@ -64,12 +64,6 @@ import { InputSwitch } from "primereact/inputswitch";
 import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCustomerInvoiceInstallmentModal";
 import { CIconButton } from "../../components/Buttons/CButtons";
 
-const CustomerInvoiceModeOptions = [
-  { value: "Cash", label: "Cash" },
-  { value: "Online", label: "Online Transfer" },
-  { value: "Instrument", label: "Instrument" },
-];
-
 const typesOptions = [
   { label: "Product", value: "Product" },
   { label: "Service", value: "Service" },
@@ -78,10 +72,7 @@ const typesOptions = [
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
-let cashDetailColor = "#22C55E";
-let onlineDetailColor = "#F59E0B";
-let chequeDetailColor = "#3B82F6";
-let ddDetailColor = "#8f48d2";
+let onlineDetailColor = "#365abd";
 let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY;
 
 export function NewCustomerInvoiceEntry() {
@@ -92,7 +83,6 @@ export function NewCustomerInvoiceEntry() {
     </div>
   );
 }
-const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 function NewCustomerInvoiceEntrySearch() {
   const queryClient = useQueryClient();
@@ -112,7 +102,8 @@ function NewCustomerInvoiceEntrySearch() {
   } = useDeleteModal(handleDelete);
 
   const [filters, setFilters] = useState({
-    VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    SessionBasedVoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    InvoiceNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CustomerInvoiceMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -174,10 +165,10 @@ function NewCustomerInvoiceEntrySearch() {
       ) : (
         <>
           <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">CustomerInvoice Vouchers</h2>
+            <h2 className="text-center my-auto">Customer Invoices</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
               <Button
-                label="Add New CustomerInvoice Voucher"
+                label="Add New Customer Invoice"
                 icon="pi pi-plus"
                 type="button"
                 className="rounded"
@@ -230,13 +221,7 @@ function NewCustomerInvoiceEntrySearch() {
               sortable
               header="Ref No"
             ></Column>
-            <Column
-              field="InvoiceTitle"
-              filter
-              filterPlaceholder="Search by invoice title"
-              sortable
-              header="Invoice Title"
-            ></Column>
+
             <Column
               field="CustomerName"
               filter
@@ -269,15 +254,23 @@ function NewCustomerInvoiceEntrySearch() {
 }
 
 const defaultValues = {
+  SesionID: "",
+  BusinessUnitID: "",
+  VoucherNo: "",
+  DocumentNo: "",
+  InvoiceTitle: "",
+  SessionBasedVoucherNo: "",
   VoucherDate: new Date(),
+  VoucherDueDate: new Date(),
   Description: "",
+  Customer: "",
+  CustomerLedgers: "",
   CustomerInvoiceDetail: [],
   installments: [],
 };
-let renderCount = 0;
+
 export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
   document.title = "CustomerInvoice Voucher Entry";
-  renderCount++;
   const queryClient = useQueryClient();
   const { CustomerInvoiceID } = useParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -336,7 +329,7 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
       +CustomerInvoiceID !== null &&
       CustomerInvoiceData?.Master?.length > 0
     ) {
-      // Setting Values
+      //   // Setting Values
       method.setValue("SessionID", CustomerInvoiceData?.Master[0]?.SessionID);
       method.setValue(
         "BusinessUnitID",
@@ -348,7 +341,6 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
         "SessionBasedVoucherNo",
         CustomerInvoiceData?.Master[0]?.InvoiceNo1
       );
-
       method.setValue(
         "VoucherDate",
         new Date(CustomerInvoiceData?.Master[0]?.InvoiceDate)
@@ -357,29 +349,25 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
         "VoucherDueDate",
         new Date(CustomerInvoiceData?.Master[0]?.InvoiceDueDate)
       );
-
       customerCompRef.current?.setCustomerID(
         CustomerInvoiceData?.Master[0]?.CustomerID
       );
-
       method.setValue(
         "CustomerLedgers",
         CustomerInvoiceData?.Master[0]?.AccountID
       );
-      document
-        .getElementById("CustomerLedgers")
-        .dispatchEvent(new Event("change", { bubbles: true }));
-      method.setValue("DocumentNo", CustomerInvoiceData?.Master[0]?.DocumentNo);
-
+      method.setValue(
+        "DocumentNo",
+        CustomerInvoiceData?.Master[0]?.DocumentNo ?? undefined
+      );
       method.setValue(
         "InvoiceTitle",
         CustomerInvoiceData?.Master[0]?.InvoiceTitle
       );
       method.setValue(
         "Description",
-        CustomerInvoiceData?.Master[0]?.MasterDescription
+        CustomerInvoiceData?.Master[0]?.MasterDescription ?? undefined
       );
-
       method.setValue(
         "CustomerInvoiceDetail",
         CustomerInvoiceData.Detail?.map((invoice, item) => {
@@ -394,7 +382,6 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
           };
         })
       );
-      console.log(CustomerInvoiceData);
       method.setValue(
         "installments",
         CustomerInvoiceData?.InstallmentDetail.map((item, index) => {
@@ -404,9 +391,6 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
           };
         })
       );
-
-      DispatchDetailEvents(CustomerInvoiceData.Detail);
-
       method.setValue("TotalAmount", CustomerInvoiceData?.Master[0]?.TotalCGS);
       method.setValue(
         "TotalNetAmount",
@@ -473,7 +457,6 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
       ) : (
         <>
           <CustomerBranchDataProvider>
-            {renderCount}
             <div className="mt-4">
               <ButtonToolBar
                 editDisable={mode !== "view"}
@@ -500,6 +483,7 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
                     `InvoicePrint?CustomerInvoiceID=${CustomerInvoiceID}`
                   )
                 }
+                printDisable={mode !== "view"}
               />
             </div>
             <form id="CustomerInvoice" className="mt-4">
@@ -507,7 +491,9 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
                 <Row>
                   <SessionSelect mode={mode} />
                   <BusinessUnitDependantFields mode={mode} />
-                  <Form.Group as={Col}>
+                </Row>
+                <Row>
+                  <Form.Group as={Col} className="col-2">
                     <Form.Label>Invoice Date</Form.Label>
                     <div>
                       <CDatePicker
@@ -517,23 +503,25 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
                       />
                     </div>
                   </Form.Group>
-                  <Form.Group as={Col}>
+                  <Form.Group as={Col} className="col-2">
                     <Form.Label>
                       Invoice Due Date
-                      {/* <CIconButton
-                      icon="pi pi-cash"
-                      toolTipPostion="left"
-                      tooltip="Installments"
-                      onClick={() =>
-                        invoiceInstallmentRef.current?.openDialog(true)
-                      }
-                    /> */}
                       <Button
+                        tooltip="Installments"
+                        icon="pi pi-money-bill"
+                        severity="primary"
+                        size="small"
+                        className="rounded-2"
                         type="button"
-                        icon="pi pi-money"
                         onClick={() =>
                           invoiceInstallmentRef.current?.openDialog(true)
                         }
+                        style={{
+                          padding: "1px 0px",
+                          fontSize: "small",
+                          width: "30px",
+                          marginLeft: "10px",
+                        }}
                       />
                     </Form.Label>
                     <div>
@@ -541,19 +529,6 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
                         control={method.control}
                         name="VoucherDueDate"
                         disabled={mode === "view"}
-                      />
-                    </div>
-                  </Form.Group>
-                </Row>
-                <Row>
-                  <Form.Group as={Col} controlId="InvoiceTitle">
-                    <Form.Label>Invoice Title</Form.Label>
-                    <div>
-                      <TextInput
-                        control={method.control}
-                        ID={"InvoiceTitle"}
-                        isEnable={mode !== "view"}
-                        focusOptions={() => method.setFocus("Customer")}
                       />
                     </div>
                   </Form.Group>
@@ -565,6 +540,18 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
                   />
                 </Row>
                 <Row>
+                  <Form.Group as={Col} controlId="InvoiceTitle">
+                    <Form.Label>Invoice Title</Form.Label>
+                    <div>
+                      <TextInput
+                        control={method.control}
+                        ID={"InvoiceTitle"}
+                        isEnable={mode !== "view"}
+                        focusOptions={() => method.setFocus("Description")}
+                      />
+                    </div>
+                  </Form.Group>
+
                   <Form.Group
                     as={Col}
                     controlId="Description"
@@ -584,15 +571,8 @@ export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
                     />
                   </Form.Group>
                 </Row>
-                {/* <Row>
-                <CustomerInvoiceModeDependantFields
-                  mode={mode}
-                  removeAllRows={detailTableRef.current?.removeAllRows}
-                />
-              </Row> */}
               </FormProvider>
             </form>
-            {mode}
             {mode !== "view" && (
               <>
                 <div className="card p-2 bg-light mt-2 ">
@@ -685,7 +665,7 @@ function SessionSelect({ mode }) {
 
   return (
     <>
-      <Form.Group className="col-xl-2" as={Col}>
+      <Form.Group className="col-xl-3" as={Col}>
         <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
           Session
           <span className="text-danger fw-bold ">*</span>
@@ -854,7 +834,7 @@ function BusinessUnitDependantFields({ mode }) {
           />
         </div>
       </Form.Group>
-      <Form.Group as={Col} className="col-sm-2">
+      <Form.Group as={Col} className="col-2">
         <Form.Label>CustomerInvoice No(Monthly)</Form.Label>
 
         <div>
@@ -865,7 +845,7 @@ function BusinessUnitDependantFields({ mode }) {
           />
         </div>
       </Form.Group>
-      <Form.Group as={Col} className="col-sm-2">
+      <Form.Group as={Col} className="col-2">
         <Form.Label>CustomerInvoice No(Yearly)</Form.Label>
 
         <div>
@@ -876,7 +856,7 @@ function BusinessUnitDependantFields({ mode }) {
           />
         </div>
       </Form.Group>
-      <Form.Group as={Col}>
+      <Form.Group as={Col} className="col-2">
         <Form.Label>Document No</Form.Label>
         <div>
           <TextInput
@@ -899,9 +879,20 @@ function CustomerInvoiceDetailHeaderForm({
 
   const method = useForm({
     defaultValues: {
+      InvoiceType: "",
+      BusinessUnitID: "",
+      ProductInfoID: "",
+      ServiceInfoID: "",
       BalanceAmount: "",
       Amount: 0,
+      Qty: 0,
+      Rate: 0,
+      IsFree: false,
+      CGS: 0,
+      Discount: 0,
+      NetAmount: 0,
       Description: "",
+      CustomerBranch: "",
     },
   });
 
@@ -948,6 +939,9 @@ function CustomerInvoiceDetailHeaderForm({
               onChange={(e) => {
                 const rate = method.getValues(["Rate"]);
                 method.setValue("Amount", e.value * rate);
+                const amount = method.getValues(["Amount"]);
+                const discount = method.getValues(["Discount"]);
+                method.setValue("NetAmount", amount - discount);
               }}
               inputClassName="form-control"
               useGrouping={false}
@@ -973,7 +967,7 @@ function CustomerInvoiceDetailHeaderForm({
               enterKeyOptions={() => method.setFocus("CGS")}
             />
           </Form.Group>
-          <Form.Group as={Col} cla ssName="col-1">
+          <Form.Group as={Col} className="col-1">
             <Form.Label>CGS</Form.Label>
             <NumberInput
               id={"CGS"}
@@ -1753,7 +1747,7 @@ const CustomerBranchDataContext = createContext();
 
 const CustomerBranchDataProvider = ({ children }) => {
   const [AccountID, setAccountID] = useState();
-  console.log(AccountID);
+
   return (
     <CustomerBranchDataContext.Provider value={{ setAccountID, AccountID }}>
       {children}

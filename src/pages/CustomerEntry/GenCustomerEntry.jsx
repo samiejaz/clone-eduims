@@ -84,7 +84,6 @@ export default function GenCustomerEntry() {
     setIdToDelete(0);
   }
   function handleView(CustomerID) {
-    console.log(CustomerID);
     navigate(viewRoute + CustomerID + "?viewMode=view");
   }
 

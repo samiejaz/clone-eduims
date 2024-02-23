@@ -22,8 +22,6 @@ import {
   fetchBankAccountById,
 } from "../../api/BankAccountData";
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
-import { fetchAllBusinessUnitsForSelect } from "../../api/SelectData";
-import CDropdown from "../../components/Forms/CDropdown";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING;
 let editRoute = `${parentRoute}/edit/`;
@@ -194,7 +192,7 @@ export function BankAccountForm({ pagesTitle, mode }) {
   const BankAccountData = useQuery({
     queryKey: [queryKey, +BankAccountID],
     queryFn: () => fetchBankAccountById(BankAccountID, user.userID),
-
+    enabled: mode !== "new",
     initialData: [],
   });
 

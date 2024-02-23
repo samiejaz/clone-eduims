@@ -16,6 +16,7 @@ class SignalRConnectionManager {
           skipNegotiation: true,
           transport: HttpTransportType.WebSockets,
         })
+        .withAutomaticReconnect([5, 15, 30, 60, 120])
         .configureLogging(LogLevel.Information)
         .build();
 

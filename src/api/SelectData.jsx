@@ -23,7 +23,7 @@ export async function fetchAllOldCustomersForSelect() {
 }
 export async function fetchAllSessionsForSelect() {
   const { data } = await axios.post(apiUrl + "/Select/SelectSessionInfo");
-  console.log(data);
+
   return data.data || [];
 }
 

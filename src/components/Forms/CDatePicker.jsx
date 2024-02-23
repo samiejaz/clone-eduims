@@ -21,7 +21,7 @@ const CDatePicker = ({
         <>
           <Calendar
             inputId={field.name}
-            value={field.value}
+            value={field.value || new Date()}
             onChange={field.onChange}
             dateFormat={dateFormat}
             style={{ width: "100%" }}
