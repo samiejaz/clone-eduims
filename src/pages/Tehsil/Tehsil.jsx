@@ -52,11 +52,7 @@ export function TehsilDetail() {
   } = useDeleteModal(handleDelete);
 
   const [filters, setFilters] = useState({
-    VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    ReceiptMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    TehsilTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
   const user = useUserData();

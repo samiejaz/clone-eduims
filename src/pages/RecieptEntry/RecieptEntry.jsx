@@ -96,6 +96,7 @@ function ReceiptEntrySearch() {
   } = useDeleteModal(handleDelete);
 
   const [filters, setFilters] = useState({
+    BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -280,8 +281,20 @@ function ReceiptEntrySearch() {
 }
 
 const defaultValues = {
-  VoucherDate: new Date(),
+  SessionID: "",
+  BusinessUnitID: "",
+  Customer: "",
+  CustomerLedgers: "",
+  DocumentNo: "",
+  VoucherNo: "",
+  SessionBasedVoucherNo: "",
+  ReceiptMode: "",
   Description: "",
+  FromBank: "",
+  TransactionID: "",
+  ReceivedInBankID: "",
+  InstrumentDate: new Date(),
+  VoucherDate: new Date(),
   receiptDetail: [],
 };
 
@@ -359,10 +372,6 @@ export function ReceiptEntryForm({ pagesTitle, mode }) {
         ReceiptVoucherData?.Master[0]?.SessionBasedVoucherNo
       );
       method.setValue(
-        "SessionBasedVoucherNo",
-        ReceiptVoucherData?.Master[0]?.SessionBasedVoucherNo
-      );
-      method.setValue(
         "ReceiptMode",
         ReceiptVoucherData?.Master[0]?.ReceiptMode
       );
@@ -377,7 +386,7 @@ export function ReceiptEntryForm({ pagesTitle, mode }) {
       );
       method.setValue(
         "Description",
-        ReceiptVoucherData?.Master[0]?.Description
+        ReceiptVoucherData?.Master[0]?.Description ?? undefined
       );
       method.setValue("FromBank", ReceiptVoucherData?.Master[0]?.FromBank);
       method.setValue(

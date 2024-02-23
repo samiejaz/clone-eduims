@@ -168,13 +168,12 @@ export function ProductCategoryForm({ pagesTitle, mode }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { ProductCategoryID } = useParams();
-  const { control, handleSubmit, setFocus, setValue, reset, register } =
-    useForm({
-      defaultValues: {
-        ProductCategoryTitle: "",
-        InActive: false,
-      },
-    });
+  const { control, handleSubmit, setFocus, setValue, reset } = useForm({
+    defaultValues: {
+      ProductCategoryTitle: "",
+      InActive: false,
+    },
+  });
 
   const user = useUserData();
 
@@ -182,6 +181,7 @@ export function ProductCategoryForm({ pagesTitle, mode }) {
     queryKey: [queryKey, ProductCategoryID],
     queryFn: () => fetchProductCategoryById(ProductCategoryID, user.userID),
     initialData: [],
+    enabled: mode !== "new",
   });
 
   useEffect(() => {

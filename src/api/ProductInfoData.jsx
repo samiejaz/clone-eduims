@@ -73,7 +73,6 @@ export async function addNewProductInfo({
       apiUrl + `/EduIMS/ProductInfoInsertUpdate`,
       DataToSend
     );
-    console.log(data);
 
     if (data.success === true) {
       if (ProductInfoID !== 0) {

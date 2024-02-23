@@ -27,7 +27,6 @@ let parentRoute = ROUTE_URLS.DEPARTMENT;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.DEPARTMENT_QUERY_KEY;
 
 export function DepartmentDetail() {
@@ -50,11 +49,7 @@ export function DepartmentDetail() {
   } = useDeleteModal(handleDelete);
 
   const [filters, setFilters] = useState({
-    VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    ReceiptMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    DepartmentName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
   const user = useUserData();

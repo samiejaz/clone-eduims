@@ -53,6 +53,7 @@ const CDropdown = ({
               }
             }
           }}
+          defaultValue={""}
           onKeyDown={(e) => {
             if (focusOptions) {
               if (e.key === "Enter") {

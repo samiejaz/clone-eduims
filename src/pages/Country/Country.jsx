@@ -22,19 +22,12 @@ import {
   fetchCountryById,
 } from "../../api/CountryData";
 import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
-import {
-  HttpTransportType,
-  HubConnectionBuilder,
-  LogLevel,
-} from "@microsoft/signalr";
-import { toast } from "react-toastify";
 import signalRConnectionManager from "../../services/SignalRService";
 
 let parentRoute = ROUTE_URLS.COUNTRY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.COUNTRIES_QUERY_KEY;
 
 export function CountryDetail() {
@@ -52,11 +45,7 @@ export function CountryDetail() {
     useDeleteModal(handleDelete);
 
   const [filters, setFilters] = useState({
-    VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    ReceiptMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    CountryTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
   const user = useUserData();
@@ -168,7 +157,7 @@ export function CountryForm({ pagesTitle, user, mode }) {
   const { CountryID } = useParams();
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
-      Country: "",
+      CountryTitle: "",
       InActive: false,
     },
   });
@@ -268,7 +257,7 @@ export function CountryForm({ pagesTitle, user, mode }) {
           </div>
           <form className="mt-4">
             <Row>
-              <Form.Group as={Col} controlId="Country">
+              <Form.Group as={Col}>
                 <Form.Label>
                   Country
                   <span className="text-danger fw-bold ">*</span>
