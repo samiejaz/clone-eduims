@@ -389,7 +389,6 @@ function LeadsIntroductionDemonstratorTable() {
       {render}
       {MeetingDoneModal}
       {RevertBackModal}
-      <ConfirmDialog />
     </>
   );
 }

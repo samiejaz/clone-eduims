@@ -16,6 +16,7 @@ import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import Logo from "../images/logo.png";
 import { toast } from "react-toastify";
+import { CheckCircle } from "lucide-react";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ const SignUp = () => {
         toast("Login sucessful", {
           autoClose: 1500,
           position: "top-right",
+          icon: <CheckCircle />,
         });
       } else {
         toast.error(data.Message, {
