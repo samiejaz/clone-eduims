@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -11,7 +9,6 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -22,12 +19,17 @@ import {
   fetchLeadSourceById,
 } from "../../api/LeadSourceData";
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
 
 let parentRoute = ROUTE_URLS.LEED_SOURCE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.LEED_SOURCE_QUERY_KEY;
 
 export function LeadSourceDetail() {
@@ -35,19 +37,11 @@ export function LeadSourceDetail() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     LeadSourceTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -72,14 +66,10 @@ export function LeadSourceDetail() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ LeadSourceID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -90,11 +80,9 @@ export function LeadSourceDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <>
+            <CustomSpinner />
+          </>
         </>
       ) : (
         <>
@@ -132,8 +120,8 @@ export function LeadSourceDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.LeadSourceID,
-                  () => handleDeleteShow(rowData.LeadSourceID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.LeadSourceID),
+                  () => showEditDialog(rowData.LeadSourceID),
                   handleView
                 )
               }
@@ -149,14 +137,12 @@ export function LeadSourceDetail() {
               header="Lead Source"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function LeadSourceForm({ pagesTitle, user, mode }) {
+export function LeadSourceForm({ mode }) {
   document.title = "Lead Source Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -167,6 +153,9 @@ export function LeadSourceForm({ pagesTitle, user, mode }) {
       InActive: false,
     },
   });
+
+  const user = useUserData();
+
   const LeadSourceData = useQuery({
     queryKey: [queryKey, LeadSourceID],
     queryFn: () => fetchLeadSourceById(LeadSourceID, user.userID),
@@ -260,12 +249,12 @@ export function LeadSourceForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col} controlId="LeadSourceTitle">
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>
                   LeadSource
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -276,9 +265,9 @@ export function LeadSourceForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="InActive">
-                <Form.Label></Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel></FormLabel>
                 <div className="mt-1">
                   <CheckBox
                     control={control}
@@ -287,8 +276,8 @@ export function LeadSourceForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

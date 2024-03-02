@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -11,7 +10,6 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -22,6 +20,12 @@ import {
   fetchDepartmentById,
 } from "../../api/DepartmentData";
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.DEPARTMENT;
 let editRoute = `${parentRoute}/edit/`;
@@ -34,19 +38,11 @@ export function DepartmentDetail() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     DepartmentName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -71,14 +67,10 @@ export function DepartmentDetail() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ DepartmentID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -89,11 +81,7 @@ export function DepartmentDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -131,8 +119,8 @@ export function DepartmentDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.DepartmentID,
-                  () => handleDeleteShow(rowData.DepartmentID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.DepartmentID),
+                  () => showEditDialog(rowData.DepartmentID),
                   handleView
                 )
               }
@@ -148,14 +136,12 @@ export function DepartmentDetail() {
               header="Department"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function DepartmentForm({ pagesTitle, user, mode }) {
+export function DepartmentForm({ mode }) {
   document.title = "Department Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -166,6 +152,9 @@ export function DepartmentForm({ pagesTitle, user, mode }) {
       InActive: false,
     },
   });
+
+  const user = useUserData();
+
   const DepartmentData = useQuery({
     queryKey: [queryKey, DepartmentID],
     queryFn: () => fetchDepartmentById(DepartmentID, user.userID),
@@ -258,12 +247,12 @@ export function DepartmentForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col} controlId="DepartmentName">
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>
                   Department
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -274,9 +263,9 @@ export function DepartmentForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="InActive">
-                <Form.Label></Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel></FormLabel>
                 <div className="mt-1">
                   <CheckBox
                     control={control}
@@ -285,8 +274,8 @@ export function DepartmentForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

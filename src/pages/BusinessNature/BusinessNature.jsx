@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -11,7 +9,7 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
+
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -22,27 +20,27 @@ import {
   fetchBusinessNatureById,
 } from "../../api/BusinessNatureData";
 import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
 
 let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY;
 
 export function BusinessNatureDetail() {
   document.title = "Business Natures";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     BusinessNatureTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -71,8 +69,6 @@ export function BusinessNatureDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -83,11 +79,7 @@ export function BusinessNatureDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -125,8 +117,8 @@ export function BusinessNatureDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.BusinessNatureID,
-                  () => handleDeleteShow(rowData?.BusinessNatureID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData?.BusinessNatureID),
+                  () => showEditDialog(rowData?.BusinessNatureID),
                   handleView
                 )
               }
@@ -142,14 +134,12 @@ export function BusinessNatureDetail() {
               header="BusinessNature"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function BusinessNatureForm({ pagesTitle, user, mode }) {
+export function BusinessNatureForm({ mode }) {
   document.title = "Business Nature Entry";
 
   const queryClient = useQueryClient();
@@ -161,9 +151,12 @@ export function BusinessNatureForm({ pagesTitle, user, mode }) {
       InActive: false,
     },
   });
+
+  const user = useUserData();
+
   const BusinessNatureData = useQuery({
     queryKey: [queryKey, BusinessNatureID],
-    queryFn: () => fetchBusinessNatureById(BusinessNatureID, user.userID),
+    queryFn: () => fetchBusinessNatureById(BusinessNatureID, user?.userID),
     enabled: BusinessNatureID !== undefined,
     initialData: [],
   });
@@ -255,12 +248,12 @@ export function BusinessNatureForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col} controlId="BusinessNatureTitle">
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>
                   Business Nature
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -271,9 +264,9 @@ export function BusinessNatureForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="InActive">
-                <Form.Label></Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel></FormLabel>
                 <div className="mt-1">
                   <CheckBox
                     control={control}
@@ -282,8 +275,8 @@ export function BusinessNatureForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

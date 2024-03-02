@@ -1,13 +1,15 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createContext } from "react";
-import { AuthContext } from "./AuthContext";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 export const AppConfigurationContext = createContext();
 
 export const AppConfigurationProivder = ({ children }) => {
-  const [pageTitles, setPageTitles] = useState();
+  const [pageTitles, setPageTitles] = useState({
+    product: null,
+    branch: null,
+  });
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {

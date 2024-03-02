@@ -1,13 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
 import { ROUTE_URLS } from "../../utils/enums";
 import signalRConnectionManager from "../../services/SignalRService";
 import { Toast } from "primereact/toast";
+import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 
 const CSidebar = ({ sideBarRef }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const toastRef = useRef(null);
+  const { pageTitles } = useContext(AppConfigurationContext);
 
   useEffect(() => {
     async function configurationSetup() {
@@ -103,12 +105,6 @@ const CSidebar = ({ sideBarRef }) => {
               <li>
                 <Link to={ROUTE_URLS.GENERAL.SESSION_INFO}>Session Info</Link>
               </li>
-              {/* <li>
-                <Link to={ROUTE_URLS.USER_ROUTE}>Users</Link>
-              </li>
-              <li>
-                <Link to={ROUTE_URLS.DEPARTMENT}>Department</Link>
-              </li> */}
             </ul>
           </li>
 
@@ -228,12 +224,12 @@ const CSidebar = ({ sideBarRef }) => {
               </li>
               <li>
                 <Link to={ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE}>
-                  Product Category
+                  {pageTitles?.product || "Product"} Category
                 </Link>
               </li>
               <li>
                 <Link to={ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE}>
-                  Product Info
+                  {pageTitles?.product || "Product"} Info
                 </Link>
               </li>
               <li>
@@ -306,43 +302,6 @@ const CSidebar = ({ sideBarRef }) => {
 
 export default CSidebar;
 
-function submenuItem() {
-  function toggleSubmenu(e) {
-    let parent = e.target.parentNode.parentNode;
-    parent.classList.toggle("c-showMenu");
-  }
-
-  return (
-    <>
-      <li className="">
-        <div className="c-iocn-link">
-          <a href="#">
-            <i className="pi pi-check"></i>
-            <span className="c-link_name">Customers</span>
-          </a>
-          <i className="pi pi-chevron-down c-arrow" onClick={toggleSubmenu}></i>
-        </div>
-        <ul className="c-sub-menu">
-          <li>
-            <a className="c-link_name" href="#">
-              Customers
-            </a>
-          </li>
-          <li>
-            <Link to={ROUTE_URLS.BUSINESS_NATURE_ROUTE}>Business Nature</Link>
-          </li>
-          <li>
-            <Link to={ROUTE_URLS.BUSINESS_NATURE_ROUTE}>Business Nature</Link>
-          </li>
-          <li>
-            <Link to={ROUTE_URLS.BUSINESS_NATURE_ROUTE}>Business Nature</Link>
-          </li>
-        </ul>
-      </li>
-    </>
-  );
-}
-
 const NotificationHandler = ({ toast }) => {
   const connection = signalRConnectionManager.getConnection();
 
@@ -362,7 +321,10 @@ const NotificationHandler = ({ toast }) => {
               style={{ alignSelf: "start", color: "#1ea97c" }}
               onClick={() => toast.current.clear()}
             >
-              <div className="font-medium text-lg my-3 text-900" style={{}}>
+              <div
+                className="font-medium text-lg my-3 text-900 text-green-700"
+                style={{}}
+              >
                 {props.message.summary}
               </div>
             </Link>
@@ -379,13 +341,6 @@ const NotificationHandler = ({ toast }) => {
       connection.off("ReceiveAllNotification");
     };
   }, [connection]);
-
-  // useEffect(() => {
-  //   if (toast.current && messages.length > 0) {
-  //     toast.current.show(messages);
-  //     setMessages([]);
-  //   }
-  // }, [messages]);
 
   return null;
 };

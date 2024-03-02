@@ -2,7 +2,6 @@ import { Row, Form, Col, Spinner } from "react-bootstrap";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
-import { toast } from "react-toastify";
 import {
   useForm,
   useFieldArray,
@@ -14,10 +13,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ActionButtons from "../../components/ActionButtons";
 import { FilterMatchMode } from "primereact/api";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+
 import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 import TextInput from "../../components/Forms/TextInput";
@@ -40,11 +37,12 @@ import {
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
   fetchAllOldCustomersForSelect,
-  fetchAllSessionsForSelect,
 } from "../../api/SelectData";
 import CDatePicker from "../../components/Forms/CDatePicker";
 import CNumberInput from "../../components/Forms/CNumberInput";
 import { useSessionSelectData } from "../../hooks/SelectData/useSelectData";
+import { CustomSpinner } from "../../components/CustomSpinner";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 const CreditNoteModeOptions = [
   { value: "Cash", label: "Cash" },
@@ -79,19 +77,11 @@ const apiUrl = import.meta.env.VITE_APP_API_URL;
 function CreditNoteEntrySearch() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -124,14 +114,10 @@ function CreditNoteEntrySearch() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ CreditNoteID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -142,16 +128,7 @@ function CreditNoteEntrySearch() {
     <>
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <Spinner
-                animation="border"
-                size="lg"
-                role="status"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -189,8 +166,8 @@ function CreditNoteEntrySearch() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.CreditNoteID,
-                  () => handleDeleteShow(rowData.CreditNoteID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.CreditNoteID),
+                  () => showEditDialog(rowData.CreditNoteID),
                   handleView
                 )
               }
@@ -228,8 +205,6 @@ function CreditNoteEntrySearch() {
               filterPlaceholder="Search by CreditNote amount"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </>
@@ -242,7 +217,7 @@ const defaultValues = {
   CreditNoteDetail: [],
 };
 
-export function CreditNoteEntryForm({ pagesTitle, mode }) {
+export function CreditNoteEntryForm({ mode }) {
   document.title = "Credit Note Entry";
   const queryClient = useQueryClient();
   const { CreditNoteID } = useParams();

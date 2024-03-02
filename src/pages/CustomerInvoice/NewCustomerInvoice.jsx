@@ -21,8 +21,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -41,10 +40,8 @@ import {
 } from "../../api/CustomerInvoiceData";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
 
-import { Tag } from "primereact/tag";
 import { QUERY_KEYS, ROUTE_URLS, SELECT_QUERY_KEYS } from "../../utils/enums";
 import {
-  fetchAllBankAccountsForSelect,
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
   fetchAllCustomerBranchesData,
@@ -54,7 +51,6 @@ import {
   fetchAllSessionsForSelect,
 } from "../../api/SelectData";
 import CDatePicker from "../../components/Forms/CDatePicker";
-import CNumberInput from "../../components/Forms/CNumberInput";
 import CSwitchInput from "../../components/Forms/CSwitchInput";
 import { useUserData } from "../../context/AuthContext";
 import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
@@ -62,12 +58,9 @@ import { PrintReportInNewTab } from "../../utils/CommonFunctions";
 import { classNames } from "primereact/utils";
 import { InputSwitch } from "primereact/inputswitch";
 import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCustomerInvoiceInstallmentModal";
-import { CIconButton } from "../../components/Buttons/CButtons";
-
-const typesOptions = [
-  { label: "Product", value: "Product" },
-  { label: "Service", value: "Service" },
-];
+import { CustomSpinner } from "../../components/CustomSpinner";
+import { AppConfigurationContext } from "../../context/AppConfigurationContext";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
 let editRoute = `${parentRoute}/edit/`;
@@ -87,19 +80,11 @@ export function NewCustomerInvoiceEntry() {
 function NewCustomerInvoiceEntrySearch() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     SessionBasedVoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -133,14 +118,10 @@ function NewCustomerInvoiceEntrySearch() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ CustomerInvoiceID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -151,16 +132,7 @@ function NewCustomerInvoiceEntrySearch() {
     <>
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <Spinner
-                animation="border"
-                size="lg"
-                role="status"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -198,8 +170,8 @@ function NewCustomerInvoiceEntrySearch() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.CustomerInvoiceID,
-                  () => handleDeleteShow(rowData.CustomerInvoiceID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.CustomerInvoiceID),
+                  () => showEditDialog(rowData.CustomerInvoiceID),
                   handleView
                 )
               }
@@ -245,8 +217,6 @@ function NewCustomerInvoiceEntrySearch() {
               header="Total Net Amount"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </>
@@ -269,13 +239,14 @@ const defaultValues = {
   installments: [],
 };
 
-export function NewCustomerInvoiceEntryForm({ pagesTitle, mode }) {
-  document.title = "CustomerInvoice Voucher Entry";
+export function NewCustomerInvoiceEntryForm({ mode }) {
+  document.title = "Customer Invoice";
   const queryClient = useQueryClient();
   const { CustomerInvoiceID } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+
   // Ref
   const detailTableRef = useRef();
   const customerCompRef = useRef();
@@ -876,6 +847,7 @@ function CustomerInvoiceDetailHeaderForm({
   customerBranchRef,
 }) {
   const invoiceTypeRef = useRef();
+  const { pageTitles } = useContext(AppConfigurationContext);
 
   const method = useForm({
     defaultValues: {
@@ -900,6 +872,11 @@ function CustomerInvoiceDetailHeaderForm({
     appendSingleRow(data);
     method.reset();
   }
+
+  const typesOptions = [
+    { label: `${pageTitles?.product || "Product"}`, value: "Product" },
+    { label: "Service", value: "Service" },
+  ];
 
   return (
     <>
@@ -1071,6 +1048,8 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
   const [InvoiceType, setInvoiceType] = useState();
   const [BusinessUnitID, setBusinessUnitID] = useState(0);
 
+  const { pageTitles } = useContext(AppConfigurationContext);
+
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
@@ -1123,7 +1102,7 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
         </div>
       </Form.Group>
       <Form.Group as={Col} className="col-3">
-        <Form.Label>Product</Form.Label>
+        <Form.Label>{pageTitles?.product || "Product"}</Form.Label>
         <span className="text-danger fw-bold ">*</span>
         <div>
           <CDropdown
@@ -1131,7 +1110,9 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             name={`ProductInfoID`}
             optionLabel="ProductInfoTitle"
             optionValue="ProductInfoID"
-            placeholder={`Select a product`}
+            placeholder={`Select a ${
+              pageTitles?.product?.toLowerCase() || "product"
+            }`}
             options={ProductsInfoSelectData}
             required={true}
             filter={true}
@@ -1140,7 +1121,11 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
         </div>
       </Form.Group>
       <Form.Group as={Col} className="col-3">
-        <Form.Label>Service to Invoice</Form.Label>
+        <Form.Label>
+          {InvoiceType === "Product"
+            ? `${pageTitles?.product || "Product"} to Invoice`
+            : "Service to Invoice"}{" "}
+        </Form.Label>
 
         <div>
           <CDropdown
@@ -1182,9 +1167,20 @@ const CustomerInvoiceDetailTable = React.forwardRef(
       },
     }));
 
+    const { pageTitles } = useContext(AppConfigurationContext);
+
+    const typesOptions = [
+      { label: `${pageTitles?.product || "Product"}`, value: "Product" },
+      { label: "Service", value: "Service" },
+    ];
+
     return (
       <>
-        <Table responsive className="table table-responsive mt-2">
+        <Table
+          responsive
+          className="table  table-responsive mt-2"
+          style={{ width: "1500px" }}
+        >
           <thead>
             <tr>
               <th
@@ -1201,7 +1197,7 @@ const CustomerInvoiceDetailTable = React.forwardRef(
               </th>
               <th
                 className="p-2 text-white"
-                style={{ background: onlineDetailColor }}
+                style={{ background: onlineDetailColor, width: "300px" }}
               >
                 InvoiceType
               </th>
@@ -1216,13 +1212,13 @@ const CustomerInvoiceDetailTable = React.forwardRef(
                 className="p-2 text-white"
                 style={{ background: onlineDetailColor }}
               >
-                Customer Branch
+                {pageTitles?.branch || "Customer Branch"}
               </th>
               <th
                 className="p-2 text-white"
                 style={{ background: onlineDetailColor }}
               >
-                Product
+                {pageTitles?.product || "Product"}
               </th>
               <th
                 className="p-2 text-white"
@@ -1292,6 +1288,8 @@ const CustomerInvoiceDetailTable = React.forwardRef(
                     disable={mode === "view"}
                     BusinessUnitSelectData={BusinessUnitSelectData}
                     remove={remove}
+                    typesOptions={typesOptions}
+                    pageTitles={pageTitles}
                   />
                 );
               })}
@@ -1309,6 +1307,8 @@ function CustomerInvoiceDetailTableRow({
   disable = false,
   BusinessUnitSelectData,
   remove,
+  typesOptions,
+  pageTitles,
 }) {
   const [BusinessUnitID, setBusinessUnitID] = useState(0);
   const [IsFree, setIsFree] = useState(false);
@@ -1356,22 +1356,6 @@ function CustomerInvoiceDetailTableRow({
         />
       </td>
       <td>
-        {/* <CSwitchInput
-            control={method.control}
-            name={`CustomerInvoiceDetail.${index}.IsFree`}
-            disabled={disable}
-            onChange={(e) => {
-              if (e.value) {
-                method.setValue(`CustomerInvoiceDetail.${index}.Rate`, 0);
-                method.setValue(`CustomerInvoiceDetail.${index}.Amount`, 0);
-                method.setValue(`CustomerInvoiceDetail.${index}.Discount`, 0);
-                method.setValue(`CustomerInvoiceDetail.${index}.NetAmount`, 0);
-                setIsFree(true);
-              } else {
-                setIsFree(false);
-              }
-            }}
-          /> */}
         <Controller
           control={method.control}
           name={`CustomerInvoiceDetail.${index}.IsFree`}
@@ -1407,7 +1391,7 @@ function CustomerInvoiceDetailTableRow({
           )}
         />
       </td>
-      <td>
+      <td style={{ width: "300px" }}>
         <CDropdown
           control={method.control}
           options={typesOptions}
@@ -1454,7 +1438,9 @@ function CustomerInvoiceDetailTableRow({
           name={`CustomerInvoiceDetail.${index}.CustomerBranch`}
           optionLabel="BranchTitle"
           optionValue="BranchID"
-          placeholder="Select a branch"
+          placeholder={`Select a ${
+            pageTitles?.branch?.toLowerCase() || "branch"
+          }`}
           options={data}
           required={true}
           disabled={disable}
@@ -1693,6 +1679,7 @@ const BranchSelectField = React.forwardRef((props, ref) => {
   const { AccountID, setAccountID } = useContext(CustomerBranchDataContext);
 
   const method = useFormContext();
+  const { pageTitles } = useContext(AppConfigurationContext);
 
   const { data } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.CUSTOMER_BRANCHES_SELECT_QUERY_KEY, AccountID],
@@ -1709,7 +1696,7 @@ const BranchSelectField = React.forwardRef((props, ref) => {
     <>
       <Form.Group as={Col} className="col-3">
         <Form.Label>
-          {"Customer Branch"}
+          {pageTitles?.branch || "Customer Branch"}
           <span className="text-danger fw-bold ">*</span>
         </Form.Label>
 
@@ -1719,7 +1706,9 @@ const BranchSelectField = React.forwardRef((props, ref) => {
             name={`CustomerBranch`}
             optionLabel="BranchTitle"
             optionValue="BranchID"
-            placeholder={`Select a ${"customer branche"}s`}
+            placeholder={`Select a  ${
+              pageTitles?.branch?.toLowerCase() || "branch"
+            }`}
             options={data}
             required={true}
             focusOptions={() => method.setFocus("ProductInfo")}

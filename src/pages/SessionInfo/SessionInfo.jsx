@@ -11,7 +11,6 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -24,27 +23,28 @@ import {
 import { ROUTE_URLS, QUERY_KEYS, SELECT_QUERY_KEYS } from "../../utils/enums";
 import CDatePicker from "../../components/Forms/CDatePicker";
 import { parseISO } from "date-fns";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY;
 
 export function SessionDetail() {
   document.title = "Session Info";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     SessionTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -75,8 +75,6 @@ export function SessionDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -87,11 +85,7 @@ export function SessionDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -127,8 +121,8 @@ export function SessionDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.SessionID,
-                  handleDeleteShow,
-                  handleEditShow,
+                  () => showDeleteDialog(rowData?.SessionID),
+                  () => showEditDialog(rowData?.SessionID),
                   handleView
                 )
               }
@@ -157,14 +151,12 @@ export function SessionDetail() {
               style={{ minWidth: "20rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function SessionForm({ pagesTitle, user, mode }) {
+export function SessionForm({ mode }) {
   document.title = "Session Info Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -175,9 +167,12 @@ export function SessionForm({ pagesTitle, user, mode }) {
       InActive: false,
     },
   });
+
+  const user = useUserData();
+
   const SessionData = useQuery({
     queryKey: [queryKey, SessionID],
-    queryFn: () => fetchSessionById(SessionID, user.userID),
+    queryFn: () => fetchSessionById(SessionID, user?.userID),
     enabled: SessionID !== undefined,
     initialData: [],
   });
@@ -280,12 +275,12 @@ export function SessionForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={4} xl={4} md={6}>
+                <FormLabel>
                   Session Info
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -296,12 +291,12 @@ export function SessionForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={6}>
+                <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
                   Session Opening Date
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
                 <div>
                   <CDatePicker
                     control={control}
@@ -310,12 +305,12 @@ export function SessionForm({ pagesTitle, user, mode }) {
                     required={true}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={6}>
+                <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
                   Session Closing Date
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
                 <div>
                   <CDatePicker
                     control={control}
@@ -324,11 +319,11 @@ export function SessionForm({ pagesTitle, user, mode }) {
                     required={true}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label></Form.Label>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={4} sm={4}>
+                <FormLabel></FormLabel>
                 <div className="mt-1">
                   <CheckBox
                     control={control}
@@ -337,8 +332,8 @@ export function SessionForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

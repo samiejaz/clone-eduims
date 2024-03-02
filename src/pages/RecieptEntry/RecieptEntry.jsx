@@ -47,6 +47,8 @@ import {
 import CDatePicker from "../../components/Forms/CDatePicker";
 import CNumberInput from "../../components/Forms/CNumberInput";
 import { PrintReportInNewTab } from "../../utils/CommonFunctions";
+import { CustomSpinner } from "../../components/CustomSpinner";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 const receiptModeOptions = [
   { value: "Cash", label: "Cash" },
@@ -81,19 +83,11 @@ const apiUrl = import.meta.env.VITE_APP_API_URL;
 function ReceiptEntrySearch() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -127,14 +121,10 @@ function ReceiptEntrySearch() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ ReceiptVoucherID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -167,16 +157,7 @@ function ReceiptEntrySearch() {
     <>
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <Spinner
-                animation="border"
-                size="lg"
-                role="status"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -214,8 +195,8 @@ function ReceiptEntrySearch() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.ReceiptVoucherID,
-                  () => handleDeleteShow(rowData.ReceiptVoucherID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.ReceiptVoucherID),
+                  () => showEditDialog(rowData.ReceiptVoucherID),
                   handleView
                 )
               }
@@ -272,8 +253,6 @@ function ReceiptEntrySearch() {
               style={{ maxWidth: "13rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </>
@@ -1116,7 +1095,10 @@ const ReceiptDetailTable = React.forwardRef(
             <tr>
               <th
                 className="p-2 text-white text-center "
-                style={{ width: "2%", background: chequeDetailColor }}
+                style={{
+                  width: "2%",
+                  background: chequeDetailColor,
+                }}
               >
                 Sr No.
               </th>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
@@ -28,34 +28,26 @@ import {
   fetchAllBusinessUnitsForSelect,
   fetchAllProductCategoriesForSelect,
 } from "../../api/SelectData";
-
-const ProductInfo = () => {
-  return <div>ProductInfo</div>;
-};
-
-export default ProductInfo;
+import { AppConfigurationContext } from "../../context/AppConfigurationContext";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.PRODUCT_INFO_QUERY_KEY;
 
 export function ProductInfoDetail() {
-  document.title = "Products";
+  const { pageTitles } = useContext(AppConfigurationContext);
+
+  document.title = `${pageTitles?.product + "s" || "Products"}`;
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
-
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
   const [filters, setFilters] = useState({
     ProductInfoTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ProductType: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -86,31 +78,26 @@ export function ProductInfoDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
     navigate(parentRoute + "/" + id);
   }
-
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
           <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Products</h2>
+            <h2 className="text-center my-auto">
+              {pageTitles?.product + "s" || "Products"}
+            </h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
               <Button
-                label="Add New Product Info"
+                label={`Add New ${pageTitles?.product || "Product"}`}
                 icon="pi pi-plus"
                 type="button"
                 className="rounded"
@@ -126,7 +113,9 @@ export function ProductInfoDetail() {
             rows={10}
             rowsPerPageOptions={[5, 10, 25, 50]}
             removableSort
-            emptyMessage="No Products found!"
+            emptyMessage={`No ${
+              pageTitles?.product + "s".toLowerCase() || "products"
+            } found!`}
             filters={filters}
             filterDisplay="row"
             resizableColumns
@@ -140,8 +129,8 @@ export function ProductInfoDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.ProductInfoID,
-                  () => handleDeleteShow(rowData.ProductInfoID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.ProductInfoID),
+                  () => showEditDialog(rowData.ProductInfoID),
                   handleView
                 )
               }
@@ -152,41 +141,43 @@ export function ProductInfoDetail() {
             <Column
               field="ProductInfoTitle"
               filter
-              filterPlaceholder="Search by Info"
+              filterPlaceholder={`Search by ${
+                pageTitles?.product.toLowerCase() || "product"
+              }`}
               sortable
-              header={`${"Product"} Info`}
+              header={`${pageTitles?.product || "Product"} Info`}
               style={{ minWidth: "20rem" }}
             ></Column>
             <Column
-              field="ProductType"
+              field="ProductCategoryTitle"
               filter
-              filterPlaceholder={`Search by ${"product"} type`}
+              filterPlaceholder={`Search by ${
+                pageTitles?.product.toLowerCase() || "product"
+              } type`}
               sortable
-              header={`"Product" Type`}
+              header={`${pageTitles?.product || "Product"} Type`}
               style={{ minWidth: "20rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
 
-export function ProductInfoForm({ pagesTitle, mode }) {
-  document.title = "Product Info Entry";
+export function ProductInfoForm({ mode }) {
+  const { pageTitles } = useContext(AppConfigurationContext);
+  document.title = `${pageTitles?.product || "Product"} Entry`;
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { ProductInfoID } = useParams();
   const [selectedBusinessUnits, setSelectedBusinessUnits] = useState();
-  const { control, handleSubmit, setFocus, setValue, reset, register } =
-    useForm({
-      defaultValues: {
-        ProductInfoTitle: "",
-        InActive: false,
-      },
-    });
+  const { control, handleSubmit, setFocus, setValue, reset } = useForm({
+    defaultValues: {
+      ProductInfoTitle: "",
+      InActive: false,
+    },
+  });
 
   const user = useUserData();
 
@@ -310,7 +301,7 @@ export function ProductInfoForm({ pagesTitle, mode }) {
             <Row>
               <Form.Group as={Col}>
                 <Form.Label>
-                  Product Info
+                  {pageTitles?.product || "Product"} Title
                   <span className="text-danger fw-bold ">*</span>
                 </Form.Label>
 
@@ -326,7 +317,7 @@ export function ProductInfoForm({ pagesTitle, mode }) {
               </Form.Group>
               <Form.Group as={Col}>
                 <Form.Label>
-                  Product Category
+                  {pageTitles?.product || "Product"} Category
                   <span className="text-danger fw-bold ">*</span>
                 </Form.Label>
 

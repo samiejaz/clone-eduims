@@ -218,9 +218,7 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
             <Form.Control
               type="text"
               id="MeetingTime"
-              value={parseISO(LeadIntroductionData.data[0]?.MeetingTime, {
-                additionalDigits: "0",
-              })}
+              value={new Date(LeadIntroductionData.data[0]?.MeetingTime)}
               disabled
             />
           </div>

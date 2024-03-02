@@ -1,6 +1,7 @@
 import React from "react";
 import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
+import { SpeedDial } from "primereact/speeddial";
 
 export default function ButtonToolBar({
   printLoading = false,
@@ -49,6 +50,11 @@ export default function ButtonToolBar({
         disabled={cancelDisable}
         onClick={() => handleCancel()}
         style={{ marginRight: "2px" }}
+        pt={{
+          label: {
+            className: "hidden md:block lg:block",
+          },
+        }}
       />
       <Button
         label="Add New"
@@ -58,6 +64,11 @@ export default function ButtonToolBar({
         disabled={addNewDisable}
         onClick={() => handleAddNew()}
         style={{ marginRight: "2px" }}
+        pt={{
+          label: {
+            className: "hidden md:block lg:block",
+          },
+        }}
       />
       <Button
         label={editLabel}
@@ -68,6 +79,11 @@ export default function ButtonToolBar({
         disabled={editDisable}
         onClick={() => handleEdit()}
         style={{ marginRight: "2px" }}
+        pt={{
+          label: {
+            className: "hidden md:block lg:block",
+          },
+        }}
       />
       {showDelete && (
         <>
@@ -80,6 +96,11 @@ export default function ButtonToolBar({
             onClick={() => handleDelete()}
             style={{ marginRight: "2px" }}
             className="p-button-success rounded"
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
           />
         </>
       )}
@@ -93,6 +114,11 @@ export default function ButtonToolBar({
         loading={saveLoading}
         className="p-button-success rounded"
         loadingIcon="pi pi-spin pi-cog"
+        pt={{
+          label: {
+            className: "hidden md:block lg:block",
+          },
+        }}
       />
       {showPrint ? (
         <>
@@ -108,6 +134,11 @@ export default function ButtonToolBar({
             loading={printLoading}
             loadingIcon="pi pi-spin pi-print"
             onClick={() => handlePrint()}
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
           />
         </>
       ) : (
@@ -118,18 +149,20 @@ export default function ButtonToolBar({
   );
 
   return (
-    <Toolbar
-      start={startContent}
-      center={centerContent}
-      pt={{
-        root: {
-          style: {
-            background: "none",
-            padding: "0",
-            border: "none",
+    <>
+      <Toolbar
+        start={startContent}
+        center={centerContent}
+        pt={{
+          root: {
+            style: {
+              background: "none",
+              padding: "0",
+              border: "none",
+            },
           },
-        },
-      }}
-    />
+        }}
+      />
+    </>
   );
 }

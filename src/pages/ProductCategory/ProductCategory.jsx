@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -23,27 +22,25 @@ import {
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
 import CDropdown from "../../components/Forms/CDropdown";
 import { useUserData } from "../../context/AuthContext";
+import { AppConfigurationContext } from "../../context/AppConfigurationContext";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY;
 
 export function ProductCategoryDetail() {
   document.title = "Product Categories";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
+  const { pageTitles } = useContext(AppConfigurationContext);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     ProductCategoryTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -75,8 +72,6 @@ export function ProductCategoryDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -87,19 +82,17 @@ export function ProductCategoryDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
           <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Product Categories</h2>
+            <h2 className="text-center my-auto">
+              {pageTitles?.product || "Product"} Categories
+            </h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
               <Button
-                label="Add New Product Category"
+                label={`Add New ${pageTitles?.product || "Product"} Category`}
                 icon="pi pi-plus"
                 type="button"
                 className="rounded"
@@ -115,7 +108,9 @@ export function ProductCategoryDetail() {
             rows={10}
             rowsPerPageOptions={[5, 10, 25, 50]}
             removableSort
-            emptyMessage="No product categories found!"
+            emptyMessage={`No ${
+              pageTitles?.product || "Product"
+            } categories found!`}
             filters={filters}
             filterDisplay="row"
             resizableColumns
@@ -129,8 +124,8 @@ export function ProductCategoryDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.ProductCategoryID,
-                  () => handleDeleteShow(rowData.ProductCategoryID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.ProductCategoryID),
+                  () => showEditDialog(rowData.ProductCategoryID),
                   handleView
                 )
               }
@@ -143,28 +138,30 @@ export function ProductCategoryDetail() {
               filter
               filterPlaceholder="Search by category"
               sortable
-              header={`${"Product"} Category`}
+              header={`${pageTitles?.product || "Product"} Category`}
               style={{ minWidth: "20rem" }}
             ></Column>
             <Column
               field="ProductType"
               filter
-              filterPlaceholder={`Search by ${"product"} type`}
+              filterPlaceholder={`Search by ${
+                pageTitles?.product.toLowerCase() || "product"
+              } type`}
               sortable
-              header={`"Product" Type`}
+              header={`${pageTitles?.product || "Product"} Type`}
               style={{ minWidth: "20rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
 
-export function ProductCategoryForm({ pagesTitle, mode }) {
-  document.title = "Product Category Entry";
+export function ProductCategoryForm({ mode }) {
+  const { pageTitles } = useContext(AppConfigurationContext);
+  document.title = `${pageTitles?.product || "Product"} Category Entry`;
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { ProductCategoryID } = useParams();
@@ -278,14 +275,14 @@ export function ProductCategoryForm({ pagesTitle, mode }) {
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
-              GoBackLabel="Product Categorys"
+              GoBackLabel={`${pageTitles?.product || "Product"} Categories`}
             />
           </div>
           <form className="mt-4">
             <Row>
               <Form.Group as={Col}>
                 <Form.Label>
-                  Product Category
+                  {pageTitles?.product || "Product"} Category
                   <span className="text-danger fw-bold ">*</span>
                 </Form.Label>
 
@@ -301,7 +298,7 @@ export function ProductCategoryForm({ pagesTitle, mode }) {
               </Form.Group>
               <Form.Group as={Col}>
                 <Form.Label>
-                  Product Type
+                  {pageTitles?.product || "Product"} Type
                   <span className="text-danger fw-bold ">*</span>
                 </Form.Label>
 

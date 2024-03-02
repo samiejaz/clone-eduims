@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -11,10 +11,9 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { AuthContext, useUserData } from "../../context/AuthContext";
 import {
   addNewTehsil,
   deleteTehsilByID,
@@ -24,6 +23,12 @@ import {
 import CDropdown from "../../components/Forms/CDropdown";
 import { useAllCountiesSelectData } from "../../hooks/SelectData/useSelectData";
 import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.TEHSIL_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -37,19 +42,11 @@ export function TehsilDetail() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     TehsilTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -72,14 +69,10 @@ export function TehsilDetail() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ TehsilID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -133,8 +126,8 @@ export function TehsilDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.TehsilID,
-                  () => handleDeleteShow(rowData.TehsilID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.TehsilID),
+                  () => showEditDialog(rowData.TehsilID),
                   handleView
                 )
               }
@@ -150,14 +143,12 @@ export function TehsilDetail() {
               header="Tehsil"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function TehsilForm({ pagesTitle, user, mode }) {
+export function TehsilForm({ mode }) {
   document.title = "Tehsil Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -171,6 +162,7 @@ export function TehsilForm({ pagesTitle, user, mode }) {
   });
 
   const countriesSelectData = useAllCountiesSelectData();
+  const { user } = useContext(AuthContext);
 
   const TehsilData = useQuery({
     queryKey: [queryKey, TehsilID],
@@ -263,12 +255,12 @@ export function TehsilForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col} controlId="TehsilTitle">
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel labelFor="TehsilTitle">
                   Tehsil
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -279,12 +271,12 @@ export function TehsilForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="Country">
-                <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel labelFor="Country">
                   Country
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
                 <div>
                   <CDropdown
                     control={control}
@@ -298,10 +290,10 @@ export function TehsilForm({ pagesTitle, user, mode }) {
                     focusOptions={() => setFocus("InActive")}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col} controlId="InActive">
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -310,8 +302,8 @@ export function TehsilForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}
