@@ -3,7 +3,7 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import React, { useRef } from "react";
 import { CCard } from "../../pages/Leads/LeadsDashboard/LeadsDashboard";
 import { Badge } from "primereact/badge";
-
+import { useClickOutside } from "primereact/hooks";
 const NotificationOverlay = () => {
   const op = useRef(null);
 

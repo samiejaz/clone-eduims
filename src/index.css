@@ -7,14 +7,16 @@
 body {
   font-family: var(--font-family);
   font-weight: normal;
-  background-color: #F9FAFB;
+ /* background-color: #F9FAFB; */
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Changed css */
-
+.min-h-90vh {
+  min-height: 90vh;
+}
 .hoverIcon:hover {
   cursor: pointer;
 }
@@ -694,4 +696,8 @@ a {
 
 .s-w-100 {
   width: 100%;
+}
+
+.rounded {
+  border-radius: 0.375rem;
 }

@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, BusinessUnitef, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -11,7 +10,11 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { Controller, useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -26,12 +29,12 @@ import ImageContainer from "../../components/ImageContainer";
 import { ColorPicker } from "primereact/colorpicker";
 import { classNames } from "primereact/utils";
 import { Tooltip } from "primereact/tooltip";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY;
 
 export function BusinessUnitDetail() {
@@ -39,19 +42,11 @@ export function BusinessUnitDetail() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -83,14 +78,10 @@ export function BusinessUnitDetail() {
       BusinessUnitID: id,
       LoginUserID: user.userID,
     });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -101,11 +92,7 @@ export function BusinessUnitDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -143,8 +130,8 @@ export function BusinessUnitDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.BusinessUnitID,
-                  () => handleDeleteShow(rowData.BusinessUnitID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.BusinessUnitID),
+                  () => showEditDialog(rowData.BusinessUnitID),
                   handleView
                 )
               }
@@ -189,8 +176,6 @@ export function BusinessUnitDetail() {
               filterPlaceholder="Search by email"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
@@ -342,7 +327,7 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
           <CustomSpinner />
         </>
       ) : (
-        <>
+        <div>
           <div className="mt-4">
             <ButtonToolBar
               editDisable={mode !== "view"}
@@ -366,12 +351,12 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
                   Business Unit Name
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -382,9 +367,9 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Landline No</Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Landline No</FormLabel>
 
                 <div>
                   <TextInput
@@ -394,9 +379,9 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Mobile No</Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Mobile No</FormLabel>
 
                 <div>
                   <TextInput
@@ -406,9 +391,9 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Email</Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Email</FormLabel>
 
                 <div>
                   <TextInput
@@ -418,11 +403,11 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>Website</Form.Label>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Website</FormLabel>
 
                 <div>
                   <TextInput
@@ -432,12 +417,12 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
                   Authority Person / CEO Name
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -447,12 +432,12 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
                   CEO Mobile No
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -462,12 +447,12 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
                   CEO Email
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -477,11 +462,11 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>NTN-No</Form.Label>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={6} xl={6}>
+                <FormLabel>NTN-No</FormLabel>
 
                 <div>
                   <TextInput
@@ -491,9 +476,9 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Sales Tax Return No</Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6}>
+                <FormLabel>Sales Tax Return No</FormLabel>
 
                 <div>
                   <TextInput
@@ -503,12 +488,12 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>Description</Form.Label>
-                <Form.Control
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn>
+                <FormLabel>Description</FormLabel>
+                <input
                   as={"textarea"}
                   rows={1}
                   disabled={mode === "view"}
@@ -519,10 +504,10 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                   }}
                   {...register("Description")}
                 />
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={6} xl={6}>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -531,13 +516,13 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
 
-            <Row>
-              <Form.Group as={Col} style={{ width: "100%" }}>
+            <FormRow>
+              <FormColumn lg={6} xl={6}>
                 <Tooltip target=".custom-target-icon" />
-                <Form.Label style={{ position: "relative" }}>
+                <FormLabel className="relative">
                   Logo
                   <i
                     className="custom-target-icon pi pi-exclamation-circle p-text-secondary"
@@ -552,16 +537,18 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                       top: "1px",
                     }}
                   ></i>
-                </Form.Label>{" "}
+                </FormLabel>
                 <div>
                   <ImageContainer
                     imageRef={imageRef}
                     hideButtons={mode === "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Choose your primary color</Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6}>
+                <FormLabel labelFor="PrimaryColor">
+                  Choose your primary color
+                </FormLabel>
                 <div>
                   <Controller
                     name="PrimaryColor"
@@ -581,10 +568,10 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
                     )}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
-        </>
+        </div>
       )}
     </>
   );

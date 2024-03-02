@@ -11,7 +11,6 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -22,10 +21,16 @@ import {
   fetchUserById,
 } from "../../api/UserData";
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
-import { FileUpload } from "primereact/fileupload";
 import { useAllDepartmentsSelectData } from "../../hooks/SelectData/useSelectData";
 import CDropdown from "../../components/Forms/CDropdown";
 import ImageContainer from "../../components/ImageContainer";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+  FormField,
+} from "../../components/Layout/LayoutComponents";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.USER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -39,19 +44,11 @@ export function UserDetail() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     FirstName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -79,14 +76,10 @@ export function UserDetail() {
 
   function handleDelete(id) {
     deleteMutation.mutate({ UserID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -139,8 +132,8 @@ export function UserDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.LoginUserID,
-                  () => handleDeleteShow(rowData.LoginUserID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.LoginUserID),
+                  () => showEditDialog(rowData.LoginUserID),
                   handleView
                 )
               }
@@ -181,15 +174,13 @@ export function UserDetail() {
               style={{ minWidth: "20rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
 
-export function UserForm({ pagesTitle, user, mode }) {
+export function UserForm({ mode }) {
   document.title = "User Entry";
 
   const queryClient = useQueryClient();
@@ -197,6 +188,7 @@ export function UserForm({ pagesTitle, user, mode }) {
 
   const navigate = useNavigate();
   const { UserID } = useParams();
+  const user = useUserData();
 
   const {
     control,
@@ -324,12 +316,12 @@ export function UserForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col} controlId="FirstName">
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   First Name
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -340,12 +332,12 @@ export function UserForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="LastName">
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   Last Name
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -356,12 +348,12 @@ export function UserForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="DepartmentID">
-                <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
                   Department
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
                 <div>
                   <CDropdown
                     control={control}
@@ -375,14 +367,14 @@ export function UserForm({ pagesTitle, user, mode }) {
                     focusOptions={() => setFocus("InActive")}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col} controlId="Email">
-                <Form.Label>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   Email
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -393,12 +385,12 @@ export function UserForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="UserName">
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   User Name
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -409,12 +401,12 @@ export function UserForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="Password">
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   Password
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -425,32 +417,34 @@ export function UserForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col} controlId="InActive">
-                <div className="mt-1">
-                  <CheckBox
-                    control={control}
-                    ID={"InActive"}
-                    Label={"InActive"}
-                    isEnable={mode !== "view"}
-                  />
-                </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormField
+                inputTemplate={
+                  <>
+                    <CheckBox
+                      control={control}
+                      ID={"InActive"}
+                      Label={"InActive"}
+                      isEnable={mode !== "view"}
+                    />
+                  </>
+                }
+              />
+            </FormRow>
 
-            <Row>
-              <Form.Group as={Col} controlId="InActive">
-                <Form.Label>Profie Pic</Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>Profie Pic</FormLabel>
                 <div>
                   <ImageContainer
                     imageRef={imageRef}
                     hideButtons={mode === "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

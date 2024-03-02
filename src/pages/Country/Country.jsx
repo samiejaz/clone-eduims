@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -11,10 +11,9 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { AuthContext, useUserData } from "../../context/AuthContext";
 import {
   addNewCountry,
   deleteCountryByID,
@@ -22,7 +21,12 @@ import {
   fetchCountryById,
 } from "../../api/CountryData";
 import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
-import signalRConnectionManager from "../../services/SignalRService";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.COUNTRY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -34,15 +38,11 @@ export function CountryDetail() {
   document.title = "Countries";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     CountryTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -69,8 +69,6 @@ export function CountryDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -81,11 +79,7 @@ export function CountryDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -123,8 +117,8 @@ export function CountryDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.CountryID,
-                  () => handleDeleteShow(rowData.CountryID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.CountryID),
+                  () => showEditDialog(rowData.CountryID),
                   handleView
                 )
               }
@@ -140,18 +134,15 @@ export function CountryDetail() {
               header="Country"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function CountryForm({ pagesTitle, user, mode }) {
+export function CountryForm({ mode }) {
   document.title = "Country Entry";
 
   const queryClient = useQueryClient();
-  const connection = signalRConnectionManager.getConnection();
 
   const navigate = useNavigate();
   const { CountryID } = useParams();
@@ -161,6 +152,8 @@ export function CountryForm({ pagesTitle, user, mode }) {
       InActive: false,
     },
   });
+
+  const { user } = useContext(AuthContext);
 
   const CountryData = useQuery({
     queryKey: [queryKey, CountryID],
@@ -177,16 +170,10 @@ export function CountryForm({ pagesTitle, user, mode }) {
 
   const mutation = useMutation({
     mutationFn: addNewCountry,
-    onSuccess: async (success) => {
+    onSuccess: async ({ success, RecordID }) => {
       if (success) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${CountryID}`);
-        try {
-          await connection.invoke("SendMessageToGroup", {
-            GroupName: "",
-            UserName: "",
-          });
-        } catch (e) {}
+        navigate(`${parentRoute}/${RecordID}`);
       }
     },
   });
@@ -256,12 +243,12 @@ export function CountryForm({ pagesTitle, user, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel labelFor={"CountryTitle"}>
                   Country
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -272,9 +259,9 @@ export function CountryForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col} controlId="InActive">
-                <Form.Label></Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <label htmlFor="InActive"></label>
                 <div className="mt-1">
                   <CheckBox
                     control={control}
@@ -283,8 +270,8 @@ export function CountryForm({ pagesTitle, user, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

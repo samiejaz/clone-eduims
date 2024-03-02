@@ -10,6 +10,7 @@ const useDeleteModal = (handleDelete) => {
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
+      position: "top",
       accept: () => handleDelete(id),
       reject,
     });
@@ -19,7 +20,25 @@ const useDeleteModal = (handleDelete) => {
     handleShow: confirm,
     handleClose: reject,
     setIdToDelete,
-    render: <ConfirmDialog />,
+    render: (
+      <ConfirmDialog
+        id="deleteDialog"
+        draggable={false}
+        style={{ width: "27vw" }}
+        pt={{
+          acceptButton: {
+            root: {
+              className: "rounded",
+            },
+          },
+          rejectButton: {
+            root: {
+              className: "rounded",
+            },
+          },
+        }}
+      />
+    ),
   };
 };
 

@@ -44,34 +44,40 @@ export async function deleteCountryByID(serviceInfo) {
 }
 
 export async function addNewCountry({ formData, userID, CountryID = 0 }) {
-  let DataToSend = {
-    CountryTitle: formData.CountryTitle,
-    InActive: formData.InActive === true ? 1 : 0,
-    EntryUserID: userID,
-  };
+  try {
+    let DataToSend = {
+      CountryTitle: formData.CountryTitle,
+      InActive: formData.InActive === true ? 1 : 0,
+      EntryUserID: userID,
+    };
 
-  if (CountryID === 0 || CountryID === undefined) {
-    DataToSend.CountryID = 0;
-  } else {
-    DataToSend.CountryID = CountryID;
-  }
-
-  const { data } = await axios.post(
-    apiUrl + `/${CONTROLLER}/CountryInsertUpdate`,
-    DataToSend
-  );
-
-  if (data.success === true) {
-    if (CountryID !== 0) {
-      toast.success("Country updated successfully!");
+    if (CountryID === 0 || CountryID === undefined) {
+      DataToSend.CountryID = 0;
     } else {
-      toast.success("Country created successfully!");
+      DataToSend.CountryID = CountryID;
     }
-    return true;
-  } else {
-    toast.error(data.message, {
+
+    const { data } = await axios.post(
+      apiUrl + `/${CONTROLLER}/CountryInsertUpdate`,
+      DataToSend
+    );
+
+    if (data.success === true) {
+      if (CountryID !== 0) {
+        toast.success("Country updated successfully!");
+      } else {
+        toast.success("Country created successfully!");
+      }
+      return { success: true, RecordID: data?.CountryID };
+    } else {
+      toast.error(data.message, {
+        autoClose: false,
+      });
+      return { success: false, RecordID: CountryID };
+    }
+  } catch (e) {
+    toast.error(e.message, {
       autoClose: false,
     });
-    return false;
   }
 }

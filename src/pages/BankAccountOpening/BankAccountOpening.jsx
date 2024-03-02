@@ -11,7 +11,6 @@ import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { useUserData } from "../../context/AuthContext";
@@ -22,27 +21,28 @@ import {
   fetchBankAccountById,
 } from "../../api/BankAccountData";
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.BANK_ACCOUNTS_QUERY_KEY;
 
 export function BankAccountDetail() {
   document.title = "Bank Accounts";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     BankAccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -75,8 +75,6 @@ export function BankAccountDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -87,11 +85,7 @@ export function BankAccountDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -129,8 +123,8 @@ export function BankAccountDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.BankAccountID,
-                  () => handleDeleteShow(rowData.BankAccountID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.BankAccountID),
+                  () => showEditDialog(rowData.BankAccountID),
                   handleView
                 )
               }
@@ -163,14 +157,12 @@ export function BankAccountDetail() {
               style={{ minWidth: "20rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function BankAccountForm({ pagesTitle, mode }) {
+export function BankAccountForm({ mode }) {
   document.title = "Bank Account Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -286,12 +278,12 @@ export function BankAccountForm({ pagesTitle, mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   Bank Name
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -302,12 +294,12 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>
                   Bank Account Title
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -318,9 +310,9 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Branch Name</Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>Branch Name</FormLabel>
 
                 <div>
                   <TextInput
@@ -330,11 +322,11 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>Branch Code</Form.Label>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>Branch Code</FormLabel>
 
                 <div>
                   <TextInput
@@ -344,9 +336,9 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Account No</Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>Account No</FormLabel>
 
                 <div>
                   <TextInput
@@ -356,9 +348,9 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>IBAN No</Form.Label>
+              </FormColumn>
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel>IBAN No</FormLabel>
 
                 <div>
                   <TextInput
@@ -368,10 +360,10 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col} controlId="InActive">
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -380,8 +372,8 @@ export function BankAccountForm({ pagesTitle, mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -13,7 +11,7 @@ import { useForm, FormProvider, Controller } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
 import { Col, Form, Row } from "react-bootstrap";
 
-import { useUserData } from "../../context/AuthContext";
+import { AuthContext, useUserData } from "../../context/AuthContext";
 import {
   addLeadIntroductionOnAction,
   addNewLeadIntroduction,
@@ -37,12 +35,12 @@ import { classNames } from "primereact/utils";
 import { Tag } from "primereact/tag";
 import { toast } from "react-toastify";
 import { CIconButton } from "../../components/Buttons/CButtons";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
 
 export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
@@ -50,19 +48,11 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     Status: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -91,14 +81,10 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
 
   function handleDelete(id) {
     deleteMutation.mutate({ LeadIntroductionID: id, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -131,8 +117,8 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
         <div style={{ display: "flex" }}>
           {ActionButtons(
             rowData.LeadIntroductionID,
-            () => handleDeleteShow(rowData.LeadIntroductionID),
-            handleEditShow,
+            () => showDeleteDialog(rowData.LeadIntroductionID),
+            () => showEditDialog(rowData.LeadIntroductionID),
             handleView
           )}
           <div>
@@ -206,11 +192,7 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -299,19 +281,17 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
               style={{ minWidth: "4rem", width: "4rem" }}
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
 
-export function LeadIntroductionForm({ pagesTitle, user, mode }) {
-  document.title = "LeadIntroduction Entry";
+export function LeadIntroductionForm({ mode }) {
+  document.title = "Lead Introduction Entry";
 
   const queryClient = useQueryClient();
-  const countryRef = useRef();
+  const { user } = useContext(AuthContext);
 
   const navigate = useNavigate();
   const { LeadIntroductionID } = useParams();
@@ -334,7 +314,6 @@ export function LeadIntroductionForm({ pagesTitle, user, mode }) {
       IsWANumberSameAsMobile: false,
     },
   });
-
   const LeadIntroductionData = useQuery({
     queryKey: [queryKey, LeadIntroductionID],
     queryFn: () => fetchLeadIntroductionById(LeadIntroductionID, user.userID),
@@ -1048,7 +1027,6 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
       />
     </>
   );
-  const headerContent = <></>;
   const dialogConent = (
     <>
       <Row>
@@ -1178,7 +1156,6 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
       />
     </>
   );
-  const headerContent = <></>;
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {

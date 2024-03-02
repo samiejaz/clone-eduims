@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
@@ -8,14 +8,11 @@ import GenNewCustomerView from "./pages/CustomerEntry/CustomerEntryView";
 import {
   AppConfiguration,
   CustomerInvoice,
-  // InvoiceDefaultDescriptions,
   CompanyInfo,
   ReceiptVoucher,
   GenCustomerEntry,
 } from "./pages";
 import { CustomerInvoiceFormMaster } from "./pages/CustomerInvoice/CustomerInvoice";
-import { useContext } from "react";
-import { AppConfigurationContext } from "./context/AppConfigurationContext";
 import {
   BusinessUnitDetail,
   BusinessUnitForm,
@@ -86,18 +83,11 @@ import {
   ProductInfoForm,
 } from "./pages/ProductInfo/ProductInfo";
 import LeadsComments from "./pages/LeadsIntroduction/LeadsComments";
+import { ConfirmDialog } from "primereact/confirmdialog";
 
 const App = () => {
-  const { pageTitles } = useContext(AppConfigurationContext);
-
-  const user = useUserData();
-
   useEffect(() => {
     signalRConnectionManager.startConnection();
-
-    return () => {
-      //signalRConnectionManager.stopConnection();
-    };
   }, []);
 
   return (
@@ -106,6 +96,10 @@ const App = () => {
         <Route path="auth" element={<SignUp />} />
         <Route path="/" element={<ProtectedRoutes />}>
           <Route index element={<Dashboard />} />
+          <Route
+            path={ROUTE_URLS.GENERAL.APP_CONFIGURATION_ROUTE}
+            element={<AppConfiguration />}
+          />
 
           <Route
             path={ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY}
@@ -126,15 +120,15 @@ const App = () => {
           />
           <Route
             path={`${`${ROUTE_URLS.GENERAL.BUSINESS_UNITS}`}/:BusinessUnitID`}
-            element={<BusinessUnitForm pageTitles={pageTitles} mode={"view"} />}
+            element={<BusinessUnitForm mode={"view"} />}
           />
           <Route
             path={`${`${ROUTE_URLS.GENERAL.BUSINESS_UNITS}`}/edit/:BusinessUnitID`}
-            element={<BusinessUnitForm pageTitles={pageTitles} mode={"edit"} />}
+            element={<BusinessUnitForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.GENERAL.BUSINESS_UNITS}/new`}
-            element={<BusinessUnitForm pageTitles={pageTitles} mode={"new"} />}
+            element={<BusinessUnitForm mode={"new"} />}
           />
           {/* Receipt Routes */}
           <Route
@@ -143,40 +137,28 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE}/:ReceiptVoucherID`}
-            element={<ReceiptEntryForm pageTitles={pageTitles} mode={"view"} />}
+            element={<ReceiptEntryForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE}/edit/:ReceiptVoucherID`}
-            element={<ReceiptEntryForm pageTitles={pageTitles} mode={"edit"} />}
+            element={<ReceiptEntryForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE}/new`}
-            element={<ReceiptEntryForm pageTitles={pageTitles} mode={"new"} />}
+            element={<ReceiptEntryForm mode={"new"} />}
           />
 
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.CUSTOMER_INVOICE}/:CustomerInvoiceID`}
-            element={
-              <CustomerInvoiceFormMaster
-                pageTitles={pageTitles}
-                mode={"view"}
-              />
-            }
+            element={<CustomerInvoiceFormMaster mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.CUSTOMER_INVOICE}/edit/:CustomerInvoiceID`}
-            element={
-              <CustomerInvoiceFormMaster
-                pageTitles={pageTitles}
-                mode={"edit"}
-              />
-            }
+            element={<CustomerInvoiceFormMaster mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.CUSTOMER_INVOICE}/new`}
-            element={
-              <CustomerInvoiceFormMaster pageTitles={pageTitles} mode={"new"} />
-            }
+            element={<CustomerInvoiceFormMaster mode={"new"} />}
           />
 
           <Route
@@ -195,21 +177,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.COUNTRY_ROUTE}/:CountryID`}
-            element={
-              <CountryForm pageTitles={pageTitles} mode={"view"} user={user} />
-            }
+            element={<CountryForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.COUNTRY_ROUTE}/edit/:CountryID`}
-            element={
-              <CountryForm pageTitles={pageTitles} mode={"edit"} user={user} />
-            }
+            element={<CountryForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.COUNTRY_ROUTE}/new`}
-            element={
-              <CountryForm pageTitles={pageTitles} mode={"new"} user={user} />
-            }
+            element={<CountryForm mode={"new"} />}
           />
           {/* Country END */}
           {/* Tehsil */}
@@ -219,21 +195,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.TEHSIL_ROUTE}/:TehsilID`}
-            element={
-              <TehsilForm pageTitles={pageTitles} mode={"view"} user={user} />
-            }
+            element={<TehsilForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.TEHSIL_ROUTE}/edit/:TehsilID`}
-            element={
-              <TehsilForm pageTitles={pageTitles} mode={"edit"} user={user} />
-            }
+            element={<TehsilForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.TEHSIL_ROUTE}/new`}
-            element={
-              <TehsilForm pageTitles={pageTitles} mode={"new"} user={user} />
-            }
+            element={<TehsilForm mode={"new"} />}
           />
           {/* Tehsil END */}
           {/* Business Nature */}
@@ -243,33 +213,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_NATURE_ROUTE}/:BusinessNatureID`}
-            element={
-              <BusinessNatureForm
-                pageTitles={pageTitles}
-                mode={"view"}
-                user={user}
-              />
-            }
+            element={<BusinessNatureForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_NATURE_ROUTE}/edit/:BusinessNatureID`}
-            element={
-              <BusinessNatureForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-                user={user}
-              />
-            }
+            element={<BusinessNatureForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_NATURE_ROUTE}/new`}
-            element={
-              <BusinessNatureForm
-                pageTitles={pageTitles}
-                mode={"new"}
-                user={user}
-              />
-            }
+            element={<BusinessNatureForm mode={"new"} />}
           />
           {/* Business Nature END */}
           {/* Business Nature */}
@@ -279,33 +231,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_SEGMENT_ROUTE}/:BusinessSegmentID`}
-            element={
-              <BusinessSegmentForm
-                pageTitles={pageTitles}
-                mode={"view"}
-                user={user}
-              />
-            }
+            element={<BusinessSegmentForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_SEGMENT_ROUTE}/edit/:BusinessSegmentID`}
-            element={
-              <BusinessSegmentForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-                user={user}
-              />
-            }
+            element={<BusinessSegmentForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_SEGMENT_ROUTE}/new`}
-            element={
-              <BusinessSegmentForm
-                pageTitles={pageTitles}
-                mode={"new"}
-                user={user}
-              />
-            }
+            element={<BusinessSegmentForm mode={"new"} />}
           />
           {/* Business Nature END */}
           {/* Business Type */}
@@ -315,66 +249,30 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_TYPE}/:BusinessTypeID`}
-            element={
-              <BusinessTypeForm
-                pageTitles={pageTitles}
-                mode={"view"}
-                user={user}
-              />
-            }
+            element={<BusinessTypeForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_TYPE}/edit/:BusinessTypeID`}
-            element={
-              <BusinessTypeForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-                user={user}
-              />
-            }
+            element={<BusinessTypeForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.BUSINESS_TYPE}/new`}
-            element={
-              <BusinessTypeForm
-                pageTitles={pageTitles}
-                mode={"new"}
-                user={user}
-              />
-            }
+            element={<BusinessTypeForm mode={"new"} />}
           />
           {/* Business Type END */}
           {/* Department */}
           <Route path={ROUTE_URLS.DEPARTMENT} element={<DepartmentDetail />} />
           <Route
             path={`${ROUTE_URLS.DEPARTMENT}/:DepartmentID`}
-            element={
-              <DepartmentForm
-                pageTitles={pageTitles}
-                mode={"view"}
-                user={user}
-              />
-            }
+            element={<DepartmentForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.DEPARTMENT}/edit/:DepartmentID`}
-            element={
-              <DepartmentForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-                user={user}
-              />
-            }
+            element={<DepartmentForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.DEPARTMENT}/new`}
-            element={
-              <DepartmentForm
-                pageTitles={pageTitles}
-                mode={"new"}
-                user={user}
-              />
-            }
+            element={<DepartmentForm mode={"new"} />}
           />
           {/* Department END */}
           {/* Department */}
@@ -384,33 +282,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.LEED_SOURCE_ROUTE}/:LeadSourceID`}
-            element={
-              <LeadSourceForm
-                pageTitles={pageTitles}
-                mode={"view"}
-                user={user}
-              />
-            }
+            element={<LeadSourceForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.LEED_SOURCE_ROUTE}/edit/:LeadSourceID`}
-            element={
-              <LeadSourceForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-                user={user}
-              />
-            }
+            element={<LeadSourceForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.LEED_SOURCE_ROUTE}/new`}
-            element={
-              <LeadSourceForm
-                pageTitles={pageTitles}
-                mode={"new"}
-                user={user}
-              />
-            }
+            element={<LeadSourceForm mode={"new"} />}
           />
           {/* Department END */}
           {/* Leads Introduction */}
@@ -420,33 +300,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}/:LeadIntroductionID`}
-            element={
-              <LeadIntroductionForm
-                pageTitles={pageTitles}
-                mode={"view"}
-                user={user}
-              />
-            }
+            element={<LeadIntroductionForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}/edit/:LeadIntroductionID`}
-            element={
-              <LeadIntroductionForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-                user={user}
-              />
-            }
+            element={<LeadIntroductionForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}/new`}
-            element={
-              <LeadIntroductionForm
-                pageTitles={pageTitles}
-                mode={"new"}
-                user={user}
-              />
-            }
+            element={<LeadIntroductionForm mode={"new"} />}
           />
           <Route
             path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID`}
@@ -465,21 +327,15 @@ const App = () => {
           <Route path={ROUTE_URLS.USER_ROUTE} element={<UserDetail />} />
           <Route
             path={`${ROUTE_URLS.USER_ROUTE}/:UserID`}
-            element={
-              <UserForm pageTitles={pageTitles} mode={"view"} user={user} />
-            }
+            element={<UserForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.USER_ROUTE}/edit/:UserID`}
-            element={
-              <UserForm pageTitles={pageTitles} mode={"edit"} user={user} />
-            }
+            element={<UserForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.USER_ROUTE}/new`}
-            element={
-              <UserForm pageTitles={pageTitles} mode={"new"} user={user} />
-            }
+            element={<UserForm mode={"new"} />}
           />
           {/* User END */}
           {/* Session */}
@@ -489,21 +345,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.GENERAL.SESSION_INFO}/:SessionID`}
-            element={
-              <SessionForm pageTitles={pageTitles} mode={"view"} user={user} />
-            }
+            element={<SessionForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.GENERAL.SESSION_INFO}/edit/:SessionID`}
-            element={
-              <SessionForm pageTitles={pageTitles} mode={"edit"} user={user} />
-            }
+            element={<SessionForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.GENERAL.SESSION_INFO}/new`}
-            element={
-              <SessionForm pageTitles={pageTitles} mode={"new"} user={user} />
-            }
+            element={<SessionForm mode={"new"} />}
           />
           {/* Session END */}
           {/* Debit Note */}
@@ -513,21 +363,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE}/:DebitNoteID`}
-            element={
-              <DebitNoteEntryForm pageTitles={pageTitles} mode={"view"} />
-            }
+            element={<DebitNoteEntryForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE}/edit/:DebitNoteID`}
-            element={
-              <DebitNoteEntryForm pageTitles={pageTitles} mode={"edit"} />
-            }
+            element={<DebitNoteEntryForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE}/new`}
-            element={
-              <DebitNoteEntryForm pageTitles={pageTitles} mode={"new"} />
-            }
+            element={<DebitNoteEntryForm mode={"new"} />}
           />
           {/* Debit Note END */}
           {/* Debit Note */}
@@ -537,21 +381,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE}/:CreditNoteID`}
-            element={
-              <CreditNoteEntryForm pageTitles={pageTitles} mode={"view"} />
-            }
+            element={<CreditNoteEntryForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE}/edit/:CreditNoteID`}
-            element={
-              <CreditNoteEntryForm pageTitles={pageTitles} mode={"edit"} />
-            }
+            element={<CreditNoteEntryForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE}/new`}
-            element={
-              <CreditNoteEntryForm pageTitles={pageTitles} mode={"new"} />
-            }
+            element={<CreditNoteEntryForm mode={"new"} />}
           />
           {/* Debit Note END */}
           {/* New Customer Invoice Note */}
@@ -561,30 +399,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE}/:CustomerInvoiceID`}
-            element={
-              <NewCustomerInvoiceEntryForm
-                pageTitles={pageTitles}
-                mode={"view"}
-              />
-            }
+            element={<NewCustomerInvoiceEntryForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE}/edit/:CustomerInvoiceID`}
-            element={
-              <NewCustomerInvoiceEntryForm
-                pageTitles={pageTitles}
-                mode={"edit"}
-              />
-            }
+            element={<NewCustomerInvoiceEntryForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE}/new`}
-            element={
-              <NewCustomerInvoiceEntryForm
-                pageTitles={pageTitles}
-                mode={"new"}
-              />
-            }
+            element={<NewCustomerInvoiceEntryForm mode={"new"} />}
           />
           {/* New Customer Invoice END */}
           {/* New Customer Invoice Note */}
@@ -594,15 +417,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING}/:BankAccountID`}
-            element={<BankAccountForm pageTitles={pageTitles} mode={"view"} />}
+            element={<BankAccountForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING}/edit/:BankAccountID`}
-            element={<BankAccountForm pageTitles={pageTitles} mode={"edit"} />}
+            element={<BankAccountForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING}/new`}
-            element={<BankAccountForm pageTitles={pageTitles} mode={"new"} />}
+            element={<BankAccountForm mode={"new"} />}
           />
           {/* New Customer Invoice END */}
           {/*  Old Customer */}
@@ -612,21 +435,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/:CustomerID`}
-            element={
-              <GenOldCustomerForm pageTitles={pageTitles} mode={"view"} />
-            }
+            element={<GenOldCustomerForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/edit/:CustomerID`}
-            element={
-              <GenOldCustomerForm pageTitles={pageTitles} mode={"edit"} />
-            }
+            element={<GenOldCustomerForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/new`}
-            element={
-              <GenOldCustomerForm pageTitles={pageTitles} mode={"new"} />
-            }
+            element={<GenOldCustomerForm mode={"new"} />}
           />
           {/* Old Customer END */}
           {/*  Old Customer */}
@@ -636,21 +453,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE}/:ProductCategoryID`}
-            element={
-              <ProductCategoryForm pageTitles={pageTitles} mode={"view"} />
-            }
+            element={<ProductCategoryForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE}/edit/:ProductCategoryID`}
-            element={
-              <ProductCategoryForm pageTitles={pageTitles} mode={"edit"} />
-            }
+            element={<ProductCategoryForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE}/new`}
-            element={
-              <ProductCategoryForm pageTitles={pageTitles} mode={"new"} />
-            }
+            element={<ProductCategoryForm mode={"new"} />}
           />
           {/* Old Customer END */}
           {/*  Old Customer */}
@@ -660,15 +471,15 @@ const App = () => {
           />
           <Route
             path={`${ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE}/:ProductInfoID`}
-            element={<ProductInfoForm pageTitles={pageTitles} mode={"view"} />}
+            element={<ProductInfoForm mode={"view"} />}
           />
           <Route
             path={`${ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE}/edit/:ProductInfoID`}
-            element={<ProductInfoForm pageTitles={pageTitles} mode={"edit"} />}
+            element={<ProductInfoForm mode={"edit"} />}
           />
           <Route
             path={`${ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE}/new`}
-            element={<ProductInfoForm pageTitles={pageTitles} mode={"new"} />}
+            element={<ProductInfoForm mode={"new"} />}
           />
           {/* Old Customer END */}
           {/* Leads */}
@@ -679,6 +490,23 @@ const App = () => {
           {/* Leads End */}
         </Route>
       </Routes>
+      <ConfirmDialog
+        id="EditDeleteDialog"
+        draggable={false}
+        style={{ width: "30vw" }}
+        pt={{
+          acceptButton: {
+            root: {
+              className: "rounded",
+            },
+          },
+          rejectButton: {
+            root: {
+              className: "rounded",
+            },
+          },
+        }}
+      />
       <ToastContainer
         position="top-center"
         pauseOnHover={false}

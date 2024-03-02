@@ -11,7 +11,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUserData } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { parseISO } from "date-fns";
 import { LeadsViewerButtonToolBar } from "../../pages/LeadsIntroductionViewer/LeadsIntroductionViewer";
 import { QUERY_KEYS } from "../../utils/enums";
 
@@ -99,7 +98,7 @@ export const MeetingDoneFields = ({
   useEffect(() => {
     if (LeadIntroductionDetailID !== 0 && data.length > 0) {
       method.setValue("ProductInfoID", data[0].RecommendedProductID);
-      method.setValue("MeetingTime", parseISO(data[0].MeetingTime));
+      method.setValue("MeetingTime", new Date(data[0].MeetingTime));
       method.setValue("Description", data[0].Description);
     }
   }, [LeadIntroductionDetailID, data]);

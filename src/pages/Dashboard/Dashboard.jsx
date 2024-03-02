@@ -130,7 +130,9 @@ function Dashboard() {
         </div>
       </div>
       <div className="card p-4 border-0 shadow-sm">
-        <div>{/* <LeadsIntroductionDemonstratorTable /> */}</div>
+        <div>
+          <LeadsIntroductionDemonstratorTable />
+        </div>
       </div>
     </div>
   );

@@ -28,6 +28,7 @@ import {
   useActivationClientsSelectData,
   useSoftwareClientsSelectData,
 } from "../../hooks/SelectData/useSelectData";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 let parentRoute = ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY;
 let editRoute = `${parentRoute}/edit/`;
@@ -40,15 +41,11 @@ export function GenOldCustomerDetail() {
   document.title = "Old Customers";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
 
-  const { render: DeleteModal, handleShow: handleDeleteShow } =
-    useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   const [filters, setFilters] = useState({
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -79,8 +76,6 @@ export function GenOldCustomerDetail() {
 
   function handleEdit(id) {
     navigate(editRoute + id);
-    handleEditClose();
-    setIdToEdit(0);
   }
 
   function handleView(id) {
@@ -91,11 +86,7 @@ export function GenOldCustomerDetail() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <CustomSpinner />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -132,8 +123,8 @@ export function GenOldCustomerDetail() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.CustomerID,
-                  () => handleDeleteShow(rowData.CustomerID),
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.CustomerID),
+                  () => showEditDialog(rowData.CustomerID),
                   handleView,
                   true
                 )
@@ -150,14 +141,12 @@ export function GenOldCustomerDetail() {
               header="Customer Name"
             ></Column>
           </DataTable>
-          {EditModal}
-          {DeleteModal}
         </>
       )}
     </div>
   );
 }
-export function GenOldCustomerForm({ pagesTitle, mode }) {
+export function GenOldCustomerForm({ mode }) {
   document.title = "Old Customer Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();

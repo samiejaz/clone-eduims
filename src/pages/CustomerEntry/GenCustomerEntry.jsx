@@ -17,6 +17,8 @@ import {
 import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
 import { useNavigate } from "react-router";
 import { ROUTE_URLS } from "../../utils/enums";
+import { CustomSpinner } from "../../components/CustomSpinner";
+import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 
 const parentRoute = ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY;
 const editRoute = `${parentRoute}/edit/`;
@@ -38,18 +40,10 @@ export default function GenCustomerEntry() {
     ContactPerson1Name: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  const {
-    render: EditModal,
-    handleShow: handleEditShow,
-    handleClose: handleEditClose,
-    setIdToEdit,
-  } = useEditModal(handleEdit);
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  const { showDeleteDialog, showEditDialog } = useConfirmationModal({
+    handleDelete,
+    handleEdit,
+  });
 
   // Queries
   const {
@@ -75,13 +69,9 @@ export default function GenCustomerEntry() {
 
   function handleEdit(CustomerID) {
     navigate(viewRoute + CustomerID + "?viewMode=edit");
-    handleEditClose();
-    setIdToEdit(0);
   }
   function handleDelete(CustomerID) {
     deleteMutation.mutate({ CustomerID, LoginUserID: user.userID });
-    handleDeleteClose();
-    setIdToDelete(0);
   }
   function handleView(CustomerID) {
     navigate(viewRoute + CustomerID + "?viewMode=view");
@@ -91,16 +81,7 @@ export default function GenCustomerEntry() {
     <div className="mt-4">
       {isLoading || isFetching ? (
         <>
-          <div className="h-100 w-100">
-            <div className="d-flex align-content-center justify-content-center ">
-              <Spinner
-                animation="border"
-                size="lg"
-                role="status"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -131,8 +112,8 @@ export default function GenCustomerEntry() {
               body={(rowData) =>
                 ActionButtons(
                   rowData.CustomerID,
-                  handleDeleteShow,
-                  handleEditShow,
+                  () => showDeleteDialog(rowData.CustomerID),
+                  () => showEditDialog(rowData.CustomerID),
                   handleView,
                   true
                 )
@@ -170,8 +151,6 @@ export default function GenCustomerEntry() {
               header="Contact Person Name"
             ></Column>
           </DataTable>
-          {DeleteModal}
-          {EditModal}
         </>
       )}
     </div>

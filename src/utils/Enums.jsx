@@ -24,12 +24,12 @@ export const ROUTE_URLS = {
     LEADS_INTROUDCTION_VIEWER_ROUTE: "/general/leadsview",
     LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE: "/general/leadsview/detail",
     LEADS_INTROUDCTION_COMMENT_ROUTE: "/general/leadcomments",
+    APP_CONFIGURATION_ROUTE: "/utilities/appconfiguration",
   },
   UTILITIES: {
     PRODUCT_CATEGORY_ROUTE: "/utilities/productcategory",
     PRODUCT_INFO_ROUTE: "/utilities/productinfo",
     INVOICE_DESCRIPTIONS: "/utilities/invoicedescription",
-    APP_CONFIGURATION_ROUTE: "/utilities/appconfiguration",
   },
   ACCOUNTS: {
     BANK_ACCOUNT_OPENING: "/accounts/bankaccountopening",
