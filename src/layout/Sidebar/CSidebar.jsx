@@ -5,6 +5,9 @@ import { ROUTE_URLS } from "../../utils/enums";
 import signalRConnectionManager from "../../services/SignalRService";
 import { Toast } from "primereact/toast";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
+import { useMutation } from "@tanstack/react-query";
+import { AuthContext } from "../../context/AuthContext";
+import { confirmDialog } from "primereact/confirmdialog";
 
 const CSidebar = ({ sideBarRef }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -288,7 +291,7 @@ const CSidebar = ({ sideBarRef }) => {
                     Development
                   </div>
                 </div>
-                <i className="pi pi-sign-out"></i>
+                <SignOut />
               </div>
             </div>
           </li>
@@ -343,4 +346,27 @@ const NotificationHandler = ({ toast }) => {
   }, [connection]);
 
   return null;
+};
+
+export const SignOut = () => {
+  const { logoutUser } = useContext(AuthContext);
+
+  const confirmLogout = () => {
+    confirmDialog({
+      message: "Are you sure you want to logout?",
+      header: "Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      position: "top",
+      accept: () => logoutUser(),
+      reject: () => {},
+    });
+  };
+
+  return (
+    <>
+      <i className="pi pi-sign-out" onClick={confirmLogout}></i>
+    </>
+  );
 };
