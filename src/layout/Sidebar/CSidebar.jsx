@@ -69,7 +69,7 @@ const CSidebar = ({ sideBarRef }) => {
               >
                 <div>
                   <div className="c-profile_name" style={{ marginLeft: "5px" }}>
-                    {user.username}
+                    {user?.username}
                   </div>
                   <div className="c-job" style={{ marginLeft: "5px" }}>
                     Development
@@ -93,39 +93,41 @@ const NotificationHandler = ({ toast }) => {
   const connection = signalRConnectionManager.getConnection();
 
   useEffect(() => {
-    connection.on("ReceiveNotification", (message, route) => {
-      toast.current.show({
-        severity: "success",
-        summary: message,
-        sticky: true,
-        content: (props) => (
-          <div
-            className="flex flex-column"
-            style={{ flex: "1", justifyContent: "start" }}
-          >
-            <Link
-              to={route}
-              style={{ alignSelf: "start", color: "#1ea97c" }}
-              onClick={() => toast.current.clear()}
+    if (connection?.state === "connected") {
+      connection.on("ReceiveNotification", (message, route) => {
+        toast.current.show({
+          severity: "success",
+          summary: message,
+          sticky: true,
+          content: (props) => (
+            <div
+              className="flex flex-column"
+              style={{ flex: "1", justifyContent: "start" }}
             >
-              <div
-                className="font-medium text-lg my-3 text-900 text-green-700"
-                style={{}}
+              <Link
+                to={route}
+                style={{ alignSelf: "start", color: "#1ea97c" }}
+                onClick={() => toast.current.clear()}
               >
-                {props.message.summary}
-              </div>
-            </Link>
-          </div>
-        ),
+                <div
+                  className="font-medium text-lg my-3 text-900 text-green-700"
+                  style={{}}
+                >
+                  {props.message.summary}
+                </div>
+              </Link>
+            </div>
+          ),
+        });
       });
-    });
-    connection.on("ReceiveAllNotification", (message) => {
-      toast.current.show(message);
-    });
+      connection.on("ReceiveAllNotification", (message) => {
+        toast.current.show(message);
+      });
+    }
 
     return () => {
-      connection.off("ReceiveNotification");
-      connection.off("ReceiveAllNotification");
+      connection?.off("ReceiveNotification");
+      connection?.off("ReceiveAllNotification");
     };
   }, [connection]);
 
