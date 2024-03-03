@@ -15,7 +15,7 @@ export const AppConfigurationProivder = ({ children }) => {
   useEffect(() => {
     async function fetchCompanyInfo() {
       const { data } = await axios.post(
-        `${apiUrl}/EduIMS/GetConfigInfo?LoginUserID=${user.userID}`
+        `${apiUrl}/EduIMS/GetConfigInfo?LoginUserID=${user?.userID}`
       );
       if (data.success === true) {
         setPageTitles({

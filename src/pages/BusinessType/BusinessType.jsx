@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FilterMatchMode } from "primereact/api";
 import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -18,13 +18,15 @@ import {
   fetchAllBusinessTypes,
   fetchBusinessTypeById,
 } from "../../api/BusinessTypeData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import {
   FormRow,
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { authorizedRoutes } from "../../layout/Sidebar/CSidebar";
 
 let parentRoute = ROUTE_URLS.BUSINESS_TYPE;
 let editRoute = `${parentRoute}/edit/`;
@@ -32,7 +34,90 @@ let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY;
 
-export function BusinessTypeDetail() {
+function checkForUserRights({
+  RoleDelete = true,
+  RoleEdit = true,
+  RoleNew = true,
+  MenuName,
+}) {
+  const ShowForm =
+    MenuName && authorizedRoutes[0] === "allowAll"
+      ? true
+      : authorizedRoutes.includes(MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY);
+
+  return [
+    {
+      RoleDelete,
+      RoleEdit,
+      RoleNew,
+      ShowForm,
+    },
+  ];
+}
+
+export function BusinessType() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const ur = checkForUserRights({
+      MenuName: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
+    });
+    setUserRights(ur);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<BusinessTypeDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:BusinessTypeID`}
+            element={
+              <BusinessTypeForm
+                key={"BusinessTypeViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:BusinessTypeID`}
+            element={
+              <BusinessTypeForm
+                key={"BusinessTypeEditRoute"}
+                mode={"edit"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`new`}
+            element={
+              <BusinessTypeForm
+                key={"BusinessTypeNewRoute"}
+                mode={"new"}
+                userRights={userRights}
+              />
+            }
+          />
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+export function BusinessTypeDetail({ userRights }) {
   document.title = "Business Types";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -141,7 +226,7 @@ export function BusinessTypeDetail() {
     </div>
   );
 }
-export function BusinessTypeForm({ mode }) {
+export function BusinessTypeForm({ mode, userRights }) {
   document.title = "Business Type Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -244,6 +329,9 @@ export function BusinessTypeForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Business Types"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

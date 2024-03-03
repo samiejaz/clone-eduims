@@ -28,6 +28,11 @@ export default function ButtonToolBar({
   deleteLabel = "Delete",
   GoBackLabel = "",
   showDelete = true,
+  showDeleteButton = true,
+  showSaveButton = true,
+  showCancelButton = true,
+  showAddNewButton = true,
+  showEditButton = true,
 }) {
   const startContent = (
     <Button
@@ -56,35 +61,43 @@ export default function ButtonToolBar({
           },
         }}
       />
-      <Button
-        label="Add New"
-        icon="pi pi-plus"
-        className="rounded"
-        type="button"
-        disabled={addNewDisable}
-        onClick={() => handleAddNew()}
-        style={{ marginRight: "2px" }}
-        pt={{
-          label: {
-            className: "hidden md:block lg:block",
-          },
-        }}
-      />
-      <Button
-        label={editLabel}
-        icon="pi pi-pencil"
-        type="button"
-        severity="warning"
-        className="p-button-success rounded"
-        disabled={editDisable}
-        onClick={() => handleEdit()}
-        style={{ marginRight: "2px" }}
-        pt={{
-          label: {
-            className: "hidden md:block lg:block",
-          },
-        }}
-      />
+      {showAddNewButton ? (
+        <>
+          <Button
+            label="Add New"
+            icon="pi pi-plus"
+            className="rounded"
+            type="button"
+            disabled={addNewDisable}
+            onClick={() => handleAddNew()}
+            style={{ marginRight: "2px" }}
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
+          />
+        </>
+      ) : null}
+      {showEditButton ? (
+        <>
+          <Button
+            label={editLabel}
+            icon="pi pi-pencil"
+            type="button"
+            severity="warning"
+            className="p-button-success rounded"
+            disabled={editDisable}
+            onClick={() => handleEdit()}
+            style={{ marginRight: "2px" }}
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
+          />
+        </>
+      ) : null}
       {showDelete && (
         <>
           <Button
@@ -104,22 +117,27 @@ export default function ButtonToolBar({
           />
         </>
       )}
-      <Button
-        label={saveLabel}
-        icon="pi pi-check"
-        type="submit"
-        severity="success"
-        disabled={saveDisable}
-        onClick={handleSave}
-        loading={saveLoading}
-        className="p-button-success rounded"
-        loadingIcon="pi pi-spin pi-cog"
-        pt={{
-          label: {
-            className: "hidden md:block lg:block",
-          },
-        }}
-      />
+      {showSaveButton ? (
+        <>
+          <Button
+            label={saveLabel}
+            icon="pi pi-check"
+            type="submit"
+            severity="success"
+            disabled={saveDisable}
+            onClick={handleSave}
+            loading={saveLoading}
+            className="p-button-success rounded"
+            loadingIcon="pi pi-spin pi-cog"
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
+          />
+        </>
+      ) : null}
+
       {showPrint ? (
         <>
           <i className="pi pi-bars p-toolbar-separator mr-2" />
