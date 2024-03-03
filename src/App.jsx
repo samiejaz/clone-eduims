@@ -32,6 +32,7 @@ import {
 } from "./pages/BusinessSegment/BusinessSegment";
 import { ROUTE_URLS } from "./utils/enums";
 import {
+  BusinessType,
   BusinessTypeDetail,
   BusinessTypeForm,
 } from "./pages/BusinessType/BusinessType";
@@ -243,7 +244,7 @@ const App = () => {
           />
           {/* Business Nature END */}
           {/* Business Type */}
-          <Route
+          {/* <Route
             path={ROUTE_URLS.BUSINESS_TYPE}
             element={<BusinessTypeDetail />}
           />
@@ -258,6 +259,10 @@ const App = () => {
           <Route
             path={`${ROUTE_URLS.BUSINESS_TYPE}/new`}
             element={<BusinessTypeForm mode={"new"} />}
+          /> */}
+          <Route
+            path={`${ROUTE_URLS.BUSINESS_TYPE}/*`}
+            element={<BusinessType />}
           />
           {/* Business Type END */}
           {/* Department */}

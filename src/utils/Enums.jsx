@@ -96,3 +96,40 @@ export const TOAST_CONTAINER_IDS = {
   CLOSE_ON_CLICK: "closeOnClick",
   AUTO_CLOSE: "autoClose",
 };
+
+export const MENU_KEYS = {
+  GENERAL: {
+    COUNTRY_FORM_KEY: "mnuCountry",
+    TEHSIL_FORM_KEY: "mnuTehsil",
+    COMPANY_INFO_FORM_KEY: "mnuCompanyInfo",
+    BUSINESS_UNIT_FORM_KEY: "mnuBusinessUnit",
+    BUSINESS_NATURE_FORM_KEY: "mnuBusinessNature",
+    BUSINESS_TYPE_FORM_KEY: "mnuBusinessType",
+    BUSINESS_SEGMENT_FORM_KEY: "mnuBusinessSegment",
+    SESSION_INFO_FORM_KEY: "mnuSessionInfo",
+  },
+  USERS: {
+    USERS_FORM_KEY: "mnuUsers",
+    DEPARTMENTS_FORM_KEY: "mnuDepartments",
+    CUSTOMERS_FORM_KEY: "mnuCustomers",
+    OLD_CUSTOMERS_FORM_KEY: "mnuOldCustomers",
+  },
+  ACCOUNTS: {
+    BANK_ACCOUNTS_FORM_KEY: "mnuBankAccounts",
+    RECIEPT_VOUCHER_FORM_KEY: "mnuRecieptVoucher",
+    DEBIT_NOTE_FORM_KEY: "mnuDebitNote",
+    CREDIT_NOTE_FORM_KEY: "mnuCreditNote",
+    CUSTOMER_INVOICE_FORM_KEY: "mnuNewCustomerInvoice",
+  },
+  LEADS: {
+    LEADS_FORM_KEY: "mnuLeads",
+    LEAD_SOURCE_FORM_KEY: "mnuLeadSource",
+    LEAD_INTRODUCTION_FORM_KEY: "mnuLeadIntroduction",
+  },
+  UTILITIES: {
+    APP_CONFIGURATION_FORM_KEY: "mnuAppConfiguration",
+    PRODUCT_CATEGORIES_FORM_KEY: "mnuProductCategories",
+    PRODUCT_INFO_FORM_KEY: "mnuProductInfo",
+    INVOICE_DESCRIPTIONS_FORM_KEY: "mnuInvoiceDescriptions",
+  },
+};
