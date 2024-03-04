@@ -26,6 +26,7 @@ import {
   Product,
   LeadIntroduction,
   LeadSource,
+  UserRights,
 } from "./pages";
 
 import { ROUTE_URLS } from "./utils/enums";
@@ -140,6 +141,13 @@ const App = () => {
           />
 
           {/* Utils Routes END */}
+
+          {/* Configuration Routes*/}
+          <Route
+            path={`${ROUTE_URLS.CONFIGURATION.USER_RIGHTS_ROUTE}`}
+            element={<UserRights />}
+          />
+          {/* Configuration Routes END */}
 
           <Route
             path={ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY}

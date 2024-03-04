@@ -1,6 +1,6 @@
 import { MENU_KEYS, ROUTE_URLS } from "./enums";
 
-const routes = [
+export const routes = [
   {
     menuGroupName: "General",
     icon: "pi pi-home",
@@ -49,7 +49,7 @@ const routes = [
       },
     ],
   },
-  ,
+
   {
     menuGroupName: "Users",
     icon: "pi pi-users",
@@ -131,6 +131,11 @@ const routes = [
         name: "Product Info",
         menuKey: MENU_KEYS.UTILITIES.PRODUCT_INFO_FORM_KEY,
         route: ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE,
+      },
+      {
+        name: "User Rights",
+        menuKey: MENU_KEYS.CONFIGURATION.USER_RIGHTS_ROUTE,
+        route: ROUTE_URLS.CONFIGURATION.USER_RIGHTS_ROUTE,
       },
     ],
   },

@@ -44,6 +44,9 @@ export const ROUTE_URLS = {
     LEED_SOURCE_ROUTE: "/leads/leadsource",
     LEAD_INTRODUCTION_ROUTE: "/leads/leadintroduction",
   },
+  CONFIGURATION: {
+    USER_RIGHTS_ROUTE: "/configuration/userrights",
+  },
 };
 
 export const QUERY_KEYS = {
@@ -131,5 +134,8 @@ export const MENU_KEYS = {
     PRODUCT_CATEGORIES_FORM_KEY: "mnuProductCategories",
     PRODUCT_INFO_FORM_KEY: "mnuProductInfo",
     INVOICE_DESCRIPTIONS_FORM_KEY: "mnuInvoiceDescriptions",
+  },
+  CONFIGURATION: {
+    USER_RIGHTS_ROUTE: "mnuUserRights",
   },
 };

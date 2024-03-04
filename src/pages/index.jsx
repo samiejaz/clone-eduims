@@ -2,6 +2,9 @@ export { default as AppConfiguration } from "./AppConfiguration/AppConfguration"
 export { default as CompanyInfo } from "./CompanyInfo/CompanyInfo";
 export { default as GenCustomerEntry } from "./CustomerEntry/GenCustomerEntry";
 
+// Configuration
+export { default as UserRights } from "./UserRights/UserRightsInfo";
+
 // General Routes
 export { default as BankAccountOpening } from "./BankAccountOpening/BankAccountOpening";
 export { default as Country } from "./Country/Country";
