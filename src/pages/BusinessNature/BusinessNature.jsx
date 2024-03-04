@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -19,20 +19,107 @@ import {
   fetchAllBusinessNatures,
   fetchBusinessNatureById,
 } from "../../api/BusinessNatureData";
-import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import {
   FormRow,
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY;
+let IDENTITY = "BusinessNatureID";
 
-export function BusinessNatureDetail() {
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<BusinessNatureDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <BusinessNatureForm
+                key={"BusinessNatureViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <BusinessNatureForm
+                      key={"BusinessNatureEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <BusinessNatureForm
+                        key={"BusinessNatureNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+export function BusinessNatureDetail({ userRights }) {
   document.title = "Business Natures";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -86,13 +173,17 @@ export function BusinessNatureDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Business Natures</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Business Nature"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Business Nature"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -119,7 +210,9 @@ export function BusinessNatureDetail() {
                   rowData.BusinessNatureID,
                   () => showDeleteDialog(rowData?.BusinessNatureID),
                   () => showEditDialog(rowData?.BusinessNatureID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -139,7 +232,7 @@ export function BusinessNatureDetail() {
     </div>
   );
 }
-export function BusinessNatureForm({ mode }) {
+function BusinessNatureForm({ mode, userRights }) {
   document.title = "Business Nature Entry";
 
   const queryClient = useQueryClient();
@@ -245,6 +338,9 @@ export function BusinessNatureForm({ mode }) {
               handleSave={() => handleSubmit(onSubmit)()}
               handleDelete={handleDelete}
               GoBackLabel="Countries"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

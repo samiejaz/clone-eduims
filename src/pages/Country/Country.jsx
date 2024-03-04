@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
@@ -20,21 +20,105 @@ import {
   fetchAllCountries,
   fetchCountryById,
 } from "../../api/CountryData";
-import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
 import {
   FormRow,
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.COUNTRY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.COUNTRIES_QUERY_KEY;
+let IDENTITY = "CountryID";
 
-export function CountryDetail() {
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route index element={<CountryDetail userRights={userRights} />} />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <CountryForm
+                key={"CountryViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <CountryForm
+                      key={"CountryEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <CountryForm
+                        key={"BankAccountNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+function CountryDetail({ userRights }) {
   document.title = "Countries";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -86,13 +170,17 @@ export function CountryDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Countries</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Country"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Country"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -119,7 +207,9 @@ export function CountryDetail() {
                   rowData.CountryID,
                   () => showDeleteDialog(rowData.CountryID),
                   () => showEditDialog(rowData.CountryID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -139,7 +229,7 @@ export function CountryDetail() {
     </div>
   );
 }
-export function CountryForm({ mode }) {
+function CountryForm({ mode, userRights }) {
   document.title = "Country Entry";
 
   const queryClient = useQueryClient();
@@ -240,6 +330,9 @@ export function CountryForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Countries"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

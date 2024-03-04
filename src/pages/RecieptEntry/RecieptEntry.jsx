@@ -18,7 +18,7 @@ import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import TextInput from "../../components/Forms/TextInput";
 import NumberInput from "../../components/Forms/NumberInput";
@@ -36,7 +36,12 @@ import {
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
 
 import { Tag } from "primereact/tag";
-import { QUERY_KEYS, ROUTE_URLS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import {
+  MENU_KEYS,
+  QUERY_KEYS,
+  ROUTE_URLS,
+  SELECT_QUERY_KEYS,
+} from "../../utils/enums";
 import {
   fetchAllBankAccountsForSelect,
   fetchAllBusinessUnitsForSelect,
@@ -49,6 +54,8 @@ import CNumberInput from "../../components/Forms/CNumberInput";
 import { PrintReportInNewTab } from "../../utils/CommonFunctions";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 const receiptModeOptions = [
   { value: "Cash", label: "Cash" },
@@ -70,17 +77,94 @@ let chequeDetailColor = "#3B82F6";
 let ddDetailColor = "#8f48d2";
 let queryKey = QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY;
 
-function ReceiptEntry() {
-  document.title = "Reciept Vouchers";
+let IDENTITY = "ReceiptVoucherID";
+
+export default function ReceiptVoucher() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
   return (
-    <div className="mt-5">
-      <ReceiptEntrySearch />
-    </div>
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<ReceiptEntrySearch userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <ReceiptEntryForm
+                key={"ReceiptEntryFormViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <ReceiptEntryForm
+                      key={"ReceiptEntryFormEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <ReceiptEntryForm
+                        key={"ReceiptEntryFormNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
   );
 }
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
-function ReceiptEntrySearch() {
+function ReceiptEntrySearch({ userRights }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -164,13 +248,17 @@ function ReceiptEntrySearch() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Receipt Vouchers</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Receipt Voucher"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Voucher"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -197,7 +285,9 @@ function ReceiptEntrySearch() {
                   rowData.ReceiptVoucherID,
                   () => showDeleteDialog(rowData.ReceiptVoucherID),
                   () => showEditDialog(rowData.ReceiptVoucherID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -277,7 +367,7 @@ const defaultValues = {
   receiptDetail: [],
 };
 
-export function ReceiptEntryForm({ pagesTitle, mode }) {
+export function ReceiptEntryForm({ mode, userRights }) {
   document.title = "Receipt Voucher Entry";
   const queryClient = useQueryClient();
   const { ReceiptVoucherID } = useParams();
@@ -469,12 +559,15 @@ export function ReceiptEntryForm({ pagesTitle, mode }) {
               GoBackLabel="Receipts"
               saveLoading={receiptVoucherMutation.isPending}
               handleDelete={handleDelete}
-              showPrint={true}
+              showPrint={userRights[0]?.RolePrint}
               handlePrint={() =>
                 PrintReportInNewTab(
                   "ReceiptVoucherPrint?ReceiptVoucherID=" + ReceiptVoucherID
                 )
               }
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form id="receiptVoucher" className="mt-4">
@@ -560,8 +653,6 @@ export function ReceiptEntryForm({ pagesTitle, mode }) {
     </>
   );
 }
-
-export default ReceiptEntry;
 
 // New Master Fields
 function SessionSelect({ mode }) {

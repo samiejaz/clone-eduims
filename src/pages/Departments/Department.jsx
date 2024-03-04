@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
@@ -19,21 +19,105 @@ import {
   fetchAllDepartments,
   fetchDepartmentById,
 } from "../../api/DepartmentData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import {
   FormRow,
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.DEPARTMENT;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.DEPARTMENT_QUERY_KEY;
+let IDENTITY = "DepartmentID";
 
-export function DepartmentDetail() {
+export default function DepartmentOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.USERS.DEPARTMENTS_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route index element={<DepartmentDetail userRights={userRights} />} />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <DepartmentForm
+                key={"DepartmentViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <DepartmentForm
+                      key={"DepartmentEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <DepartmentForm
+                        key={"DepartmentNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+function DepartmentDetail({ userRights }) {
   document.title = "Departments";
 
   const queryClient = useQueryClient();
@@ -88,13 +172,17 @@ export function DepartmentDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Departments</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Department"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Department"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -121,7 +209,9 @@ export function DepartmentDetail() {
                   rowData.DepartmentID,
                   () => showDeleteDialog(rowData.DepartmentID),
                   () => showEditDialog(rowData.DepartmentID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -141,7 +231,7 @@ export function DepartmentDetail() {
     </div>
   );
 }
-export function DepartmentForm({ mode }) {
+function DepartmentForm({ mode, userRights }) {
   document.title = "Department Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -244,6 +334,9 @@ export function DepartmentForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Departments"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

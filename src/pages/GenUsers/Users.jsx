@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
@@ -20,7 +20,7 @@ import {
   fetchAllUsers,
   fetchUserById,
 } from "../../api/UserData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import { useAllDepartmentsSelectData } from "../../hooks/SelectData/useSelectData";
 import CDropdown from "../../components/Forms/CDropdown";
 import ImageContainer from "../../components/ImageContainer";
@@ -31,15 +31,97 @@ import {
   FormField,
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.USER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.USER_QUERY_KEY;
+let IDENTITY = "UserID";
+export default function Users() {
+  const [userRights, setUserRights] = useState([]);
 
-export function UserDetail() {
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.USERS.USERS_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route index element={<UserDetail userRights={userRights} />} />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <UserForm
+                key={"UserViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <UserForm
+                      key={"UserEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <UserForm
+                        key={"UserNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+function UserDetail({ userRights }) {
   document.title = "Users";
 
   const queryClient = useQueryClient();
@@ -101,13 +183,17 @@ export function UserDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Users</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New User"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New User"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -134,7 +220,9 @@ export function UserDetail() {
                   rowData.LoginUserID,
                   () => showDeleteDialog(rowData.LoginUserID),
                   () => showEditDialog(rowData.LoginUserID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -180,7 +268,7 @@ export function UserDetail() {
   );
 }
 
-export function UserForm({ mode }) {
+function UserForm({ mode, userRights }) {
   document.title = "User Entry";
 
   const queryClient = useQueryClient();
@@ -313,6 +401,9 @@ export function UserForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Users"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

@@ -138,8 +138,8 @@ export async function addLeadIntroductionOnAction({
       newFormData.append("Description", formData.Description ?? "");
       Status = "Forwarded";
     } else if (from === "Quoted" || from === "Finalized") {
-      if (file) {
-        newFormData.append("AttachmentFile", file);
+      if (file.length > 0) {
+        newFormData.append("AttachmentFile", file[0]);
       } else {
         newFormData.append(
           "AttachmentFile",
@@ -228,5 +228,19 @@ export async function fetchDemonstrationLeadsDataByID({
     return data.data ?? [];
   } else {
     return [];
+  }
+}
+
+export async function getLeadsFile(filename) {
+  try {
+    const { data } = await axios.get(
+      `${apiUrl}/data_LeadIntroduction/DownloadLeadProposal?filename=${filename}`
+    );
+
+    console.log(data);
+  } catch (err) {
+    toast.error(err.message, {
+      autoClose: false,
+    });
   }
 }

@@ -5,7 +5,6 @@ function ActionButtons(
   handleDelete,
   handleEdit,
   handleView,
-  disableBtn = false,
   showEditButton = true,
   showDeleteButton = true,
   showViewButton = true
@@ -60,13 +59,12 @@ function ActionButtons(
         </>
       ) : null}
 
-      {disableBtn === true && !showDeleteButton ? null : (
+      {!showDeleteButton ? null : (
         <>
           <Button
             size="sm"
             id="delete"
             variant="outline-danger"
-            disabled={disableBtn}
             onClick={() => handleDelete(ID)}
           >
             <svg

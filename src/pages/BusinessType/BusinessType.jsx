@@ -18,7 +18,6 @@ import {
   fetchAllBusinessTypes,
   fetchBusinessTypeById,
 } from "../../api/BusinessTypeData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import {
   FormRow,
@@ -26,7 +25,8 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { authorizedRoutes } from "../../layout/Sidebar/CSidebar";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.BUSINESS_TYPE;
 let editRoute = `${parentRoute}/edit/`;
@@ -34,35 +34,14 @@ let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY;
 
-function checkForUserRights({
-  RoleDelete = true,
-  RoleEdit = true,
-  RoleNew = true,
-  MenuName,
-}) {
-  const ShowForm =
-    MenuName && authorizedRoutes[0] === "allowAll"
-      ? true
-      : authorizedRoutes.includes(MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY);
-
-  return [
-    {
-      RoleDelete,
-      RoleEdit,
-      RoleNew,
-      ShowForm,
-    },
-  ];
-}
-
 export function BusinessType() {
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
-    const ur = checkForUserRights({
+    const rights = checkForUserRights({
       MenuName: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
     });
-    setUserRights(ur);
+    setUserRights(rights);
   }, []);
 
   return (
@@ -86,23 +65,44 @@ export function BusinessType() {
           <Route
             path={`edit/:BusinessTypeID`}
             element={
-              <BusinessTypeForm
-                key={"BusinessTypeEditRoute"}
-                mode={"edit"}
-                userRights={userRights}
-              />
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <BusinessTypeForm
+                      key={"BusinessTypeEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
             }
           />
-          <Route
-            path={`new`}
-            element={
-              <BusinessTypeForm
-                key={"BusinessTypeNewRoute"}
-                mode={"new"}
-                userRights={userRights}
-              />
-            }
-          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <BusinessTypeForm
+                        key={"BusinessTypeNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
         </>
       ) : (
         <Route
@@ -173,13 +173,17 @@ export function BusinessTypeDetail({ userRights }) {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Business Types</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Business Type"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Business Type"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -206,7 +210,9 @@ export function BusinessTypeDetail({ userRights }) {
                   rowData.BusinessTypeID,
                   () => showDeleteDialog(rowData.BusinessTypeID),
                   () => showEditDialog(rowData.BusinessTypeID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"

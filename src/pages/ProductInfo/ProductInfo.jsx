@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
@@ -21,7 +21,12 @@ import {
   fetchAllProducts,
   fetchProductInfoByID,
 } from "../../api/ProductInfoData";
-import { ROUTE_URLS, QUERY_KEYS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import {
+  ROUTE_URLS,
+  QUERY_KEYS,
+  SELECT_QUERY_KEYS,
+  MENU_KEYS,
+} from "../../utils/enums";
 import CDropdown from "../../components/Forms/CDropdown";
 import { useUserData } from "../../context/AuthContext";
 import {
@@ -30,14 +35,101 @@ import {
 } from "../../api/SelectData";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.PRODUCT_INFO_QUERY_KEY;
+let IDENTITY = "ProductInfoID";
 
-export function ProductInfoDetail() {
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.UTILITIES.PRODUCT_INFO_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<ProductInfoDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <ProductInfoForm
+                key={"ProductInfoViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <ProductInfoForm
+                      key={"ProductInfoEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <ProductInfoForm
+                        key={"ProductInfoNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+function ProductInfoDetail({ userRights }) {
   const { pageTitles } = useContext(AppConfigurationContext);
 
   document.title = `${pageTitles?.product + "s" || "Products"}`;
@@ -96,13 +188,17 @@ export function ProductInfoDetail() {
               {pageTitles?.product + "s" || "Products"}
             </h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label={`Add New ${pageTitles?.product || "Product"}`}
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label={`Add New ${pageTitles?.product || "Product"}`}
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -131,7 +227,9 @@ export function ProductInfoDetail() {
                   rowData.ProductInfoID,
                   () => showDeleteDialog(rowData.ProductInfoID),
                   () => showEditDialog(rowData.ProductInfoID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -165,7 +263,7 @@ export function ProductInfoDetail() {
   );
 }
 
-export function ProductInfoForm({ mode }) {
+function ProductInfoForm({ mode, userRights }) {
   const { pageTitles } = useContext(AppConfigurationContext);
   document.title = `${pageTitles?.product || "Product"} Entry`;
   const queryClient = useQueryClient();
@@ -294,7 +392,10 @@ export function ProductInfoForm({ mode }) {
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
-              GoBackLabel="Product Infos"
+              GoBackLabel={`${pageTitles?.product || "Product"}s`}
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

@@ -20,7 +20,7 @@
     border: 1px solid #424B57 !important;
     border-radius: 1rem;
     min-width: 35rem;
-    max-width: 80%;
+    max-width: 100%;
     width: 100%;
 
     background-color: #1F2937;
@@ -84,6 +84,7 @@
     height: 50%;
     object-fit: cover;
     display: block;
+  
 }
 
 .s-preview-image:hover {

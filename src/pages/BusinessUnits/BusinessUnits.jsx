@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState, useRef } from "react";
@@ -24,21 +24,108 @@ import {
   fetchAllBusinessUnits,
   fetchBusinessUnitById,
 } from "../../api/BusinessUnitData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import ImageContainer from "../../components/ImageContainer";
 import { ColorPicker } from "primereact/colorpicker";
 import { classNames } from "primereact/utils";
 import { Tooltip } from "primereact/tooltip";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY;
+let IDENTITY = "BusinessUnitID";
 
-export function BusinessUnitDetail() {
-  document.title = "BusinessUnits";
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<BusinessUnitDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <BusinessUnitForm
+                key={"BusinessUnitViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <BusinessUnitForm
+                      key={"BusinessUnitEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <BusinessUnitForm
+                        key={"BusinessUnitNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+function BusinessUnitDetail({ userRights }) {
+  document.title = "Business Units";
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -99,13 +186,17 @@ export function BusinessUnitDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Business Units</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Business Unit"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Business Unit"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -132,7 +223,9 @@ export function BusinessUnitDetail() {
                   rowData.BusinessUnitID,
                   () => showDeleteDialog(rowData.BusinessUnitID),
                   () => showEditDialog(rowData.BusinessUnitID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -182,7 +275,7 @@ export function BusinessUnitDetail() {
   );
 }
 
-export function BusinessUnitForm({ pagesTitle, mode }) {
+function BusinessUnitForm({ mode, userRights }) {
   document.title = "Business Unit Entry";
 
   const queryClient = useQueryClient();
@@ -192,31 +285,24 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
   const { BusinessUnitID } = useParams();
 
   const user = useUserData();
-  const {
-    control,
-    handleSubmit,
-    setFocus,
-    setValue,
-    reset,
-    register,
-    formState: { isDirty },
-  } = useForm({
-    defaultValues: {
-      BusinessUnitName: "",
-      Address: "",
-      LandlineNo: "",
-      MobileNo: "",
-      Email: "",
-      Website: "",
-      AuthorityPersonName: "",
-      AuthorityPersonNo: "",
-      AuthorityPersonEmail: "",
-      NTNno: "",
-      STRNo: "",
-      Description: "",
-      InActive: false,
-    },
-  });
+  const { control, handleSubmit, setFocus, setValue, reset, register } =
+    useForm({
+      defaultValues: {
+        BusinessUnitName: "",
+        Address: "",
+        LandlineNo: "",
+        MobileNo: "",
+        Email: "",
+        Website: "",
+        AuthorityPersonName: "",
+        AuthorityPersonNo: "",
+        AuthorityPersonEmail: "",
+        NTNno: "",
+        STRNo: "",
+        Description: "",
+        InActive: false,
+      },
+    });
 
   const BusinessUnitData = useQuery({
     queryKey: [queryKey, BusinessUnitID],
@@ -348,6 +434,9 @@ export function BusinessUnitForm({ pagesTitle, mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Business Units"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">
