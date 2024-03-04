@@ -15,7 +15,7 @@ import { FilterMatchMode } from "primereact/api";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import TextInput from "../../components/Forms/TextInput";
 import NumberInput from "../../components/Forms/NumberInput";
@@ -31,7 +31,12 @@ import {
   deleteDebitNoteByID,
 } from "../../api/DebitNoteData";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { QUERY_KEYS, ROUTE_URLS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import {
+  MENU_KEYS,
+  QUERY_KEYS,
+  ROUTE_URLS,
+  SELECT_QUERY_KEYS,
+} from "../../utils/enums";
 import {
   fetchAllBankAccountsForSelect,
   fetchAllBusinessUnitsForSelect,
@@ -43,34 +48,100 @@ import CDatePicker from "../../components/Forms/CDatePicker";
 import CNumberInput from "../../components/Forms/CNumberInput";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-
-const DebitNoteModeOptions = [
-  { value: "Cash", label: "Cash" },
-  { value: "Online", label: "Online Transfer" },
-  { value: "Instrument", label: "Instrument" },
-];
-
-const instrumentTypeOptions = [
-  { value: "Cheque", label: "Cheque" },
-  { value: "DD", label: "DD" },
-];
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let cashDetailColor = "#22C55E";
 let queryKey = QUERY_KEYS.DEBIT_NODE_QUERY_KEY;
+let IDENTITY = "DebitNoteID";
 
-export function DebitNoteEntry() {
-  document.title = "Debit Notes";
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.DEBIT_NOTE_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
   return (
-    <div className="mt-5">
-      <DebitNoteEntrySearch />
-    </div>
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<DebitNoteEntrySearch userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <DebitNoteEntryForm
+                key={"DebitNoteViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <DebitNoteEntryForm
+                      key={"DebitNoteEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <DebitNoteEntryForm
+                        key={"DebitNoteNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
   );
 }
-
-function DebitNoteEntrySearch() {
+function DebitNoteEntrySearch({ userRights }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -131,13 +202,17 @@ function DebitNoteEntrySearch() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Debit Notes</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Debit Note"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Debit Note"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -164,7 +239,9 @@ function DebitNoteEntrySearch() {
                   rowData.DebitNoteID,
                   () => showDeleteDialog(rowData.DebitNoteID),
                   () => showEditDialog(rowData.DebitNoteID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -213,7 +290,7 @@ const defaultValues = {
   DebitNoteDetail: [],
 };
 
-export function DebitNoteEntryForm({ pagesTitle, mode }) {
+function DebitNoteEntryForm({ mode, userRights }) {
   document.title = "Debit Note Entry";
   const queryClient = useQueryClient();
   const { DebitNoteID } = useParams();
@@ -373,6 +450,9 @@ export function DebitNoteEntryForm({ pagesTitle, mode }) {
               GoBackLabel="DebitNotes"
               saveLoading={DebitNoteMutation.isPending}
               handleDelete={handleDelete}
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form id="DebitNote" className="mt-4">
@@ -673,116 +753,6 @@ function BusinessUnitDependantFields({ mode }) {
           />
         </div>
       </Form.Group>
-    </>
-  );
-}
-
-function DebitNoteModeDependantFields({ mode, removeAllRows }) {
-  const [DebitNoteMode, setDebitNoteMode] = useState("");
-
-  const method = useFormContext();
-
-  function ShowSection() {
-    if (DebitNoteMode === "Online") {
-      return (
-        <>
-          <MasterBankFields mode={mode} />
-        </>
-      );
-    } else if (DebitNoteMode === "DD" || DebitNoteMode === "Cheque") {
-      return (
-        <>
-          <MasterBankFields
-            mode={mode}
-            FromBankTitle="Instrument Of"
-            ReceivedInBankTitle="In Bank"
-            TranstactionIDTitle="Instrument No"
-          />
-          <Form.Group as={Col}>
-            <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
-              Instrument Date
-            </Form.Label>
-            <div>
-              <CDatePicker
-                control={method.control}
-                name="InstrumentDate"
-                disabled={mode === "view"}
-              />
-            </div>
-          </Form.Group>
-        </>
-      );
-    }
-  }
-
-  function emptyAllFieldsOnDebitNoteModeChange() {
-    method.resetField("FromBank");
-    method.resetField("InstrumentDate");
-    method.resetField("ReceivedInBankID");
-    method.resetField("TransactionID");
-  }
-
-  return (
-    <>
-      <Form.Group className="col-xl-2 " as={Col}>
-        <Form.Label>
-          DebitNote Mode
-          <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
-        <div>
-          <CDropdown
-            control={method.control}
-            options={DebitNoteModeOptions}
-            optionValue="value"
-            optionLabel="label"
-            name={`DebitNoteMode`}
-            placeholder="Select DebitNote mode"
-            onChange={(e) => {
-              setDebitNoteMode(e.value);
-              method.setValue("InstrumentType", []);
-              removeAllRows();
-              emptyAllFieldsOnDebitNoteModeChange();
-            }}
-            showOnFocus={true}
-            disabled={mode === "view"}
-            focusOptions={(e) => {
-              method.setFocus(
-                e.value === "Instrument" ? "InstrumentType" : "Description"
-              );
-            }}
-          />
-        </div>
-      </Form.Group>
-
-      <Form.Group className="col-xl-2 " as={Col}>
-        <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
-          Instrument Type
-        </Form.Label>
-        <div>
-          <CDropdown
-            control={method.control}
-            name={`InstrumentType`}
-            placeholder="Select a type"
-            options={instrumentTypeOptions}
-            required={DebitNoteMode === "Instrument"}
-            disabled={
-              mode === "view" ||
-              DebitNoteMode === "Cash" ||
-              DebitNoteMode === "Online"
-            }
-            focusOptions={() => method.setFocus("Description")}
-            onChange={(e) => {
-              setDebitNoteMode(e.value);
-              removeAllRows();
-              emptyAllFieldsOnDebitNoteModeChange();
-            }}
-          />
-        </div>
-      </Form.Group>
-
-      <Row>
-        <ShowSection />
-      </Row>
     </>
   );
 }

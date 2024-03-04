@@ -23,7 +23,7 @@ import React, {
 } from "react";
 
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import TextInput from "../../components/Forms/TextInput";
 import NumberInput from "../../components/Forms/NumberInput";
@@ -40,7 +40,12 @@ import {
 } from "../../api/CustomerInvoiceData";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
 
-import { QUERY_KEYS, ROUTE_URLS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import {
+  MENU_KEYS,
+  QUERY_KEYS,
+  ROUTE_URLS,
+  SELECT_QUERY_KEYS,
+} from "../../utils/enums";
 import {
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
@@ -61,23 +66,101 @@ import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCusto
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let onlineDetailColor = "#365abd";
 let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY;
+let IDENTITY = "CustomerInvoiceID";
 
-export function NewCustomerInvoiceEntry() {
-  document.title = "Reciept Vouchers";
+export default function CustomerInvoice() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.CUSTOMER_INVOICE_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
   return (
-    <div className="mt-5">
-      <NewCustomerInvoiceEntrySearch />
-    </div>
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<NewCustomerInvoiceEntrySearch userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <NewCustomerInvoiceEntryForm
+                key={"CustomerInvoiceViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <NewCustomerInvoiceEntryForm
+                      key={"CustomerInvoiceEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <NewCustomerInvoiceEntryForm
+                        key={"CustomerInvoiceNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
   );
 }
 
-function NewCustomerInvoiceEntrySearch() {
+function NewCustomerInvoiceEntrySearch({ userRights }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -139,13 +222,17 @@ function NewCustomerInvoiceEntrySearch() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Customer Invoices</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Customer Invoice"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Create New Invoice"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -172,7 +259,9 @@ function NewCustomerInvoiceEntrySearch() {
                   rowData.CustomerInvoiceID,
                   () => showDeleteDialog(rowData.CustomerInvoiceID),
                   () => showEditDialog(rowData.CustomerInvoiceID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -239,7 +328,7 @@ const defaultValues = {
   installments: [],
 };
 
-export function NewCustomerInvoiceEntryForm({ mode }) {
+function NewCustomerInvoiceEntryForm({ mode, userRights }) {
   document.title = "Customer Invoice";
   const queryClient = useQueryClient();
   const { CustomerInvoiceID } = useParams();
@@ -448,13 +537,16 @@ export function NewCustomerInvoiceEntryForm({ mode }) {
                 GoBackLabel="CustomerInvoices"
                 saveLoading={CustomerInvoiceMutation.isPending}
                 handleDelete={handleDelete}
-                showPrint={true}
+                showPrint={userRights[0]?.RolePrint}
                 handlePrint={() =>
                   PrintReportInNewTab(
                     `InvoicePrint?CustomerInvoiceID=${CustomerInvoiceID}`
                   )
                 }
                 printDisable={mode !== "view"}
+                showAddNewButton={userRights[0]?.RoleNew}
+                showEditButton={userRights[0]?.RoleEdit}
+                showDelete={userRights[0]?.RoleDelete}
               />
             </div>
             <form id="CustomerInvoice" className="mt-4">

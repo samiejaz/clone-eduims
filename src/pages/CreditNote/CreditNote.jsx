@@ -15,7 +15,7 @@ import { FilterMatchMode } from "primereact/api";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import TextInput from "../../components/Forms/TextInput";
 import NumberInput from "../../components/Forms/NumberInput";
@@ -31,7 +31,12 @@ import {
   deleteCreditNoteByID,
 } from "../../api/CreditNoteData";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { QUERY_KEYS, ROUTE_URLS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import {
+  MENU_KEYS,
+  QUERY_KEYS,
+  ROUTE_URLS,
+  SELECT_QUERY_KEYS,
+} from "../../utils/enums";
 import {
   fetchAllBankAccountsForSelect,
   fetchAllBusinessUnitsForSelect,
@@ -43,38 +48,101 @@ import CNumberInput from "../../components/Forms/CNumberInput";
 import { useSessionSelectData } from "../../hooks/SelectData/useSelectData";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-
-const CreditNoteModeOptions = [
-  { value: "Cash", label: "Cash" },
-  { value: "Online", label: "Online Transfer" },
-  { value: "Instrument", label: "Instrument" },
-];
-
-const instrumentTypeOptions = [
-  { value: "Cheque", label: "Cheque" },
-  { value: "DD", label: "DD" },
-];
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
-let cashDetailColor = "#22C55E";
-let onlineDetailColor = "#F59E0B";
-let chequeDetailColor = "#3B82F6";
 let ddDetailColor = "#8f48d2";
 let queryKey = QUERY_KEYS.CREDIT_NODE_QUERY_KEY;
+let IDENTITY = "CreditNoteID";
 
-export function CreditNoteEntry() {
-  document.title = "Credit Notes";
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
   return (
-    <div className="mt-5">
-      <CreditNoteEntrySearch />
-    </div>
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<CreditNoteEntrySearch userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <CreditNoteEntryForm
+                key={"CreditNoteViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <CreditNoteEntryForm
+                      key={"CreditNoteEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <CreditNoteEntryForm
+                        key={"CreditNoteNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
   );
 }
-const apiUrl = import.meta.env.VITE_APP_API_URL;
 
-function CreditNoteEntrySearch() {
+function CreditNoteEntrySearch({ userRights }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -135,13 +203,17 @@ function CreditNoteEntrySearch() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Credit Notes</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Credit Note"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Credit Note"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -168,7 +240,9 @@ function CreditNoteEntrySearch() {
                   rowData.CreditNoteID,
                   () => showDeleteDialog(rowData.CreditNoteID),
                   () => showEditDialog(rowData.CreditNoteID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -217,7 +291,7 @@ const defaultValues = {
   CreditNoteDetail: [],
 };
 
-export function CreditNoteEntryForm({ mode }) {
+function CreditNoteEntryForm({ mode, userRights }) {
   document.title = "Credit Note Entry";
   const queryClient = useQueryClient();
   const { CreditNoteID } = useParams();
@@ -381,6 +455,9 @@ export function CreditNoteEntryForm({ mode }) {
               GoBackLabel="CreditNotes"
               saveLoading={CreditNoteMutation.isPending}
               handleDelete={handleDelete}
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form id="CreditNote" className="mt-4">
@@ -682,116 +759,6 @@ function BusinessUnitDependantFields({ mode }) {
           />
         </div>
       </Form.Group>
-    </>
-  );
-}
-
-function CreditNoteModeDependantFields({ mode, removeAllRows }) {
-  const [CreditNoteMode, setCreditNoteMode] = useState("");
-
-  const method = useFormContext();
-
-  function ShowSection() {
-    if (CreditNoteMode === "Online") {
-      return (
-        <>
-          <MasterBankFields mode={mode} />
-        </>
-      );
-    } else if (CreditNoteMode === "DD" || CreditNoteMode === "Cheque") {
-      return (
-        <>
-          <MasterBankFields
-            mode={mode}
-            FromBankTitle="Instrument Of"
-            ReceivedInBankTitle="In Bank"
-            TranstactionIDTitle="Instrument No"
-          />
-          <Form.Group as={Col}>
-            <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
-              Instrument Date
-            </Form.Label>
-            <div>
-              <CDatePicker
-                control={method.control}
-                name="InstrumentDate"
-                disabled={mode === "view"}
-              />
-            </div>
-          </Form.Group>
-        </>
-      );
-    }
-  }
-
-  function emptyAllFieldsOnCreditNoteModeChange() {
-    method.resetField("FromBank");
-    method.resetField("InstrumentDate");
-    method.resetField("ReceivedInBankID");
-    method.resetField("TransactionID");
-  }
-
-  return (
-    <>
-      <Form.Group className="col-xl-2 " as={Col}>
-        <Form.Label>
-          CreditNote Mode
-          <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
-        <div>
-          <CDropdown
-            control={method.control}
-            options={CreditNoteModeOptions}
-            optionValue="value"
-            optionLabel="label"
-            name={`CreditNoteMode`}
-            placeholder="Select CreditNote mode"
-            onChange={(e) => {
-              setCreditNoteMode(e.value);
-              method.setValue("InstrumentType", []);
-              removeAllRows();
-              emptyAllFieldsOnCreditNoteModeChange();
-            }}
-            showOnFocus={true}
-            disabled={mode === "view"}
-            focusOptions={(e) => {
-              method.setFocus(
-                e.value === "Instrument" ? "InstrumentType" : "Description"
-              );
-            }}
-          />
-        </div>
-      </Form.Group>
-
-      <Form.Group className="col-xl-2 " as={Col}>
-        <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
-          Instrument Type
-        </Form.Label>
-        <div>
-          <CDropdown
-            control={method.control}
-            name={`InstrumentType`}
-            placeholder="Select a type"
-            options={instrumentTypeOptions}
-            required={CreditNoteMode === "Instrument"}
-            disabled={
-              mode === "view" ||
-              CreditNoteMode === "Cash" ||
-              CreditNoteMode === "Online"
-            }
-            focusOptions={() => method.setFocus("Description")}
-            onChange={(e) => {
-              setCreditNoteMode(e.value);
-              removeAllRows();
-              emptyAllFieldsOnCreditNoteModeChange();
-            }}
-          />
-        </div>
-      </Form.Group>
-
-      <Row>
-        <ShowSection />
-      </Row>
     </>
   );
 }

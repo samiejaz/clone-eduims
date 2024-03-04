@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
@@ -20,7 +20,12 @@ import {
   fetchAllSessions,
   fetchSessionById,
 } from "../../api/SessionData";
-import { ROUTE_URLS, QUERY_KEYS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import {
+  ROUTE_URLS,
+  QUERY_KEYS,
+  SELECT_QUERY_KEYS,
+  MENU_KEYS,
+} from "../../utils/enums";
 import CDatePicker from "../../components/Forms/CDatePicker";
 import { parseISO } from "date-fns";
 import {
@@ -29,14 +34,98 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY;
+let IDENTITY = "SessionID";
 
-export function SessionDetail() {
+export default function SessionInfoOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route index element={<SessionDetail userRights={userRights} />} />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <SessionForm
+                key={"SessionInfoViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <SessionForm
+                      key={"SessionInfoEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <SessionForm
+                        key={"SessionInfoNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+export function SessionDetail({ userRights }) {
   document.title = "Session Info";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -92,13 +181,17 @@ export function SessionDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Session Info</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Session Info"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Session Info"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -123,7 +216,9 @@ export function SessionDetail() {
                   rowData.SessionID,
                   () => showDeleteDialog(rowData?.SessionID),
                   () => showEditDialog(rowData?.SessionID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -156,7 +251,7 @@ export function SessionDetail() {
     </div>
   );
 }
-export function SessionForm({ mode }) {
+export function SessionForm({ mode, userRights }) {
   document.title = "Session Info Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -272,6 +367,9 @@ export function SessionForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Sessions"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FilterMatchMode } from "primereact/api";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -19,7 +19,7 @@ import {
   fetchAllLeadIntroductions,
   fetchLeadIntroductionById,
 } from "../../api/LeadIntroductionData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import { LeadsIntroductionFormComponent } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook";
 import { Menu } from "primereact/menu";
 import { Dialog } from "primereact/dialog";
@@ -36,14 +36,119 @@ import { Tag } from "primereact/tag";
 import { toast } from "react-toastify";
 import { CIconButton } from "../../components/Buttons/CButtons";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
+import LeadsIntroductionViewer, {
+  LeadsIntroductionViewerDetail,
+} from "../LeadsIntroductionViewer/LeadsIntroductionViewer";
+import LeadsComments from "./LeadsComments";
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
+let IDENTITY = "LeadIntroductionID";
 
-export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
+export default function LeadIntroduction() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+  console.log(userRights);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<LeadIntroductionDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <LeadIntroductionForm
+                key={"LeadIntroductionViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <LeadIntroductionForm
+                      key={"LeadIntroductionEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <LeadIntroductionForm
+                        key={"LeadIntroductionNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+      <Route
+        path={`:LeadIntroductionID`}
+        element={<LeadsIntroductionViewer />}
+      />
+      <Route
+        path={`:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
+        element={<LeadsIntroductionViewerDetail />}
+      />
+      <Route path={`:LeadIntroductionID`} element={<LeadsComments />} />
+    </Routes>
+  );
+}
+
+export function LeadIntroductionDetail({
+  ShowMetaDeta = true,
+  Rows = 10,
+  userRights,
+}) {
   document.title = ShowMetaDeta ? "Lead Introductions" : "Leads Dashboard";
 
   const queryClient = useQueryClient();
@@ -119,7 +224,9 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
             rowData.LeadIntroductionID,
             () => showDeleteDialog(rowData.LeadIntroductionID),
             () => showEditDialog(rowData.LeadIntroductionID),
-            handleView
+            handleView,
+            userRights[0]?.RoleEdit,
+            userRights[0]?.RoleDelete
           )}
           <div>
             <Button
@@ -204,14 +311,17 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
                   className="text-end my-auto"
                   style={{ marginLeft: "10px" }}
                 >
-                  <Button
-                    label="Add New Lead Introduction"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                  {/* <LeadsIntroductionFormModal /> */}
+                  {userRights[0]?.RoleNew && (
+                    <>
+                      <Button
+                        label="Add New Lead Introduction"
+                        icon="pi pi-plus"
+                        type="button"
+                        className="rounded"
+                        onClick={() => navigate(newRoute)}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             </>
@@ -287,7 +397,7 @@ export function LeadIntroductionDetail({ ShowMetaDeta = true, Rows = 10 }) {
   );
 }
 
-export function LeadIntroductionForm({ mode }) {
+function LeadIntroductionForm({ mode, userRights }) {
   document.title = "Lead Introduction Entry";
 
   const queryClient = useQueryClient();
@@ -452,6 +562,9 @@ export function LeadIntroductionForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => method.handleSubmit(onSubmit)()}
               GoBackLabel="LeadIntroductions"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <div className="mt-4">
@@ -461,120 +574,6 @@ export function LeadIntroductionForm({ mode }) {
           </div>
         </>
       )}
-    </>
-  );
-}
-
-function MenuItemsComponent() {
-  const menuLeft = useRef();
-
-  const items = [
-    {
-      label: "Options",
-      items: [
-        {
-          template: (item) => (
-            <Button
-              className="menuBtn"
-              icon="pi pi-send"
-              style={{ background: "tranparent" }}
-              label={"Forward"}
-              pt={{
-                label: {
-                  style: {
-                    fontWeight: "normal",
-                  },
-                },
-              }}
-              onClick={(e) => console.log(e)}
-            />
-          ),
-        },
-        {
-          template: (item) => (
-            <Button
-              className="menuBtn"
-              icon={item.icon}
-              label={"Quote"}
-              style={{ background: "tranparent" }}
-              pt={{
-                label: {
-                  style: {
-                    fontWeight: "normal",
-                  },
-                },
-              }}
-              onClick={(e) => console.log(e)}
-            />
-          ),
-          icon: "pi pi-upload",
-        },
-        {
-          template: (item) => (
-            <Button
-              className="menuBtn"
-              icon={item.icon}
-              label={"Completed"}
-              pt={{
-                label: {
-                  style: {
-                    fontWeight: "normal",
-                  },
-                },
-              }}
-              onClick={(e) => console.log(e)}
-            />
-          ),
-          icon: "pi pi-check",
-        },
-        {
-          template: (item) => (
-            <Button
-              className="menuBtn"
-              icon={item.icon}
-              label={"Close"}
-              pt={{
-                label: {
-                  style: {
-                    fontWeight: "normal",
-                  },
-                },
-              }}
-              onClick={() => handleCloseClick()}
-            />
-          ),
-          icon: "pi pi-times",
-        },
-      ],
-    },
-  ];
-
-  function handleCloseClick() {}
-
-  return (
-    <>
-      <Button
-        onClick={(event) => menuLeft?.current?.toggle(event)}
-        size="sm"
-        id="edit"
-        variant="outline-warning"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="14"
-          height="14"
-          fill="currentColor"
-          className="bi bi-pencil-square"
-          viewBox="0 0 16 16"
-        >
-          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-          <path
-            fillRule="evenodd"
-            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
-          />
-        </svg>
-      </Button>
-      <Menu model={items} popup ref={menuLeft} id="popup_menu_left" />
     </>
   );
 }

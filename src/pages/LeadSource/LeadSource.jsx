@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -18,13 +18,15 @@ import {
   fetchAllLeadSources,
   fetchLeadSourceById,
 } from "../../api/LeadSourceData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import {
   FormRow,
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.LEED_SOURCE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -32,7 +34,90 @@ let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.LEED_SOURCE_QUERY_KEY;
 
-export function LeadSourceDetail() {
+let IDENTITY = "LeadSourceID";
+
+export default function BanckAccountOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.LEADS.LEAD_SOURCE_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route index element={<LeadSourceDetail userRights={userRights} />} />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <LeadSourceForm
+                key={"LeadSourceViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <LeadSourceForm
+                      key={"LeadSourceEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <LeadSourceForm
+                        key={"LeadSourceNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+function LeadSourceDetail({ userRights }) {
   document.title = "Lead Sources";
 
   const queryClient = useQueryClient();
@@ -89,13 +174,17 @@ export function LeadSourceDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Lead Sources</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Lead Source"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Lead Source"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -122,7 +211,9 @@ export function LeadSourceDetail() {
                   rowData.LeadSourceID,
                   () => showDeleteDialog(rowData.LeadSourceID),
                   () => showEditDialog(rowData.LeadSourceID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -142,7 +233,7 @@ export function LeadSourceDetail() {
     </div>
   );
 }
-export function LeadSourceForm({ mode }) {
+function LeadSourceForm({ mode, userRights }) {
   document.title = "Lead Source Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -246,6 +337,9 @@ export function LeadSourceForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="LeadSources"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

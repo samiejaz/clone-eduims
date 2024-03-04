@@ -1,10 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./MultiFileUpload.css";
-import { Download, Eye, File, X, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  Download,
+  Eye,
+  File,
+  Files,
+  Upload,
+  X,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 
 const MultiFileUpload = React.forwardRef((props, ref) => {
   React.useImperativeHandle(ref, () => ({
-    setAllFiles(data) {},
+    setAllFiles(data) {
+      setAllFiles(data);
+    },
     getAllFiles,
   }));
   const { name, id } = props;
@@ -57,53 +68,23 @@ const MultiFileUpload = React.forwardRef((props, ref) => {
         <div className="file-input_component">
           <div className="file-input_component-upper">
             <div>
-              <button
+              <SIconButton
                 onClick={uploadBtnClick}
-                className="s-file-input-icon"
-                type="button"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-upload"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" x2="12" y1="3" y2="15" />
-                </svg>
-              </button>
-              <button className="s-file-input-icon" type="button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-x-circle"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m15 9-6 6" />
-                  <path d="m9 9 6 6" />
-                </svg>
-              </button>
+                icon={<Upload />}
+                color="cyan"
+              />
+              <SIconButton
+                onClick={() => setFiles([])}
+                icon={<X />}
+                color="red"
+              />
             </div>
 
             {/* <button className='s-file-input-icon' type='button'>Upload</button> */}
           </div>
           <div className="file-input_component-lower">
             <div style={{ width: "100%" }}>
-              {files.length > 0 ? (
+              {files?.length > 0 ? (
                 <>
                   <div className="flex-center-col-wg">
                     {files.map((file, index) => (
@@ -133,27 +114,16 @@ const MultiFileUpload = React.forwardRef((props, ref) => {
                           </div>
                         )}
                         <div>
-                          <button
-                            type="button"
-                            className="s-file-input-icon"
+                          <SIconButton
                             onClick={() => downloadFile(file)}
-                          >
-                            <Download />
-                          </button>
-                          <button
-                            type="button"
-                            className="s-file-input-icon"
-                            onClick={() => downloadFile(file)}
-                          >
-                            <Eye />
-                          </button>
-                          <button
-                            type="button"
-                            className="s-file-input-icon"
+                            icon={<Download />}
+                            color="#eee"
+                          />
+                          <SIconButton
                             onClick={() => removeFile(index)}
-                          >
-                            <X />
-                          </button>
+                            icon={<X />}
+                            color="red"
+                          />
                         </div>
                       </div>
                     ))}
@@ -162,22 +132,7 @@ const MultiFileUpload = React.forwardRef((props, ref) => {
               ) : (
                 <>
                   <div className="flex-center-col">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="5rem"
-                      height="5rem"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#424B57"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-files s-image-icon"
-                    >
-                      <path d="M20 7h-3a2 2 0 0 1-2-2V2" />
-                      <path d="M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z" />
-                      <path d="M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8" />
-                    </svg>
+                    <Files width="5rem" height="5rem" color="#758890" />
                   </div>
                   <div style={{ textAlign: "center" }}>
                     <p
@@ -187,7 +142,7 @@ const MultiFileUpload = React.forwardRef((props, ref) => {
                         fontWeight: "600",
                       }}
                     >
-                      Drag and Drop Image Here
+                      Upload Files Here...
                     </p>
                   </div>
                 </>
@@ -239,7 +194,11 @@ const ImageViewerModal = ({ isOpen, onClose, imageSrc }) => {
 
   return (
     <div className="s-modal-overlay" onClick={onClose}>
-      <div className="s-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="s-modal-content"
+        onClick={(e) => e.stopPropagation()}
+        style={{ zIndex: 999 }}
+      >
         <div
           style={{
             display: "flex",
@@ -250,15 +209,21 @@ const ImageViewerModal = ({ isOpen, onClose, imageSrc }) => {
           }}
           className="s-close-button"
         >
-          <SIconButton onClick={onClose} icon={<X />} />
-
-          <SIconButton onClick={zoomIn} icon={<ZoomIn />} />
-
-          <SIconButton onClick={zoomOut} icon={<ZoomOut />} />
+          <SIconButton
+            onClick={() => {
+              onClose();
+              setZoomLevel(1);
+            }}
+            icon={<X />}
+            color="#fff"
+          />
+          <SIconButton onClick={zoomIn} icon={<ZoomIn />} color="#fff" />
+          <SIconButton onClick={zoomOut} icon={<ZoomOut />} color="#fff" />
         </div>
         <img
           src={imageSrc}
           alt="Preview"
+          id="overLayImage"
           style={{
             transform: `scale(${zoomLevel})`,
             margin: "auto",
@@ -271,15 +236,16 @@ const ImageViewerModal = ({ isOpen, onClose, imageSrc }) => {
   );
 };
 
-const SIconButton = (props) => {
+const SIconButton = ({ icon, onClick, color = "cyan" }) => {
   return (
     <>
       <button
         type="button"
         className="s-file-input-icon"
-        onClick={props.onClick}
+        onClick={onClick}
+        style={{ color: color, borderColor: color }}
       >
-        {props.icon}
+        {icon}
       </button>
     </>
   );

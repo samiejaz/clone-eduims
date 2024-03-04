@@ -18,10 +18,14 @@ import {
 import { Calendar } from "primereact/calendar";
 import { classNames } from "primereact/utils";
 import { parseISO } from "date-fns";
-import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData";
+import {
+  addLeadIntroductionOnAction,
+  getLeadsFile,
+} from "../../api/LeadIntroductionData";
 import { toast } from "react-toastify";
 import { MeetingDoneFields } from "../../components/Modals/MeetingDoneModal";
 import { RevertBackFields } from "../../components/Modals/RevertBackModal";
+import MultiFileUpload from "../../components/Forms/MultiFileUpload";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -337,7 +341,6 @@ function ForwardedFieldsContainer({
       : "http://192.168.9.110:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
         data[0]?.FileName;
   let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1);
-
   // Forward Fields
   const ForwardFields = (
     <>
@@ -553,15 +556,17 @@ function QuotedFieldsContainer({
     if (data.length > 0) {
       method.setValue("Amount", data[0].Amount);
       method.setValue("Description", data[0].Description);
+      let filePath = getLeadsFile(data[0]?.FileName);
+
       setFilePath(
         data[0]?.FileName === null
           ? null
           : "http://110.39.141.170:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
               data[0]?.FileName
       );
-      setFileType(
-        data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
-      );
+      // setFileType(
+      //   data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
+      // );
     }
   }, [data]);
 
@@ -610,7 +615,7 @@ function QuotedFieldsContainer({
         FileName: data[0]?.FileName ?? "",
         FullFilePath: data[0]?.FullFilePath ?? "",
       },
-      file: fileInputRef.current?.children[0].files[0],
+      file: fileInputRef.current?.getAllFiles(),
     });
   }
 
@@ -643,7 +648,7 @@ function QuotedFieldsContainer({
       ) : (
         <></>
       )}
-      {filePath !== null && fileType !== "" ? (
+      {filePath !== null ? (
         <>
           <Form.Label>File</Form.Label>
           {isEnable && (
@@ -655,11 +660,11 @@ function QuotedFieldsContainer({
             </>
           )}
           <div className="mt-5">
-            {/* <FileViewer
-              fileType={getFileType(fileType)}
-              filePath={filePath}
+            <MultiFileUpload
+              name="quotationFiles"
+              id="quotationFiles"
               ref={fileInputRef}
-            /> */}
+            />
           </div>
         </>
       ) : (

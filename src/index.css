@@ -432,7 +432,7 @@ a {
   height: 100%;
   width: 260px;
   background: #11101d;
-  z-index: 100;
+  z-index: 80;
   transition: all 0.5s ease;
 }
 .c-sidebar.c-close {

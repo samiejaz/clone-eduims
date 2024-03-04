@@ -1,18 +1,14 @@
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import React, { useRef, useState } from "react";
-import ReactDatePicker from "react-datepicker";
 import { LeadIntroductionDetail } from "../../LeadsIntroduction/LeadsIntroduction";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { QUERY_KEYS } from "../../../utils/enums";
-import CDatePicker from "../../../components/Forms/CDatePicker";
+import { MENU_KEYS, QUERY_KEYS } from "../../../utils/enums";
 import { Calendar } from "primereact/calendar";
 import { formatDateToMMDDYYYY } from "../../../utils/CommonFunctions";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "primereact/badge";
+import { checkForUserRights } from "../../../utils/routes";
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 function LeadsDashboard() {
@@ -122,7 +118,13 @@ function LeadsDashboard() {
       </div>
       <div className="card p-3 border-0 shadow-sm">
         <div>
-          <LeadIntroductionDetail ShowMetaDeta={false} Rows={5} />
+          <LeadIntroductionDetail
+            ShowMetaDeta={false}
+            Rows={5}
+            userRights={checkForUserRights({
+              MenuName: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
+            })}
+          />
         </div>
       </div>
     </div>

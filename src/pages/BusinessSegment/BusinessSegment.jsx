@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -18,21 +18,108 @@ import {
   fetchAllBusinessSegments,
   fetchBusinessSegmentById,
 } from "../../api/BusinessSegmentData";
-import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
 import {
   FormRow,
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.BUSINESS_SEGMENT_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.BUSINESS_SEGMENT_QUERY_KEY;
+let IDENTITY = "BusinessSegmentID";
 
-export function BusinessSegmentDetail() {
+export default function BusinessSegmentOpening() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.GENERAL.BUSINESS_SEGMENT_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<BusinessSegmentDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <BusinessSegmentForm
+                key={"BusinessSegmentViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <BusinessSegmentForm
+                      key={"BusinessSegmentEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <BusinessSegmentForm
+                        key={"BusinessSegmentNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+export function BusinessSegmentDetail({ userRights }) {
   document.title = "Business Segments";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -91,13 +178,17 @@ export function BusinessSegmentDetail() {
           <div className="d-flex text-dark  mb-4 ">
             <h2 className="text-center my-auto">Business Segments</h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New Business Segment"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label="Add New Business Segment"
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -124,7 +215,9 @@ export function BusinessSegmentDetail() {
                   rowData.BusinessSegmentID,
                   () => showDeleteDialog(rowData.BusinessSegmentID),
                   () => showEditDialog(rowData.BusinessSegmentID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -144,7 +237,7 @@ export function BusinessSegmentDetail() {
     </div>
   );
 }
-export function BusinessSegmentForm({ mode }) {
+export function BusinessSegmentForm({ mode, userRights }) {
   document.title = "Business Segment Entry";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -253,6 +346,9 @@ export function BusinessSegmentForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Business Segments"
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">

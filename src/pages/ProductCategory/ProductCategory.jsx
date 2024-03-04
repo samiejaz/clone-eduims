@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import { FilterMatchMode } from "primereact/api";
 import { useContext, useEffect, useState } from "react";
@@ -19,19 +19,106 @@ import {
   fetchAllProductCategories,
   fetchProductCategoryById,
 } from "../../api/ProductCategoryData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import CDropdown from "../../components/Forms/CDropdown";
 import { useUserData } from "../../context/AuthContext";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { checkForUserRights } from "../../utils/routes";
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY;
+let IDENTITY = "ProductCategoryID";
 
-export function ProductCategoryDetail() {
+export default function ProductCategory() {
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuName: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
+    });
+    setUserRights(rights);
+  }, []);
+
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route
+            index
+            element={<ProductCategoryDetail userRights={userRights} />}
+          />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <ProductCategoryForm
+                key={"ProductCategoryViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+          <Route
+            path={`edit/:${IDENTITY}`}
+            element={
+              <>
+                {userRights[0].RoleEdit ? (
+                  <>
+                    <ProductCategoryForm
+                      key={"ProductCategoryEditRoute"}
+                      mode={"edit"}
+                      userRights={userRights}
+                    />
+                  </>
+                ) : (
+                  <AccessDeniedPage />
+                )}
+              </>
+            }
+          />
+
+          <>
+            <Route
+              path={`new`}
+              element={
+                <>
+                  {userRights[0].RoleNew ? (
+                    <>
+                      <ProductCategoryForm
+                        key={"ProductCategoryNewRoute"}
+                        mode={"new"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AccessDeniedPage />
+                    </>
+                  )}
+                </>
+              }
+            />
+          </>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+export function ProductCategoryDetail({ userRights }) {
   document.title = "Product Categories";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -91,13 +178,19 @@ export function ProductCategoryDetail() {
               {pageTitles?.product || "Product"} Categories
             </h2>
             <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label={`Add New ${pageTitles?.product || "Product"} Category`}
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
+              {userRights[0]?.RoleNew && (
+                <>
+                  <Button
+                    label={`Add New ${
+                      pageTitles?.product || "Product"
+                    } Category`}
+                    icon="pi pi-plus"
+                    type="button"
+                    className="rounded"
+                    onClick={() => navigate(newRoute)}
+                  />
+                </>
+              )}
             </div>
           </div>
           <DataTable
@@ -126,7 +219,9 @@ export function ProductCategoryDetail() {
                   rowData.ProductCategoryID,
                   () => showDeleteDialog(rowData.ProductCategoryID),
                   () => showEditDialog(rowData.ProductCategoryID),
-                  handleView
+                  handleView,
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"
@@ -158,7 +253,7 @@ export function ProductCategoryDetail() {
   );
 }
 
-export function ProductCategoryForm({ mode }) {
+function ProductCategoryForm({ mode, userRights }) {
   const { pageTitles } = useContext(AppConfigurationContext);
   document.title = `${pageTitles?.product || "Product"} Category Entry`;
 
@@ -276,6 +371,9 @@ export function ProductCategoryForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel={`${pageTitles?.product || "Product"} Categories`}
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
+              showDelete={userRights[0]?.RoleDelete}
             />
           </div>
           <form className="mt-4">
