@@ -9,10 +9,9 @@ import {
 import { routes } from "../../utils/routes";
 import TextInput from "../../components/Forms/TextInput";
 import { classNames } from "primereact/utils";
-import React, { useState, useEffect, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
+import React from "react";
+
+import UserRightsGroupedTable from "./UserRightsGroupedDatatable";
 
 let detailTableName = "UserRightsDetail";
 let cashDetailColor = "#22C55E";
@@ -227,82 +226,3 @@ const UserRightDetailTableRow = ({ index, item, disable = false }) => {
     </tr>
   );
 };
-
-function UserRightsGroupedTable() {
-  const [expandedRows, setExpandedRows] = useState([]);
-
-  const headerTemplate = (data) => {
-    return (
-      <React.Fragment>
-        <span className="vertical-align-middle ml-2 font-bold line-height-3">
-          {data.menuGroupName}
-        </span>
-      </React.Fragment>
-    );
-  };
-  const textEditor = (options) => {
-    console.log(options);
-    //  return <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-    // return <InputSwitch  value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-  };
-
-  const onRowEditComplete = () => {};
-
-  const bodyTemplate = (rowData) => {
-    return (
-      <>
-        <DataTable
-          value={rowData.subItems}
-          tableStyle={{ minWidth: "45rem" }}
-          editMode="row"
-          dataKey="menuKey"
-          onRowEditComplete={onRowEditComplete}
-        >
-          <Column field="name" header="Name" style={{ width: "20%" }}></Column>
-          <Column field="" header="Role New" style={{ width: "20%" }}></Column>
-          <Column
-            field=""
-            header="Role Edit"
-            style={{ width: "20%" }}
-            editor={(options) => textEditor(options)}
-          ></Column>
-          <Column
-            field=""
-            header="Role Delete"
-            style={{ width: "20%" }}
-          ></Column>
-          <Column
-            field=""
-            header="Role Print"
-            style={{ width: "20%" }}
-          ></Column>
-        </DataTable>
-      </>
-    );
-  };
-
-  return (
-    <div className="card">
-      <DataTable
-        value={routes}
-        rowGroupMode="subheader"
-        groupRowsBy="menuGroupName"
-        sortMode="single"
-        sortField="menuGroupName"
-        sortOrder={1}
-        expandableRowGroups
-        expandedRows={expandedRows}
-        onRowToggle={(e) => setExpandedRows(e.data)}
-        rowGroupHeaderTemplate={headerTemplate}
-        tableStyle={{ minWidth: "50rem" }}
-      >
-        <Column
-          field="menuGroupName"
-          header="Name"
-          style={{ width: "20%" }}
-          body={bodyTemplate}
-        ></Column>
-      </DataTable>
-    </div>
-  );
-}

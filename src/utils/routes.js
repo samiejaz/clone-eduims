@@ -62,7 +62,7 @@ export const routes = [
       },
       {
         name: "Departments",
-        menuKey: MENU_KEYS.USERS.OLD_CUSTOMERS_FORM_KEY,
+        menuKey: MENU_KEYS.USERS.DEPARTMENTS_FORM_KEY,
         route: ROUTE_URLS.DEPARTMENT,
       },
       {
@@ -156,6 +156,20 @@ export const routes = [
     ],
   },
 ];
+
+export const routesWithUserRights = routes.map((route) => {
+  const updatedRoute = { ...route };
+
+  updatedRoute.subItems = route.subItems.map((subItem) => ({
+    ...subItem,
+    RoleNew: true,
+    RoleEdit: true,
+    RoleDelete: true,
+    RolePrint: true,
+  }));
+
+  return updatedRoute;
+});
 
 // Authorized Routes
 export let authorizedRoutes = ["allowAll"];
