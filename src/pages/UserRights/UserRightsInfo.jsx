@@ -12,6 +12,7 @@ import { classNames } from "primereact/utils";
 import React from "react";
 
 import UserRightsGroupedTable from "./UserRightsGroupedDatatable";
+import UserRightsGroupedTableCellWise from "./UserRightsGroupedDataTableCellWise";
 
 let detailTableName = "UserRightsDetail";
 let cashDetailColor = "#22C55E";
@@ -23,7 +24,8 @@ const UserRightsInfo = () => {
     <>
       <FormProvider {...method}>
         {/* <UserRightsDetailTable /> */}
-        <UserRightsGroupedTable />
+        {/* <UserRightsGroupedTable /> */}
+        <UserRightsGroupedTableCellWise />
       </FormProvider>
     </>
   );
