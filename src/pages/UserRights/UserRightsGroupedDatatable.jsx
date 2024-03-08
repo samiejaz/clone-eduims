@@ -1,12 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
-import { routes, routesWithUserRights } from "../../utils/routes";
 import { InputSwitch } from "primereact/inputswitch";
+import { UserRightsContext } from "../../context/UserRightContext";
+import { FilterMatchMode } from "primereact/api";
+
+let filters = {
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+};
 
 export default function UserRightsGroupedTable() {
   const [expandedRows, setExpandedRows] = useState([]);
+  const { setRoutesWithUserRights, routesWithUserRights } =
+    useContext(UserRightsContext);
 
   const headerTemplate = (data) => {
     return (
@@ -25,6 +31,9 @@ export default function UserRightsGroupedTable() {
       />
     );
   };
+  const ShowFormTemplate = (rowData) => {
+    return <InputSwitch checked={rowData.ShowForm} />;
+  };
   const RoleEditTemplate = (rowData) => {
     return <InputSwitch checked={rowData.RoleEdit} />;
   };
@@ -37,21 +46,20 @@ export default function UserRightsGroupedTable() {
   const RolePrintTemplate = (rowData) => {
     return <InputSwitch checked={rowData.RolePrint} />;
   };
-
   const onRowEditComplete = (e) => {
     let _routesWithUserRights = [...routesWithUserRights];
-    let { newData, index } = e;
+
+    let { newData } = e;
     for (let i = 0; i < _routesWithUserRights.length; i++) {
-      if (
-        _routesWithUserRights[i]?.subItems[index]?.menuKey === newData.menuKey
-      ) {
-        _routesWithUserRights[i].subItems[index] = { ...newData };
+      for (let j = 0; j < _routesWithUserRights[i].subItems.length; j++) {
+        if (
+          _routesWithUserRights[i]?.subItems[j]?.menuKey === newData.menuKey
+        ) {
+          _routesWithUserRights[i].subItems[j] = { ...newData };
+        }
       }
     }
-
-    console.log(_routesWithUserRights);
-
-    //   setProducts(_products);
+    setRoutesWithUserRights(_routesWithUserRights);
   };
 
   const bodyTemplate = (rowData) => {
@@ -63,12 +71,28 @@ export default function UserRightsGroupedTable() {
           editMode="row"
           dataKey="menuKey"
           onRowEditComplete={onRowEditComplete}
+          filters={filters}
+          filterDisplay="row"
         >
-          <Column field="name" header="Name" style={{ width: "20%" }}></Column>
+          <Column
+            field="name"
+            header="Name"
+            style={{ width: "40%" }}
+            filter
+            filterPlaceholder="Search by form name"
+          ></Column>
+          <Column
+            field="ShowForm"
+            header="Show Form"
+            style={{ width: "10%" }}
+            bodyStyle={{ textAlign: "center" }}
+            body={ShowFormTemplate}
+            editor={(options) => RoleEditor(options)}
+          ></Column>
           <Column
             field="RoleNew"
             header="Role New"
-            style={{ width: "20%" }}
+            style={{ width: "10%" }}
             bodyStyle={{ textAlign: "center" }}
             body={RoleNewTemplate}
             editor={(options) => RoleEditor(options)}
@@ -76,7 +100,7 @@ export default function UserRightsGroupedTable() {
           <Column
             field="RoleEdit"
             header="Role Edit"
-            style={{ width: "20%" }}
+            style={{ width: "10%" }}
             editor={(options) => RoleEditor(options)}
             body={RoleEditTemplate}
             bodyStyle={{ textAlign: "center" }}
@@ -84,7 +108,7 @@ export default function UserRightsGroupedTable() {
           <Column
             field="RoleDelete"
             header="Role Delete"
-            style={{ width: "20%" }}
+            style={{ width: "10%" }}
             bodyStyle={{ textAlign: "center" }}
             body={RoleDeleteTemplate}
             editor={(options) => RoleEditor(options)}
@@ -92,7 +116,7 @@ export default function UserRightsGroupedTable() {
           <Column
             field="RolePrint"
             header="Role Print"
-            style={{ width: "20%" }}
+            style={{ width: "10%" }}
             bodyStyle={{ textAlign: "center" }}
             body={RolePrintTemplate}
             editor={(options) => RoleEditor(options)}
@@ -122,7 +146,7 @@ export default function UserRightsGroupedTable() {
       >
         <Column
           field="menuGroupName"
-          header="Name"
+          header="Forms"
           style={{ width: "20%" }}
           body={bodyTemplate}
         ></Column>

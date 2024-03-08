@@ -1,33 +1,47 @@
-import { Row, Form, Col, Button, ButtonGroup, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useContext, useEffect, useState } from "react";
-import { Image } from "primereact/image";
+import { useMutation } from "@tanstack/react-query";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import {
   convertBase64StringToFile,
   preventFormByEnterKeySubmission,
 } from "../../utils/CommonFunctions";
+import {
+  FormColumn,
+  FormRow,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import TextInput from "../../components/Forms/TextInput";
+import ImageContainer from "../../components/ImageContainer";
+import { Tooltip } from "react-bootstrap";
+import { Button } from "primereact/button";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
+
+const defaultValues = {
+  CompanyName: "",
+  Address: "",
+  LandlineNo: "",
+  MobileNo: "",
+  Email: "",
+  Website: "",
+  AuthorityPersonName: "",
+  AuthorityPersonNo: "",
+  AuthorityPersonEmail: "",
+  Description: "",
+};
 
 function CompanyInfo() {
   document.title = "Company Info";
   const [CompanyInfo, setCompanyInfo] = useState([]);
-  const [isLoding, setIsLoading] = useState(false);
   const [reload, setReload] = useState(true);
-  const [imgData, setImgData] = useState();
-  const [editImage, setEditImage] = useState(false);
+  const imageRef = useRef();
 
-  const {
-    register,
-    handleSubmit,
-
-    setValue,
-    formState: { isDirty, isValid, errors },
-  } = useForm();
+  const { register, handleSubmit, control, setValue, setFocus } = useForm({
+    defaultValues,
+  });
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -36,7 +50,6 @@ function CompanyInfo() {
         `${apiUrl}/EduIMS/GetCompany?LoginUserID=${user.userID}`
       );
       if (data.success === true) {
-        setIsLoading(true);
         setCompanyInfo(data.data);
         setValue("CompanyName", data?.data[0]?.CompanyName);
         setValue("Address", data?.data[0]?.Address);
@@ -47,10 +60,9 @@ function CompanyInfo() {
         setValue("AuthorityPersonName", data?.data[0]?.AuthorityPersonName);
         setValue("AuthorityPersonNo", data?.data[0]?.AuthorityPersonNo);
         setValue("AuthorityPersonEmail", data?.data[0]?.AuthorityPersonEmail);
-
         setValue("Description", data?.data[0]?.Description);
-        setImgData(data?.data[0].CompanyLogo);
-        setIsLoading(false);
+        imageRef.current.src =
+          "data:image/png;base64," + data?.data[0]?.CompanyLogo;
         setReload(false);
       }
     }
@@ -61,52 +73,59 @@ function CompanyInfo() {
 
   const companyMutation = useMutation({
     mutationFn: async (formData) => {
-      let newFormData = new FormData();
-      newFormData.append("CompanyID", CompanyInfo[0]?.CompanyID);
-      newFormData.append("CompanyName", formData.CompanyName);
-      newFormData.append("Address", formData?.Address || "");
-      newFormData.append("LandlineNo", formData?.LandlineNo || "");
-      newFormData.append("MobileNo", formData?.MobileNo || "");
-      newFormData.append("Email", formData?.Email || "");
-      newFormData.append("Website", formData?.Website || "");
-      newFormData.append(
-        "AuthorityPersonName",
-        formData?.AuthorityPersonName || ""
-      );
-      newFormData.append(
-        "AuthorityPersonNo",
-        formData?.AuthorityPersonNo || ""
-      );
-      newFormData.append(
-        "AuthorityPersonEmail",
-        formData?.AuthorityPersonEmail || ""
-      );
-      newFormData.append("Description", formData?.Description || "");
-      newFormData.append("EntryUserID", user.userID);
+      try {
+        let newFormData = new FormData();
+        newFormData.append("CompanyID", CompanyInfo[0]?.CompanyID);
+        newFormData.append("CompanyName", formData.CompanyName);
+        newFormData.append("Address", formData?.Address || "");
+        newFormData.append("LandlineNo", formData?.LandlineNo || "");
+        newFormData.append("MobileNo", formData?.MobileNo || "");
+        newFormData.append("Email", formData?.Email || "");
+        newFormData.append("Website", formData?.Website || "");
+        newFormData.append(
+          "AuthorityPersonName",
+          formData?.AuthorityPersonName || ""
+        );
+        newFormData.append(
+          "AuthorityPersonNo",
+          formData?.AuthorityPersonNo || ""
+        );
+        newFormData.append(
+          "AuthorityPersonEmail",
+          formData?.AuthorityPersonEmail || ""
+        );
+        newFormData.append("Description", formData?.Description || "");
+        newFormData.append("EntryUserID", user.userID);
 
-      if (imgData && CompanyInfo[0]?.CompanyLogo && !formData?.CompanyLogo[0]) {
-        let file = convertBase64StringToFile(CompanyInfo[0]?.CompanyLogo);
-        newFormData.append("logo", file);
-      } else {
-        newFormData.append("logo", formData?.CompanyLogo[0]);
-      }
-
-      const { data } = await axios.post(
-        "http://192.168.9.110:90/api/EduIMS/CompanyInfoInsertUpdate",
-        newFormData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        if (imageRef.current.src !== "" || imageRef.current.src !== undefined) {
+          let businessUnitFile = convertBase64StringToFile(
+            imageRef.current.src,
+            true
+          );
+          newFormData.append("logo", businessUnitFile);
         }
-      );
 
-      if (data.success === true) {
-        toast.success("Company Info updated successfully!");
-        setReload(true);
-      } else {
-        toast.error(data.message, {
-          autoClose: 1500,
+        const { data } = await axios.post(
+          apiUrl + "/EduIMS/CompanyInfoInsertUpdate",
+          newFormData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (data.success === true) {
+          toast.success("Company Info updated successfully!");
+          setReload(true);
+        } else {
+          toast.error(data.message, {
+            autoClose: false,
+          });
+        }
+      } catch (error) {
+        toast.error(error.message, {
+          autoClose: false,
         });
       }
     },
@@ -116,161 +135,210 @@ function CompanyInfo() {
     companyMutation.mutate(data);
   }
 
-  function onLogoChange(e) {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      let base64Data;
-      if (reader.result.includes("data:image/png;base64,")) {
-        base64Data = reader.result.replace(/^data:image\/png;base64,/, "");
-      } else {
-        base64Data = reader.result.replace(/^data:image\/jpeg;base64,/, "");
-      }
-      setImgData(base64Data);
-    });
-    reader.readAsDataURL(e.target.files[0]);
-  }
-
-  function handleEdit() {
-    setEditImage(true);
-  }
-
-  function handleDelete() {
-    setValue("CompanyLogo", []);
-    setImgData("");
-  }
-
   return (
     <>
-      <div className="mt-5 p-2">
-        <h4 className="p-3 mb-2 bg-light text-dark text-center  ">
-          Company Info
-        </h4>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={preventFormByEnterKeySubmission}
-        >
-          <Row className="p-3">
-            <Form.Group as={Col} controlId="CompanyName">
-              <Form.Label>Company Name</Form.Label>
+      <div className="p-2">
+        <div className="flex align-content-center justify-content-between">
+          <div
+            style={{ justifySelf: "center", flex: "1", textAlign: "center" }}
+          >
+            <h1 className="text-2xl fw-bold ">Company Info</h1>
+          </div>
+          <div className="flex gap-2">
+            {/* <Button
+              label="Edit"
+              severity="warning"
+              type="button"
+              tooltip="Edit"
+              className="rounded"
+            /> */}
+            <Button
+              label="Save"
+              severity="success"
+              className="rounded"
+              onClick={() => handleSubmit(onSubmit)()}
+            />
+          </div>
+        </div>
+        <form onKeyDown={preventFormByEnterKeySubmission}>
+          <FormRow>
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Company Name</FormLabel>
               <span className="text-danger fw-bold ">*</span>
-              <Form.Control
-                type="text"
-                required
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"CompanyName"}
+                  required={true}
+                  focusOptions={() => setFocus("Address")}
+                />
+              </div>
+            </FormColumn>
+            <FormColumn lg={9} xl={9} md={6}>
+              <FormLabel>Address</FormLabel>
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"Address"}
+                  required={true}
+                  focusOptions={() => setFocus("LandlineNo")}
+                />
+              </div>
+            </FormColumn>
+          </FormRow>
+          <FormRow>
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Landline No</FormLabel>
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"LandlineNo"}
+                  required={true}
+                  focusOptions={() => setFocus("MobileNo")}
+                />
+              </div>
+            </FormColumn>
+
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Mobile No</FormLabel>
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"MobileNo"}
+                  required={true}
+                  focusOptions={() => setFocus("Email")}
+                />
+              </div>
+            </FormColumn>
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Email</FormLabel>
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"Email"}
+                  required={true}
+                  focusOptions={() => setFocus("Website")}
+                />
+              </div>
+            </FormColumn>
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Website</FormLabel>
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"Website"}
+                  required={true}
+                  focusOptions={() => setFocus("AuthorityPersonName")}
+                />
+              </div>
+            </FormColumn>
+          </FormRow>
+          <FormRow>
+            <FormColumn lg={4} xl={4} md={6}>
+              <FormLabel>Authority Person / CEO Name</FormLabel>
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"AuthorityPersonName"}
+                  required={true}
+                  focusOptions={() => setFocus("AuthorityPersonNo")}
+                />
+              </div>
+            </FormColumn>
+
+            <FormColumn lg={4} xl={4} md={6}>
+              <FormLabel>CEO Mobile No</FormLabel>
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"AuthorityPersonNo"}
+                  required={true}
+                  focusOptions={() => setFocus("AuthorityPersonEmail")}
+                />
+              </div>
+            </FormColumn>
+            <FormColumn lg={4} xl={4} md={6}>
+              <FormLabel>CEO Email</FormLabel>
+
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"AuthorityPersonEmail"}
+                  required={true}
+                  focusOptions={() => setFocus("Description")}
+                />
+              </div>
+            </FormColumn>
+          </FormRow>
+
+          <FormRow>
+            <FormColumn lg={12} xl={12} md={6}>
+              <FormLabel>Description</FormLabel>
+              <input
+                as={"textarea"}
+                rows={1}
                 className="form-control"
-                {...register("CompanyName")}
-              />
-              <p className="text-danger">{errors.CompanyName?.message}</p>
-            </Form.Group>
-            <Form.Group as={Col} controlId="Address">
-              <Form.Label>Address</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("Address")}
-              />
-            </Form.Group>
-          </Row>
-          <Row className="p-3" style={{ marginTop: "-25px" }}>
-            <Form.Group as={Col} controlId="LandlineNo">
-              <Form.Label>Landline No</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("LandlineNo")}
-              />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId="MobileNo">
-              <Form.Label>Mobile No</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("MobileNo")}
-              />
-            </Form.Group>
-            <Form.Group as={Col} controlId="Email">
-              <Form.Label>Email</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("Email")}
-              />
-            </Form.Group>
-            <Form.Group as={Col} controlId="Website">
-              <Form.Label>Website</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("Website")}
-              />
-            </Form.Group>
-          </Row>
-          <Row className="p-3" style={{ marginTop: "-25px" }}>
-            <Form.Group as={Col} controlId="AuthorityPersonName">
-              <Form.Label>Authority Person / CEO Name</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("AuthorityPersonName")}
-              />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId="AuthorityPersonNo">
-              <Form.Label>Mobile No</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("AuthorityPersonNo")}
-              />
-            </Form.Group>
-            <Form.Group as={Col} controlId="AuthorityPersonEmail">
-              <Form.Label>Email</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("AuthorityPersonEmail")}
-              />
-            </Form.Group>
-          </Row>
-
-          <Row className="p-3" style={{ marginTop: "-25px" }}>
-            <Form.Group as={Col} controlId="Description">
-              <Form.Label>Description</Form.Label>
-
-              <Form.Control
-                type="text"
-                className="form-control"
+                style={{
+                  padding: "0.3rem 0.4rem",
+                  fontSize: "0.8em",
+                }}
                 {...register("Description")}
               />
-            </Form.Group>
-          </Row>
+            </FormColumn>
+          </FormRow>
 
-          {(editImage || !CompanyInfo[0]?.CompanyLogo) && (
+          <FormRow>
+            <FormColumn lg={6} xl={6}>
+              <Tooltip target=".custom-target-icon" />
+              <FormLabel className="relative">
+                Logo
+                <i
+                  className="custom-target-icon pi pi-exclamation-circle p-text-secondary"
+                  data-pr-tooltip="Recommended Size (500x500px)"
+                  data-pr-position="right"
+                  data-pr-at="right+5 top"
+                  data-pr-my="left center-2"
+                  style={{
+                    cursor: "pointer",
+                    position: "absolute",
+                    right: "-20px",
+                    top: "1px",
+                  }}
+                ></i>
+              </FormLabel>
+              <div>
+                <ImageContainer
+                  imageRef={imageRef}
+                  //  hideButtons={mode === "view"}
+                />
+              </div>
+            </FormColumn>
+          </FormRow>
+
+          {/* {(editImage || !CompanyInfo[0]?.CompanyLogo) && (
             <>
-              <Row className="p-3" style={{ marginTop: "-25px" }}>
-                <Form.Group controlId="CompanyLogo" className="mb-3">
-                  <Form.Label>Company Logo</Form.Label>
+              <FormRow className="p-3" style={{ marginTop: "-25px" }}>
+                <FormColumn controlId="CompanyLogo" className="mb-3">
+                  <FormLabel>Company Logo</FormLabel>
                   <Form.Control
                     type="file"
                     {...register("CompanyLogo")}
                     onChange={onLogoChange}
                     accept="image/jpeg, image/png"
                   />
-                </Form.Group>
-              </Row>
+                </FormColumn>
+              </FormRow>
             </>
           )}
 
           {imgData && (
-            <Row className="p-3" style={{ marginTop: "-25px" }}>
+            <FormRow className="p-3" style={{ marginTop: "-25px" }}>
               <div className="text-end mb-1">
                 <ButtonGroup className="gap-1">
                   <Button
@@ -313,7 +381,7 @@ function CompanyInfo() {
                   </Button>
                 </ButtonGroup>
               </div>
-              <Form.Group as={Col} controlId="CompanyLogo" className="mb-3">
+              <FormColumn controlId="CompanyLogo" className="mb-3">
                 <div className="card flex justify-content-center">
                   <>
                     <Image
@@ -325,11 +393,11 @@ function CompanyInfo() {
                     />
                   </>
                 </div>
-              </Form.Group>
-            </Row>
-          )}
+              </FormColumn>
+            </FormRow>
+          )} */}
 
-          <Row>
+          {/* <FormRow>
             <ButtonGroup className="gap-2 rounded-2">
               <Button
                 disabled={!isDirty || !isValid || companyMutation.isPending}
@@ -354,7 +422,7 @@ function CompanyInfo() {
                 )}
               </Button>
             </ButtonGroup>
-          </Row>
+          </FormRow> */}
         </form>
       </div>
     </>

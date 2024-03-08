@@ -100,4 +100,47 @@ const CDropdown = ({
   );
 };
 
+export const CDropdownWithOutControl = ({
+  name,
+  onChange,
+  focusOptions,
+  options = [],
+  placeholder = "",
+  optionLabel = "label",
+  optionValue = "value",
+  required = false,
+  showOnFocus = true,
+  showClear = false,
+  filter = true,
+  disabled = false,
+  ...moreOptions
+}) => {
+  return (
+    <Dropdown
+      id={name}
+      value={options.value}
+      optionLabel={optionLabel}
+      optionValue={optionValue}
+      placeholder={placeholder}
+      options={options}
+      filter
+      pt={{
+        input: {
+          style: {
+            padding: "0.25rem 0.4rem",
+            fontSize: ".9em",
+          },
+        },
+        item: {
+          style: {
+            padding: "0.4rem 0.4rem",
+          },
+        },
+      }}
+      resetFilterOnHide
+      {...moreOptions}
+    />
+  );
+};
+
 export default CDropdown;

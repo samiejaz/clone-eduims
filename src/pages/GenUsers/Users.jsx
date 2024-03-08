@@ -3,7 +3,7 @@ import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -32,7 +32,7 @@ import {
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.USER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -41,13 +41,15 @@ let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.USER_QUERY_KEY;
 let IDENTITY = "UserID";
 export default function Users() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.USERS.USERS_FORM_KEY,
+      MenuKey: MENU_KEYS.USERS.USERS_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (
@@ -210,7 +212,6 @@ function UserDetail({ userRights }) {
             resizableColumns
             size="small"
             selectionMode="single"
-            style={{ backgroundColor: "red" }}
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
           >

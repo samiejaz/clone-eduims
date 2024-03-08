@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -27,7 +27,7 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -36,13 +36,15 @@ let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY;
 let IDENTITY = "BusinessNatureID";
 
 export default function BanckAccountOpening() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+      MenuKey: MENU_KEYS.GENERAL.BUSINESS_NATURE_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (

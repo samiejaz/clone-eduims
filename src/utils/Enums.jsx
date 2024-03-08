@@ -102,6 +102,8 @@ export const TOAST_CONTAINER_IDS = {
 
 export const MENU_KEYS = {
   GENERAL: {
+    GROUP_NAME: "General",
+    GROUP_KEY: "mnuGeneral",
     COUNTRY_FORM_KEY: "mnuCountry",
     TEHSIL_FORM_KEY: "mnuTehsil",
     COMPANY_INFO_FORM_KEY: "mnuCompanyInfo",
@@ -112,12 +114,16 @@ export const MENU_KEYS = {
     SESSION_INFO_FORM_KEY: "mnuSessionInfo",
   },
   USERS: {
+    GROUP_NAME: "Users",
+    GROUP_KEY: "mnuUsers",
     USERS_FORM_KEY: "mnuUsers",
     DEPARTMENTS_FORM_KEY: "mnuDepartments",
     CUSTOMERS_FORM_KEY: "mnuCustomers",
     OLD_CUSTOMERS_FORM_KEY: "mnuOldCustomers",
   },
   ACCOUNTS: {
+    GROUP_NAME: "Accounts",
+    GROUP_KEY: "mnuAccounts",
     BANK_ACCOUNTS_FORM_KEY: "mnuBankAccounts",
     RECIEPT_VOUCHER_FORM_KEY: "mnuRecieptVoucher",
     DEBIT_NOTE_FORM_KEY: "mnuDebitNote",
@@ -125,17 +131,23 @@ export const MENU_KEYS = {
     CUSTOMER_INVOICE_FORM_KEY: "mnuNewCustomerInvoice",
   },
   LEADS: {
+    GROUP_NAME: "Leads",
+    GROUP_KEY: "mnuLeads",
     LEADS_FORM_KEY: "mnuLeads",
     LEAD_SOURCE_FORM_KEY: "mnuLeadSource",
     LEAD_INTRODUCTION_FORM_KEY: "mnuLeadIntroduction",
   },
   UTILITIES: {
+    GROUP_NAME: "Utilities",
+    GROUP_KEY: "mnuUtitities",
     APP_CONFIGURATION_FORM_KEY: "mnuAppConfiguration",
     PRODUCT_CATEGORIES_FORM_KEY: "mnuProductCategories",
     PRODUCT_INFO_FORM_KEY: "mnuProductInfo",
     INVOICE_DESCRIPTIONS_FORM_KEY: "mnuInvoiceDescriptions",
   },
   CONFIGURATION: {
+    GROUP_NAME: "Configuration",
+    GROUP_KEY: "mnuConfiguration",
     USER_RIGHTS_ROUTE: "mnuUserRights",
   },
 };

@@ -16,6 +16,7 @@ import { AuthProvier } from "./context/AuthContext";
 import { BrowserRouter } from "react-router-dom";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AppConfigurationProivder } from "./context/AppConfigurationContext.jsx";
+import { UserRightsProivder } from "./context/UserRightContext.jsx";
 
 const queryClient = new QueryClient();
 
@@ -24,9 +25,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvier>
-          <AppConfigurationProivder>
-            <App />
-          </AppConfigurationProivder>
+          <UserRightsProivder>
+            <AppConfigurationProivder>
+              <App />
+            </AppConfigurationProivder>
+          </UserRightsProivder>
         </AuthProvier>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />

@@ -1,4 +1,4 @@
-import { Row, Form, Col, Spinner } from "react-bootstrap";
+import { Row, Form, Col, Spinner, Dropdown } from "react-bootstrap";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
@@ -55,12 +55,12 @@ import { PrintReportInNewTab } from "../../utils/CommonFunctions";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 const receiptModeOptions = [
-  { value: "Cash", label: "Cash" },
-  { value: "Online", label: "Online Transfer" },
-  { value: "Instrument", label: "Instrument" },
+  { label: "Cash", value: "Cash" },
+  { label: "Online Transfer", value: "Online" },
+  { label: "Instrument", value: "Instrument" },
 ];
 
 const instrumentTypeOptions = [
@@ -80,13 +80,15 @@ let queryKey = QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY;
 let IDENTITY = "ReceiptVoucherID";
 
 export default function ReceiptVoucher() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
+      MenuKey: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (
@@ -162,7 +164,6 @@ export default function ReceiptVoucher() {
     </Routes>
   );
 }
-const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 function ReceiptEntrySearch({ userRights }) {
   const queryClient = useQueryClient();
@@ -178,7 +179,7 @@ function ReceiptEntrySearch({ userRights }) {
     VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    ReceiptMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ReceiptMode: { value: null, matchMode: FilterMatchMode.EQUALS },
     TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
@@ -223,6 +224,26 @@ function ReceiptEntrySearch({ userRights }) {
       />
     );
   };
+  const statusItemTemplate = (option) => {
+    console.log(option);
+    return <Tag value={option} severity={getSeverity(option)} />;
+  };
+
+  const [statuses] = useState(["Cash", "Online", "Instrument", "Cheque", "DD"]);
+
+  const statusRowFilterTemplate = (options) => {
+    return (
+      <Dropdown
+        value={options.value}
+        options={statuses}
+        onChange={(e) => options.filterApplyCallback(e.value)}
+        itemTemplate={statusItemTemplate}
+        placeholder="Select One"
+        className="p-column-filter"
+        style={{ minWidth: "12rem" }}
+      />
+    );
+  };
 
   const getSeverity = (status) => {
     switch (status) {
@@ -230,10 +251,12 @@ function ReceiptEntrySearch({ userRights }) {
         return "warning";
       case "Cash":
         return "success";
-      case "Instument":
+      case "Instrument":
         return "help";
       case "DD":
         return "danger";
+      default:
+        return "info";
     }
   };
 
@@ -311,13 +334,13 @@ function ReceiptEntrySearch({ userRights }) {
 
             <Column
               field="ReceiptMode"
-              filter
-              filterPlaceholder="Search by receipt mode"
               sortable
               header="Receipt Mode"
               showFilterMenu={false}
               filterMenuStyle={{ width: "4rem" }}
               body={statusBodyTemplate}
+              filter
+              filterElement={statusRowFilterTemplate}
             ></Column>
 
             <Column
