@@ -25,7 +25,7 @@ import { useUserData } from "../../context/AuthContext";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -35,13 +35,15 @@ let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY;
 let IDENTITY = "ProductCategoryID";
 
 export default function ProductCategory() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
+      MenuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.UTILITIES.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (

@@ -26,7 +26,7 @@ import {
 } from "../../components/Layout/LayoutComponents";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.BUSINESS_TYPE;
 let editRoute = `${parentRoute}/edit/`;
@@ -35,86 +35,90 @@ let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY;
 
 export function BusinessType() {
+  const { checkForUserRights } = useContext(UserRightsContext);
+
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuName: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
+    let data = checkForUserRights({
+      MenuKey: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([data]);
   }, []);
-
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<BusinessTypeDetail userRights={userRights} />}
-          />
-          <Route
-            path={`:BusinessTypeID`}
-            element={
-              <BusinessTypeForm
-                key={"BusinessTypeViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:BusinessTypeID`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <BusinessTypeForm
-                      key={"BusinessTypeEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
+    <>
+      <Routes>
+        {userRights.length > 0 && userRights[0].ShowForm ? (
           <>
             <Route
-              path={`new`}
+              index
+              element={<BusinessTypeDetail userRights={userRights} />}
+            />
+            <Route
+              path={`:BusinessTypeID`}
+              element={
+                <BusinessTypeForm
+                  key={"BusinessTypeViewRoute"}
+                  mode={"view"}
+                  userRights={userRights}
+                />
+              }
+            />
+            <Route
+              path={`edit/:BusinessTypeID`}
               element={
                 <>
-                  {userRights[0].RoleNew ? (
+                  {userRights[0].RoleEdit ? (
                     <>
                       <BusinessTypeForm
-                        key={"BusinessTypeNewRoute"}
-                        mode={"new"}
+                        key={"BusinessTypeEditRoute"}
+                        mode={"edit"}
                         userRights={userRights}
                       />
                     </>
                   ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
+                    <AccessDeniedPage />
                   )}
                 </>
               }
             />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
+
             <>
-              <AccessDeniedPage />
+              <Route
+                path={`new`}
+                element={
+                  <>
+                    {userRights[0].RoleNew ? (
+                      <>
+                        <BusinessTypeForm
+                          key={"BusinessTypeNewRoute"}
+                          mode={"new"}
+                          userRights={userRights}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <AccessDeniedPage />
+                      </>
+                    )}
+                  </>
+                }
+              />
             </>
-          }
-        />
-      )}
-    </Routes>
+          </>
+        ) : (
+          <Route
+            path="*"
+            element={
+              <>
+                <AccessDeniedPage />
+              </>
+            }
+          />
+        )}
+      </Routes>
+    </>
   );
 }
 export function BusinessTypeDetail({ userRights }) {

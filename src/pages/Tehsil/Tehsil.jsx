@@ -28,7 +28,7 @@ import {
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.TEHSIL_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -38,13 +38,15 @@ let queryKey = QUERY_KEYS.TEHSIL_QUERY_KEY;
 let IDENTITY = "TehsilID";
 
 export default function BanckAccountOpening() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.GENERAL.TEHSIL_FORM_KEY,
+      MenuKey: MENU_KEYS.GENERAL.TEHSIL_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (

@@ -49,7 +49,7 @@ import CNumberInput from "../../components/Forms/CNumberInput";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -59,13 +59,15 @@ let queryKey = QUERY_KEYS.DEBIT_NODE_QUERY_KEY;
 let IDENTITY = "DebitNoteID";
 
 export default function BanckAccountOpening() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.ACCOUNTS.DEBIT_NOTE_FORM_KEY,
+      MenuKey: MENU_KEYS.ACCOUNTS.DEBIT_NOTE_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (

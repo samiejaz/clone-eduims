@@ -3,7 +3,7 @@ import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import useEditModal from "../../hooks/useEditModalHook";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -35,7 +35,7 @@ import {
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO;
 let editRoute = `${parentRoute}/edit/`;
@@ -45,13 +45,15 @@ let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY;
 let IDENTITY = "SessionID";
 
 export default function SessionInfoOpening() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+      MenuKey: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (

@@ -8,6 +8,7 @@ import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import { AuthContext } from "../../context/AuthContext";
 import { confirmDialog } from "primereact/confirmdialog";
 import { finalFilteredRoutes } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 const CSidebar = ({ sideBarRef }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -158,9 +159,11 @@ export const SignOut = () => {
 };
 
 const SubSidebar = () => {
+  const { routesWithUserRights } = useContext(UserRightsContext);
+
   return (
     <>
-      {finalFilteredRoutes.map((route) => (
+      {routesWithUserRights.map((route) => (
         <MenuGroup
           key={route.menuGroupName}
           menuGroupName={route.menuGroupName}
@@ -215,7 +218,8 @@ const MenuGroup = ({
                       name={item.name}
                       route={item.route}
                       showDividerOnTop={item?.showDividerOnTop}
-                      hideMenuItem={item?.hideMenuItem}
+                      hideMenuItem={item.ShowForm}
+                      showForm={item.ShowForm}
                     />
                   </>
                 ))}
@@ -231,11 +235,12 @@ const MenuItem = ({
   route,
   name,
   showDividerOnTop = false,
-  hideMenuItem = false,
+  hideMenuItem = true,
+  showForm = true,
 }) => {
   return (
     <>
-      {!hideMenuItem && (
+      {hideMenuItem && (
         <>
           {showDividerOnTop ? (
             <>

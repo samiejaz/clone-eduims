@@ -79,8 +79,6 @@ const MultiFileUpload = React.forwardRef((props, ref) => {
                 color="red"
               />
             </div>
-
-            {/* <button className='s-file-input-icon' type='button'>Upload</button> */}
           </div>
           <div className="file-input_component-lower">
             <div style={{ width: "100%" }}>

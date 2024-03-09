@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
 import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -28,7 +26,7 @@ import {
 } from "../../components/Layout/LayoutComponents";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.COUNTRY_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -38,13 +36,15 @@ let queryKey = QUERY_KEYS.COUNTRIES_QUERY_KEY;
 let IDENTITY = "CountryID";
 
 export default function BanckAccountOpening() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+      MenuKey: MENU_KEYS.GENERAL.COUNTRY_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (

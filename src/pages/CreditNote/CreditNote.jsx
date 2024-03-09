@@ -49,7 +49,7 @@ import { useSessionSelectData } from "../../hooks/SelectData/useSelectData";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -59,18 +59,20 @@ let queryKey = QUERY_KEYS.CREDIT_NODE_QUERY_KEY;
 let IDENTITY = "CreditNoteID";
 
 export default function BanckAccountOpening() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY,
+      MenuKey: MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
 
   return (
     <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
+      {userRights.length > 0 && userRights[0]?.ShowForm ? (
         <>
           <Route
             index

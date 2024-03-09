@@ -37,7 +37,7 @@ import { toast } from "react-toastify";
 import { CIconButton } from "../../components/Buttons/CButtons";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { checkForUserRights } from "../../utils/routes";
+import { UserRightsContext } from "../../context/UserRightContext";
 import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer";
@@ -51,15 +51,16 @@ let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
 let IDENTITY = "LeadIntroductionID";
 
 export default function LeadIntroduction() {
+  const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuName: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
+      MenuKey: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.LEADS.GROUP_KEY,
     });
-    setUserRights(rights);
+    setUserRights([rights]);
   }, []);
-  console.log(userRights);
 
   return (
     <Routes>

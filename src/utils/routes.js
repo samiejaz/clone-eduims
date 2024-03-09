@@ -4,6 +4,7 @@ export const routes = [
   {
     menuGroupName: "General",
     icon: "pi pi-home",
+    menuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
     subItems: [
       {
         name: "Country",
@@ -53,7 +54,7 @@ export const routes = [
   {
     menuGroupName: "Users",
     icon: "pi pi-users",
-
+    menuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
     subItems: [
       {
         name: "Users",
@@ -81,6 +82,7 @@ export const routes = [
   {
     menuGroupName: "Accounts",
     icon: "pi pi-dollar",
+    menuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
     subItems: [
       {
         name: "Bank Account Opening",
@@ -115,7 +117,7 @@ export const routes = [
   {
     menuGroupName: "Utilities",
     icon: "pi pi-cog",
-
+    menuGroupKey: MENU_KEYS.UTILITIES.GROUP_KEY,
     subItems: [
       {
         name: "App Configuration",
@@ -142,6 +144,7 @@ export const routes = [
   {
     menuGroupName: "Leads",
     icon: "pi pi-phone",
+    menuGroupKey: MENU_KEYS.LEADS.GROUP_KEY,
     subItems: [
       {
         name: "Leads Introduction",
@@ -166,10 +169,29 @@ export const routesWithUserRights = routes.map((route) => {
     RoleEdit: true,
     RoleDelete: true,
     RolePrint: true,
+    ShowForm: true,
   }));
 
   return updatedRoute;
 });
+
+export const initRoutesWithUserRights = () => {
+  const updatedRoutes = routes.map((route) => {
+    const updatedRoute = { ...route };
+
+    updatedRoute.subItems = route.subItems.map((subItem) => ({
+      ...subItem,
+      RoleNew: true,
+      RoleEdit: true,
+      RoleDelete: true,
+      RolePrint: true,
+      ShowForm: true,
+    }));
+
+    return updatedRoute;
+  });
+  return updatedRoutes;
+};
 
 // Authorized Routes
 export let authorizedRoutes = ["allowAll"];
