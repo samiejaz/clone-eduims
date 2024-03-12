@@ -48,7 +48,7 @@ export async function addNewComment({
   try {
     const DataToSend = {
       CommentID: 0,
-      LeadIntroductionID: LeadIntroductionID,
+      LeadIntroductionID: +LeadIntroductionID,
       Comment: formData.Comment,
       EntryUserID: userID,
     };

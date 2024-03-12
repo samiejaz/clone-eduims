@@ -1,30 +1,72 @@
-import { Spinner } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
-import useEditModal from "../../hooks/useEditModalHook";
 import { FilterMatchMode } from "primereact/api";
-
 import {
   deleteNewCustomerByID,
   fetchAllNewCustomers,
 } from "../../api/NewCustomerData";
 import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
 import { useNavigate } from "react-router";
-import { ROUTE_URLS } from "../../utils/enums";
+import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import AccessDeniedPage from "../../components/AccessDeniedPage";
+import { UserRightsContext } from "../../context/UserRightContext";
+import GenNewCustomerView from "./CustomerEntryView";
+import { Route, Routes } from "react-router-dom";
 
 const parentRoute = ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY;
-const editRoute = `${parentRoute}/edit/`;
 const viewRoute = `${parentRoute}/`;
+const IDENTITY = "CustomerID";
 
-export default function GenCustomerEntry() {
+export default function Customers() {
+  const { checkForUserRights } = useContext(UserRightsContext);
+  const [userRights, setUserRights] = useState([]);
+
+  useEffect(() => {
+    const rights = checkForUserRights({
+      MenuKey: MENU_KEYS.USERS.CUSTOMERS_FORM_KEY,
+      MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
+    });
+    setUserRights([rights]);
+  }, []);
+  console.log(userRights);
+  return (
+    <Routes>
+      {userRights && userRights[0]?.ShowForm ? (
+        <>
+          <Route index element={<GenCustomerEntry userRights={userRights} />} />
+          <Route
+            path={`:${IDENTITY}`}
+            element={
+              <GenNewCustomerView
+                key={"CustomerEntryViewRoute"}
+                mode={"view"}
+                userRights={userRights}
+              />
+            }
+          />
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <>
+              <AccessDeniedPage />
+            </>
+          }
+        />
+      )}
+    </Routes>
+  );
+}
+
+export function GenCustomerEntry({ userRights }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   // Hooks
@@ -88,9 +130,13 @@ export default function GenCustomerEntry() {
           <div className="d-flex text-dark mb-4">
             <h2 className="text-center my-auto">Customer Entry</h2>
 
-            <div className="text-end my-auto">
-              <CustomerEntryForm IconButton={false} />
-            </div>
+            {userRights[0]?.RoleNew && (
+              <>
+                <div className="text-end my-auto">
+                  <CustomerEntryForm IconButton={false} />
+                </div>
+              </>
+            )}
           </div>
           <DataTable
             showGridlines
@@ -115,7 +161,8 @@ export default function GenCustomerEntry() {
                   () => showDeleteDialog(rowData.CustomerID),
                   () => showEditDialog(rowData.CustomerID),
                   handleView,
-                  true
+                  userRights[0]?.RoleEdit,
+                  userRights[0]?.RoleDelete
                 )
               }
               header="Actions"

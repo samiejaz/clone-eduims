@@ -176,21 +176,26 @@ export const routesWithUserRights = routes.map((route) => {
 });
 
 export const initRoutesWithUserRights = () => {
-  const updatedRoutes = routes.map((route) => {
-    const updatedRoute = { ...route };
+  const userRights = JSON.parse(localStorage.getItem("userRights"));
+  if (userRights?.length > 0) {
+    return userRights;
+  } else {
+    const updatedRoutes = routes.map((route) => {
+      const updatedRoute = { ...route, AllowAllRoles: false };
 
-    updatedRoute.subItems = route.subItems.map((subItem) => ({
-      ...subItem,
-      RoleNew: true,
-      RoleEdit: true,
-      RoleDelete: true,
-      RolePrint: true,
-      ShowForm: true,
-    }));
+      updatedRoute.subItems = route.subItems.map((subItem) => ({
+        ...subItem,
+        RoleNew: true,
+        RoleEdit: true,
+        RoleDelete: true,
+        RolePrint: true,
+        ShowForm: true,
+      }));
 
-    return updatedRoute;
-  });
-  return updatedRoutes;
+      return updatedRoute;
+    });
+    return updatedRoutes;
+  }
 };
 
 // Authorized Routes
