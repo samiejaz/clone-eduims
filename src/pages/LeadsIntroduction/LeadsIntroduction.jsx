@@ -71,6 +71,14 @@ export default function LeadIntroduction() {
             element={<LeadIntroductionDetail userRights={userRights} />}
           />
           <Route
+            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID`}
+            element={<LeadsIntroductionViewer />}
+          />
+          <Route
+            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE}/:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
+            element={<LeadsIntroductionViewerDetail />}
+          />
+          <Route
             path={`:${IDENTITY}`}
             element={
               <LeadIntroductionForm

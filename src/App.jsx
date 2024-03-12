@@ -27,6 +27,7 @@ import {
   LeadIntroduction,
   LeadSource,
   UserRights,
+  Customers,
 } from "./pages";
 
 import { ROUTE_URLS } from "./utils/enums";
@@ -93,6 +94,10 @@ const App = () => {
             path={`${ROUTE_URLS.DEPARTMENT}/*`}
             element={<Departments />}
           />
+          <Route
+            path={`${ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY}/*`}
+            element={<Customers />}
+          />
 
           {/* Users Routes END*/}
 
@@ -148,15 +153,6 @@ const App = () => {
             element={<UserRights />}
           />
           {/* Configuration Routes END */}
-
-          <Route
-            path={ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY}
-            element={<GenCustomerEntry />}
-          />
-          <Route
-            path={`${ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY}/:CustomerID`}
-            element={<GenNewCustomerView />}
-          />
 
           <Route
             path={`${ROUTE_URLS.GENERAL.COMPANY_INFO_ROUTE}`}

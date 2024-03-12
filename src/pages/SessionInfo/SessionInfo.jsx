@@ -50,7 +50,7 @@ export default function SessionInfoOpening() {
 
   useEffect(() => {
     const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+      MenuKey: MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY,
       MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
     });
     setUserRights([rights]);

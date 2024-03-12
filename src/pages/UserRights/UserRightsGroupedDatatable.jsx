@@ -11,15 +11,53 @@ let filters = {
 
 export default function UserRightsGroupedTable() {
   const [expandedRows, setExpandedRows] = useState([]);
+
   const { setRoutesWithUserRights, routesWithUserRights } =
     useContext(UserRightsContext);
+
+  function updateAllRolesOfGroup(groupKey, currentState) {
+    let _routesWithUserRights = [...routesWithUserRights];
+    for (let i = 0; i < _routesWithUserRights.length; i++) {
+      if (_routesWithUserRights[i].menuGroupKey === groupKey) {
+        _routesWithUserRights[i].AllowAllRoles = !currentState;
+        _routesWithUserRights[i].subItems = _routesWithUserRights[
+          i
+        ].subItems?.map((item) => {
+          return {
+            ...item,
+            RoleDelete: !currentState,
+            RoleEdit: !currentState,
+            RoleNew: !currentState,
+            RolePrint: !currentState,
+            ShowForm: !currentState,
+          };
+        });
+      }
+    }
+    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights));
+    setRoutesWithUserRights(_routesWithUserRights);
+  }
 
   const headerTemplate = (data) => {
     return (
       <React.Fragment>
-        <span className="vertical-align-middle ml-2 font-bold line-height-3">
-          {data.menuGroupName}
-        </span>
+        <div className="flex align-content-center justify-content-between">
+          <span className="vertical-align-middle ml-2 font-bold line-height-3">
+            {data.menuGroupName}
+          </span>
+          <div className="flex align-items-center gap-2">
+            <span className="vertical-align-middle ml-2 font-bold line-height-3">
+              Allow All
+            </span>
+
+            <InputSwitch
+              checked={data.AllowAllRoles}
+              onChange={() =>
+                updateAllRolesOfGroup(data.menuGroupKey, data.AllowAllRoles)
+              }
+            />
+          </div>
+        </div>
       </React.Fragment>
     );
   };
@@ -46,6 +84,7 @@ export default function UserRightsGroupedTable() {
   const RolePrintTemplate = (rowData) => {
     return <InputSwitch checked={rowData.RolePrint} />;
   };
+
   const onRowEditComplete = (e) => {
     let _routesWithUserRights = [...routesWithUserRights];
 
@@ -59,6 +98,7 @@ export default function UserRightsGroupedTable() {
         }
       }
     }
+    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights));
     setRoutesWithUserRights(_routesWithUserRights);
   };
 

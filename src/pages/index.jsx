@@ -17,6 +17,7 @@ export { default as Session } from "./SessionInfo/SessionInfo";
 // User Routes
 export { default as Users } from "./GenUsers/Users";
 export { default as Departments } from "./Departments/Department";
+export { default as Customers } from "./CustomerEntry/GenCustomerEntry";
 
 // Account Routes
 export { default as CustomerInvoice } from "./CustomerInvoice/NewCustomerInvoice";
