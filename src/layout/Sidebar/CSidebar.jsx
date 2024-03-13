@@ -1,19 +1,19 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
-import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums";
+import { ROUTE_URLS } from "../../utils/enums";
 import signalRConnectionManager from "../../services/SignalRService";
 import { Toast } from "primereact/toast";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import { AuthContext } from "../../context/AuthContext";
 import { confirmDialog } from "primereact/confirmdialog";
-import { finalFilteredRoutes } from "../../utils/routes";
+import { InputText } from "primereact/inputtext";
 import { UserRightsContext } from "../../context/UserRightContext";
 
 const CSidebar = ({ sideBarRef }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const toastRef = useRef(null);
-  const { pageTitles } = useContext(AppConfigurationContext);
+  let isSidebarOpen = localStorage.getItem("isSidebarOpen");
 
   useEffect(() => {
     async function configurationSetup() {
@@ -29,11 +29,6 @@ const CSidebar = ({ sideBarRef }) => {
     };
   }, []);
 
-  function toggleSubmenu(e) {
-    let parent = e.target.parentNode.parentNode;
-    parent.classList.toggle("c-showMenu");
-  }
-
   return (
     <>
       <div ref={sideBarRef} className={`c-sidebar c-close`}>
@@ -42,6 +37,9 @@ const CSidebar = ({ sideBarRef }) => {
             EDUIMS
           </span>
         </div>
+
+        <SearchBar />
+
         <ul className="c-nav-links">
           <li>
             <Link to={"/"}>
@@ -159,11 +157,11 @@ export const SignOut = () => {
 };
 
 const SubSidebar = () => {
-  const { routesWithUserRights } = useContext(UserRightsContext);
+  const { filteredRoutes } = useContext(UserRightsContext);
 
   return (
     <>
-      {routesWithUserRights.map((route) => (
+      {filteredRoutes?.map((route) => (
         <MenuGroup
           key={route.menuGroupName}
           menuGroupName={route.menuGroupName}
@@ -258,6 +256,43 @@ const MenuItem = ({
           )}
         </>
       )}
+    </>
+  );
+};
+
+const SearchBar = () => {
+  const [searchText, setSearchText] = useState("");
+
+  const { routesWithUserRights, setFilteredRoutes } =
+    useContext(UserRightsContext);
+  const filterRoutes = () => {
+    if (!searchText) return routesWithUserRights;
+
+    return routesWithUserRights.map((group) => ({
+      ...group,
+      subItems: group.subItems.filter((subItem) =>
+        subItem.name.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    }));
+  };
+
+  // Update the context with the filtered routes
+  useEffect(() => {
+    if (searchText !== "") {
+      setFilteredRoutes(filterRoutes());
+    }
+  }, [searchText]);
+
+  return (
+    <>
+      <div className="text-center c-close" id="routeSearchContainer">
+        <InputText
+          prefix="pi pi-cog"
+          placeholder="Search for form..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      </div>
     </>
   );
 };

@@ -1,4 +1,3 @@
-import { Row, Form, Col, Button, ButtonGroup, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
@@ -7,6 +6,16 @@ import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import TextInput from "../../components/Forms/TextInput";
+import { Button } from "primereact/button";
+import { useKeyCombinationHook } from "../../hooks/hooks";
+import { Tag } from "primereact/tag";
+import SimpleToolbar from "../../components/Toolbars/SimpleToolbar";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -21,15 +30,14 @@ function AppConfiguration() {
   const [reload, setReload] = useState(true);
   const [ConfigID, setConfigID] = useState(true);
   const { setPageTitles } = useContext(AppConfigurationContext);
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { isDirty, isValid, errors },
-  } = useForm({
+  const { control, setFocus, handleSubmit, setValue } = useForm({
     defaultValues,
   });
   const { user } = useContext(AuthContext);
+
+  useKeyCombinationHook(() => {
+    handleSubmit(onSubmit)();
+  }, "s");
 
   useEffect(() => {
     async function fetchCompanyInfo() {
@@ -54,24 +62,30 @@ function AppConfiguration() {
 
   const configurationMutation = useMutation({
     mutationFn: async (formData) => {
-      let DataToSend = {
-        ConfigID: ConfigID,
-        ProductTitle: formData?.ProductName,
-        CustomerBranchTitle: formData?.BranchName,
-        EntryUserID: user?.userID,
-      };
+      try {
+        let DataToSend = {
+          ConfigID: ConfigID,
+          ProductTitle: formData?.ProductName,
+          CustomerBranchTitle: formData?.BranchName,
+          EntryUserID: user?.userID,
+        };
 
-      const { data } = await axios.post(
-        "http://192.168.9.110:90/api/EduIMS/ConfigOneInsertUpdate",
-        DataToSend
-      );
+        const { data } = await axios.post(
+          `${apiUrl}/EduIMS/ConfigOneInsertUpdate`,
+          DataToSend
+        );
 
-      if (data.success === true) {
-        toast.success("App Configuration updated successfully!");
-        setReload(true);
-      } else {
-        toast.error(data.message, {
-          autoClose: 1500,
+        if (data.success === true) {
+          toast.success("App Configuration updated successfully!");
+          setReload(true);
+        } else {
+          toast.error(data.message, {
+            autoClose: false,
+          });
+        }
+      } catch (error) {
+        toast.error(error.message, {
+          autoClose: false,
         });
       }
     },
@@ -83,65 +97,32 @@ function AppConfiguration() {
 
   return (
     <>
-      <div className="mt-5 p-2">
-        <h4 className="p-3 mb-2 bg-light text-dark text-center  ">
-          App Configuration
-        </h4>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={preventFormByEnterKeySubmission}
-        >
-          <Row className="p-3">
-            <Form.Group as={Col} controlId="ProductName">
-              <Form.Label>Product Name</Form.Label>
+      <div className="p-2">
+        <SimpleToolbar
+          onSaveClick={() => handleSubmit(onSubmit)()}
+          title={"App Configuration"}
+        />
+        <form onKeyDown={preventFormByEnterKeySubmission}>
+          <FormRow>
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Product Name</FormLabel>
 
-              <Form.Control
-                type="text"
-                required
-                className="form-control"
-                {...register("ProductName")}
-              />
-              <p className="text-danger">{errors.ProductName?.message}</p>
-            </Form.Group>
-            <Form.Group as={Col} controlId="BranchName">
-              <Form.Label>Branch Name</Form.Label>
+              <div>
+                <TextInput
+                  control={control}
+                  ID={"ProductName"}
+                  focusOptions={() => setFocus("BranchName")}
+                />
+              </div>
+            </FormColumn>
+            <FormColumn lg={3} xl={3} md={6}>
+              <FormLabel>Branch Name</FormLabel>
 
-              <Form.Control
-                type="text"
-                className="form-control"
-                {...register("BranchName")}
-              />
-            </Form.Group>
-          </Row>
-
-          <Row>
-            <ButtonGroup className="gap-2 rounded-2">
-              <Button
-                disabled={
-                  !isDirty || !isValid || configurationMutation.isPending
-                }
-                variant="success"
-                style={{ marginTop: "30px" }}
-                className="btn btn-primary p-2 rounded-sm fw-bold"
-                type="submit"
-              >
-                {configurationMutation.isPending ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                    <span> Saving...</span>
-                  </>
-                ) : (
-                  "Save"
-                )}
-              </Button>
-            </ButtonGroup>
-          </Row>
+              <div>
+                <TextInput control={control} ID={"BranchName"} />
+              </div>
+            </FormColumn>
+          </FormRow>
         </form>
       </div>
     </>

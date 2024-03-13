@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useUserData } from "../../context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -13,49 +13,26 @@ import {
   deleteCommentByID,
   fetchAllLeadComments,
 } from "../../api/LeadsIntroductionCommentsData";
-import { Card } from "primereact/card";
-import { Avatar } from "primereact/avatar";
 import { Controller, useForm } from "react-hook-form";
 import { classNames } from "primereact/utils";
-import { Mention } from "primereact/mention";
 import { Button } from "primereact/button";
-import { ROUTE_URLS } from "../../utils/enums";
-import { Dialog } from "primereact/dialog";
-import { CIconButton } from "../../components/Buttons/CButtons";
-import TextInput from "../../components/Forms/TextInput";
+
 import { InputText } from "primereact/inputtext";
 import { ContextMenu } from "primereact/contextmenu";
 import { confirmDialog } from "primereact/confirmdialog";
+import { Avatar } from "primereact/avatar";
 
 const LeadsComments = () => {
   const { LeadIntroductionID } = useParams();
-  const navigate = useNavigate();
   const user = useUserData();
-
-  const commentDialogRef = useRef();
 
   return (
     <LeadCommentProivder>
       <div className="flex flex-column h-full" style={{ minHeight: "90vh" }}>
-        {/* <div className="s-sb">
-        <Button
-          onClick={() => navigate(ROUTE_URLS.LEAD_INTRODUCTION_ROUTE)}
-          type="button"
-          icon="pi pi-arrow-left"
-          label="Back to Leads"
-          className="rounded"
-        />
-        <Button
-          onClick={() => commentDialogRef.current?.setVisible(true)}
-          type="button"
-          icon="pi pi-plus"
-          label="Add New Comment"
-          className="rounded"
-          severity="success"
-        />
-      </div> */}
-
-        <div className="flex-grow-1 w-full relative overflow-y-scroll">
+        <div
+          id="comment-scrollbar"
+          className="flex-grow-1 w-full relative overflow-y-scroll"
+        >
           <div className="absolute top-0 left-0 right-0 bottom-2">
             <CommentsContainer
               LeadIntroductionID={LeadIntroductionID}
@@ -157,7 +134,6 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
   }
 
   function handleEdit(id, comment) {
-    console.log(id, comment);
     setComment({
       CommentID: id,
       Comment: comment,
@@ -216,12 +192,9 @@ const SingleComment = ({ comment, user, handleRightClick }) => {
   return (
     <>
       <li
-        className={classNames(
-          "px-4 py-2 bg-primary  w-full rounded align-self-start",
-          {
-            "align-self-end ": comment.EntryUserID === user.userID,
-          }
-        )}
+        className={classNames("flex w-full align-self-start gap-1", {
+          "align-self-end": comment.EntryUserID === user.userID,
+        })}
         style={{ maxWidth: "fit-content" }}
         onContextMenu={(event) => {
           if (comment.EntryUserID === user.userID) {
@@ -229,9 +202,26 @@ const SingleComment = ({ comment, user, handleRightClick }) => {
           }
         }}
       >
-        <p className="p-0 m-0">{comment.FullName}</p>
-        <span className="p-0 m-0">@{comment.UserName}</span>
-        <p className="p-0 m-0">{comment.Comment}</p>
+        <div
+          className={classNames("flex-none", {
+            "flex-order-1": comment.EntryUserID === user.userID,
+          })}
+        >
+          <Avatar
+            image={"data:image/png;base64," + comment.ProfilePic}
+            size="large"
+            shape="circle"
+          />
+        </div>
+        <div
+          className={classNames("flex-grow-1 px-3 py-2 rounded", {
+            "flex-order-0": comment.EntryUserID === user.userID,
+          })}
+          style={{ background: "#202C33", color: "white" }}
+        >
+          <p className="p-0 m-0 text-sm font-semibold">~{comment.FullName}</p>
+          <p className="p-0 m-0">{comment.Comment}</p>
+        </div>
       </li>
     </>
   );
@@ -249,6 +239,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
   useEffect(() => {
     if (comment?.Comment !== null) {
       method.setValue("Comment", comment.Comment);
+      method.setFocus("Comment");
     }
   }, [comment]);
 
