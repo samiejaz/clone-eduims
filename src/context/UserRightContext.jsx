@@ -9,6 +9,7 @@ export const UserRightsContext = createContext();
 
 export const UserRightsProivder = ({ children }) => {
   const [routesWithUserRights, setRoutesWithUserRights] = useState([]);
+  const [filteredRoutes, setFilteredRoutes] = useState([]);
 
   useEffect(() => {
     /* This will be an api call for getting department or user rights */
@@ -63,6 +64,8 @@ export const UserRightsProivder = ({ children }) => {
         routesWithUserRights,
         setRoutesWithUserRights,
         checkForUserRights,
+        filteredRoutes,
+        setFilteredRoutes,
       }}
     >
       {children}

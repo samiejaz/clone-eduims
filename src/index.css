@@ -14,6 +14,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+#comment-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 10px;
+  color: beige !important;
+}
+
 /* Changed css */
 .min-h-90vh {
   min-height: 90vh;
@@ -529,6 +535,9 @@ a {
   padding: 6px 6px 14px 80px;
   margin-top: -10px;
   background: #1d1b31;
+  display: none;
+}
+.c-sidebar.c-close #routeSearchContainer {
   display: none;
 }
 .c-sidebar .c-nav-links li.c-showMenu .c-sub-menu {

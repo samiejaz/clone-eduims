@@ -17,6 +17,8 @@ import TextInput from "../../components/Forms/TextInput";
 import ImageContainer from "../../components/ImageContainer";
 import { Tooltip } from "react-bootstrap";
 import { Button } from "primereact/button";
+import SimpleToolbar from "../../components/Toolbars/SimpleToolbar";
+import { useKeyCombinationHook } from "../../hooks/hooks";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -43,6 +45,10 @@ function CompanyInfo() {
     defaultValues,
   });
   const { user } = useContext(AuthContext);
+
+  useKeyCombinationHook(() => {
+    handleSubmit(onSubmit)();
+  }, "s");
 
   useEffect(() => {
     async function fetchCompanyInfo() {
@@ -138,28 +144,10 @@ function CompanyInfo() {
   return (
     <>
       <div className="p-2">
-        <div className="flex align-content-center justify-content-between">
-          <div
-            style={{ justifySelf: "center", flex: "1", textAlign: "center" }}
-          >
-            <h1 className="text-2xl fw-bold ">Company Info</h1>
-          </div>
-          <div className="flex gap-2">
-            {/* <Button
-              label="Edit"
-              severity="warning"
-              type="button"
-              tooltip="Edit"
-              className="rounded"
-            /> */}
-            <Button
-              label="Save"
-              severity="success"
-              className="rounded"
-              onClick={() => handleSubmit(onSubmit)()}
-            />
-          </div>
-        </div>
+        <SimpleToolbar
+          onSaveClick={() => handleSubmit(onSubmit)()}
+          title={"Company Info"}
+        />
         <form onKeyDown={preventFormByEnterKeySubmission}>
           <FormRow>
             <FormColumn lg={3} xl={3} md={6}>
@@ -313,116 +301,10 @@ function CompanyInfo() {
                 ></i>
               </FormLabel>
               <div>
-                <ImageContainer
-                  imageRef={imageRef}
-                  //  hideButtons={mode === "view"}
-                />
+                <ImageContainer imageRef={imageRef} />
               </div>
             </FormColumn>
           </FormRow>
-
-          {/* {(editImage || !CompanyInfo[0]?.CompanyLogo) && (
-            <>
-              <FormRow className="p-3" style={{ marginTop: "-25px" }}>
-                <FormColumn controlId="CompanyLogo" className="mb-3">
-                  <FormLabel>Company Logo</FormLabel>
-                  <Form.Control
-                    type="file"
-                    {...register("CompanyLogo")}
-                    onChange={onLogoChange}
-                    accept="image/jpeg, image/png"
-                  />
-                </FormColumn>
-              </FormRow>
-            </>
-          )}
-
-          {imgData && (
-            <FormRow className="p-3" style={{ marginTop: "-25px" }}>
-              <div className="text-end mb-1">
-                <ButtonGroup className="gap-1">
-                  <Button
-                    onClick={() => handleDelete()}
-                    size="sm"
-                    variant="danger"
-                    className="rounded"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      fill="currentColor"
-                      className="bi bi-trash3"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
-                    </svg>
-                  </Button>
-                  <Button
-                    onClick={() => handleEdit()}
-                    size="sm"
-                    variant="success"
-                    className="rounded"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
-                      />
-                    </svg>
-                  </Button>
-                </ButtonGroup>
-              </div>
-              <FormColumn controlId="CompanyLogo" className="mb-3">
-                <div className="card flex justify-content-center">
-                  <>
-                    <Image
-                      src={"data:image/png;base64," + imgData}
-                      alt="Image"
-                      width="250"
-                      preview
-                      className="text-center"
-                    />
-                  </>
-                </div>
-              </FormColumn>
-            </FormRow>
-          )} */}
-
-          {/* <FormRow>
-            <ButtonGroup className="gap-2 rounded-2">
-              <Button
-                disabled={!isDirty || !isValid || companyMutation.isPending}
-                variant="success"
-                style={{ marginTop: "30px" }}
-                className="btn btn-primary p-2 rounded-sm fw-bold"
-                type="submit"
-              >
-                {companyMutation.isPending ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                    <span> Saving...</span>
-                  </>
-                ) : (
-                  "Save"
-                )}
-              </Button>
-            </ButtonGroup>
-          </FormRow> */}
         </form>
       </div>
     </>

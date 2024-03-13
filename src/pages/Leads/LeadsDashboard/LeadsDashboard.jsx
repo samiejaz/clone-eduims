@@ -9,6 +9,7 @@ import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import { checkForUserRights } from "../../../utils/routes";
+import { ContextMenu } from "primereact/contextmenu";
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 function LeadsDashboard() {
@@ -16,6 +17,7 @@ function LeadsDashboard() {
 
   const [visible, setVisible] = useState(false);
   const toastBC = useRef(null);
+  const cm = useRef(null);
   const navigate = useNavigate();
 
   const clear = () => {
@@ -58,7 +60,22 @@ function LeadsDashboard() {
   };
 
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const onRightClick = (event) => {
+    if (cm.current) {
+      cm.current.show(event);
+    }
+  };
 
+  const items = [
+    {
+      label: "Move to Main Dashboard",
+      icon: "pi pi-pencil",
+      command: () => {
+        // handleClick(commentID, CONTEXT_ACTIONS.EDIT_ACTION, commentText);
+        localStorage.setItem("dynamic-component", "LeadIntroductionDetail");
+      },
+    },
+  ];
   return (
     <div
       style={{
@@ -116,7 +133,12 @@ function LeadsDashboard() {
           </div>
         </div>
       </div>
-      <div className="card p-3 border-0 shadow-sm">
+      <div
+        className="card p-3 border-0 shadow-sm"
+        onContextMenu={(event) => {
+          onRightClick(event);
+        }}
+      >
         <div>
           <LeadIntroductionDetail
             ShowMetaDeta={false}
@@ -127,6 +149,16 @@ function LeadsDashboard() {
           />
         </div>
       </div>
+      <ContextMenu
+        ref={cm}
+        model={items}
+        onHide={() => {}}
+        pt={{
+          menu: {
+            className: "m-0",
+          },
+        }}
+      />{" "}
     </div>
   );
 }

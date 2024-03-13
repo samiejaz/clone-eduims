@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import React, { useState } from "react";
-import ReactDatePicker from "react-datepicker";
+import React, { useEffect, useState } from "react";
 import { useUserData } from "../../context/AuthContext";
 import { QUERY_KEYS } from "../../utils/enums";
 import {
@@ -18,122 +17,45 @@ import { CIconButton } from "../../components/Buttons/CButtons";
 import { useRevertBackModalHook } from "../../components/Modals/RevertBackModal";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { toast } from "react-toastify";
-import { parseISO } from "date-fns";
+import { LeadIntroductionDetail } from "../LeadsIntroduction/LeadsIntroduction";
+
+const componentMapping = {
+  LeadIntroductionDetail,
+};
+
+function DynamicComponent({ componentName }) {
+  const Component = componentMapping[componentName];
+  return <Component />;
+}
 
 function Dashboard() {
   document.title = "Dashboard";
+  const [dynamicComponent, setDynamicComponent] = useState("");
+
+  useEffect(() => {
+    function getDynamicallyCreatedComponent() {
+      const dynamicComponent = localStorage.getItem("dynamic-component");
+      if (dynamicComponent) {
+        setDynamicComponent(dynamicComponent);
+      }
+    }
+    getDynamicallyCreatedComponent();
+  }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-      }}
-      className="mt-4"
-    >
-      <div className="card p-4 border-0 shadow-sm">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <h3>Title</h3>
-            <div>
-              <div>
-                <ReactDatePicker
-                  placeholderText="Select date"
-                  dateFormat={"dd-MMM-yyyy"}
-                  className={"binput"}
-                />
-              </div>
-            </div>
-          </div>
-          <hr />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "start",
-              gap: "10px",
-            }}
-          >
-            <div
-              className="card p-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <p className="fw-bold">Title</p>
-              <p>10000</p>
-            </div>
-            <div
-              className="card p-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <p className="fw-bold">Title</p>
-              <p>10000</p>
-            </div>
-            <div
-              className="card p-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <p className="fw-bold">Title</p>
-              <p>10000</p>
-            </div>
-            <div
-              className="card p-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <p className="fw-bold">Title</p>
-              <p>10000</p>
-            </div>
-            <div
-              className="card p-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <p className="fw-bold">Title</p>
-              <p>10000</p>
-            </div>
-            <div
-              className="card p-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <p className="fw-bold">Title</p>
-              <p>10000</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="card p-4 border-0 shadow-sm">
+    <div className="mt-4 flex flex-column gap-1">
+      <div>
         <div>
           <LeadsIntroductionDemonstratorTable />
         </div>
       </div>
+      {dynamicComponent !== "" && (
+        <>
+          <div>
+            {/* <DynamicComponent componentName={"LeadIntroductionDetail"} /> */}
+          </div>
+        </>
+      )}
     </div>
   );
 }
