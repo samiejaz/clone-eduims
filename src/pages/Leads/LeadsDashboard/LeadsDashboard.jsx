@@ -1,156 +1,168 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { LeadIntroductionDetail } from "../../LeadsIntroduction/LeadsIntroduction";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { MENU_KEYS, QUERY_KEYS } from "../../../utils/enums";
-import { Calendar } from "primereact/calendar";
+import {
+  MENU_KEYS,
+  MOVEABLE_COMPNENTS_NAMES,
+  QUERY_KEYS,
+} from "../../../utils/enums";
 import { formatDateToMMDDYYYY } from "../../../utils/CommonFunctions";
-import { Toast } from "primereact/toast";
-import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
 import { checkForUserRights } from "../../../utils/routes";
 import { ContextMenu } from "primereact/contextmenu";
+import {
+  FormRow,
+  FormColumn,
+} from "../../../components/Layout/LayoutComponents";
+import { useUserData } from "../../../context/AuthContext";
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
-function LeadsDashboard() {
+export function LeadsDashboard() {
   document.title = "Leads Dashboard";
 
-  const [visible, setVisible] = useState(false);
-  const toastBC = useRef(null);
-  const cm = useRef(null);
-  const navigate = useNavigate();
+  return (
+    <div className="flex flex-column gap-1 mt-4">
+      <div className="w-full">
+        <div className="flex align-items-center justify-content-between">
+          <h1 className="text-2xl">Leads Dashboard</h1>
+        </div>
+        <hr />
+        <InfoCardsContainer
+          componentLocation="LeadsDashboard"
+          selectedDate={formatDateToMMDDYYYY(new Date())}
+        />
+      </div>
+      <div className="w-full">
+        <LeadIntroductionDetail
+          ShowMetaDeta={false}
+          Rows={5}
+          userRights={checkForUserRights({
+            MenuName: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
+          })}
+        />
+      </div>
+    </div>
+  );
+}
 
-  const clear = () => {
-    toastBC.current.clear();
-    navigate("/");
-    setVisible(false);
-  };
+export default LeadsDashboard;
 
-  const confirm = () => {
-    if (!visible) {
-      setVisible(true);
-      toastBC.current.clear();
-      toastBC.current.show({
-        severity: "success",
-        summary: "Can you send me the report?",
-        sticky: true,
+export function InfoCardsContainer({
+  componentLocation = "",
+  selectedDate = new Date().toISOString(),
+}) {
+  const user = useUserData();
 
-        content: (props) => (
-          <div
-            className="flex flex-column align-items-left"
-            style={{ flex: "1" }}
-          >
-            <div className="flex align-items-center gap-2">
-              {/* <Avatar image="/images/avatar/amyelsner.png" shape="circle" /> */}
-              <span className="font-bold text-900">Amy Elsner</span>
-            </div>
-            <div className="font-medium text-lg my-3 text-900">
-              {props.message.summary}
-            </div>
-            <Button
-              className="p-button-sm flex"
-              label="Reply"
-              severity="success"
-              onClick={clear}
-            ></Button>
-          </div>
-        ),
-      });
-    }
-  };
+  const { data } = useQuery({
+    queryKey: [QUERY_KEYS.LEADS_CARD_DATA],
+    queryFn: async () => {
+      const url =
+        apiUrl +
+        `/data_LeadIntroduction/GetLeadIntroductionDashboardCounter?LoginUserID=${user.userID}&DateTo=${selectedDate}`;
+      const { data } = await axios.post(url);
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
+      return data.data || [];
+    },
+    initialData: [],
+  });
+
+  const cmRef = useRef();
   const onRightClick = (event) => {
-    if (cm.current) {
-      cm.current.show(event);
+    if (cmRef.current) {
+      cmRef.current.show(event);
     }
   };
 
   const items = [
     {
-      label: "Move to Main Dashboard",
-      icon: "pi pi-pencil",
+      label: `${
+        componentLocation === "LeadsDashboard" ? "Move to" : "Remove from"
+      } Main Dashboard`,
+      icon: `${
+        componentLocation === "LeadsDashboard" ? "pi pi-send" : "pi pi-times"
+      }`,
       command: () => {
-        // handleClick(commentID, CONTEXT_ACTIONS.EDIT_ACTION, commentText);
-        localStorage.setItem("dynamic-component", "LeadIntroductionDetail");
+        setOrRemoveItemFromLocalStorage();
       },
     },
   ];
+
+  function setOrRemoveItemFromLocalStorage() {
+    if (componentLocation === "LeadsDashboard") {
+      localStorage.setItem(
+        "dynamic-component",
+        MOVEABLE_COMPNENTS_NAMES.LEADS_DASHBOARD_CARDS
+      );
+    } else {
+      localStorage.removeItem(
+        "dynamic-component",
+        MOVEABLE_COMPNENTS_NAMES.LEADS_DASHBOARD_CARDS
+      );
+    }
+  }
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-      }}
-      className="mt-4"
-    >
-      <div className="border-0">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <h3>Leads Dashboard</h3>
-            <Toast ref={toastBC} position="top-right" onRemove={clear} />
-            <Button onClick={confirm} label="Confirm" />
-            <div style={{ width: "25%" }}>
-              <div>
-                <Calendar
-                  dateFormat="dd/mm/yy"
-                  style={{ width: "100%" }}
-                  hourFormat="12"
-                  inputStyle={{ textAlign: "center" }}
-                  value={selectedDate}
-                  onChange={(e) => {
-                    setSelectedDate(e.value);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <hr />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "0.5rem",
-              // flexWrap: "wrap",
-            }}
-          >
-            <InfoCardsContainer
-              selectedDate={formatDateToMMDDYYYY(selectedDate)}
-            />
-          </div>
+    <>
+      {data.length > 0 && (
+        <div ref={cmRef} onContextMenu={(e) => onRightClick(e)}>
+          <FormRow>
+            <FormColumn xl={2} lg={4} md={4}>
+              <CCard
+                Status={"New Lead"}
+                Value={data[0].NewLeadStatusCount}
+                Icon={"pi pi-plus"}
+                BackGroundColor="#C7EEEA"
+                ForeGroundColor="#14B8A6"
+              />
+            </FormColumn>
+
+            <FormColumn xl={2} lg={4} md={4}>
+              <CCard
+                Status={"Forwarded"}
+                Value={data[0].ForwardedStatusCount}
+                Icon={"pi pi-send"}
+              />
+            </FormColumn>
+            <FormColumn xl={2} lg={4} md={4}>
+              <CCard
+                Status={"Quoted"}
+                Value={data[0].QuotedStatusCount}
+                Icon={"pi pi-dollar"}
+                BackGroundColor="#A0E6BA"
+                ForeGroundColor="#136C34"
+              />
+            </FormColumn>
+            <FormColumn xl={2} lg={4} md={4}>
+              <CCard
+                Status={"Finalized"}
+                Value={data[0].FinalizedStatusCount}
+                Icon={"pi pi-check"}
+                BackGroundColor="#DADAFC"
+                ForeGroundColor="#8183F4"
+              />
+            </FormColumn>
+            <FormColumn xl={2} lg={4} md={4}>
+              <CCard
+                Status={"Closed"}
+                Value={data[0].ClosedStatusCount}
+                Icon={"pi pi-times"}
+                BackGroundColor="#FFD0CE"
+                ForeGroundColor="#FF3D32"
+              />
+            </FormColumn>
+            <FormColumn xl={2} lg={4} md={4}>
+              <CCard
+                Status={"Acknowledged"}
+                Value={data[0].AcknowledgedStatusCount}
+                Icon={"pi pi-user"}
+              />
+            </FormColumn>
+          </FormRow>
         </div>
-      </div>
-      <div
-        className="card p-3 border-0 shadow-sm"
-        onContextMenu={(event) => {
-          onRightClick(event);
-        }}
-      >
-        <div>
-          <LeadIntroductionDetail
-            ShowMetaDeta={false}
-            Rows={5}
-            userRights={checkForUserRights({
-              MenuName: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
-            })}
-          />
-        </div>
-      </div>
+      )}
+
       <ContextMenu
-        ref={cm}
+        ref={cmRef}
         model={items}
         onHide={() => {}}
         pt={{
@@ -158,74 +170,7 @@ function LeadsDashboard() {
             className: "m-0",
           },
         }}
-      />{" "}
-    </div>
-  );
-}
-
-export default LeadsDashboard;
-
-let lightSuccessColor = "#A0E6BA";
-let darkSuccessColor = "#1DA750";
-
-function InfoCardsContainer({ selectedDate }) {
-  const { data } = useQuery({
-    queryKey: [QUERY_KEYS.LEADS_CARD_DATA, selectedDate],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDashboardCounter?LoginUserID=1&DateTo=${selectedDate}`
-      );
-
-      return data.data || [];
-    },
-    initialData: [],
-  });
-
-  return (
-    <>
-      {data.length > 0 && (
-        <>
-          <CCard
-            Status={"New Lead"}
-            Value={data[0].NewLeadStatusCount}
-            Icon={"pi pi-plus"}
-            BackGroundColor="#C7EEEA"
-            ForeGroundColor="#14B8A6"
-          />
-          <CCard
-            Status={"Forwarded"}
-            Value={data[0].ForwardedStatusCount}
-            Icon={"pi pi-send"}
-          />
-          <CCard
-            Status={"Quoted"}
-            Value={data[0].QuotedStatusCount}
-            Icon={"pi pi-dollar"}
-            BackGroundColor="#A0E6BA"
-            ForeGroundColor="#136C34"
-          />
-          <CCard
-            Status={"Finalized"}
-            Value={data[0].FinalizedStatusCount}
-            Icon={"pi pi-check"}
-            BackGroundColor="#DADAFC"
-            ForeGroundColor="#8183F4"
-          />
-          <CCard
-            Status={"Closed"}
-            Value={data[0].ClosedStatusCount}
-            Icon={"pi pi-times"}
-            BackGroundColor="#FFD0CE"
-            ForeGroundColor="#FF3D32"
-          />
-          <CCard
-            Status={"Acknowledged"}
-            Value={data[0].AcknowledgedStatusCount}
-            Icon={"pi pi-user"}
-          />
-        </>
-      )}
+      />
     </>
   );
 }

@@ -3,7 +3,7 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import React, { useEffect, useState } from "react";
 import { useUserData } from "../../context/AuthContext";
-import { QUERY_KEYS } from "../../utils/enums";
+import { MOVEABLE_COMPNENTS_NAMES, QUERY_KEYS } from "../../utils/enums";
 import {
   addLeadIntroductionOnAction,
   fetchAllDemonstrationLeadsData,
@@ -15,12 +15,12 @@ import { useLeadsIntroductionModalHook } from "../../hooks/ModalHooks/useLeadsIn
 import { useMeetingDoneModalHook } from "../../components/Modals/MeetingDoneModal";
 import { CIconButton } from "../../components/Buttons/CButtons";
 import { useRevertBackModalHook } from "../../components/Modals/RevertBackModal";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { confirmDialog } from "primereact/confirmdialog";
 import { toast } from "react-toastify";
-import { LeadIntroductionDetail } from "../LeadsIntroduction/LeadsIntroduction";
+import { InfoCardsContainer } from "../Leads/LeadsDashboard/LeadsDashboard";
 
 const componentMapping = {
-  LeadIntroductionDetail,
+  InfoCardsContainer,
 };
 
 function DynamicComponent({ componentName }) {
@@ -40,22 +40,26 @@ function Dashboard() {
       }
     }
     getDynamicallyCreatedComponent();
-  }, []);
+  }, [localStorage.getItem("dynamic-component")]);
 
   return (
-    <div className="mt-4 flex flex-column gap-1">
-      <div>
-        <div>
-          <LeadsIntroductionDemonstratorTable />
+    <div className="flex flex-column gap-1 mt-4">
+      <div className="w-full">
+        <div className="flex align-items-center justify-content-between">
+          <h1 className="text-2xl">Dashboard</h1>
         </div>
+        <hr />
+        {dynamicComponent !== "" && (
+          <>
+            <DynamicComponent
+              componentName={MOVEABLE_COMPNENTS_NAMES.LEADS_DASHBOARD_CARDS}
+            />
+          </>
+        )}
       </div>
-      {dynamicComponent !== "" && (
-        <>
-          <div>
-            {/* <DynamicComponent componentName={"LeadIntroductionDetail"} /> */}
-          </div>
-        </>
-      )}
+      <div className="w-full">
+        <LeadsIntroductionDemonstratorTable />
+      </div>
     </div>
   );
 }
