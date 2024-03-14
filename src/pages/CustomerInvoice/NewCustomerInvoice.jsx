@@ -900,7 +900,7 @@ function BusinessUnitDependantFields({ mode }) {
         </div>
       </Form.Group>
       <Form.Group as={Col} className="col-2">
-        <Form.Label>CustomerInvoice No(Monthly)</Form.Label>
+        <Form.Label>Customer Invoice No(Monthly)</Form.Label>
 
         <div>
           <TextInput
@@ -911,7 +911,7 @@ function BusinessUnitDependantFields({ mode }) {
         </div>
       </Form.Group>
       <Form.Group as={Col} className="col-2">
-        <Form.Label>CustomerInvoice No(Yearly)</Form.Label>
+        <Form.Label>Customer Invoice No(Yearly)</Form.Label>
 
         <div>
           <TextInput
@@ -1812,19 +1812,6 @@ const BranchSelectField = React.forwardRef((props, ref) => {
     </>
   );
 });
-
-function DispatchDetailEvents(details) {
-  if (details.length > 0) {
-    // details.forEach((item, index) => {
-    //   document
-    //     .getElementById(`CustomerInvoiceDetail.${index}.IsFree`)
-    //     ?.dispatchEvent(new Event("change"));
-    // });
-    document
-      .getElementById(`CustomerInvoiceDetail.2.BusinessUnitID`)
-      ?.dispatchEvent(new Event("change"));
-  }
-}
 
 const CustomerBranchDataContext = createContext();
 

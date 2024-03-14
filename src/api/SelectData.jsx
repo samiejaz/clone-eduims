@@ -48,15 +48,15 @@ export async function fetchAllProductsForSelect(BusinessUnitID) {
 }
 export async function fetchAllCustomerBranchesData(AccountID) {
   let whereClause = "";
-
   if (AccountID !== undefined) {
     whereClause = "?AccountID=" + AccountID;
+    const { data } = await axios.post(
+      apiUrl + "/Select/SelectCustomerBranches" + whereClause
+    );
+    return data.data || [];
+  } else {
+    return [];
   }
-  const { data } = await axios.post(
-    apiUrl + "/Select/SelectCustomerBranches" + whereClause
-  );
-
-  return data.data || [];
 }
 export async function fetchAllServicesForSelect(BusinessUnitID) {
   let whereClause = "";

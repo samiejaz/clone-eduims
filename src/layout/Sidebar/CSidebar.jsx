@@ -10,10 +10,9 @@ import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
 import { UserRightsContext } from "../../context/UserRightContext";
 
-const CSidebar = ({ sideBarRef }) => {
+const CSidebar = ({ sideBarRef, searchInputRef }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const toastRef = useRef(null);
-  let isSidebarOpen = localStorage.getItem("isSidebarOpen");
 
   useEffect(() => {
     async function configurationSetup() {
@@ -38,7 +37,7 @@ const CSidebar = ({ sideBarRef }) => {
           </span>
         </div>
 
-        <SearchBar />
+        <SearchBar searchInputRef={searchInputRef} />
 
         <ul className="c-nav-links">
           <li>
@@ -260,7 +259,7 @@ const MenuItem = ({
   );
 };
 
-const SearchBar = () => {
+const SearchBar = ({ searchInputRef }) => {
   const [searchText, setSearchText] = useState("");
 
   const { routesWithUserRights, setFilteredRoutes } =
@@ -268,25 +267,28 @@ const SearchBar = () => {
   const filterRoutes = () => {
     if (!searchText) return routesWithUserRights;
 
-    return routesWithUserRights.map((group) => ({
-      ...group,
-      subItems: group.subItems.filter((subItem) =>
-        subItem.name.toLowerCase().includes(searchText.toLowerCase())
-      ),
-    }));
+    return routesWithUserRights
+      .map((group) => ({
+        ...group,
+        subItems: group.subItems.filter((subItem) =>
+          subItem.name
+            .toLowerCase()
+            .replaceAll(" ", "")
+            .includes(searchText.toLowerCase().replaceAll(" ", ""))
+        ),
+      }))
+      .filter((group) => group.subItems.length > 0);
   };
 
-  // Update the context with the filtered routes
   useEffect(() => {
-    if (searchText !== "") {
-      setFilteredRoutes(filterRoutes());
-    }
+    setFilteredRoutes(filterRoutes());
   }, [searchText]);
 
   return (
     <>
       <div className="text-center c-close" id="routeSearchContainer">
         <InputText
+          ref={searchInputRef}
           prefix="pi pi-cog"
           placeholder="Search for form..."
           value={searchText}

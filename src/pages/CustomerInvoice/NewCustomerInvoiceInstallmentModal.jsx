@@ -90,7 +90,11 @@ const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
             label="Add Installment"
             type="button"
             onClick={() => installmentsFieldArray.append({ Amount: 0 })}
-            disabled={mode === "view"}
+            disabled={
+              mode === "view" ||
+              method.getValues("InstallmentTotalRemaining") == 0 ||
+              method.getValues("InstallmentTotalAmount") == 0
+            }
           />
           <div
             style={{
@@ -147,20 +151,6 @@ const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
                     style={{ marginBottom: "10px", gap: 2 }}
                   >
                     <div style={{ width: "100%" }}>
-                      {/* <Controller
-                        control={method.control}
-                        name={`installments.${index}.IDate`}
-                        render={({ field }) => (
-                          <ReactDatePicker
-                            placeholderText="Select installment date"
-                            onChange={(date) => field.onChange(date)}
-                            selected={field.value || new Date()}
-                            dateFormat={"dd-MMM-yyyy"}
-                            className="binput"
-                            disabled={mode === "view"}
-                          />
-                        )}
-                      /> */}
                       <CDatePicker
                         control={method.control}
                         name={`installments.${index}.IDate`}

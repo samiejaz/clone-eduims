@@ -540,6 +540,18 @@ a {
 .c-sidebar.c-close #routeSearchContainer {
   display: none;
 }
+@keyframes showElement {
+  from {
+     opacity: 0;
+  }
+  to {
+     opacity: 1;
+  }
+ }
+#routeSearchContainer {
+  animation: showElement 0.5s ease-in forwards; 
+  opacity: 0; 
+}
 .c-sidebar .c-nav-links li.c-showMenu .c-sub-menu {
   display: block;
 }

@@ -2,18 +2,21 @@ import { Outlet } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
 import Logo from "../images/logo.png";
 import User from "../images/profilelogo.png";
-import { Avatar } from "primereact/avatar";
 import CSidebar from "./Sidebar/CSidebar";
 import { useRef } from "react";
 import NotificationOverlay from "../components/OverlayPanel/NotificationOverlay";
 
 function RootLayout() {
   const sidebarRef = useRef();
+  const searchInputRef = useRef();
 
   return (
     <>
       <div>
-        <CSidebar sideBarRef={sidebarRef}></CSidebar>
+        <CSidebar
+          sideBarRef={sidebarRef}
+          searchInputRef={searchInputRef}
+        ></CSidebar>
         {/* <Sidebar logoImage={<LogoImage />} userImage={<UserImage />} />{" "} */}
         <section className="c-home-section">
           <div className="c-home-content">
@@ -31,6 +34,7 @@ function RootLayout() {
                 onClick={() => {
                   if (sidebarRef.current.className.includes("c-close")) {
                     sidebarRef.current.className = "c-sidebar";
+                    searchInputRef.current?.focus();
                     localStorage.setItem("isSidebarOpen", true);
                   } else {
                     sidebarRef.current.className = "c-sidebar c-close";

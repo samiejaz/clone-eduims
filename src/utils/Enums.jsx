@@ -151,3 +151,7 @@ export const MENU_KEYS = {
     USER_RIGHTS_ROUTE: "mnuUserRights",
   },
 };
+
+export const MOVEABLE_COMPNENTS_NAMES = {
+  LEADS_DASHBOARD_CARDS: "InfoCardsContainer",
+};
