@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -17,6 +18,7 @@ export async function fetchAllTehsiles(LoginUserID) {
 
 // URL: /EduIMS/GetTehsilWhere?TehsilID=??&LoginUserID=??
 export async function fetchTehsilById(TehsilID = 0, LoginUserID) {
+  TehsilID = decryptID(TehsilID);
   if (TehsilID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?TehsilID=${TehsilID}&LoginUserID=${LoginUserID}`
@@ -27,9 +29,10 @@ export async function fetchTehsilById(TehsilID = 0, LoginUserID) {
   }
 }
 // URL: /EduIMS/TehsilDelete?TehsilID=??&LoginUserID=??
-export async function deleteTehsilByID(serviceInfo) {
+export async function deleteTehsilByID({ TehsilID, LoginUserID }) {
+  TehsilID = decryptID(TehsilID);
   const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?TehsilID=${serviceInfo.TehsilID}&LoginUserID=${serviceInfo.LoginUserID}`
+    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?TehsilID=${TehsilID}&LoginUserID=${LoginUserID}`
   );
 
   if (data.success === true) {
@@ -52,6 +55,7 @@ export async function addNewTehsil({ formData, userID, TehsilID = 0 }) {
       EntryUserID: userID,
     };
 
+    TehsilID = TehsilID !== 0 ? decryptID(TehsilID) : 0;
     if (TehsilID === 0 || TehsilID === undefined) {
       DataToSend.TehsilID = 0;
     } else {
@@ -69,12 +73,12 @@ export async function addNewTehsil({ formData, userID, TehsilID = 0 }) {
       } else {
         toast.success("Tehsil created successfully!");
       }
-      return { success: true, RecordID: data?.TehsilID };
+      return { success: true, RecordID: encryptID(data?.TehsilID) };
     } else {
       toast.error(data.message, {
         autoClose: false,
       });
-      return { success: false, RecordID: TehsilID };
+      return { success: false, RecordID: encryptID(TehsilID) };
     }
   } catch (e) {
     toast.error(e.message, {

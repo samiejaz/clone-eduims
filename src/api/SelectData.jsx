@@ -36,15 +36,23 @@ export async function fetchAllCustomerAccountsForSelect(CustomerID) {
   );
   return data.data || [];
 }
-export async function fetchAllProductsForSelect(BusinessUnitID) {
+export async function fetchAllProductsForSelect(
+  BusinessUnitID = 0,
+  selectWithoutBusinessUnits = false
+) {
   let whereClause = "";
-  if (BusinessUnitID !== undefined) {
-    whereClause = "?BusinessUnitID=" + BusinessUnitID;
+  if (BusinessUnitID !== 0 && !selectWithoutBusinessUnits) {
+    if (BusinessUnitID !== undefined) {
+      whereClause = "?BusinessUnitID=" + BusinessUnitID;
+    }
+    const { data } = await axios.post(
+      apiUrl + "/Select/SelectProducts" + whereClause
+    );
+    return data.data || [];
+  } else {
+    const { data } = await axios.post(apiUrl + "/Select/SelectProducts");
+    return data.data || [];
   }
-  const { data } = await axios.post(
-    apiUrl + "/Select/SelectProducts" + whereClause
-  );
-  return data.data || [];
 }
 export async function fetchAllCustomerBranchesData(AccountID) {
   let whereClause = "";

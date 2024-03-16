@@ -10,11 +10,9 @@ import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUserData } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { LeadsViewerButtonToolBar } from "../../pages/LeadsIntroductionViewer/LeadsIntroductionViewer";
 import { QUERY_KEYS } from "../../utils/enums";
-
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+import { getLeadsTimelineDetail } from "../../pages/LeadsIntroductionViewer/LeadsTimelineData";
 
 const defaultValues = {
   ProductInfoID: [],
@@ -84,19 +82,15 @@ export const MeetingDoneFields = ({
 
   const { data } = useQuery({
     queryKey: ["key2", LeadIntroductionDetailID],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${user.userID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-      return data.data;
-    },
-    enabled: LeadIntroductionDetailID !== 0,
-    initialData: [],
+    queryFn: () =>
+      getLeadsTimelineDetail({
+        LeadIntroductionDetailID,
+        LoginUserID: user.userID,
+      }),
   });
 
   useEffect(() => {
-    if (LeadIntroductionDetailID !== 0 && data.length > 0) {
+    if (LeadIntroductionDetailID !== 0 && data && data.length > 0) {
       method.setValue("ProductInfoID", data[0].RecommendedProductID);
       method.setValue("MeetingTime", new Date(data[0].MeetingTime));
       method.setValue("Description", data[0].Description);

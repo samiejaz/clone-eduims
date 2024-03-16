@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -18,6 +19,7 @@ export async function fetchAllBusinessSegments(LoginUserID) {
 
 // URL: /EduIMS/GetBusinessSegmentWhere?BusinessSegmentID=??&LoginUserID=??
 export async function fetchBusinessSegmentById(BusinessSegmentID, LoginUserID) {
+  BusinessSegmentID = decryptID(BusinessSegmentID);
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?BusinessSegmentID=${BusinessSegmentID}&LoginUserID=${LoginUserID}`
   );
@@ -28,6 +30,7 @@ export async function deleteBusinessSegmentByID({
   BusinessSegmentID,
   LoginUserID,
 }) {
+  BusinessSegmentID = decryptID(BusinessSegmentID);
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?BusinessSegmentID=${BusinessSegmentID}&LoginUserID=${LoginUserID}`
   );
@@ -53,7 +56,8 @@ export async function addNewBusinessSegment({
     InActive: formData.InActive === true ? 1 : 0,
     EntryUserID: userID,
   };
-
+  BusinessSegmentID =
+    BusinessSegmentID === 0 ? 0 : decryptID(BusinessSegmentID);
   if (BusinessSegmentID === 0 || BusinessSegmentID === undefined) {
     DataToSend.BusinessSegmentID = 0;
   } else {
@@ -71,11 +75,11 @@ export async function addNewBusinessSegment({
     } else {
       toast.success("Business Segment created successfully!");
     }
-    return { success: true, RecordID: data?.BusinessSegmentID };
+    return { success: true, RecordID: encryptID(data?.BusinessSegmentID) };
   } else {
     toast.error(data.message, {
       autoClose: false,
     });
-    return { success: false, RecordID: BusinessSegmentID };
+    return { success: false, RecordID: encryptID(BusinessSegmentID) };
   }
 }

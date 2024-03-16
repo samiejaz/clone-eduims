@@ -286,22 +286,15 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
 export function LeadsIntroductionFormComponent({
   mode = "",
   hideFieldsForDemo = false,
+  countryRef,
 }) {
-  const [CountryID, setCountryID] = useState(0);
   const [items, setItems] = useState([]);
 
-  const countriesSelectData = useAllCountiesSelectData();
-
   const businessTypesSelectData = useAllBusinessTypesSelectData();
-  const tehsilsSelectData = useAllTehsilsSelectData(CountryID);
   const businessNatureSelectData = useAllBusinessNatureSelectData(true);
   const leadSourcesSelectData = useAllLeadsSouceSelectData();
 
   const method = useFormContext();
-
-  useEffect(() => {
-    setCountryID(method.control._fields.CountryID._f.value);
-  }, []);
 
   const search = (event) => {
     let _filteredItems;
@@ -331,48 +324,11 @@ export function LeadsIntroductionFormComponent({
               />
             </div>
           </Form.Group>
-          <Form.Group as={Col} controlId="CountryID">
-            <Form.Label>
-              Country
-              <span className="text-danger fw-bold ">*</span>
-            </Form.Label>
-            <div>
-              <CDropdown
-                control={method.control}
-                name={`CountryID`}
-                optionLabel="CountryTitle"
-                optionValue="CountryID"
-                placeholder="Select a country"
-                options={countriesSelectData.data}
-                required={true}
-                disabled={mode === "view"}
-                focusOptions={() => method.setFocus("TehsilID")}
-                onChange={(e) => {
-                  // setCountryID(e.value);
-                  method.resetField("TehsilID");
-                }}
-              />
-            </div>
-          </Form.Group>
-          <Form.Group as={Col} controlId="TehsilID">
-            <Form.Label>
-              Tehsil
-              <span className="text-danger fw-bold ">*</span>
-            </Form.Label>
-            <div>
-              <CDropdown
-                control={method.control}
-                name={`TehsilID`}
-                optionLabel="TehsilTitle"
-                optionValue="TehsilID"
-                placeholder="Select a tehsil"
-                options={tehsilsSelectData.data}
-                required={true}
-                disabled={mode === "view"}
-                focusOptions={() => method.setFocus("BusinessTypeID")}
-              />
-            </div>
-          </Form.Group>
+
+          <FormProvider {...method}>
+            <CountryDependentFields mode={mode} ref={countryRef} />
+          </FormProvider>
+
           <Form.Group as={Col} controlId="BusinessTypeID">
             <Form.Label>
               Business Type
@@ -638,10 +594,6 @@ export function LeadsIntroductionFormModalButton({
         }}
         onClick={() => {
           setVisible(true);
-          // queryClient.invalidateQueries([
-          //   QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY,
-          //   LeadIntroductionDetailID,
-          // ]);
         }}
         style={{
           padding: "1px 0px",
@@ -655,3 +607,62 @@ export function LeadsIntroductionFormModalButton({
     </>
   );
 }
+
+export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
+  const [CountryID, setCountryID] = useState(0);
+
+  const method = useFormContext();
+  const countriesSelectData = useAllCountiesSelectData();
+  const tehsilsSelectData = useAllTehsilsSelectData(CountryID);
+
+  React.useImperativeHandle(ref, () => ({
+    setCountryID,
+  }));
+
+  return (
+    <>
+      <Form.Group as={Col} controlId="CountryID">
+        <Form.Label>
+          Country
+          <span className="text-danger fw-bold ">*</span>
+        </Form.Label>
+        <div>
+          <CDropdown
+            control={method.control}
+            name={`CountryID`}
+            optionLabel="CountryTitle"
+            optionValue="CountryID"
+            placeholder="Select a country"
+            options={countriesSelectData.data}
+            required={true}
+            disabled={mode === "view"}
+            focusOptions={() => method.setFocus("TehsilID")}
+            onChange={(e) => {
+              setCountryID(e.value);
+              method.resetField("TehsilID");
+            }}
+          />
+        </div>
+      </Form.Group>
+      <Form.Group as={Col} controlId="TehsilID">
+        <Form.Label>
+          Tehsil
+          <span className="text-danger fw-bold ">*</span>
+        </Form.Label>
+        <div>
+          <CDropdown
+            control={method.control}
+            name={`TehsilID`}
+            optionLabel="TehsilTitle"
+            optionValue="TehsilID"
+            placeholder="Select a tehsil"
+            options={tehsilsSelectData.data}
+            required={true}
+            disabled={mode === "view"}
+            focusOptions={() => method.setFocus("BusinessTypeID")}
+          />
+        </div>
+      </Form.Group>
+    </>
+  );
+});

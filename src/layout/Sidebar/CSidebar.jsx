@@ -290,7 +290,7 @@ const SearchBar = ({ searchInputRef }) => {
         <InputText
           ref={searchInputRef}
           prefix="pi pi-cog"
-          placeholder="Search for form..."
+          placeholder="Ctrl + k to search..."
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />

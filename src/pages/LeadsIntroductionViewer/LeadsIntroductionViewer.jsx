@@ -26,34 +26,56 @@ import { toast } from "react-toastify";
 import { MeetingDoneFields } from "../../components/Modals/MeetingDoneModal";
 import { RevertBackFields } from "../../components/Modals/RevertBackModal";
 import MultiFileUpload from "../../components/Forms/MultiFileUpload";
+import { decryptID, encryptID } from "../../utils/crypto";
+import { ShowErrorToast } from "../../utils/CommonFunctions";
+import { useUserData } from "../../context/AuthContext";
+import { CustomSpinner } from "../../components/CustomSpinner";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
-let parentRoute = ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = "key";
-// let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
 
-//api/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=1&LeadIntroductionID=7
-const user = JSON.parse(localStorage.getItem("user"));
+async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
+  if (LeadIntroductionID !== undefined) {
+    LeadIntroductionID = decryptID(LeadIntroductionID);
+    const { data } = await axios.post(
+      apiUrl +
+        `/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=${LoginUserID}&LeadIntroductionID=${LeadIntroductionID}`
+    );
+    return data.data;
+  } else {
+    return [];
+  }
+}
+async function getLeadsTimelineDetail({
+  LeadIntroductionDetailID,
+  LoginUserID,
+}) {
+  try {
+    if (LeadIntroductionDetailID !== undefined) {
+      LeadIntroductionDetailID = decryptID(LeadIntroductionDetailID);
+      const { data } = await axios.post(
+        apiUrl +
+          `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${LoginUserID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
+      );
+      return data.data;
+    }
+  } catch (e) {
+    ShowErrorToast(e.message);
+  }
+}
 
 const LeadsIntroductionViewer = () => {
   const { LeadIntroductionID } = useParams();
   const navigate = useNavigate();
+  const user = useUserData();
 
   const { data } = useQuery({
-    queryKey: [queryKey, +LeadIntroductionID],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=${user.userID}&LeadIntroductionID=${LeadIntroductionID}`
-      );
-      return data.data;
-    },
+    queryKey: [queryKey, LeadIntroductionID],
+    queryFn: async () =>
+      getLeadsTimeline({ LeadIntroductionID, LoginUserID: user.userID }),
     initialData: [],
+    enabled: LeadIntroductionID !== undefined,
   });
 
   let newEvents = data.map((item) => {
@@ -129,20 +151,18 @@ const LeadsIntroductionViewer = () => {
         <p>{item.Detail}</p>
         {item.Status !== "Acknowledged" && (
           <>
-            <Button
-              label="View More"
-              className="p-button-text"
-              type="button"
-              onClick={() =>
-                navigate(
-                  `${
-                    ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE
-                  }/${LeadIntroductionID}/${
-                    item.Status === "Meeting Done" ? "MeetingDone" : item.Status
-                  }/${item.LeadIntroductionDetailID}`
-                )
-              }
-            ></Button>
+            <Link
+              to={`${
+                ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE
+              }/${LeadIntroductionID}/${
+                item.Status === "Meeting Done"
+                  ? encryptID("MeetingDone")
+                  : encryptID(item.Status)
+              }/${encryptID(item.LeadIntroductionDetailID)}`}
+              className="p-button p-button-text text-blue-700 font-semibold"
+            >
+              View More
+            </Link>
           </>
         )}
       </Card>
@@ -166,13 +186,21 @@ const LeadsIntroductionViewer = () => {
         Back To Leads
       </Link>
       <div style={{ marginBottom: "1rem" }}>
-        <Timeline
-          value={newEvents}
-          align="alternate"
-          className="customized-timeline"
-          marker={customizedMarker}
-          content={customizedContent}
-        />
+        {newEvents && newEvents.length > 0 ? (
+          <>
+            <Timeline
+              value={newEvents}
+              align="alternate"
+              className="customized-timeline"
+              marker={customizedMarker}
+              content={customizedContent}
+            />
+          </>
+        ) : (
+          <>
+            <CustomSpinner message="Loading timeline..." />
+          </>
+        )}
       </div>
     </div>
   );
@@ -223,11 +251,10 @@ function formatDate(data) {
 let queryKey2 = "key2";
 export const LeadsIntroductionViewerDetail = () => {
   const { LeadIntroductionID, LeadIntroductionDetailID, Type } = useParams();
-  const [isEnable, setIsEnable] = useState(false);
-
+  const TimelineType = decryptID(Type);
   return (
     <div className="mt-5">
-      {Type === "Forwarded" ? (
+      {TimelineType === "Forwarded" ? (
         <>
           <ForwardedFieldsContainer
             LeadIntroductionDetailID={LeadIntroductionDetailID}
@@ -237,18 +264,18 @@ export const LeadsIntroductionViewerDetail = () => {
       ) : (
         <></>
       )}
-      {Type === "Quoted" || Type === "Finalized" ? (
+      {TimelineType === "Quoted" || TimelineType === "Finalized" ? (
         <>
           <QuotedFieldsContainer
             LeadIntroductionDetailID={LeadIntroductionDetailID}
             LeadIntroductionID={LeadIntroductionID}
-            Type={Type}
+            Type={TimelineType}
           />
         </>
       ) : (
         <></>
       )}
-      {Type === "Closed" ? (
+      {TimelineType === "Closed" ? (
         <>
           <ClosedFieldContainer
             LeadIntroductionDetailID={LeadIntroductionDetailID}
@@ -258,7 +285,7 @@ export const LeadsIntroductionViewerDetail = () => {
       ) : (
         <></>
       )}
-      {Type === "MeetingDone" ? (
+      {TimelineType === "MeetingDone" ? (
         <>
           <MeetingDoneFields
             LeadIntroductionID={LeadIntroductionID}
@@ -271,7 +298,7 @@ export const LeadsIntroductionViewerDetail = () => {
       ) : (
         ""
       )}
-      {Type === "Pending" ? (
+      {TimelineType === "Pending" ? (
         <>
           <RevertBackFields
             LeadIntroductionID={LeadIntroductionID}
@@ -298,17 +325,17 @@ function ForwardedFieldsContainer({
 
   const departmentSelectData = useAllDepartmentsSelectData();
   const usersSelectData = useAllUsersSelectData();
-  const productsSelectData = useProductsInfoSelectData();
+  const productsSelectData = useProductsInfoSelectData(0, true);
+  const user = useUserData();
+  console.log(productsSelectData);
 
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${user.userID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-      return data.data;
-    },
+    queryFn: () =>
+      getLeadsTimelineDetail({
+        LeadIntroductionDetailID,
+        LoginUserID: user.userID,
+      }),
     initialData: [],
   });
 
@@ -527,17 +554,16 @@ function QuotedFieldsContainer({
   const fileInputRef = useRef();
   const [isEnable, setIsEnable] = useState(false);
   const [filePath, setFilePath] = useState("");
-  const [fileType, setFileType] = useState("");
+
+  const user = useUserData();
+
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${user.userID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-
-      return data.data;
-    },
+    queryFn: () =>
+      getLeadsTimelineDetail({
+        LeadIntroductionDetailID,
+        LoginUserID: user.userID,
+      }),
     enabled: isEnable === false,
     initialData: [],
   });
@@ -679,17 +705,16 @@ function ClosedFieldContainer({
   LeadIntroductionID,
 }) {
   const [isEnable, setIsEnable] = useState(false);
+  const user = useUserData();
 
   const method = useForm();
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${user.userID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-      return data.data;
-    },
+    queryFn: () =>
+      getLeadsTimelineDetail({
+        LeadIntroductionDetailID,
+        LoginUserID: user.userID,
+      }),
     initialData: [],
   });
 

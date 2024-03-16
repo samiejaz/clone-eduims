@@ -1,7 +1,11 @@
 import axios from "axios";
-import { toast } from "react-toastify";
-import { convertBase64StringToFile } from "../utils/CommonFunctions";
+import {
+  ShowErrorToast,
+  ShowSuccessToast,
+  convertBase64StringToFile,
+} from "../utils/CommonFunctions";
 import { TOAST_CONTAINER_IDS } from "../utils/enums";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -20,6 +24,7 @@ export async function fetchAllUsers(LoginUserID) {
 
 // URL: /gen_User/GetUserWhere?UserID=??&LoginUserID=??
 export async function fetchUserById(UserID = 0, LoginUserID) {
+  UserID = decryptID(UserID);
   if (UserID !== undefined || UserID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?UserID=${UserID}&LoginUserID=${LoginUserID}`
@@ -31,18 +36,25 @@ export async function fetchUserById(UserID = 0, LoginUserID) {
 }
 // URL: /gen_User/UserDelete?UserID=??&LoginUserID=??
 export async function deleteUserByID({ UserID, LoginUserID }) {
-  const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?UserID=${UserID}&LoginUserID=${LoginUserID}`
-  );
+  try {
+    UserID = decryptID(UserID);
+    ShowErrorToast(UserID + "-" + LoginUserID);
+    ShowErrorToast(
+      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?UserID=${UserID}&LoginUserID=${LoginUserID}`
+    );
+    const { data } = await axios.post(
+      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?UserID=${UserID}&LoginUserID=${LoginUserID}`
+    );
 
-  if (data.success === true) {
-    toast.success("User sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+    if (data.success === true) {
+      ShowSuccessToast("User sucessfully deleted!");
+      return true;
+    } else {
+      ShowErrorToast(data.message);
+      return false;
+    }
+  } catch (e) {
+    ShowErrorToast(e.message);
   }
 }
 // URL: /gen_User/UserInsertUpdate
@@ -62,11 +74,11 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
       let userImageFile = convertBase64StringToFile(UserImage, true);
       newFormData.append("image", userImageFile);
     }
-
-    if (+UserID === 0 || +UserID === undefined) {
+    UserID = UserID === 0 ? 0 : decryptID(UserID);
+    if (UserID === 0 || UserID === undefined) {
       newFormData.append("LoginUserID", 0);
     } else {
-      newFormData.append("LoginUserID", +UserID);
+      newFormData.append("LoginUserID", UserID);
     }
 
     const { data } = await axios.post(
@@ -81,7 +93,7 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
 
     if (data.success === true) {
       if (+UserID !== 0) {
-        if (+UserID === user.userID) {
+        if (UserID === user.userID) {
           localStorage.setItem(
             "user",
             JSON.stringify({
@@ -91,20 +103,20 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
             })
           );
         }
-        toast.success("User updated successfully!", {
+        ShowSuccessToast("User updated successfully!", {
           containerId: TOAST_CONTAINER_IDS.AUTO_CLOSE,
         });
       } else {
-        toast.success("User created successfully!", {
+        ShowSuccessToast("User created successfully!", {
           containerId: TOAST_CONTAINER_IDS.AUTO_CLOSE,
         });
       }
-      return { success: true, RecordID: data?.LoginUserID };
+      return { success: true, RecordID: encryptID(data?.LoginUserID) };
     } else {
-      toast.error(data.message, {
-        autoClose: false,
-      });
-      return { success: false, RecordID: UserID };
+      ShowErrorToast(data.message);
+      return { success: false, RecordID: encryptID(UserID) };
     }
-  } catch (err) {}
+  } catch (err) {
+    ShowErrorToast(err.message);
+  }
 }

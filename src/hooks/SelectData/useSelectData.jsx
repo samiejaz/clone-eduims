@@ -94,10 +94,14 @@ export function useBusinessUnitsSelectData() {
 }
 
 // All Products
-export function useProductsInfoSelectData(BusinessUnitID = 0) {
+export function useProductsInfoSelectData(
+  BusinessUnitID = 0,
+  selectWithoutBusinessUnits = false
+) {
   const productsInfoSelectData = useQuery({
     queryKey: ["productsInfo", BusinessUnitID],
-    queryFn: () => fetchAllProductsForSelect(BusinessUnitID),
+    queryFn: () =>
+      fetchAllProductsForSelect(BusinessUnitID, selectWithoutBusinessUnits),
     initialData: [],
   });
   return productsInfoSelectData;

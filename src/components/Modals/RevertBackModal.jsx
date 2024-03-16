@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { LeadsViewerButtonToolBar } from "../../pages/LeadsIntroductionViewer/LeadsIntroductionViewer";
 import { QUERY_KEYS } from "../../utils/enums";
+import { getLeadsTimelineDetail } from "../../pages/LeadsIntroductionViewer/LeadsTimelineData";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -81,19 +82,15 @@ export const RevertBackFields = ({
 
   const { data } = useQuery({
     queryKey: ["key2", LeadIntroductionDetailID],
-    queryFn: async () => {
-      const { data } = await axios.post(
-        apiUrl +
-          `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${user.userID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-      return data.data;
-    },
-    enabled: LeadIntroductionDetailID !== 0,
-    initialData: [],
+    queryFn: () =>
+      getLeadsTimelineDetail({
+        LeadIntroductionDetailID,
+        LoginUserID: user.userID,
+      }),
   });
 
   useEffect(() => {
-    if (LeadIntroductionDetailID !== 0 && data.length > 0) {
+    if (LeadIntroductionDetailID !== 0 && data && data.length > 0) {
       method.setValue("Description", data[0].Description);
     }
   }, [LeadIntroductionDetailID, data]);

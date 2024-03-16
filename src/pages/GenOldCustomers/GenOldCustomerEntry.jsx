@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -12,9 +10,7 @@ import { MultiSelect } from "primereact/multiselect";
 import ActionButtons from "../../components/ActionButtons";
 import { Controller, useForm } from "react-hook-form";
 import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
-import { Col, Form, Row } from "react-bootstrap";
 import TextInput from "../../components/Forms/TextInput";
-
 import { useUserData } from "../../context/AuthContext";
 import {
   addNewGenOldCustomer,
@@ -23,18 +19,22 @@ import {
   fetchGenOldCustomerById,
 } from "../../api/GenOldCustomerData";
 import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
-
 import {
   useActivationClientsSelectData,
   useSoftwareClientsSelectData,
 } from "../../hooks/SelectData/useSelectData";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+import { decryptID, encryptID } from "../../utils/crypto";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
 
 let parentRoute = ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
-let detail = "#22C55E";
 let queryKey = QUERY_KEYS.OLD_CUSTOMERS_QUERY_KEY;
 
 export function GenOldCustomerDetail() {
@@ -122,9 +122,9 @@ export function GenOldCustomerDetail() {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.CustomerID,
-                  () => showDeleteDialog(rowData.CustomerID),
-                  () => showEditDialog(rowData.CustomerID),
+                  encryptID(rowData.CustomerID),
+                  () => showDeleteDialog(encryptID(rowData.CustomerID)),
+                  () => showEditDialog(encryptID(rowData.CustomerID)),
                   handleView,
                   true
                 )
@@ -160,8 +160,12 @@ export function GenOldCustomerForm({ mode }) {
     },
   });
 
-  const activationClients = useActivationClientsSelectData(CustomerID ?? 0);
-  const softwareClients = useSoftwareClientsSelectData(CustomerID ?? 0);
+  const activationClients = useActivationClientsSelectData(
+    CustomerID ? decryptID(CustomerID) : 0
+  );
+  const softwareClients = useSoftwareClientsSelectData(
+    CustomerID ? decryptID(CustomerID) : 0
+  );
 
   const GenOldCustomerData = useQuery({
     queryKey: [queryKey, CustomerID],
@@ -245,12 +249,7 @@ export function GenOldCustomerForm({ mode }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
@@ -267,12 +266,12 @@ export function GenOldCustomerForm({ mode }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={12}>
+                <FormLabel>
                   Customer Name (Activation)
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <Controller
@@ -310,12 +309,12 @@ export function GenOldCustomerForm({ mode }) {
                     )}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={12}>
+                <FormLabel>
                   Customer Name (Software Mgt.)
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <Controller
@@ -352,11 +351,11 @@ export function GenOldCustomerForm({ mode }) {
                     )}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>Customer Name</Form.Label>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={12} xl={12} md={12}>
+                <FormLabel>Customer Name</FormLabel>
                 <span className="text-danger fw-bold ">*</span>
                 <div>
                   <TextInput
@@ -367,8 +366,8 @@ export function GenOldCustomerForm({ mode }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

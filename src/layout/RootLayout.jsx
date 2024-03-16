@@ -5,10 +5,40 @@ import User from "../images/profilelogo.png";
 import CSidebar from "./Sidebar/CSidebar";
 import { useRef } from "react";
 import NotificationOverlay from "../components/OverlayPanel/NotificationOverlay";
+import useKeyCombination from "../hooks/useKeyCombinationHook";
 
 function RootLayout() {
   const sidebarRef = useRef();
   const searchInputRef = useRef();
+
+  useKeyCombination(
+    () => {
+      toggleSideBar(true);
+    },
+    "k",
+    true
+  );
+
+  function toggleSideBar(openSideBarOnly = false) {
+    if (!openSideBarOnly) {
+      if (sidebarRef.current.className.includes("c-close")) {
+        sidebarRef.current.className = "c-sidebar";
+        searchInputRef.current?.focus();
+        localStorage.setItem("isSidebarOpen", true);
+      } else {
+        sidebarRef.current.className = "c-sidebar c-close";
+        localStorage.removeItem("isSidebarOpen");
+      }
+    } else {
+      if (sidebarRef.current.className.includes("c-close")) {
+        sidebarRef.current.className = "c-sidebar";
+        searchInputRef.current?.focus();
+        localStorage.setItem("isSidebarOpen", true);
+      } else {
+        searchInputRef.current?.focus();
+      }
+    }
+  }
 
   return (
     <>
@@ -17,7 +47,7 @@ function RootLayout() {
           sideBarRef={sidebarRef}
           searchInputRef={searchInputRef}
         ></CSidebar>
-        {/* <Sidebar logoImage={<LogoImage />} userImage={<UserImage />} />{" "} */}
+
         <section className="c-home-section">
           <div className="c-home-content">
             <div
@@ -32,14 +62,7 @@ function RootLayout() {
               <i
                 className="pi pi-bars hoverIcon"
                 onClick={() => {
-                  if (sidebarRef.current.className.includes("c-close")) {
-                    sidebarRef.current.className = "c-sidebar";
-                    searchInputRef.current?.focus();
-                    localStorage.setItem("isSidebarOpen", true);
-                  } else {
-                    sidebarRef.current.className = "c-sidebar c-close";
-                    localStorage.removeItem("isSidebarOpen");
-                  }
+                  toggleSideBar();
                 }}
               ></i>
               <NotificationOverlay />

@@ -37,6 +37,7 @@ import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -226,9 +227,9 @@ function ProductInfoDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.ProductInfoID,
-                  () => showDeleteDialog(rowData.ProductInfoID),
-                  () => showEditDialog(rowData.ProductInfoID),
+                  encryptID(rowData.ProductInfoID),
+                  () => showDeleteDialog(encryptID(rowData.ProductInfoID)),
+                  () => showEditDialog(encryptID(rowData.ProductInfoID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -377,12 +378,7 @@ function ProductInfoForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}

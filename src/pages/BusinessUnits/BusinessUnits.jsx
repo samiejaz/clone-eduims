@@ -32,6 +32,7 @@ import { Tooltip } from "primereact/tooltip";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS;
 let editRoute = `${parentRoute}/edit/`;
@@ -222,9 +223,9 @@ function BusinessUnitDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.BusinessUnitID,
-                  () => showDeleteDialog(rowData.BusinessUnitID),
-                  () => showEditDialog(rowData.BusinessUnitID),
+                  encryptID(rowData.BusinessUnitID),
+                  () => showDeleteDialog(encryptID(rowData.BusinessUnitID)),
+                  () => showEditDialog(encryptID(rowData.BusinessUnitID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -404,7 +405,9 @@ function BusinessUnitForm({ mode, userRights }) {
       formData: data,
       userID: user?.userID,
       BusinessUnitID: BusinessUnitID,
-      BusinessUnitLogo: imageRef.current.src,
+      BusinessUnitLogo: imageRef.current?.src.includes(newRoute)
+        ? ""
+        : imageRef.current.src,
     });
   }
 
@@ -418,12 +421,7 @@ function BusinessUnitForm({ mode, userRights }) {
         <div>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}

@@ -1,5 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 const CONTROLLER = "EduIMS";
@@ -26,36 +28,41 @@ export async function fetchAllProductCategories(
 }
 
 export async function fetchProductCategoryById(ProductCategoryID, LoginUserID) {
-  if (
-    ProductCategoryID !== 0 ||
-    ProductCategoryID !== undefined ||
-    ProductCategoryID !== null
-  ) {
+  if (ProductCategoryID !== undefined) {
     try {
+      ProductCategoryID = decryptID(ProductCategoryID);
       const { data } = await axios.post(
         apiUrl +
           `/EduIMS/GetProductCategoryWhere?ProductCategoryID=${ProductCategoryID}&LoginUserID=${LoginUserID}`
       );
       return data.data;
-    } catch (error) {}
+    } catch (error) {
+      ShowErrorToast(error.message);
+    }
   } else {
     return [];
   }
 }
 
-export async function deleteProductCategoryByID(productCategory) {
-  const { data } = await axios.post(
-    apiUrl +
-      `/EduIMS/ProductCategoryDelete?ProductCategoryID=${productCategory.ProductCategoryID}&LoginUserID=${productCategory.LoginUserID}`
-  );
-  if (data.success === true) {
-    toast.success("Product category sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+export async function deleteProductCategoryByID({
+  ProductCategoryID,
+  LoginUserID,
+}) {
+  try {
+    ProductCategoryID = decryptID(ProductCategoryID);
+    const { data } = await axios.post(
+      apiUrl +
+        `/EduIMS/ProductCategoryDelete?ProductCategoryID=${ProductCategoryID}&LoginUserID=${LoginUserID}`
+    );
+    if (data.success === true) {
+      ShowSuccessToast("Product category sucessfully deleted!");
+      return true;
+    } else {
+      ShowErrorToast(data.message);
+      return false;
+    }
+  } catch (e) {
+    ShowErrorToast(e.message);
   }
 }
 
@@ -73,6 +80,8 @@ export async function addNewProductCategory({
       EntryUserID: userID,
     };
 
+    ProductCategoryID =
+      ProductCategoryID === 0 ? 0 : decryptID(ProductCategoryID);
     if (ProductCategoryID === 0 || ProductCategoryID === undefined) {
       DataToSend.ProductCategoryID = 0;
     } else {
@@ -86,20 +95,16 @@ export async function addNewProductCategory({
 
     if (data.success === true) {
       if (ProductCategoryID !== 0) {
-        toast.success("Product Category updated successfully!");
+        ShowSuccessToast("Product Category updated successfully!");
       } else {
-        toast.success("Product Category created successfully!");
+        ShowSuccessToast("Product Category created successfully!");
       }
-      return { success: true, RecordID: data?.ProductCategoryID };
+      return { success: true, RecordID: encryptID(data?.ProductCategoryID) };
     } else {
-      toast.error(data.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(data.message);
       return { success: false, RecordID: ProductCategoryID };
     }
   } catch (e) {
-    toast.error(e.message, {
-      autoClose: false,
-    });
+    ShowErrorToast(e.message);
   }
 }

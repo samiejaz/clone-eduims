@@ -213,7 +213,7 @@ const App = () => {
           },
           rejectButton: {
             root: {
-              className: "rounded",
+              className: "rounded p-button-secondary",
             },
           },
         }}

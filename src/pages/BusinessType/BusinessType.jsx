@@ -27,6 +27,7 @@ import {
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.BUSINESS_TYPE;
 let editRoute = `${parentRoute}/edit/`;
@@ -211,9 +212,9 @@ export function BusinessTypeDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.BusinessTypeID,
-                  () => showDeleteDialog(rowData.BusinessTypeID),
-                  () => showEditDialog(rowData.BusinessTypeID),
+                  encryptID(rowData.BusinessTypeID),
+                  () => showDeleteDialog(encryptID(rowData.BusinessTypeID)),
+                  () => showEditDialog(encryptID(rowData.BusinessTypeID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -321,12 +322,7 @@ export function BusinessTypeForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}

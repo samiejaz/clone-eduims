@@ -1,5 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -10,31 +12,39 @@ export async function fetchAllProducts(LoginUserID) {
   return data.data ?? [];
 }
 
-export async function fetchProductInfoByID(ProductInfoID = 0, LoginUserID) {
-  if (ProductInfoID !== null || ProductInfoID !== 0) {
+export async function fetchProductInfoByID(ProductInfoID, LoginUserID) {
+  if (ProductInfoID !== undefined) {
     try {
+      ProductInfoID = decryptID(ProductInfoID);
       const { data } = await axios.post(
         apiUrl +
           `/EduIMS/GetProductInfoWhere?ProductInfoID=${ProductInfoID}&LoginUserID=${LoginUserID}`
       );
       return data;
-    } catch (error) {}
+    } catch (error) {
+      ShowErrorToast("Fetch::" + error.message);
+    }
   }
 }
 
-export async function deleteProductInfoByID(productInfo) {
-  const { data } = await axios.post(
-    apiUrl +
-      `/EduIMS/ProductInfoDelete?ProductInfoID=${productInfo.ProductInfoID}&LoginUserID=${productInfo.LoginUserID}`
-  );
-  if (data.success === true) {
-    toast.success("Product sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+export async function deleteProductInfoByID({ ProductInfoID, LoginUserID }) {
+  try {
+    if (ProductInfoID !== undefined) {
+      ProductInfoID = decryptID(ProductInfoID);
+      const { data } = await axios.post(
+        apiUrl +
+          `/EduIMS/ProductInfoDelete?ProductInfoID=${ProductInfoID}&LoginUserID=${LoginUserID}`
+      );
+      if (data.success === true) {
+        ShowSuccessToast("Product sucessfully deleted!");
+        return true;
+      } else {
+        ShowErrorToast(data.message);
+        return false;
+      }
+    }
+  } catch (e) {
+    ShowErrorToast("Delete::" + e.message);
   }
 }
 
@@ -63,6 +73,7 @@ export async function addNewProductInfo({
       EntryUserID: userID,
     };
 
+    ProductInfoID = ProductInfoID === 0 ? 0 : decryptID(ProductInfoID);
     if (ProductInfoID === 0 || ProductInfoID === undefined) {
       DataToSend.ProductInfoID = 0;
     } else {
@@ -76,20 +87,16 @@ export async function addNewProductInfo({
 
     if (data.success === true) {
       if (ProductInfoID !== 0) {
-        toast.success("Product updated successfully!");
+        ShowSuccessToast("Product updated successfully!");
       } else {
-        toast.success("Product created successfully!");
+        ShowSuccessToast("Product created successfully!");
       }
-      return { success: true, RecordID: data?.ProductInfoID };
+      return { success: true, RecordID: encryptID(data?.ProductInfoID) };
     } else {
-      toast.error(data.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(data.message);
       return { success: false, RecordID: ProductInfoID };
     }
   } catch (e) {
-    toast.error(e.message, {
-      autoClose: false,
-    });
+    ShowErrorToast("Insert::" + e.message);
   }
 }

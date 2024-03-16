@@ -1,5 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -23,6 +25,7 @@ export async function fetchLeadIntroductionById(
   LoginUserID
 ) {
   if (LeadIntroductionID !== undefined || LeadIntroductionID !== 0) {
+    LeadIntroductionID = decryptID(LeadIntroductionID);
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LeadIntroductionID=${LeadIntroductionID}&LoginUserID=${LoginUserID}`
     );
@@ -32,19 +35,25 @@ export async function fetchLeadIntroductionById(
   }
 }
 // URL: /data_LeadIntroduction/LeadIntroductionDelete?LeadIntroductionID=??&LoginUserID=??
-export async function deleteLeadIntroductionByID(serviceInfo) {
-  const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?LeadIntroductionID=${serviceInfo.LeadIntroductionID}&LoginUserID=${serviceInfo.LoginUserID}`
-  );
+export async function deleteLeadIntroductionByID({
+  LeadIntroductionID,
+  LoginUserID,
+}) {
+  try {
+    LeadIntroductionID = decryptID(LeadIntroductionID);
+    const { data } = await axios.post(
+      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?LeadIntroductionID=${LeadIntroductionID}&LoginUserID=${LoginUserID}`
+    );
 
-  if (data.success === true) {
-    toast.success("Lead sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+    if (data.success === true) {
+      ShowSuccessToast("Lead sucessfully deleted!");
+      return true;
+    } else {
+      ShowErrorToast(data.message);
+      return false;
+    }
+  } catch (e) {
+    ShowErrorToast(e.message);
   }
 }
 // URL: /data_LeadIntroduction/LeadIntroductionInsertUpdate
@@ -78,6 +87,8 @@ export async function addNewLeadIntroduction({
       DataToSend.ContactPersonWhatsAppNo =
         formData.ContactPersonWhatsAppNo.replaceAll("-", "");
     }
+    LeadIntroductionID =
+      LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
     if (LeadIntroductionID === 0 || LeadIntroductionID === undefined) {
       DataToSend.LeadIntroductionID = 0;
     } else {
@@ -90,21 +101,17 @@ export async function addNewLeadIntroduction({
     );
     if (data.success === true) {
       if (LeadIntroductionID !== 0) {
-        toast.success("Lead updated successfully!");
+        ShowSuccessToast("Lead updated successfully!");
       } else {
-        toast.success("Lead created successfully!");
+        ShowSuccessToast("Lead created successfully!");
       }
-      return { success: true, RecordID: data?.LeadIntroductionID };
+      return { success: true, RecordID: encryptID(data?.LeadIntroductionID) };
     } else {
-      toast.error(data.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(data.message);
       return { success: false, RecordID: LeadIntroductionID };
     }
   } catch (e) {
-    toast.error(e.message, {
-      autoClose: false,
-    });
+    ShowErrorToast(e.message);
   }
 }
 
@@ -138,7 +145,7 @@ export async function addLeadIntroductionOnAction({
       newFormData.append("Description", formData.Description ?? "");
       Status = "Forwarded";
     } else if (from === "Quoted" || from === "Finalized") {
-      if (file.length > 0) {
+      if (file && file.length > 0) {
         newFormData.append("AttachmentFile", file[0]);
       } else {
         newFormData.append(
@@ -172,13 +179,19 @@ export async function addLeadIntroductionOnAction({
     } else if (from === "Acknowledged") {
       Status = "Acknowledged";
     }
-
+    LeadIntroductionDetailID =
+      LeadIntroductionDetailID === 0 ? 0 : decryptID(LeadIntroductionDetailID);
     if (LeadIntroductionDetailID !== 0) {
       newFormData.append("LeadIntroductionDetailID", LeadIntroductionDetailID);
     } else {
       newFormData.append("LeadIntroductionDetailID", 0);
     }
     newFormData.append("EntryUserID", +userID);
+    console.log(LeadIntroductionID);
+    LeadIntroductionID =
+      LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
+    console.log(LeadIntroductionID);
+
     newFormData.append("LeadIntroductionID", LeadIntroductionID);
     newFormData.append("Status", Status);
 
@@ -195,13 +208,13 @@ export async function addLeadIntroductionOnAction({
     if (data.success === true) {
       return { success: true };
     } else {
-      toast.error(data.message, {
+      ShowErrorToast(data.message, {
         autoClose: false,
       });
       return { success: false };
     }
   } catch (error) {
-    toast.error(error.message, {
+    ShowErrorToast(error.message, {
       autoClose: false,
     });
   }
@@ -239,7 +252,7 @@ export async function getLeadsFile(filename) {
 
     console.log(data);
   } catch (err) {
-    toast.error(err.message, {
+    ShowErrorToast(err.message, {
       autoClose: false,
     });
   }

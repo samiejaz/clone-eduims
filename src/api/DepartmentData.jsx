@@ -1,5 +1,6 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -16,30 +17,42 @@ export async function fetchAllDepartments(LoginUserID) {
 }
 
 // URL: /EduIMS/GetDepartmentWhere?DepartmentID=??&LoginUserID=??
-export async function fetchDepartmentById(DepartmentID, LoginUserID) {
-  if (DepartmentID !== undefined) {
-    const { data } = await axios.post(
-      `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?DepartmentID=${DepartmentID}&LoginUserID=${LoginUserID}`
-    );
-    return data.data ?? [];
-  } else {
-    return [];
+export async function fetchDepartmentById(
+  DepartmentID = undefined,
+  LoginUserID
+) {
+  try {
+    DepartmentID = decryptID(DepartmentID);
+
+    if (DepartmentID !== 0) {
+      const { data } = await axios.post(
+        `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?DepartmentID=${DepartmentID}&LoginUserID=${LoginUserID}`
+      );
+      return data.data ?? [];
+    } else {
+      return [];
+    }
+  } catch (e) {
+    ShowErrorToast("Fetch::" + e.message);
   }
 }
 // URL: /EduIMS/DepartmentDelete?DepartmentID=??&LoginUserID=??
 export async function deleteDepartmentByID({ DepartmentID, LoginUserID }) {
-  const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?DepartmentID=${DepartmentID}&LoginUserID=${LoginUserID}`
-  );
+  try {
+    DepartmentID = decryptID(DepartmentID);
+    const { data } = await axios.post(
+      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?DepartmentID=${DepartmentID}&LoginUserID=${LoginUserID}`
+    );
 
-  if (data.success === true) {
-    toast.success("Department sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+    if (data.success === true) {
+      ShowSuccessToast("Department sucessfully deleted!");
+      return true;
+    } else {
+      ShowErrorToast(data.message);
+      return false;
+    }
+  } catch (e) {
+    ShowErrorToast("Delete::" + e.message);
   }
 }
 
@@ -50,7 +63,7 @@ export async function addNewDepartment({ formData, userID, DepartmentID = 0 }) {
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
     };
-
+    DepartmentID = DepartmentID === 0 ? 0 : decryptID(DepartmentID);
     if (DepartmentID === 0 || DepartmentID === undefined) {
       DataToSend.DepartmentID = 0;
     } else {
@@ -64,20 +77,16 @@ export async function addNewDepartment({ formData, userID, DepartmentID = 0 }) {
 
     if (data.success === true) {
       if (DepartmentID !== 0) {
-        toast.success("Department updated successfully!");
+        ShowSuccessToast("Department updated successfully!");
       } else {
-        toast.success("Department created successfully!");
+        ShowSuccessToast("Department created successfully!");
       }
-      return { success: true, RecordID: data?.DepartmentID };
+      return { success: true, RecordID: encryptID(data?.DepartmentID) };
     } else {
-      toast.error(data.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(data.message);
       return { success: false, RecordID: DepartmentID };
     }
   } catch (e) {
-    toast.error(e.message, {
-      autoClose: false,
-    });
+    ShowErrorToast("Insert::" + e.message);
   }
 }
