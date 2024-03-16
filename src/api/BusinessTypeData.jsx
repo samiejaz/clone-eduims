@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -18,6 +19,7 @@ export async function fetchAllBusinessTypes(LoginUserID) {
 
 // URL: /gen_BusinessType/GetBusinessTypeWhere?BusinessTypeID=??&LoginUserID=??
 export async function fetchBusinessTypeById(BusinessTypeID = 0, LoginUserID) {
+  BusinessTypeID = decryptID(BusinessTypeID);
   if (BusinessTypeID !== undefined || BusinessTypeID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?BusinessTypeID=${BusinessTypeID}&LoginUserID=${LoginUserID}`
@@ -28,9 +30,10 @@ export async function fetchBusinessTypeById(BusinessTypeID = 0, LoginUserID) {
   }
 }
 // URL: /gen_BusinessType/BusinessTypeDelete?BusinessTypeID=??&LoginUserID=??
-export async function deleteBusinessTypeByID(serviceInfo) {
+export async function deleteBusinessTypeByID({ BusinessTypeID, LoginUserID }) {
+  BusinessTypeID = decryptID(BusinessTypeID);
   const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?BusinessTypeID=${serviceInfo.BusinessTypeID}&LoginUserID=${serviceInfo.LoginUserID}`
+    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?BusinessTypeID=${BusinessTypeID}&LoginUserID=${LoginUserID}`
   );
 
   if (data.success === true) {
@@ -54,7 +57,7 @@ export async function addNewBusinessType({
     InActive: formData.InActive === true ? 1 : 0,
     EntryUserID: userID,
   };
-
+  BusinessTypeID = BusinessTypeID === 0 ? 0 : decryptID(BusinessTypeID);
   if (BusinessTypeID === 0 || BusinessTypeID === undefined) {
     DataToSend.BusinessTypeID = 0;
   } else {
@@ -72,11 +75,11 @@ export async function addNewBusinessType({
     } else {
       toast.success("Business Type created successfully!");
     }
-    return { success: true, RecordID: data?.BusinessTypeID };
+    return { success: true, RecordID: encryptID(data?.BusinessTypeID) };
   } else {
     toast.error(data.message, {
       autoClose: false,
     });
-    return { success: false, RecordID: BusinessTypeID };
+    return { success: false, RecordID: encryptID(BusinessTypeID) };
   }
 }

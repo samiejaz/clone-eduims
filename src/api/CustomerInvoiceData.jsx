@@ -1,6 +1,7 @@
 import axios from "axios";
-import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
+import { decryptID, encryptID } from "../utils/crypto";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -31,11 +32,15 @@ export async function fetchAllCustomerInvoices(LoginUserID) {
 // URL: /EduIMS/GetCustomerInvoiceWhere?CustomerInvoiceID=??&LoginUserID=??
 export async function fetchCustomerInvoiceById(CustomerInvoiceID, LoginUserID) {
   try {
+    CustomerInvoiceID = decryptID(CustomerInvoiceID);
+
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?CustomerInvoiceID=${CustomerInvoiceID}&LoginUserID=${LoginUserID}`
     );
     return data;
-  } catch (error) {}
+  } catch (e) {
+    ShowErrorToast(e.message);
+  }
 }
 
 export async function fetchMaxInvoiceNo(LoginUserID) {
@@ -45,9 +50,7 @@ export async function fetchMaxInvoiceNo(LoginUserID) {
     );
     return data;
   } catch (error) {
-    toast.error(error, {
-      autoClose: false,
-    });
+    ShowErrorToast(error);
   }
 }
 export async function fetchMaxSessionBasedVoucherNo(LoginUserID) {
@@ -57,9 +60,7 @@ export async function fetchMaxSessionBasedVoucherNo(LoginUserID) {
     );
     return data;
   } catch (error) {
-    toast.error(error, {
-      autoClose: false,
-    });
+    ShowErrorToast("Fetch::" + error.message);
   }
 }
 // URL: /CustomerInvoice/CustomerInvoiceDelete?CustomerInvoiceID=??&LoginUserID=??
@@ -67,18 +68,21 @@ export async function deleteCustomerInvoiceByID({
   CustomerInvoiceID,
   LoginUserID,
 }) {
-  const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CustomerInvoiceID=${CustomerInvoiceID}&LoginUserID=${LoginUserID}`
-  );
+  try {
+    CustomerInvoiceID = decryptID(CustomerInvoiceID);
+    const { data } = await axios.post(
+      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CustomerInvoiceID=${CustomerInvoiceID}&LoginUserID=${LoginUserID}`
+    );
 
-  if (data.success === true) {
-    toast.success("Invoice sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+    if (data.success === true) {
+      ShowSuccessToast("Invoice sucessfully deleted!");
+      return true;
+    } else {
+      ShowErrorToast(data.message);
+      return false;
+    }
+  } catch (e) {
+    ShowErrorToast("Delete::" + e.message);
   }
 }
 
@@ -143,11 +147,10 @@ export async function addNewCustomerInvoice({
       DataToSend.InvoiceInstallmentDetail = JSON.stringify(InstallmentDetail);
     }
 
-    if (
-      CustomerInvoiceID !== 0 ||
-      CustomerInvoiceID !== undefined ||
-      CustomerInvoiceID !== null
-    ) {
+    CustomerInvoiceID =
+      CustomerInvoiceID === 0 ? 0 : decryptID(CustomerInvoiceID);
+
+    if (CustomerInvoiceID !== 0 || CustomerInvoiceID !== undefined) {
       DataToSend.CustomerInvoiceID = CustomerInvoiceID;
     } else {
       DataToSend.CustomerInvoiceID = 0;
@@ -160,17 +163,17 @@ export async function addNewCustomerInvoice({
 
     if (data.success === true) {
       if (CustomerInvoiceID !== 0) {
-        toast.success("Business Type updated successfully!");
+        ShowSuccessToast("Invoice updated successfully!");
       } else {
-        toast.success("Business Type created successfully!");
+        ShowSuccessToast("Invoice created successfully!");
       }
-      return { success: true, RecordID: data?.CustomerInvoiceID };
+      return { success: true, RecordID: encryptID(data?.CustomerInvoiceID) };
     } else {
-      toast.error(data.message);
+      ShowErrorToast(data.message);
       return { success: false, RecordID: CustomerInvoiceID };
     }
   } catch (e) {
-    toast.error(e.message);
+    ShowErrorToast("Insert::" + e.message);
   }
 }
 export async function fetchMonthlyMaxCustomerInvoiceNo(BusinessUnitID) {
@@ -181,9 +184,7 @@ export async function fetchMonthlyMaxCustomerInvoiceNo(BusinessUnitID) {
       );
       return data.data;
     } catch (error) {
-      toast.error(error.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(error.message);
     }
   } else {
     return [];

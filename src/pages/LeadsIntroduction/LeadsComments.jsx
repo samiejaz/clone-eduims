@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useUserData } from "../../context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -16,11 +16,14 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
-
 import { InputText } from "primereact/inputtext";
 import { ContextMenu } from "primereact/contextmenu";
 import { confirmDialog } from "primereact/confirmdialog";
 import { Avatar } from "primereact/avatar";
+import { CustomSpinner } from "../../components/CustomSpinner";
+import { ROUTE_URLS } from "../../utils/enums";
+import { CIconButton } from "../../components/Buttons/CButtons";
+import { decryptID } from "../../utils/crypto";
 
 const LeadsComments = () => {
   const { LeadIntroductionID } = useParams();
@@ -35,14 +38,14 @@ const LeadsComments = () => {
         >
           <div className="absolute top-0 left-0 right-0 bottom-2">
             <CommentsContainer
-              LeadIntroductionID={LeadIntroductionID}
+              LeadIntroductionID={decryptID(LeadIntroductionID)}
               user={user}
             />
           </div>
         </div>
         <div className="flex-none w-full">
           <CreateCommentInput
-            LeadIntroductionID={LeadIntroductionID}
+            LeadIntroductionID={decryptID(LeadIntroductionID)}
             user={user}
           />
         </div>
@@ -60,7 +63,7 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
   const queryClient = useQueryClient();
   const [commentID, setCommentID] = useState(null);
   const [commentText, setCommentText] = useState(null);
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["leadComments"],
     queryFn: () =>
       fetchAllLeadComments({
@@ -142,48 +145,72 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
 
   return (
     <>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <ul className="w-full flex flex-column gap-2">
-            {data?.length > 0 ? (
-              data.map((comment, index) => (
-                <React.Fragment key={comment.CommentID}>
-                  <SingleComment
-                    comment={comment}
-                    user={user}
-                    handleRightClick={onRightClick}
-                    key={comment.CommentID}
-                  />
-                </React.Fragment>
-              ))
-            ) : (
-              <li style={{ textAlign: "center" }}>
-                <p>No Comments!</p>
-              </li>
-            )}
-          </ul>
-        </div>
+      {isLoading ? (
+        <>
+          <CustomSpinner message="Loading Chats..." />
+        </>
+      ) : (
+        <>
+          <div className="relative">
+            <Link
+              to={ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}
+              className="fixed"
+              style={{ top: "3rem", left: "6.3rem" }}
+            >
+              <CIconButton
+                icon="pi pi-arrow-left"
+                onClick={() => null}
+                severity="secondary"
+                tooltip="Go Back..."
+              />
+            </Link>
+            <hr
+              className="mt-2"
+              aria-hidden="true"
+              style={{ color: "#F9FAFB" }}
+            />
+            <div className="flex align-items-center flex-column ">
+              <ul className="w-full flex flex-column gap-2">
+                {data?.length > 0 ? (
+                  data.map((comment, index) => (
+                    <React.Fragment key={comment.CommentID}>
+                      <SingleComment
+                        comment={comment}
+                        user={user}
+                        handleRightClick={onRightClick}
+                        key={comment.CommentID}
+                      />
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <li style={{ textAlign: "center" }}>
+                    <div
+                      className="flex align-items-center justify-content-center"
+                      style={{ minHeight: "80vh" }}
+                    >
+                      <p>No Comments!</p>
+                    </div>
+                  </li>
+                )}
+              </ul>
+            </div>
 
-        <ContextMenu
-          ref={cm}
-          model={items}
-          onHide={() => {
-            setCommentID(null);
-            setCommentText(null);
-          }}
-          pt={{
-            menu: {
-              className: "m-0",
-            },
-          }}
-        />
-      </div>
+            <ContextMenu
+              ref={cm}
+              model={items}
+              onHide={() => {
+                setCommentID(null);
+                setCommentText(null);
+              }}
+              pt={{
+                menu: {
+                  className: "m-0",
+                },
+              }}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 };

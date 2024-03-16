@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -21,6 +22,7 @@ export async function fetchBusinessNatureById(
   BusinessNatureID = 0,
   LoginUserID
 ) {
+  BusinessNatureID = decryptID(BusinessNatureID);
   if (BusinessNatureID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?BusinessNatureID=${BusinessNatureID}&LoginUserID=${LoginUserID}`
@@ -35,6 +37,7 @@ export async function deleteBusinessNatureByID({
   BusinessNatureID,
   LoginUserID,
 }) {
+  BusinessNatureID = decryptID(BusinessNatureID);
   if (BusinessNatureID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?BusinessNatureID=${BusinessNatureID}&LoginUserID=${LoginUserID}`
@@ -62,7 +65,7 @@ export async function addNewBusinessNature({
     InActive: formData.InActive === true ? 1 : 0,
     EntryUserID: userID,
   };
-
+  BusinessNatureID = BusinessNatureID === 0 ? 0 : decryptID(BusinessNatureID);
   if (BusinessNatureID === 0 || BusinessNatureID === undefined) {
     DataToSend.BusinessNatureID = 0;
   } else {
@@ -80,11 +83,11 @@ export async function addNewBusinessNature({
     } else {
       toast.success("Business Nature created successfully!");
     }
-    return { success: true, RecordID: data?.BusinessNatureID };
+    return { success: true, RecordID: encryptID(data?.BusinessNatureID) };
   } else {
     toast.error(data.message, {
       autoClose: false,
     });
-    return { success: false, RecordID: BusinessNatureID };
+    return { success: false, RecordID: encryptID(BusinessNatureID) };
   }
 }

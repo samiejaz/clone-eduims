@@ -1,6 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import { convertBase64StringToFile } from "../utils/CommonFunctions";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -19,6 +20,7 @@ export async function fetchAllBusinessUnits(LoginUserID) {
 
 // URL: /gen_BusinessUnit/GetBusinessUnitWhere?BusinessUnitID=??&LoginUserID=??
 export async function fetchBusinessUnitById(BusinessUnitID = 0, LoginUserID) {
+  BusinessUnitID = decryptID(BusinessUnitID);
   if (BusinessUnitID !== undefined || BusinessUnitID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?BusinessUnitID=${BusinessUnitID}&LoginUserID=${LoginUserID}`
@@ -29,9 +31,10 @@ export async function fetchBusinessUnitById(BusinessUnitID = 0, LoginUserID) {
   }
 }
 // URL: /gen_BusinessUnit/BusinessUnitDelete?BusinessUnitID=??&LoginUserID=??
-export async function deleteBusinessUnitByID(serviceInfo) {
+export async function deleteBusinessUnitByID({ BusinessUnitID, LoginUserID }) {
+  BusinessUnitID = decryptID(BusinessUnitID);
   const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?BusinessUnitID=${serviceInfo.BusinessUnitID}&LoginUserID=${serviceInfo.LoginUserID}`
+    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?BusinessUnitID=${BusinessUnitID}&LoginUserID=${LoginUserID}`
   );
 
   if (data.success === true) {
@@ -49,7 +52,7 @@ export async function addNewBusinessUnit({
   formData,
   userID,
   BusinessUnitID = 0,
-  BusinessUnitLogo,
+  BusinessUnitLogo = "",
 }) {
   try {
     let newFormData = new FormData();
@@ -73,17 +76,24 @@ export async function addNewBusinessUnit({
     newFormData.append("Description", formData.Description || "");
     newFormData.append("EntryUserID", userID);
     newFormData.append("Inactive", formData.InActive === false ? 0 : 1);
-    if (BusinessUnitLogo !== "" || BusinessUnitLogo !== undefined) {
+    if (BusinessUnitLogo !== "") {
       let businessUnitFile = convertBase64StringToFile(BusinessUnitLogo, true);
       newFormData.append("image", businessUnitFile);
     }
 
-    const { r, g, b } = formData.PrimaryColor;
-    newFormData.append("RedColor", r);
-    newFormData.append("GreenColor", g);
-    newFormData.append("BlueColor", b);
+    if (formData.PrimaryColor) {
+      const { r, g, b } = formData.PrimaryColor;
+      newFormData.append("RedColor", r);
+      newFormData.append("GreenColor", g);
+      newFormData.append("BlueColor", b);
+    } else {
+      newFormData.append("RedColor", 22);
+      newFormData.append("GreenColor", 163);
+      newFormData.append("BlueColor", 64);
+    }
+    BusinessUnitID = BusinessUnitID === 0 ? 0 : decryptID(BusinessUnitID);
 
-    if (+BusinessUnitID === 0 || +BusinessUnitID === undefined) {
+    if (BusinessUnitID === 0 || BusinessUnitID === undefined) {
       newFormData.append("BusinessUnitID", 0);
     } else {
       newFormData.append("BusinessUnitID", +BusinessUnitID);
@@ -105,12 +115,16 @@ export async function addNewBusinessUnit({
       } else {
         toast.success("Business Unit created successfully!");
       }
-      return { success: true, RecordID: data?.BusinessUnitID };
+      return { success: true, RecordID: encryptID(data?.BusinessUnitID) };
     } else {
       toast.error(data.message, {
         autoClose: false,
       });
-      return { success: false, RecordID: BusinessUnitID };
+      return { success: false, RecordID: encryptID(BusinessUnitID) };
     }
-  } catch (err) {}
+  } catch (err) {
+    toast.error(err.message, {
+      autoClose: false,
+    });
+  }
 }

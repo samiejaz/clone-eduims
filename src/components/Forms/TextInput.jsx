@@ -11,6 +11,7 @@ function TextInput({
   isEnable = true,
   floatLabel = false,
   onChange,
+  errorMessage = "This field is required!",
   ...options
 }) {
   return (
@@ -54,6 +55,9 @@ function TextInput({
               autoComplete="off"
               {...options}
             />
+            <span className="text-danger text-sm">
+              {fieldState.error ? errorMessage : ""}
+            </span>
           </span>
         </>
       )}

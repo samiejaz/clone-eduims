@@ -1,6 +1,7 @@
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -30,8 +31,10 @@ export async function fetchAllSessions(LoginUserID) {
   return newData;
 }
 
-export async function fetchSessionById(SessionID, LoginUserID) {
-  if (SessionID !== undefined) {
+export async function fetchSessionById(SessionID = 0, LoginUserID) {
+  SessionID = decryptID(SessionID);
+
+  if (SessionID !== 0) {
     try {
       const { data } = await axios.post(
         apiUrl +
@@ -44,10 +47,11 @@ export async function fetchSessionById(SessionID, LoginUserID) {
   }
 }
 
-export async function deleteSessionByID(session) {
+export async function deleteSessionByID({ SessionID, LoginUserID }) {
+  SessionID = decryptID(SessionID);
   const { data } = await axios.post(
     apiUrl +
-      `/EduIMS/SessionDelete?SessionID=${session.SessionID}&LoginUserID=${session.LoginUserID}`
+      `/EduIMS/SessionDelete?SessionID=${SessionID}&LoginUserID=${LoginUserID}`
   );
   if (data.success === true) {
     toast.success("Session deleted successfully!");
@@ -68,6 +72,7 @@ export async function addNewSession({ formData, userID, SessionID = 0 }) {
       EntryUserID: userID,
     };
 
+    SessionID = SessionID === 0 ? 0 : decryptID(SessionID);
     if (SessionID === 0 || SessionID === undefined) {
       DataToSend.SessionID = 0;
     } else {
@@ -85,12 +90,12 @@ export async function addNewSession({ formData, userID, SessionID = 0 }) {
       } else {
         toast.success("Business Type created successfully!");
       }
-      return { success: true, RecordID: data?.SessionID };
+      return { success: true, RecordID: encryptID(data?.SessionID) };
     } else {
       toast.error(data.message, {
         autoClose: false,
       });
-      return { success: false, RecordID: SessionID };
+      return { success: false, RecordID: encryptID(SessionID) };
     }
   } catch (e) {
     toast.error(e.message, {

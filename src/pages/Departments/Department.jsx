@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-
 import { FilterMatchMode } from "primereact/api";
 import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -28,6 +27,7 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.DEPARTMENT;
 let editRoute = `${parentRoute}/edit/`;
@@ -208,9 +208,9 @@ function DepartmentDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.DepartmentID,
-                  () => showDeleteDialog(rowData.DepartmentID),
-                  () => showEditDialog(rowData.DepartmentID),
+                  encryptID(rowData.DepartmentID),
+                  () => showDeleteDialog(encryptID(rowData.DepartmentID)),
+                  () => showEditDialog(encryptID(rowData.DepartmentID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -318,12 +318,7 @@ function DepartmentForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}

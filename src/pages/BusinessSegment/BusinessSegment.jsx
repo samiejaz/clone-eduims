@@ -27,6 +27,7 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.BUSINESS_SEGMENT_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -214,9 +215,9 @@ export function BusinessSegmentDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.BusinessSegmentID,
-                  () => showDeleteDialog(rowData.BusinessSegmentID),
-                  () => showEditDialog(rowData.BusinessSegmentID),
+                  encryptID(rowData.BusinessSegmentID),
+                  () => showDeleteDialog(encryptID(rowData.BusinessSegmentID)),
+                  () => showEditDialog(encryptID(rowData.BusinessSegmentID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -330,12 +331,7 @@ export function BusinessSegmentForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}

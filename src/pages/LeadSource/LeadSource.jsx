@@ -27,6 +27,7 @@ import {
 } from "../../components/Layout/LayoutComponents";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.LEED_SOURCE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -210,9 +211,9 @@ function LeadSourceDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.LeadSourceID,
-                  () => showDeleteDialog(rowData.LeadSourceID),
-                  () => showEditDialog(rowData.LeadSourceID),
+                  encryptID(rowData.LeadSourceID),
+                  () => showDeleteDialog(encryptID(rowData.LeadSourceID)),
+                  () => showEditDialog(encryptID(rowData.LeadSourceID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -321,12 +322,7 @@ function LeadSourceForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
@@ -348,7 +344,7 @@ function LeadSourceForm({ mode, userRights }) {
             <FormRow>
               <FormColumn lg={6} xl={6} md={6}>
                 <FormLabel>
-                  LeadSource
+                  Lead Source
                   <span className="text-danger fw-bold ">*</span>
                 </FormLabel>
 
@@ -359,6 +355,7 @@ function LeadSourceForm({ mode, userRights }) {
                     required={true}
                     focusOptions={() => setFocus("InActive")}
                     isEnable={mode !== "view"}
+                    errorMessage="Source title is required!"
                   />
                 </div>
               </FormColumn>

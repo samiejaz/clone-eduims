@@ -1,5 +1,6 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -11,32 +12,42 @@ export async function fetchAllGenOldCustomers(LoginUserID) {
 
     return data.data ?? [];
   } catch (error) {
-    toast.error(error.message, {
-      autoClose: false,
-    });
+    ShowErrorToast("FetchAll::" + error.message);
   }
 }
-export async function fetchGenOldCustomerById(CustomerID = 0, LoginUserID) {
-  if (CustomerID !== null || CustomerID !== undefined || CustomerID !== 0) {
-    try {
-      const { data } = await axios.post(
-        `${apiUrl}/EduIMS/GetOldCustomersWhere?CustomerID=${CustomerID}&LoginUserID=${LoginUserID}`
-      );
-      return data;
-    } catch (error) {
-      toast.error(error.message, {
-        autoClose: false,
-      });
+export async function fetchGenOldCustomerById(CustomerID, LoginUserID) {
+  try {
+    CustomerID = decryptID(CustomerID);
+    if (CustomerID !== 0) {
+      try {
+        const { data } = await axios.post(
+          `${apiUrl}/EduIMS/GetOldCustomersWhere?CustomerID=${CustomerID}&LoginUserID=${LoginUserID}`
+        );
+        return data;
+      } catch (error) {
+        ShowErrorToast(error.message);
+      }
+    } else {
+      return [];
     }
-  } else {
-    return [];
+  } catch (e) {
+    ShowErrorToast("Fetch::" + error.message);
   }
 }
 
-export async function deleteGenOldCustomerByID(oldCustomer) {
-  await axios.post(
-    apiUrl + "/EduIMS/CustomerDelete?CustomerID=" + oldCustomer.OldCustomerID
-  );
+export async function deleteGenOldCustomerByID(OldCustomerID) {
+  try {
+    const { data } = await axios.post(
+      apiUrl + "/EduIMS/CustomerDelete?CustomerID=" + OldCustomerID
+    );
+    if (data.success === true) {
+      ShowSuccessToast("Customer successfully deleted!");
+    } else {
+      ShowErrorToast(data.message);
+    }
+  } catch (e) {
+    ShowErrorToast("Delete::" + e.message);
+  }
 }
 
 export async function addNewGenOldCustomer({
@@ -52,6 +63,7 @@ export async function addNewGenOldCustomer({
       EntryUserID: userID,
     };
 
+    CustomerID = CustomerID === 0 ? 0 : decryptID(CustomerID);
     if (CustomerID === 0 || CustomerID === undefined) {
       DataToSend.CustomerID = 0;
     } else {
@@ -65,20 +77,16 @@ export async function addNewGenOldCustomer({
 
     if (data.success === true) {
       if (CustomerID !== 0) {
-        toast.success("Customer updated successfully!");
+        ShowSuccessToast("Customer updated successfully!");
       } else {
-        toast.success("Customer created successfully!");
+        ShowSuccessToast("Customer created successfully!");
       }
-      return { success: true, RecordID: data?.CustomerID };
+      return { success: true, RecordID: encryptID(data?.CustomerID) };
     } else {
-      toast.error(data.message, {
-        autoClose: false,
-      });
-      return { success: false, RecordID: CustomerID };
+      ShowErrorToast(data.message);
+      return { success: false, RecordID: encryptID(CustomerID) };
     }
   } catch (error) {
-    toast.error(error.message, {
-      autoClose: false,
-    });
+    ShowErrorToast(error.message);
   }
 }

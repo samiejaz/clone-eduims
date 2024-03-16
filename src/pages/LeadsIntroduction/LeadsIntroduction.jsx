@@ -42,6 +42,7 @@ import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer";
 import LeadsComments from "./LeadsComments";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -182,6 +183,7 @@ export function LeadIntroductionDetail({
     queryKey: [queryKey],
     queryFn: () => fetchAllLeadIntroductions(user.userID),
     initialData: [],
+    refetchOnWindowFocus: false,
   });
 
   const deleteMutation = useMutation({
@@ -210,16 +212,16 @@ export function LeadIntroductionDetail({
       <React.Fragment>
         <div>
           <ForwardDialogComponent
-            LeadIntroductionID={rowData.LeadIntroductionID}
+            LeadIntroductionID={encryptID(rowData.LeadIntroductionID)}
           />
           <QuoteDialogComponent
-            LeadIntroductionID={rowData.LeadIntroductionID}
+            LeadIntroductionID={encryptID(rowData.LeadIntroductionID)}
           />
           <FinalizedDialogComponent
-            LeadIntroductionID={rowData.LeadIntroductionID}
+            LeadIntroductionID={encryptID(rowData.LeadIntroductionID)}
           />
           <ClosedDialogComponent
-            LeadIntroductionID={rowData.LeadIntroductionID}
+            LeadIntroductionID={encryptID(rowData.LeadIntroductionID)}
           />
         </div>
       </React.Fragment>
@@ -230,9 +232,9 @@ export function LeadIntroductionDetail({
       <React.Fragment>
         <div style={{ display: "flex" }}>
           {ActionButtons(
-            rowData.LeadIntroductionID,
-            () => showDeleteDialog(rowData.LeadIntroductionID),
-            () => showEditDialog(rowData.LeadIntroductionID),
+            encryptID(rowData.LeadIntroductionID),
+            () => showDeleteDialog(encryptID(rowData.LeadIntroductionID)),
+            () => showEditDialog(encryptID(rowData.LeadIntroductionID)),
             handleView,
             userRights[0]?.RoleEdit,
             userRights[0]?.RoleDelete
@@ -251,7 +253,7 @@ export function LeadIntroductionDetail({
                 navigate(
                   ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE +
                     "/" +
-                    rowData.LeadIntroductionID
+                    encryptID(rowData.LeadIntroductionID)
                 )
               }
               style={{
@@ -269,7 +271,7 @@ export function LeadIntroductionDetail({
                 navigate(
                   ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_COMMENT_ROUTE +
                     "/" +
-                    rowData.LeadIntroductionID
+                    encryptID(rowData.LeadIntroductionID)
                 )
               }
               tooltip="Comments"
@@ -412,15 +414,17 @@ function LeadIntroductionForm({ mode, userRights }) {
   const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
 
+  const countryRef = useRef();
+
   const navigate = useNavigate();
   const { LeadIntroductionID } = useParams();
 
   const method = useForm({
     defaultValues: {
       CompanyName: "",
-      CountryID: [],
-      TehsilID: [],
-      BusinessTypeID: [],
+      CountryID: null,
+      TehsilID: null,
+      BusinessTypeID: null,
       CompanyAddress: "",
       CompanyWebsite: "",
       BusinessNature: "",
@@ -429,7 +433,7 @@ function LeadIntroductionForm({ mode, userRights }) {
       ContactPersonWhatsAppNo: "",
       ContactPersonEmail: "",
       RequirementDetails: "",
-      LeadSourceID: [],
+      LeadSourceID: null,
       IsWANumberSameAsMobile: false,
     },
   });
@@ -445,10 +449,9 @@ function LeadIntroductionForm({ mode, userRights }) {
       LeadIntroductionID !== undefined &&
       LeadIntroductionData?.data?.length > 0
     ) {
-      method.control._fields.CountryID._f.value =
-        LeadIntroductionData.data[0].CountryID;
       method.setValue("CompanyName", LeadIntroductionData.data[0].CompanyName);
       method.setValue("CountryID", LeadIntroductionData.data[0].CountryID);
+      countryRef.current?.setCountryID(LeadIntroductionData.data[0].CountryID);
       method.setValue("TehsilID", LeadIntroductionData.data[0].TehsilID);
       method.setValue(
         "BusinessTypeID",
@@ -553,12 +556,6 @@ function LeadIntroductionForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
@@ -574,11 +571,15 @@ function LeadIntroductionForm({ mode, userRights }) {
               showAddNewButton={userRights[0]?.RoleNew}
               showEditButton={userRights[0]?.RoleEdit}
               showDelete={userRights[0]?.RoleDelete}
+              mode={mode}
             />
           </div>
           <div className="mt-4">
             <FormProvider {...method}>
-              <LeadsIntroductionFormComponent mode={mode} />
+              <LeadsIntroductionFormComponent
+                mode={mode}
+                countryRef={countryRef}
+              />
             </FormProvider>
           </div>
         </>
@@ -610,7 +611,7 @@ function ForwardDialogComponent({ LeadIntroductionID }) {
         icon="pi pi-send"
         rounded
         outlined
-        className="mr-2"
+        className="mr-2 text-blue-300"
         tooltip="Forward"
         tooltipOptions={{
           position: "left",

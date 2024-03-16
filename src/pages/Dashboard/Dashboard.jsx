@@ -18,6 +18,7 @@ import { useRevertBackModalHook } from "../../components/Modals/RevertBackModal"
 import { confirmDialog } from "primereact/confirmdialog";
 import { toast } from "react-toastify";
 import { InfoCardsContainer } from "../Leads/LeadsDashboard/LeadsDashboard";
+import { encryptID } from "../../utils/crypto";
 
 const componentMapping = {
   InfoCardsContainer,
@@ -87,6 +88,7 @@ function LeadsIntroductionDemonstratorTable() {
       LeadsIntroductionID: LeadIntroductionData.LeadIntroductionID,
       LeadIntroductionDetailID: LeadIntroductionData.LeadIntroductionDetailID,
     });
+
   const user = useUserData();
 
   const mutation = useMutation({
@@ -156,8 +158,10 @@ function LeadsIntroductionDemonstratorTable() {
               }}
               onClick={() => {
                 setLeadIntroductionData({
-                  LeadIntroductionID: rowData.LeadIntroductionID,
-                  LeadIntroductionDetailID: rowData.LeadIntroductionDetailID,
+                  LeadIntroductionID: encryptID(rowData.LeadIntroductionID),
+                  LeadIntroductionDetailID: encryptID(
+                    rowData.LeadIntroductionDetailID
+                  ),
                 });
                 setVisible(true);
               }}
@@ -166,7 +170,7 @@ function LeadsIntroductionDemonstratorTable() {
             <CIconButton
               onClick={() => {
                 setLeadIntroductionData({
-                  LeadIntroductionID: rowData.LeadIntroductionID,
+                  LeadIntroductionID: encryptID(rowData.LeadIntroductionID),
                   LeadIntroductionDetailID: 0,
                 });
                 setMeetingDoneModalVisible(true);
@@ -186,7 +190,7 @@ function LeadsIntroductionDemonstratorTable() {
             <CIconButton
               onClick={() => {
                 setLeadIntroductionData({
-                  LeadIntroductionID: rowData.LeadIntroductionID,
+                  LeadIntroductionID: encryptID(rowData.LeadIntroductionID),
                   LeadIntroductionDetailID: 0,
                 });
                 setRevertBackModalVisible(true);
@@ -204,7 +208,9 @@ function LeadsIntroductionDemonstratorTable() {
               }
             />
             <CIconButton
-              onClick={() => confirmAcknowledge(rowData.LeadIntroductionID)}
+              onClick={() =>
+                confirmAcknowledge(encryptID(rowData.LeadIntroductionID))
+              }
               icon={"pi pi-star"}
               severity="warning"
               tooltip="Acknowledged"
@@ -256,7 +262,7 @@ function LeadsIntroductionDemonstratorTable() {
         rows={5}
         rowsPerPageOptions={[5, 10, 25, 50]}
         removableSort
-        emptyMessage="No LeadIntroductions found!"
+        emptyMessage="No Leads found!"
         filters={filters}
         filterDisplay="row"
         resizableColumns

@@ -1,6 +1,8 @@
 import React from "react";
 import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
+import useKeyCombination from "../../hooks/useKeyCombinationHook";
+import { confirmDialog } from "primereact/confirmdialog";
 
 export default function ButtonToolBar({
   printLoading = false,
@@ -32,7 +34,47 @@ export default function ButtonToolBar({
   showCancelButton = true,
   showAddNewButton = true,
   showEditButton = true,
+  mode = "new",
 }) {
+  useKeyCombination(() => {
+    if (mode === "edit" || mode === "new") {
+      handleSave();
+    }
+  }, "s");
+
+  useKeyCombination(() => {
+    if (mode === "view") {
+      confirmDialog({
+        message: "Are you sure you delete this record?",
+        header: "Confirmation",
+        icon: "pi pi-info-circle",
+        defaultFocus: "reject",
+        acceptClassName: "p-button-danger",
+        position: "top",
+        accept: () => handleDelete(),
+        reject: () => {},
+      });
+    }
+  }, "d");
+
+  useKeyCombination(() => {
+    if (mode === "view") {
+      handleEdit();
+    }
+  }, "e");
+
+  useKeyCombination(() => {
+    if (mode !== "view") {
+      handleCancel();
+    }
+  }, "c");
+
+  useKeyCombination(() => {
+    if (mode !== "new") {
+      handleAddNew();
+    }
+  }, "n");
+
   const startContent = (
     <Button
       icon="pi pi-arrow-left"
@@ -52,7 +94,7 @@ export default function ButtonToolBar({
           className="rounded"
           type="button"
           severity="secondary"
-          disabled={cancelDisable}
+          disabled={cancelDisable ? true : mode === "view"}
           onClick={() => handleCancel()}
           pt={{
             label: {
@@ -67,7 +109,9 @@ export default function ButtonToolBar({
               icon="pi pi-plus"
               className="rounded"
               type="button"
-              disabled={addNewDisable}
+              disabled={
+                addNewDisable ? true : mode === "edit" || mode === "new"
+              }
               onClick={() => handleAddNew()}
               pt={{
                 label: {
@@ -88,7 +132,7 @@ export default function ButtonToolBar({
               type="button"
               severity="warning"
               className="p-button-success rounded"
-              disabled={editDisable}
+              disabled={editDisable ? true : mode !== "view" ? true : false}
               onClick={() => handleEdit()}
               pt={{
                 label: {
@@ -105,8 +149,21 @@ export default function ButtonToolBar({
               icon="pi pi-trash"
               type="button"
               severity="danger"
-              disabled={deleteDisable}
-              onClick={() => handleDelete()}
+              disabled={
+                deleteDisable ? true : mode === "edit" || mode === "new"
+              }
+              onClick={() => {
+                confirmDialog({
+                  message: "Are you sure you delete this record?",
+                  header: "Confirmation",
+                  icon: "pi pi-info-circle",
+                  defaultFocus: "reject",
+                  acceptClassName: "p-button-danger",
+                  position: "top",
+                  accept: () => handleDelete(),
+                  reject: () => {},
+                });
+              }}
               className="p-button-success rounded"
               pt={{
                 label: {
@@ -119,11 +176,17 @@ export default function ButtonToolBar({
         {showSaveButton ? (
           <>
             <Button
-              label={saveLabel}
+              label={
+                saveLabel !== "Save"
+                  ? saveLabel
+                  : mode === "edit"
+                  ? "Update"
+                  : "Save"
+              }
               icon="pi pi-check"
               type="submit"
               severity="success"
-              disabled={saveDisable}
+              disabled={saveDisable ? true : mode === "view"}
               onClick={handleSave}
               loading={saveLoading}
               className="p-button-success rounded"

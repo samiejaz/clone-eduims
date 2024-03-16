@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export function FormatDate(dateString) {
   const formattedDate = `${dateString.slice(0, 4)}-${dateString.slice(
@@ -73,4 +74,18 @@ export async function PrintReportInNewTab(url) {
   setTimeout(() => {
     win.document.write(html);
   }, 0);
+}
+
+export function ShowErrorToast(message = "") {
+  if (message !== "") {
+    toast.error(message, {
+      autoClose: false,
+    });
+  }
+}
+
+export function ShowSuccessToast(message = "") {
+  if (message !== "") {
+    toast.success(message);
+  }
 }

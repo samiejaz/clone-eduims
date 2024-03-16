@@ -29,6 +29,7 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.TEHSIL_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -212,9 +213,9 @@ function TehsilDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.TehsilID,
-                  () => showDeleteDialog(rowData.TehsilID),
-                  () => showEditDialog(rowData.TehsilID),
+                  encryptID(rowData.TehsilID),
+                  () => showDeleteDialog(encryptID(rowData.TehsilID)),
+                  () => showEditDialog(encryptID(rowData.TehsilID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -270,10 +271,11 @@ function TehsilForm({ mode, userRights }) {
 
   const mutation = useMutation({
     mutationFn: addNewTehsil,
-    onSuccess: (success) => {
+    onSuccess: ({ success, RecordID }) => {
+      console.log(success, RecordID);
       if (success) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${TehsilID}`);
+        navigate(`${parentRoute}/${RecordID}`);
       }
     },
   });
@@ -323,12 +325,7 @@ function TehsilForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -17,6 +18,7 @@ export async function fetchAllCountries(LoginUserID) {
 
 // URL: /gen_Country/GetCountryWhere?CountryID=??&LoginUserID=??
 export async function fetchCountryById(CountryID, LoginUserID) {
+  CountryID = decryptID(CountryID);
   if (CountryID === undefined || CountryID === 0) {
     return [];
   } else {
@@ -27,9 +29,10 @@ export async function fetchCountryById(CountryID, LoginUserID) {
   }
 }
 // URL: /gen_Country/CountryDelete?CountryID=??&LoginUserID=??
-export async function deleteCountryByID(serviceInfo) {
+export async function deleteCountryByID({ CountryID, LoginUserID }) {
+  CountryID = decryptID(CountryID);
   const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CountryID=${serviceInfo.CountryID}&LoginUserID=${serviceInfo.LoginUserID}`
+    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CountryID=${CountryID}&LoginUserID=${LoginUserID}`
   );
 
   if (data.success === true) {
@@ -50,7 +53,7 @@ export async function addNewCountry({ formData, userID, CountryID = 0 }) {
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
     };
-
+    CountryID = CountryID === 0 ? 0 : decryptID(CountryID);
     if (CountryID === 0 || CountryID === undefined) {
       DataToSend.CountryID = 0;
     } else {
@@ -68,12 +71,12 @@ export async function addNewCountry({ formData, userID, CountryID = 0 }) {
       } else {
         toast.success("Country created successfully!");
       }
-      return { success: true, RecordID: data?.CountryID };
+      return { success: true, RecordID: encryptID(data?.CountryID) };
     } else {
       toast.error(data.message, {
         autoClose: false,
       });
-      return { success: false, RecordID: CountryID };
+      return { success: false, RecordID: encryptID(CountryID) };
     }
   } catch (e) {
     toast.error(e.message, {

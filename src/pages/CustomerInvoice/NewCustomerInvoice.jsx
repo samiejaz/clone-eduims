@@ -59,7 +59,10 @@ import CDatePicker from "../../components/Forms/CDatePicker";
 import CSwitchInput from "../../components/Forms/CSwitchInput";
 import { useUserData } from "../../context/AuthContext";
 import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
-import { PrintReportInNewTab } from "../../utils/CommonFunctions";
+import {
+  PrintReportInNewTab,
+  ShowErrorToast,
+} from "../../utils/CommonFunctions";
 import { classNames } from "primereact/utils";
 import { InputSwitch } from "primereact/inputswitch";
 import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCustomerInvoiceInstallmentModal";
@@ -68,6 +71,7 @@ import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
 let editRoute = `${parentRoute}/edit/`;
@@ -197,10 +201,6 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
     },
   });
 
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
-
   function handleDelete(id) {
     deleteMutation.mutate({ CustomerInvoiceID: id, LoginUserID: user.userID });
   }
@@ -258,9 +258,9 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.CustomerInvoiceID,
-                  () => showDeleteDialog(rowData.CustomerInvoiceID),
-                  () => showEditDialog(rowData.CustomerInvoiceID),
+                  encryptID(rowData.CustomerInvoiceID),
+                  () => showDeleteDialog(encryptID(rowData.CustomerInvoiceID)),
+                  () => showEditDialog(encryptID(rowData.CustomerInvoiceID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -388,10 +388,9 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
 
   useEffect(() => {
     if (
-      +CustomerInvoiceID !== null &&
+      CustomerInvoiceID !== undefined &&
       CustomerInvoiceData?.Master?.length > 0
     ) {
-      //   // Setting Values
       method.setValue("SessionID", CustomerInvoiceData?.Master[0]?.SessionID);
       method.setValue(
         "BusinessUnitID",
@@ -418,6 +417,10 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
         "CustomerLedgers",
         CustomerInvoiceData?.Master[0]?.AccountID
       );
+      customerBranchRef.current?.setAccountID(
+        CustomerInvoiceData?.Master[0]?.AccountID
+      );
+
       method.setValue(
         "DocumentNo",
         CustomerInvoiceData?.Master[0]?.DocumentNo ?? undefined
@@ -464,7 +467,7 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
       );
       method.setValue("TotalRate", CustomerInvoiceData?.Master[0]?.TotalRate);
     }
-  }, [+CustomerInvoiceID, CustomerInvoiceData]);
+  }, [CustomerInvoiceID, CustomerInvoiceData]);
 
   function handleEdit() {
     navigate(`${editRoute}${CustomerInvoiceID}`);
@@ -499,7 +502,7 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
         CustomerInvoiceID: CustomerInvoiceID,
       });
     } else {
-      toast.error("Please add atleast 1 row!");
+      ShowErrorToast("Please add atleast 1 row!");
     }
   }
 
@@ -521,12 +524,7 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
           <CustomerBranchDataProvider>
             <div className="mt-4">
               <ButtonToolBar
-                editDisable={mode !== "view"}
-                cancelDisable={mode === "view"}
-                addNewDisable={mode === "edit" || mode === "new"}
-                deleteDisable={mode === "edit" || mode === "new"}
-                saveDisable={mode === "view"}
-                saveLabel={mode === "edit" ? "Update" : "Save"}
+                mode={mode}
                 handleGoBack={() => navigate(parentRoute)}
                 handleEdit={() => handleEdit()}
                 handleCancel={() => {
@@ -1407,7 +1405,6 @@ function CustomerInvoiceDetailTableRow({
   const [BusinessUnitID, setBusinessUnitID] = useState(0);
   const [IsFree, setIsFree] = useState(false);
   const [InvoiceType, setInvoiceType] = useState("");
-
   const method = useFormContext();
   const { data: ProductsInfoSelectData } = useQuery({
     queryKey: [
@@ -1816,7 +1813,7 @@ const BranchSelectField = React.forwardRef((props, ref) => {
 const CustomerBranchDataContext = createContext();
 
 const CustomerBranchDataProvider = ({ children }) => {
-  const [AccountID, setAccountID] = useState();
+  const [AccountID, setAccountID] = useState(0);
 
   return (
     <CustomerBranchDataContext.Provider value={{ setAccountID, AccountID }}>

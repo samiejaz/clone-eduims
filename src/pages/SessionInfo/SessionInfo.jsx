@@ -36,6 +36,7 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO;
 let editRoute = `${parentRoute}/edit/`;
@@ -51,7 +52,7 @@ export default function SessionInfoOpening() {
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
+      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
     });
     setUserRights([rights]);
   }, []);
@@ -215,9 +216,9 @@ export function SessionDetail({ userRights }) {
             <Column
               body={(rowData) =>
                 ActionButtons(
-                  rowData.SessionID,
-                  () => showDeleteDialog(rowData?.SessionID),
-                  () => showEditDialog(rowData?.SessionID),
+                  encryptID(rowData.SessionID),
+                  () => showDeleteDialog(encryptID(rowData?.SessionID)),
+                  () => showEditDialog(encryptID(rowData?.SessionID)),
                   handleView,
                   userRights[0]?.RoleEdit,
                   userRights[0]?.RoleDelete
@@ -351,12 +352,7 @@ export function SessionForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               saveLoading={mutation.isPending}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
