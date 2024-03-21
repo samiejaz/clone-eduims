@@ -161,13 +161,15 @@ const SubSidebar = () => {
   return (
     <>
       {filteredRoutes?.map((route) => (
-        <MenuGroup
-          key={route.menuGroupName}
-          menuGroupName={route.menuGroupName}
-          subItems={route.subItems}
-          icon={route.icon}
-          hideMenuGroup={route?.hideMenuGroup}
-        />
+        <>
+          <MenuGroup
+            key={route.menuGroupKey}
+            menuGroupName={route.menuGroupName}
+            subItems={route.subItems}
+            icon={route.icon}
+            hideMenuGroup={route?.hideMenuGroup}
+          />
+        </>
       ))}
     </>
   );
@@ -187,7 +189,7 @@ const MenuGroup = ({
     <>
       {!hideMenuGroup && (
         <>
-          <li className="">
+          <li>
             <div className="c-iocn-link">
               <Link to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}>
                 <i className={`pi ${icon}`}></i>

@@ -43,6 +43,8 @@ import LeadsIntroductionViewer, {
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer";
 import LeadsComments from "./LeadsComments";
 import { encryptID } from "../../utils/crypto";
+import { SingleFileUploadField } from "../../components/Forms/form";
+import { ShowErrorToast } from "../../utils/CommonFunctions";
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -870,6 +872,7 @@ function QuoteDialogComponent({ LeadIntroductionID }) {
 
 function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const method = useForm();
+  const fileRef = useRef();
   const queryClient = useQueryClient();
   const user = useUserData();
   const footerContent = (
@@ -892,10 +895,13 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
             File
             <span className="text-danger fw-bold ">*</span>
           </Form.Label>
-          <Form.Control
+          {/* <Form.Control
             type="file"
             {...method.register("AttachmentFile")}
-          ></Form.Control>
+          ></Form.Control> */}
+          <div>
+            <SingleFileUploadField ref={fileRef} />
+          </div>
         </Form.Group>
       </Row>
       <Row>
@@ -939,12 +945,19 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
     },
   });
   function onSubmit(data) {
-    mutation.mutate({
-      from: "Quoted",
-      formData: data,
-      userID: user.userID,
-      LeadIntroductionID: LeadIntroductionID,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      ShowErrorToast("File is required!");
+      fileRef.current?.setError();
+    } else {
+      data.AttachmentFile = file;
+      mutation.mutate({
+        from: "Quoted",
+        formData: data,
+        userID: user.userID,
+        LeadIntroductionID: LeadIntroductionID,
+      });
+    }
   }
 
   return (
@@ -955,7 +968,7 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
         visible={visible}
         draggable={false}
         onHide={() => setVisible(false)}
-        style={{ width: "75vw", height: "55vh" }}
+        style={{ width: "75vw", height: "80vh" }}
       >
         {dialogConent}
       </Dialog>
@@ -1012,6 +1025,8 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const user = useUserData();
   const method = useForm();
 
+  const fileRef = useRef(null);
+
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
@@ -1044,10 +1059,9 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
             File
             <span className="text-danger fw-bold ">*</span>
           </Form.Label>
-          <Form.Control
-            type="file"
-            {...method.register("AttachmentFile")}
-          ></Form.Control>
+          <div>
+            <SingleFileUploadField ref={fileRef} background="bg-primary" />
+          </div>
         </Form.Group>
       </Row>
       <Row>
@@ -1080,12 +1094,19 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   );
 
   function onSubmit(data) {
-    mutation.mutate({
-      from: "Finalized",
-      formData: data,
-      userID: user.userID,
-      LeadIntroductionID: LeadIntroductionID,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      ShowErrorToast("File is required!");
+      fileRef.current?.setError();
+    } else {
+      data.AttachmentFile = file;
+      mutation.mutate({
+        from: "Finalized",
+        formData: data,
+        userID: user.userID,
+        LeadIntroductionID: LeadIntroductionID,
+      });
+    }
   }
 
   return (
@@ -1096,7 +1117,7 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         visible={visible}
         draggable={false}
         onHide={() => setVisible(false)}
-        style={{ width: "75vw", height: "55vh" }}
+        style={{ width: "75vw", height: "80vh" }}
       >
         {dialogConent}
       </Dialog>

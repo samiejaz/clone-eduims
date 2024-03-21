@@ -582,11 +582,10 @@ function BusinessUnitForm({ mode, userRights }) {
             <FormRow>
               <FormColumn>
                 <FormLabel>Description</FormLabel>
-                <input
-                  as={"textarea"}
-                  rows={1}
+                <textarea
+                  rows={"1"}
                   disabled={mode === "view"}
-                  className="form-control"
+                  className="p-inputtext"
                   style={{
                     padding: "0.3rem 0.4rem",
                     fontSize: "0.8em",

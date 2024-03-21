@@ -70,10 +70,11 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
     newFormData.append("Password", formData.Password);
     newFormData.append("Inactive", formData.InActive === false ? 0 : 1);
     newFormData.append("EntryUserID", userID);
-    if (UserImage !== "") {
-      let userImageFile = convertBase64StringToFile(UserImage, true);
-      newFormData.append("image", userImageFile);
-    }
+    // if (UserImage !== "") {
+    //   let userImageFile = convertBase64StringToFile(UserImage, true);
+    //   newFormData.append("image", userImageFile);
+    // }
+    newFormData.append("image", formData.UserImage);
     UserID = UserID === 0 ? 0 : decryptID(UserID);
     if (UserID === 0 || UserID === undefined) {
       newFormData.append("LoginUserID", 0);

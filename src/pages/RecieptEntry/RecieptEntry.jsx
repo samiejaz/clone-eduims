@@ -583,14 +583,12 @@ export function ReceiptEntryForm({ mode, userRights }) {
               saveLoading={receiptVoucherMutation.isPending}
               handleDelete={handleDelete}
               showPrint={userRights[0]?.RolePrint}
-              handlePrint={() =>
-                PrintReportInNewTab(
-                  "ReceiptVoucherPrint?ReceiptVoucherID=" + ReceiptVoucherID
-                )
-              }
               showAddNewButton={userRights[0]?.RoleNew}
               showEditButton={userRights[0]?.RoleEdit}
               showDelete={userRights[0]?.RoleDelete}
+              getPrintFromUrl={
+                "ReceiptVoucherPrint?ReceiptVoucherID=" + ReceiptVoucherID
+              }
             />
           </div>
           <form id="receiptVoucher" className="mt-4">

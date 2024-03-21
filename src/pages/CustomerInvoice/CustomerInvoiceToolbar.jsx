@@ -3,6 +3,8 @@ import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
 import useKeyCombination from "../../hooks/useKeyCombinationHook";
 import { confirmDialog } from "primereact/confirmdialog";
+import { useMutation } from "@tanstack/react-query";
+import { PrintReportInNewTab } from "../../utils/CommonFunctions";
 
 export default function ButtonToolBar({
   printLoading = false,
@@ -35,6 +37,7 @@ export default function ButtonToolBar({
   showAddNewButton = true,
   showEditButton = true,
   mode = "new",
+  getPrintFromUrl = "",
 }) {
   useKeyCombination(() => {
     if (mode === "edit" || mode === "new") {
@@ -204,21 +207,9 @@ export default function ButtonToolBar({
           <>
             <i className="pi pi-bars p-toolbar-separator mr-2" />
 
-            <Button
-              label={printLoading ? "Loading..." : "Print"}
-              icon="pi pi-print"
-              className="rounded"
-              type="button"
-              severity="help"
-              disabled={printDisable}
-              loading={printLoading}
-              loadingIcon="pi pi-spin pi-print"
-              onClick={() => handlePrint()}
-              pt={{
-                label: {
-                  className: "hidden md:block lg:block",
-                },
-              }}
+            <PrintRecordButton
+              getPrintFromUrl={getPrintFromUrl}
+              printDisable={printDisable}
             />
           </>
         ) : (
@@ -247,3 +238,33 @@ export default function ButtonToolBar({
     </>
   );
 }
+
+const PrintRecordButton = ({ getPrintFromUrl, printDisable }) => {
+  const mutation = useMutation({
+    mutationFn: () =>
+      PrintReportInNewTab({
+        controllerName: getPrintFromUrl,
+      }),
+  });
+
+  return (
+    <>
+      <Button
+        label={mutation.isPending ? "Generating..." : "Print"}
+        icon="pi pi-print"
+        className="rounded"
+        type="button"
+        severity="help"
+        disabled={printDisable}
+        loading={mutation.isPending}
+        loadingIcon="pi pi-spin pi-print"
+        onClick={() => mutation.mutateAsync()}
+        pt={{
+          label: {
+            className: "hidden md:block lg:block",
+          },
+        }}
+      />
+    </>
+  );
+};

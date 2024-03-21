@@ -32,6 +32,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
 import { encryptID } from "../../utils/crypto";
+import { SingleFileUploadField } from "../../components/Forms/form";
 
 let parentRoute = ROUTE_URLS.USER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -272,7 +273,7 @@ function UserForm({ mode, userRights }) {
   document.title = "User Entry";
 
   const queryClient = useQueryClient();
-  const imageRef = useRef();
+  const fileRef = useRef();
 
   const navigate = useNavigate();
   const { UserID } = useParams();
@@ -317,8 +318,9 @@ function UserForm({ mode, userRights }) {
           setValue("Password", UserData?.data[0]?.Password);
           setValue("InActive", UserData?.data[0]?.InActive);
           setValue("DepartmentID", UserData?.data[0]?.DepartmentID);
-          imageRef.current.src =
-            "data:image/png;base64," + UserData?.data[0]?.ProfilePic;
+          fileRef.current?.setBase64File(
+            "data:image/png;base64," + UserData?.data[0]?.ProfilePic
+          );
         } catch (error) {}
       }
     }
@@ -363,16 +365,18 @@ function UserForm({ mode, userRights }) {
   function handleEdit() {
     navigate(editRoute + UserID);
   }
-
   function onSubmit(data) {
-    mutation.mutate({
-      formData: data,
-      userID: user?.userID,
-      UserID: UserID,
-      UserImage: imageRef.current?.src.includes(newRoute)
-        ? ""
-        : imageRef.current.src,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      fileRef.current?.setError();
+    } else {
+      data.UserImage = file;
+      mutation.mutate({
+        formData: data,
+        userID: user?.userID,
+        UserID: UserID,
+      });
+    }
   }
 
   return (
@@ -526,9 +530,12 @@ function UserForm({ mode, userRights }) {
               <FormColumn lg={6} xl={6} md={6}>
                 <FormLabel>Profie Pic</FormLabel>
                 <div>
-                  <ImageContainer
-                    imageRef={imageRef}
-                    hideButtons={mode === "view"}
+                  <SingleFileUploadField
+                    ref={fileRef}
+                    accept="image/*"
+                    chooseBtnLabel="Select Image"
+                    changeBtnLabel="Change Image"
+                    mode={mode}
                   />
                 </div>
               </FormColumn>
