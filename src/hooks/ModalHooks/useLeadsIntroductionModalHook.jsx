@@ -13,22 +13,25 @@ import {
   useAllTehsilsSelectData,
 } from "../SelectData/useSelectData";
 import CDropdown from "../../components/Forms/CDropdown";
-import { Col, Form, Row } from "react-bootstrap";
 import CheckBox from "../../components/Forms/CheckBox";
 import TextInput from "../../components/Forms/TextInput";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { classNames } from "primereact/utils";
-import {
-  fetchDemonstrationLeadsDataByID,
-  fetchLeadIntroductionById,
-} from "../../api/LeadIntroductionData";
+import { fetchDemonstrationLeadsDataByID } from "../../api/LeadIntroductionData";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../../utils/enums";
 import { useUserData } from "../../context/AuthContext";
-import { parseISO } from "date-fns";
 import { Dropdown } from "primereact/dropdown";
+import { CMaskInputField } from "../../components/Forms/form";
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import { decryptID } from "../../utils/crypto";
+import { formatDateAndTime } from "../../utils/CommonFunctions";
 
 export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
   const queryClient = useQueryClient();
@@ -41,7 +44,7 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
       fetchDemonstrationLeadsDataByID({
         UserID: user.userID,
         DepartmentID: user.DepartmentID,
-        LeadIntroductionDetailID,
+        LeadIntroductionDetailID: decryptID(LeadIntroductionDetailID),
       }),
 
     enabled: LeadIntroductionDetailID !== 0,
@@ -50,139 +53,152 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
 
   const dialogContent = (
     <>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Name of firm</Form.Label>
+      <FormRow>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Name of firm</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
+              className="form-control"
               id="CompanyName"
-              value={LeadIntroductionData.data[0]?.CompanyName}
+              value={LeadIntroductionData.data[0]?.CompanyName || ""}
               disabled
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Country</Form.Label>
+        </FormColumn>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Country</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="CountryID"
-              value={LeadIntroductionData.data[0]?.CountryTitle}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.CountryTitle || ""}
               disabled
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Tehsil</Form.Label>
+        </FormColumn>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Tehsil</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="TehsilID"
-              value={LeadIntroductionData.data[0]?.TehsilTitle}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.TehsilTitle || ""}
               disabled
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Business Type</Form.Label>
+        </FormColumn>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Business Type</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="BusinessTypeID"
-              value={LeadIntroductionData.data[0]?.BusinessTypeTitle}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.BusinessTypeTitle || ""}
               disabled
             />
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Business Nature</Form.Label>
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Business Nature</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="BusinessNatureID"
-              value={LeadIntroductionData.data[0]?.BusinessNature}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.BusinessNature || ""}
               disabled
             />
           </div>
-        </Form.Group>
+        </FormColumn>
 
-        <Form.Group as={Col}>
-          <Form.Label>Company Website</Form.Label>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Company Website</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="CompanyWebsite"
-              value={LeadIntroductionData.data[0]?.CompanyWebsite}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.CompanyWebsite || ""}
               disabled
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Contact Person Name</Form.Label>
+        </FormColumn>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Contact Person Name</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="ContactPersonName"
-              value={LeadIntroductionData.data[0]?.ContactPersonName}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.ContactPersonName || ""}
               disabled
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Contact Person Mobile No</Form.Label>
+        </FormColumn>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Contact Person Mobile No</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="ContactPersonMobileNo"
-              value={LeadIntroductionData.data[0]?.ContactPersonMobileNo}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.ContactPersonMobileNo || ""}
               disabled
             />
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Contact Person Email</Form.Label>
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>Contact Person Email</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="ContactPersonEmail"
-              value={LeadIntroductionData.data[0]?.ContactPersonEmail}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.ContactPersonEmail || ""}
               disabled
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Contact Person Whatsapp No</Form.Label>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>Contact Person Whatsapp No</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="CompanyAddress"
-              value={LeadIntroductionData.data[0]?.CompanyAddress}
+              className="form-control"
+              value={LeadIntroductionData.data[0]?.CompanyAddress || ""}
               disabled
             />
           </div>
-        </Form.Group>
+        </FormColumn>
 
-        <Form.Group as={Col}>
-          <Form.Label>Contact Person Whatsapp No</Form.Label>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>Contact Person Whatsapp No</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="ContactPersonWhatsAppNo"
-              value={LeadIntroductionData.data[0]?.ContactPersonWhatsAppNo}
+              className="form-control"
+              value={
+                LeadIntroductionData.data[0]?.ContactPersonWhatsAppNo || ""
+              }
               disabled
             />
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Requirements Detail</Form.Label>
-          <Form.Control
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={12} xl={12} md={6}>
+          <FormLabel>Requirements Detail</FormLabel>
+          <input
             as={"textarea"}
             rows={1}
             disabled
@@ -191,13 +207,13 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
               padding: "0.3rem 0.4rem",
               fontSize: "0.8em",
             }}
-            value={LeadIntroductionData.data[0]?.RequirementDetail}
+            value={LeadIntroductionData.data[0]?.RequirementDetail || ""}
           />
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Meeting Place</Form.Label>
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>Meeting Place</FormLabel>
           <div>
             <Dropdown
               options={[
@@ -211,34 +227,39 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
               dropdownIcon={() => null}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Meeting Time</Form.Label>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>Meeting Time</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="MeetingTime"
-              value={new Date(LeadIntroductionData.data[0]?.MeetingTime)}
+              value={
+                formatDateAndTime(LeadIntroductionData.data[0]?.MeetingTime) ||
+                ""
+              }
               disabled
+              className="form-control"
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Product</Form.Label>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>Product</FormLabel>
           <div>
-            <Form.Control
+            <input
               type="text"
               id="Product"
-              value={LeadIntroductionData.data[0]?.ProductInfoTitle}
+              value={LeadIntroductionData.data[0]?.ProductInfoTitle || ""}
               disabled
+              className="form-control"
             />
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Description</Form.Label>
-          <Form.Control
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={12} xl={12} md={6}>
+          <FormLabel>Description</FormLabel>
+          <input
             as={"textarea"}
             rows={1}
             disabled
@@ -247,10 +268,10 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
               padding: "0.3rem 0.4rem",
               fontSize: "0.8em",
             }}
-            value={LeadIntroductionData.data[0]?.Description}
+            value={LeadIntroductionData.data[0]?.Description || ""}
           />
-        </Form.Group>
-      </Row>
+        </FormColumn>
+      </FormRow>
     </>
   );
 
@@ -308,12 +329,12 @@ export function LeadsIntroductionFormComponent({
   return (
     <>
       <form>
-        <Row>
-          <Form.Group as={Col} controlId="CompanyName">
-            <Form.Label>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>
               Name of firm
               <span className="text-danger fw-bold ">*</span>
-            </Form.Label>
+            </FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -323,17 +344,17 @@ export function LeadsIntroductionFormComponent({
                 isEnable={mode !== "view"}
               />
             </div>
-          </Form.Group>
+          </FormColumn>
 
           <FormProvider {...method}>
             <CountryDependentFields mode={mode} ref={countryRef} />
           </FormProvider>
 
-          <Form.Group as={Col} controlId="BusinessTypeID">
-            <Form.Label>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>
               Business Type
               <span className="text-danger fw-bold ">*</span>
-            </Form.Label>
+            </FormLabel>
             <div>
               <CDropdown
                 control={method.control}
@@ -347,14 +368,14 @@ export function LeadsIntroductionFormComponent({
                 focusOptions={() => method.setFocus("BusinessNatureID")}
               />
             </div>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} controlId="BusinessNatureID">
-            <Form.Label>
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>
               Business Nature
               <span className="text-danger fw-bold ">*</span>
-            </Form.Label>
+            </FormLabel>
             <div style={{ width: "100%" }}>
               <Controller
                 name="BusinessNatureID"
@@ -397,10 +418,10 @@ export function LeadsIntroductionFormComponent({
                 )}
               />
             </div>
-          </Form.Group>
+          </FormColumn>
 
-          <Form.Group as={Col} controlId="CompanyWebsite">
-            <Form.Label>Company Website</Form.Label>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>Company Website</FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -410,9 +431,9 @@ export function LeadsIntroductionFormComponent({
                 isEnable={mode !== "view"}
               />
             </div>
-          </Form.Group>
-          <Form.Group as={Col} controlId="ContactPersonName">
-            <Form.Label>Contact Person Name</Form.Label>
+          </FormColumn>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>Contact Person Name</FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -422,11 +443,11 @@ export function LeadsIntroductionFormComponent({
                 isEnable={mode !== "view"}
               />
             </div>
-          </Form.Group>
-          <Form.Group as={Col} controlId="ContactPersonMobileNo">
-            <Form.Label>Contact Person Mobile No</Form.Label>
+          </FormColumn>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>Contact Person Mobile No</FormLabel>
             <div>
-              <TextInput
+              {/* <TextInput
                 control={method.control}
                 ID={"ContactPersonMobileNo"}
                 required={true}
@@ -437,25 +458,26 @@ export function LeadsIntroductionFormComponent({
                     method.setValue("ContactPersonWhatsAppNo", e.target.value);
                   }
                 }}
-              />
-              {/* <CMaskInput
+              /> */}
+              <CMaskInputField
                 control={method.control}
                 name={"ContactPersonMobileNo"}
                 required={true}
                 focusOptions={() => method.setFocus("ContactPersonEmail")}
                 mask="9999-9999999"
+                disabled={mode === "view"}
                 onChange={(e) => {
                   if (method.watch("IsWANumberSameAsMobile")) {
                     method.setValue("ContactPersonWhatsAppNo", e.value);
                   }
                 }}
-              /> */}
+              />
             </div>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} controlId="ContactPersonEmail">
-            <Form.Label>Contact Person Email</Form.Label>
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>Contact Person Email</FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -465,12 +487,12 @@ export function LeadsIntroductionFormComponent({
                 isEnable={mode !== "view"}
               />
             </div>
-          </Form.Group>
-          <Form.Group as={Col} controlId="CompanyAddress">
-            <Form.Label>
+          </FormColumn>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>
               Company Address
               <span className="text-danger fw-bold ">*</span>
-            </Form.Label>
+            </FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -480,32 +502,34 @@ export function LeadsIntroductionFormComponent({
                 isEnable={mode !== "view"}
               />
             </div>
-          </Form.Group>
+          </FormColumn>
 
-          <Form.Group as={Col} controlId="ContactPersonWhatsAppNo">
-            <Form.Label>Contact Person Whatsapp No</Form.Label>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>Contact Person Whatsapp No</FormLabel>
             <div>
-              {/* <CMaskInput
+              <CMaskInputField
                 control={method.control}
                 name={"ContactPersonWhatsAppNo"}
                 required={true}
-                disabled={method.watch("IsWANumberSameAsMobile")}
+                disabled={
+                  method.watch("IsWANumberSameAsMobile") || mode === "view"
+                }
                 focusOptions={() => method.setFocus("IsWANumberSameAsMobile")}
                 mask="9999-9999999"
-              /> */}
-              <TextInput
+              />
+              {/* <TextInput
                 control={method.control}
                 ID={"ContactPersonWhatsAppNo"}
                 required={true}
                 isEnable={mode !== "view"}
                 focusOptions={() => method.setFocus("IsWANumberSameAsMobile")}
-              />
+              /> */}
             </div>
-          </Form.Group>
+          </FormColumn>
           {hideFieldsForDemo === false ? (
             <>
-              <Form.Group as={Col} controlId="IsWANumberSameAsMobile">
-                <Form.Label></Form.Label>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel></FormLabel>
                 <div className="mt-1">
                   <CheckBox
                     control={method.control}
@@ -516,7 +540,7 @@ export function LeadsIntroductionFormComponent({
                       if (e.checked) {
                         method.setValue(
                           "ContactPersonWhatsAppNo",
-                          method.getValues(["ContactPersonMobileNo"])
+                          method.getValues("ContactPersonMobileNo")
                         );
                       } else {
                         method.setValue("ContactPersonWhatsAppNo", "");
@@ -524,16 +548,16 @@ export function LeadsIntroductionFormComponent({
                     }}
                   />
                 </div>
-              </Form.Group>
+              </FormColumn>
             </>
           ) : (
             <></>
           )}
-        </Row>
-        <Row>
-          <Form.Group as={Col} controlId="RequirementDetails" className="col-9">
-            <Form.Label>Requirements Detail</Form.Label>
-            <Form.Control
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={9} xl={9} md={12}>
+            <FormLabel>Requirements Detail</FormLabel>
+            <input
               as={"textarea"}
               rows={1}
               disabled={mode === "view"}
@@ -544,14 +568,14 @@ export function LeadsIntroductionFormComponent({
               }}
               {...method.register("RequirementDetails")}
             />
-          </Form.Group>
+          </FormColumn>
           {hideFieldsForDemo === false ? (
             <>
-              <Form.Group as={Col} controlId="LeadSourceID">
-                <Form.Label>
-                  Where have you here about us?
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
+                  Where have you heard about us?
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
                 <div>
                   <CDropdown
                     control={method.control}
@@ -564,12 +588,12 @@ export function LeadsIntroductionFormComponent({
                     disabled={mode === "view"}
                   />
                 </div>
-              </Form.Group>
+              </FormColumn>
             </>
           ) : (
             <></>
           )}
-        </Row>
+        </FormRow>
       </form>
     </>
   );
@@ -621,11 +645,11 @@ export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
 
   return (
     <>
-      <Form.Group as={Col} controlId="CountryID">
-        <Form.Label>
+      <FormColumn lg={3} xl={3} md={6}>
+        <FormLabel>
           Country
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
         <div>
           <CDropdown
             control={method.control}
@@ -643,12 +667,12 @@ export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
             }}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} controlId="TehsilID">
-        <Form.Label>
+      </FormColumn>
+      <FormColumn lg={3} xl={3} md={6}>
+        <FormLabel>
           Tehsil
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
         <div>
           <CDropdown
             control={method.control}
@@ -662,7 +686,7 @@ export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
             focusOptions={() => method.setFocus("BusinessTypeID")}
           />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   );
 });

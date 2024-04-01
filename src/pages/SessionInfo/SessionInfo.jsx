@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
 import { useContext, useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -215,14 +213,17 @@ export function SessionDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.SessionID),
-                  () => showDeleteDialog(encryptID(rowData?.SessionID)),
-                  () => showEditDialog(encryptID(rowData?.SessionID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.SessionID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.SessionID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.SessionID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.SessionID),
+                })
               }
               header="Actions"
               resizeable={false}
@@ -419,8 +420,7 @@ export function SessionForm({ mode, userRights }) {
             </FormRow>
             <FormRow>
               <FormColumn lg={6} xl={6} md={4} sm={4}>
-                <FormLabel></FormLabel>
-                <div className="mt-1">
+                <div>
                   <CheckBox
                     control={control}
                     ID={"InActive"}

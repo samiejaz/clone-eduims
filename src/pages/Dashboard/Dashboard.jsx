@@ -67,6 +67,27 @@ function Dashboard() {
 
 export default Dashboard;
 
+const getSeverity = (status) => {
+  switch (status?.toLowerCase().replaceAll(" ", "")) {
+    case "newlead":
+      return "#34568B";
+    case "closed":
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+    case "quoted":
+      return "#22C55E";
+    case "finalized":
+      return "#B35DF7";
+    case "forwarded":
+      return "#9EBBF9";
+    case "acknowledged":
+      return "#FCB382";
+    case "meetingdone":
+      return "#FF6F61";
+    case "pending":
+      return "#DFCFBE";
+  }
+};
+
 function LeadsIntroductionDemonstratorTable() {
   const queryClient = useQueryClient();
 
@@ -236,21 +257,6 @@ function LeadsIntroductionDemonstratorTable() {
         style={{ background: getSeverity(rowData.Status) }}
       />
     );
-  };
-
-  const getSeverity = (status) => {
-    switch (status) {
-      case "New Lead":
-        return "linear-gradient(90deg, rgba(31, 17, 206, 1) 0%, rgba(229, 43, 43, 1) 100%)";
-      case "Closed":
-        return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
-      case "Quoted":
-        return "linear-gradient(90deg, rgba(200, 0, 158, 1) 0%, rgba(0, 128, 0, 1) 100%)";
-      case "Finalized":
-        return "linear-gradient(90deg, rgba(0, 255, 49, 1) 0%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%)";
-      case "Forwarded":
-        return "help";
-    }
   };
 
   return (

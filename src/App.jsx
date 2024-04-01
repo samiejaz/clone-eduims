@@ -46,6 +46,7 @@ import {
 
 import LeadsComments from "./pages/LeadsIntroduction/LeadsComments";
 import { ConfirmDialog } from "primereact/confirmdialog";
+import { KSearchBar } from "./components/KSearchBar";
 
 const App = () => {
   useEffect(() => {
@@ -54,6 +55,7 @@ const App = () => {
 
   return (
     <>
+      <KSearchBar />
       <Routes>
         <Route path="auth" element={<SignUp />} />
         <Route path="/" element={<ProtectedRoutes />}>

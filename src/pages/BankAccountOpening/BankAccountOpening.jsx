@@ -212,14 +212,17 @@ function BankAccountDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.BankAccountID),
-                  () => showDeleteDialog(encryptID(rowData.BankAccountID)),
-                  () => showEditDialog(encryptID(rowData.BankAccountID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.BankAccountID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.BankAccountID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.BankAccountID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.BankAccountID),
+                })
               }
               header="Actions"
               resizeable={false}

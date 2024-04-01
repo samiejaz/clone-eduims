@@ -218,14 +218,18 @@ export function ProductCategoryDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.ProductCategoryID),
-                  () => showDeleteDialog(encryptID(rowData.ProductCategoryID)),
-                  () => showEditDialog(encryptID(rowData.ProductCategoryID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.ProductCategoryID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.ProductCategoryID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.ProductCategoryID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute:
+                    viewRoute + encryptID(rowData.ProductCategoryID),
+                })
               }
               header="Actions"
               resizeable={false}

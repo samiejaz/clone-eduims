@@ -65,6 +65,69 @@ async function getLeadsTimelineDetail({
   }
 }
 
+// UI
+function getStatusIcon(status) {
+  switch (status) {
+    case "Forwarded":
+      return "pi pi-send";
+    case "Quoted":
+      return "pi pi-dollar";
+    case "Finalized":
+      return "pi pi-check";
+    case "Closed":
+      return "pi pi-times";
+    case "Acknowledge":
+      return "pi pi-star";
+    case "Acknowledged":
+      return "pi pi-star";
+    case "Meeting Done":
+      return "pi pi-check-circle";
+    case "Pending":
+      return "pi pi-spinner";
+  }
+}
+
+function getIconColor(status) {
+  switch (status?.toLowerCase().replaceAll(" ", "")) {
+    case "newlead":
+      return "#34568B";
+    case "closed":
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+    case "quoted":
+      return "#22C55E";
+    case "finalized":
+      return "#B35DF7";
+    case "forwarded":
+      return "#9EBBF9";
+    case "acknowledge":
+      return "#FCB382";
+    case "acknowledged":
+      return "#FCB382";
+    case "meetingdone":
+      return "#FF6F61";
+    case "pending":
+      return "#DFCFBE";
+  }
+}
+
+const customizedMarker = (item) => {
+  return (
+    <>
+      <span
+        className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
+        style={{
+          background: item.color,
+          width: "2rem ",
+          height: "2rem ",
+          borderRadius: "50% ",
+        }}
+      >
+        <i className={item.icon}></i>
+      </span>
+    </>
+  );
+};
+
 const LeadsIntroductionViewer = () => {
   const { LeadIntroductionID } = useParams();
   const navigate = useNavigate();
@@ -88,62 +151,6 @@ const LeadsIntroductionViewer = () => {
       LeadIntroductionDetailID: item.LeadIntroductionDetailID,
     };
   });
-
-  function getStatusIcon(status) {
-    switch (status) {
-      case "Forwarded":
-        return "pi pi-send";
-      case "Quoted":
-        return "pi pi-dollar";
-      case "Finalized":
-        return "pi pi-check";
-      case "Closed":
-        return "pi pi-times";
-      case "Acknowledge":
-        return "pi pi-star";
-      case "Meeting Done":
-        return "pi pi-check-circle";
-      case "Pending":
-        return "pi pi-spinner";
-    }
-  }
-
-  function getIconColor(status) {
-    switch (status) {
-      case "Forwarded":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(0, 162, 255, 1) 0%)";
-      case "Quoted":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(0, 255, 69, 1) 0%)";
-      case "Finalized":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(59, 199, 255, 1) 0%)";
-      case "Closed":
-        return "linear-gradient(90deg, rgba(212, 0, 27, 1) 84%, rgba(255, 30, 30, 1) 100%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%, rgba(0, 188, 212, 1) 100%)";
-      case "Acknowledge":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(0, 255, 10, 1) 0%)";
-      case "Meeting Done":
-        return "linear-gradient(90deg, rgba(99, 255, 30, 1) 100%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%, rgba(0, 188, 212, 1) 100%, rgba(0, 188, 212, 1) 100%)";
-      case "Pending":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(255, 165, 59, 1) 0%)";
-    }
-  }
-
-  const customizedMarker = (item) => {
-    return (
-      <>
-        <span
-          className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
-          style={{
-            background: item.color,
-            width: "2rem ",
-            height: "2rem ",
-            borderRadius: "50% ",
-          }}
-        >
-          <i className={item.icon}></i>
-        </span>
-      </>
-    );
-  };
 
   const customizedContent = (item) => {
     return (

@@ -11,17 +11,19 @@ const CMaskInput = ({
   focusOptions,
   onChange,
   disabled = false,
+  required = false,
   ...options
 }) => {
   return (
     <Controller
       name={name}
       control={control}
-      rules={{ required: "Phone is required." }}
+      rules={{ required: required }}
       render={({ field, fieldState }) => (
         <>
           <InputMask
             id={field.name}
+            name={field.name}
             value={field.value}
             className={classNames({ "p-invalid": fieldState.error })}
             onChange={(e) => {

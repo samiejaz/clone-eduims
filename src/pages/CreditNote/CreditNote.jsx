@@ -54,6 +54,7 @@ import { UserRightsContext } from "../../context/UserRightContext";
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
+let viewRoute = `${parentRoute}/`;
 let ddDetailColor = "#8f48d2";
 let queryKey = QUERY_KEYS.CREDIT_NODE_QUERY_KEY;
 let IDENTITY = "CreditNoteID";
@@ -238,14 +239,17 @@ function CreditNoteEntrySearch({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  rowData.CreditNoteID,
-                  () => showDeleteDialog(rowData.CreditNoteID),
-                  () => showEditDialog(rowData.CreditNoteID),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.CreditNoteID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.CreditNoteID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.CreditNoteID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.CreditNoteID),
+                })
               }
               header="Actions"
               resizeable={false}

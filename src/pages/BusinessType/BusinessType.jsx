@@ -211,14 +211,17 @@ export function BusinessTypeDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.BusinessTypeID),
-                  () => showDeleteDialog(encryptID(rowData.BusinessTypeID)),
-                  () => showEditDialog(encryptID(rowData.BusinessTypeID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.BusinessTypeID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.BusinessTypeID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.BusinessTypeID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.BusinessTypeID),
+                })
               }
               header="Actions"
               resizeable={false}

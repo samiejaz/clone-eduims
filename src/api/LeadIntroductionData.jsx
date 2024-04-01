@@ -78,15 +78,10 @@ export async function addNewLeadIntroduction({
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
     };
-    DataToSend.ContactPersonMobileNo =
-      formData.ContactPersonMobileNo.replaceAll("-", "");
-    if (formData?.IsWANumberSameAsMobile) {
-      DataToSend.ContactPersonWhatsAppNo =
-        formData.ContactPersonWhatsAppNo[0].replaceAll("-", "");
-    } else {
-      DataToSend.ContactPersonWhatsAppNo =
-        formData.ContactPersonWhatsAppNo.replaceAll("-", "");
-    }
+    DataToSend.ContactPersonMobileNo = formData.ContactPersonMobileNo;
+
+    DataToSend.ContactPersonWhatsAppNo = formData.ContactPersonWhatsAppNo;
+
     LeadIntroductionID =
       LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
     if (LeadIntroductionID === 0 || LeadIntroductionID === undefined) {

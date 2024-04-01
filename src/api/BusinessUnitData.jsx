@@ -52,7 +52,6 @@ export async function addNewBusinessUnit({
   formData,
   userID,
   BusinessUnitID = 0,
-  BusinessUnitLogo = "",
 }) {
   try {
     let newFormData = new FormData();
@@ -76,10 +75,8 @@ export async function addNewBusinessUnit({
     newFormData.append("Description", formData.Description || "");
     newFormData.append("EntryUserID", userID);
     newFormData.append("Inactive", formData.InActive === false ? 0 : 1);
-    if (BusinessUnitLogo !== "") {
-      let businessUnitFile = convertBase64StringToFile(BusinessUnitLogo, true);
-      newFormData.append("image", businessUnitFile);
-    }
+
+    newFormData.append("image", formData.Logo);
 
     if (formData.PrimaryColor) {
       const { r, g, b } = formData.PrimaryColor;

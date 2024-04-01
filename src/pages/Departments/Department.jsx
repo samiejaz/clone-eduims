@@ -207,14 +207,17 @@ function DepartmentDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.DepartmentID),
-                  () => showDeleteDialog(encryptID(rowData.DepartmentID)),
-                  () => showEditDialog(encryptID(rowData.DepartmentID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.DepartmentID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.DepartmentID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.DepartmentID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.DepartmentID),
+                })
               }
               header="Actions"
               resizeable={false}

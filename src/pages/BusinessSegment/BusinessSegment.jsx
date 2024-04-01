@@ -214,14 +214,18 @@ export function BusinessSegmentDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.BusinessSegmentID),
-                  () => showDeleteDialog(encryptID(rowData.BusinessSegmentID)),
-                  () => showEditDialog(encryptID(rowData.BusinessSegmentID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.BusinessSegmentID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.BusinessSegmentID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.BusinessSegmentID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute:
+                    viewRoute + encryptID(rowData.BusinessSegmentID),
+                })
               }
               header="Actions"
               resizeable={false}

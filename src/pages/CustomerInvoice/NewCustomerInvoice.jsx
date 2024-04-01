@@ -256,14 +256,18 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.CustomerInvoiceID),
-                  () => showDeleteDialog(encryptID(rowData.CustomerInvoiceID)),
-                  () => showEditDialog(encryptID(rowData.CustomerInvoiceID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.CustomerInvoiceID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.CustomerInvoiceID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.CustomerInvoiceID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute:
+                    viewRoute + encryptID(rowData.CustomerInvoiceID),
+                })
               }
               header="Actions"
               resizeable={false}

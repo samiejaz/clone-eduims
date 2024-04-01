@@ -53,6 +53,27 @@ let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
 let IDENTITY = "LeadIntroductionID";
 
+const getSeverity = (status) => {
+  switch (status?.toLowerCase().replaceAll(" ", "")) {
+    case "newlead":
+      return "#34568B";
+    case "closed":
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+    case "quoted":
+      return "#22C55E";
+    case "finalized":
+      return "#B35DF7";
+    case "forwarded":
+      return "#9EBBF9";
+    case "acknowledged":
+      return "#FCB382";
+    case "meetingdone":
+      return "#FF6F61";
+    case "pending":
+      return "#DFCFBE";
+  }
+};
+
 export default function LeadIntroduction() {
   const { checkForUserRights } = useContext(UserRightsContext);
   const [userRights, setUserRights] = useState([]);
@@ -233,14 +254,17 @@ export function LeadIntroductionDetail({
     return (
       <React.Fragment>
         <div style={{ display: "flex" }}>
-          {ActionButtons(
-            encryptID(rowData.LeadIntroductionID),
-            () => showDeleteDialog(encryptID(rowData.LeadIntroductionID)),
-            () => showEditDialog(encryptID(rowData.LeadIntroductionID)),
-            handleView,
-            userRights[0]?.RoleEdit,
-            userRights[0]?.RoleDelete
-          )}
+          {ActionButtons({
+            ID: encryptID(rowData.LeadIntroductionID),
+            handleDelete: () =>
+              showDeleteDialog(encryptID(rowData.LeadIntroductionID)),
+            handleEdit: () =>
+              showEditDialog(encryptID(rowData.LeadIntroductionID)),
+            handleView: handleView,
+            showEditButton: userRights[0]?.RoleEdit,
+            showDeleteButton: userRights[0]?.RoleDelete,
+            viewBtnRoute: viewRoute + encryptID(rowData.LeadIntroductionID),
+          })}
           <div>
             <Button
               icon="pi pi-list"
@@ -291,21 +315,6 @@ export function LeadIntroductionDetail({
         style={{ background: getSeverity(rowData.Status) }}
       />
     );
-  };
-
-  const getSeverity = (status) => {
-    switch (status) {
-      case "New Lead":
-        return "linear-gradient(90deg, rgba(31, 17, 206, 1) 0%, rgba(229, 43, 43, 1) 100%)";
-      case "Closed":
-        return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
-      case "Quoted":
-        return "linear-gradient(90deg, rgba(200, 0, 158, 1) 0%, rgba(0, 128, 0, 1) 100%)";
-      case "Finalized":
-        return "linear-gradient(90deg, rgba(0, 255, 49, 1) 0%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%)";
-      case "Forwarded":
-        return "help";
-    }
   };
 
   return (
@@ -541,6 +550,17 @@ function LeadIntroductionForm({ mode, userRights }) {
   }
 
   function onSubmit(data) {
+    console.log(data);
+    data.ContactPersonWhatsAppNo = data.ContactPersonWhatsAppNo?.replaceAll(
+      "-",
+      ""
+    );
+    data.ContactPersonMobileNo = data.ContactPersonMobileNo?.replaceAll(
+      "-",
+      ""
+    );
+    console.log(data);
+
     mutation.mutate({
       formData: data,
       userID: user.userID,
@@ -638,7 +658,7 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const user = useUserData();
   const usersSelectData = useAllUsersSelectData();
   const departmentSelectData = useAllDepartmentsSelectData();
-  const productsSelectData = useProductsInfoSelectData();
+  const productsSelectData = useProductsInfoSelectData(0, true);
   const method = useForm({
     defaultValues: {
       Description: "",
@@ -669,7 +689,6 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
       />
     </>
   );
-  const headerContent = <></>;
   const dialogConent = (
     <>
       <Row>
@@ -895,10 +914,6 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
             File
             <span className="text-danger fw-bold ">*</span>
           </Form.Label>
-          {/* <Form.Control
-            type="file"
-            {...method.register("AttachmentFile")}
-          ></Form.Control> */}
           <div>
             <SingleFileUploadField ref={fileRef} />
           </div>
@@ -947,7 +962,6 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
   function onSubmit(data) {
     const file = fileRef.current?.getFile();
     if (file === null) {
-      ShowErrorToast("File is required!");
       fileRef.current?.setError();
     } else {
       data.AttachmentFile = file;
@@ -1096,7 +1110,6 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   function onSubmit(data) {
     const file = fileRef.current?.getFile();
     if (file === null) {
-      ShowErrorToast("File is required!");
       fileRef.current?.setError();
     } else {
       data.AttachmentFile = file;
