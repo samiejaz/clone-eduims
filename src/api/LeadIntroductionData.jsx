@@ -78,15 +78,10 @@ export async function addNewLeadIntroduction({
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
     };
-    DataToSend.ContactPersonMobileNo =
-      formData.ContactPersonMobileNo.replaceAll("-", "");
-    if (formData?.IsWANumberSameAsMobile) {
-      DataToSend.ContactPersonWhatsAppNo =
-        formData.ContactPersonWhatsAppNo[0].replaceAll("-", "");
-    } else {
-      DataToSend.ContactPersonWhatsAppNo =
-        formData.ContactPersonWhatsAppNo.replaceAll("-", "");
-    }
+    DataToSend.ContactPersonMobileNo = formData.ContactPersonMobileNo;
+
+    DataToSend.ContactPersonWhatsAppNo = formData.ContactPersonWhatsAppNo;
+
     LeadIntroductionID =
       LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
     if (LeadIntroductionID === 0 || LeadIntroductionID === undefined) {
@@ -221,11 +216,14 @@ export async function addLeadIntroductionOnAction({
 }
 
 export async function fetchAllDemonstrationLeadsData({ UserID, DepartmentID }) {
-  const { data } = await axios.post(
-    `${apiUrl}/UserLeadDashboard/GetLeadIntroductionWhereForUser?LoginUserID=${UserID}&DepartmentID=${DepartmentID}`
-  );
-
-  return data.data ?? [];
+  if (UserID && DepartmentID) {
+    const { data } = await axios.post(
+      `${apiUrl}/UserLeadDashboard/GetLeadIntroductionWhereForUser?LoginUserID=${UserID}&DepartmentID=${DepartmentID}`
+    );
+    return data.data ?? [];
+  } else {
+    return [];
+  }
 }
 
 export async function fetchDemonstrationLeadsDataByID({

@@ -1,8 +1,6 @@
 import React, { useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
 import { FilterMatchMode } from "primereact/api";
 import { useEffect, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
@@ -226,14 +224,17 @@ function ProductInfoDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.ProductInfoID),
-                  () => showDeleteDialog(encryptID(rowData.ProductInfoID)),
-                  () => showEditDialog(encryptID(rowData.ProductInfoID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.ProductInfoID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.ProductInfoID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.ProductInfoID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.ProductInfoID),
+                })
               }
               header="Actions"
               resizeable={false}

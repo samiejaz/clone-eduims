@@ -204,14 +204,17 @@ function CountryDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.CountryID),
-                  () => showDeleteDialog(encryptID(rowData.CountryID)),
-                  () => showEditDialog(encryptID(rowData.CountryID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.CountryID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.CountryID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.CountryID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.CountryID),
+                })
               }
               header="Actions"
               resizeable={false}

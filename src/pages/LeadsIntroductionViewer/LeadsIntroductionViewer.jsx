@@ -30,20 +30,30 @@ import { decryptID, encryptID } from "../../utils/crypto";
 import { ShowErrorToast } from "../../utils/CommonFunctions";
 import { useUserData } from "../../context/AuthContext";
 import { CustomSpinner } from "../../components/CustomSpinner";
+import {
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents";
+import { SingleFileUploadField } from "../../components/Forms/form";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 let queryKey = "key";
 
 async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
-  if (LeadIntroductionID !== undefined) {
-    LeadIntroductionID = decryptID(LeadIntroductionID);
-    const { data } = await axios.post(
-      apiUrl +
-        `/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=${LoginUserID}&LeadIntroductionID=${LeadIntroductionID}`
-    );
-    return data.data;
-  } else {
+  try {
+    if (LeadIntroductionID !== undefined) {
+      LeadIntroductionID = decryptID(LeadIntroductionID);
+      const { data } = await axios.post(
+        apiUrl +
+          `/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=${LoginUserID}&LeadIntroductionID=${LeadIntroductionID}`
+      );
+      return data.data;
+    } else {
+      return [];
+    }
+  } catch (e) {
+    ShowErrorToast(e.message);
     return [];
   }
 }
@@ -59,11 +69,77 @@ async function getLeadsTimelineDetail({
           `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${LoginUserID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
       );
       return data.data;
+    } else {
+      return [];
     }
   } catch (e) {
     ShowErrorToast(e.message);
+    return [];
   }
 }
+
+// UI
+function getStatusIcon(status) {
+  switch (status) {
+    case "Forwarded":
+      return "pi pi-send";
+    case "Quoted":
+      return "pi pi-dollar";
+    case "Finalized":
+      return "pi pi-check";
+    case "Closed":
+      return "pi pi-times";
+    case "Acknowledge":
+      return "pi pi-star";
+    case "Acknowledged":
+      return "pi pi-star";
+    case "Meeting Done":
+      return "pi pi-check-circle";
+    case "Pending":
+      return "pi pi-spinner";
+  }
+}
+
+function getIconColor(status) {
+  switch (status?.toLowerCase().replaceAll(" ", "")) {
+    case "newlead":
+      return "#34568B";
+    case "closed":
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+    case "quoted":
+      return "#22C55E";
+    case "finalized":
+      return "#B35DF7";
+    case "forwarded":
+      return "#9EBBF9";
+    case "acknowledge":
+      return "#FCB382";
+    case "acknowledged":
+      return "#FCB382";
+    case "meetingdone":
+      return "#FF6F61";
+    case "pending":
+      return "#DFCFBE";
+  }
+}
+
+const customizedMarker = (item) => {
+  return (
+    <>
+      <span
+        className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
+        style={{
+          background: item.color,
+          width: "2rem ",
+          height: "2rem ",
+          borderRadius: "50% ",
+        }}
+      >
+        <i className={item.icon}></i>
+      </span>
+    </>
+  );
+};
 
 const LeadsIntroductionViewer = () => {
   const { LeadIntroductionID } = useParams();
@@ -78,6 +154,8 @@ const LeadsIntroductionViewer = () => {
     enabled: LeadIntroductionID !== undefined,
   });
 
+  console.log(data);
+
   let newEvents = data.map((item) => {
     return {
       Status: item.Status,
@@ -89,67 +167,11 @@ const LeadsIntroductionViewer = () => {
     };
   });
 
-  function getStatusIcon(status) {
-    switch (status) {
-      case "Forwarded":
-        return "pi pi-send";
-      case "Quoted":
-        return "pi pi-dollar";
-      case "Finalized":
-        return "pi pi-check";
-      case "Closed":
-        return "pi pi-times";
-      case "Acknowledge":
-        return "pi pi-star";
-      case "Meeting Done":
-        return "pi pi-check-circle";
-      case "Pending":
-        return "pi pi-spinner";
-    }
-  }
-
-  function getIconColor(status) {
-    switch (status) {
-      case "Forwarded":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(0, 162, 255, 1) 0%)";
-      case "Quoted":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(0, 255, 69, 1) 0%)";
-      case "Finalized":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(59, 199, 255, 1) 0%)";
-      case "Closed":
-        return "linear-gradient(90deg, rgba(212, 0, 27, 1) 84%, rgba(255, 30, 30, 1) 100%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%, rgba(0, 188, 212, 1) 100%)";
-      case "Acknowledge":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(0, 255, 10, 1) 0%)";
-      case "Meeting Done":
-        return "linear-gradient(90deg, rgba(99, 255, 30, 1) 100%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%, rgba(0, 188, 212, 1) 100%, rgba(0, 188, 212, 1) 100%)";
-      case "Pending":
-        return "linear-gradient(90deg, rgba(255, 30, 30, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(238, 130, 238, 1) 0%, rgba(0, 188, 212, 1) 0%, rgba(255, 165, 59, 1) 0%)";
-    }
-  }
-
-  const customizedMarker = (item) => {
-    return (
-      <>
-        <span
-          className="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
-          style={{
-            background: item.color,
-            width: "2rem ",
-            height: "2rem ",
-            borderRadius: "50% ",
-          }}
-        >
-          <i className={item.icon}></i>
-        </span>
-      </>
-    );
-  };
-
   const customizedContent = (item) => {
     return (
       <Card title={item.Status} subTitle={item.Date}>
         <p>{item.Detail}</p>
-        {item.Status !== "Acknowledged" && (
+        {!(item.Status === "Acknowledged" || item.Status === "Acknowledge") && (
           <>
             <Link
               to={`${
@@ -198,7 +220,13 @@ const LeadsIntroductionViewer = () => {
           </>
         ) : (
           <>
-            <CustomSpinner message="Loading timeline..." />
+            <div className="flex align-items-center justify-content-center min-h-90vh">
+              <div>
+                <p className="fw-bold">No data found!</p>
+              </div>
+            </div>
+
+            {/* <CustomSpinner message="Loading timeline..." /> */}
           </>
         )}
       </div>
@@ -327,7 +355,6 @@ function ForwardedFieldsContainer({
   const usersSelectData = useAllUsersSelectData();
   const productsSelectData = useProductsInfoSelectData(0, true);
   const user = useUserData();
-  console.log(productsSelectData);
 
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
@@ -338,6 +365,8 @@ function ForwardedFieldsContainer({
       }),
     initialData: [],
   });
+
+  console.log(data);
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
@@ -519,6 +548,8 @@ function ForwardedFieldsContainer({
     }
   }
 
+  const fileRef = useRef();
+
   return (
     <>
       <LeadsViewerButtonToolBar
@@ -533,10 +564,19 @@ function ForwardedFieldsContainer({
 
       {filePath !== null && fileType !== "" ? (
         <>
-          <Form.Label>File</Form.Label>
-          {/* <div className="mt-5">
-            <FileViewer fileType={fileType} filePath={filePath} />
-          </div> */}
+          <FormColumn lg={12} xl={12} md={12}>
+            <FormLabel>File</FormLabel>
+            <div>
+              <SingleFileUploadField
+                ref={fileRef}
+                accept="image/*"
+                chooseBtnLabel="Select Image"
+                changeBtnLabel="Change Image"
+                mode={"view"}
+                errorMessage="Upload your logo"
+              />
+            </div>
+          </FormColumn>
         </>
       ) : (
         <></>
@@ -582,7 +622,7 @@ function QuotedFieldsContainer({
     if (data.length > 0) {
       method.setValue("Amount", data[0].Amount);
       method.setValue("Description", data[0].Description);
-      let filePath = getLeadsFile(data[0]?.FileName);
+      //  let filePath = getLeadsFile(data[0]?.FileName);
 
       setFilePath(
         data[0]?.FileName === null
@@ -595,6 +635,8 @@ function QuotedFieldsContainer({
       // );
     }
   }, [data]);
+
+  const fileRef = useRef();
 
   const QuotedFields = (
     <>
@@ -676,22 +718,19 @@ function QuotedFieldsContainer({
       )}
       {filePath !== null ? (
         <>
-          <Form.Label>File</Form.Label>
-          {isEnable && (
-            <>
-              <div>
-                <Button icon="pi pi-plus" type="button" className="rounded" />
-                <Button icon="pi pi-trash" type="button" className="rounded" />
-              </div>
-            </>
-          )}
-          <div className="mt-5">
-            <MultiFileUpload
-              name="quotationFiles"
-              id="quotationFiles"
-              ref={fileInputRef}
-            />
-          </div>
+          <FormColumn lg={12} xl={12} md={12}>
+            <FormLabel>File</FormLabel>
+            <div>
+              <SingleFileUploadField
+                ref={fileRef}
+                accept="image/*"
+                chooseBtnLabel="Select Image"
+                changeBtnLabel="Change Image"
+                mode={"view"}
+                errorMessage="Upload your logo"
+              />
+            </div>
+          </FormColumn>
         </>
       ) : (
         <></>

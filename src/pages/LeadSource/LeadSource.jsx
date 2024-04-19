@@ -210,14 +210,17 @@ function LeadSourceDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.LeadSourceID),
-                  () => showDeleteDialog(encryptID(rowData.LeadSourceID)),
-                  () => showEditDialog(encryptID(rowData.LeadSourceID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.LeadSourceID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.LeadSourceID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.LeadSourceID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.LeadSourceID),
+                })
               }
               header="Actions"
               resizeable={false}

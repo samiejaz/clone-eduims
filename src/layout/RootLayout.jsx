@@ -6,6 +6,7 @@ import CSidebar from "./Sidebar/CSidebar";
 import { useRef } from "react";
 import NotificationOverlay from "../components/OverlayPanel/NotificationOverlay";
 import useKeyCombination from "../hooks/useKeyCombinationHook";
+import useUserProfile from "../hooks/useUserProfile";
 
 function RootLayout() {
   const sidebarRef = useRef();
@@ -50,29 +51,46 @@ function RootLayout() {
 
         <section className="c-home-section">
           <div className="c-home-content">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-              className="mt-4"
-            >
-              <i
-                className="pi pi-bars hoverIcon"
-                onClick={() => {
-                  toggleSideBar();
-                }}
-              ></i>
-              <NotificationOverlay />
-            </div>
+            <Header toggleSidebar={toggleSideBar} />
           </div>
           <div className="px-3 mt-4">
             <Outlet />
           </div>
         </section>
       </div>
+    </>
+  );
+}
+
+function Header({ toggleSidebar }) {
+  const { handleCloseProfile, handleShowProfile, render } = useUserProfile();
+
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+        className="mt-4"
+      >
+        <i
+          className="pi pi-bars hoverIcon"
+          onClick={() => {
+            toggleSidebar();
+          }}
+        ></i>
+        <i
+          className="pi pi-user hoverIcon"
+          onClick={() => {
+            handleShowProfile();
+          }}
+        ></i>
+        {/* <NotificationOverlay /> */}
+      </div>
+      {render}
     </>
   );
 }

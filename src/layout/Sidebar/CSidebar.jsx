@@ -58,14 +58,8 @@ const CSidebar = ({ sideBarRef, searchInputRef }) => {
 
           <li>
             <div className="c-profile-details">
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div>
+              <div className="flex align-content-center justify-content-between w-full">
+                <div className="ml-2">
                   <div className="c-profile_name" style={{ marginLeft: "5px" }}>
                     {user?.username}
                   </div>
@@ -150,7 +144,11 @@ export const SignOut = () => {
 
   return (
     <>
-      <i className="pi pi-sign-out" onClick={confirmLogout}></i>
+      <i
+        className="pi pi-sign-out"
+        onClick={confirmLogout}
+        style={{ width: "50px", minWidth: "50px" }}
+      ></i>
     </>
   );
 };
@@ -162,7 +160,7 @@ const SubSidebar = () => {
     <>
       {filteredRoutes?.map((route) => (
         <MenuGroup
-          key={route.menuGroupName}
+          key={route.menuGroupKey}
           menuGroupName={route.menuGroupName}
           subItems={route.subItems}
           icon={route.icon}
@@ -186,43 +184,39 @@ const MenuGroup = ({
   return (
     <>
       {!hideMenuGroup && (
-        <>
-          <li className="">
-            <div className="c-iocn-link">
-              <Link to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}>
-                <i className={`pi ${icon}`}></i>
-                <span className="c-link_name">{menuGroupName}</span>
+        <li>
+          <div className="c-iocn-link">
+            <Link to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}>
+              <i className={`pi ${icon}`}></i>
+              <span className="c-link_name">{menuGroupName}</span>
+            </Link>
+            <i
+              className="pi pi-chevron-down c-arrow"
+              onClick={toggleSubmenu}
+            ></i>
+          </div>
+          <ul className="c-sub-menu" key={menuGroupName}>
+            <li>
+              <Link
+                className="c-link_name"
+                to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}
+              >
+                {menuGroupName}
               </Link>
-              <i
-                className="pi pi-chevron-down c-arrow"
-                onClick={toggleSubmenu}
-              ></i>
-            </div>
-            <ul className="c-sub-menu" key={menuGroupName}>
-              <li>
-                <Link
-                  className="c-link_name"
-                  to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}
-                >
-                  {menuGroupName}
-                </Link>
-              </li>
-              {subItems.length > 0 &&
-                subItems.map((item) => (
-                  <>
-                    <MenuItem
-                      key={item.menuKey}
-                      name={item.name}
-                      route={item.route}
-                      showDividerOnTop={item?.showDividerOnTop}
-                      hideMenuItem={item.ShowForm}
-                      showForm={item.ShowForm}
-                    />
-                  </>
-                ))}
-            </ul>
-          </li>
-        </>
+            </li>
+            {subItems.length > 0 &&
+              subItems.map((item) => (
+                <MenuItem
+                  key={item.menuKey}
+                  name={item.name}
+                  route={item.route}
+                  showDividerOnTop={item?.showDividerOnTop}
+                  hideMenuItem={item.ShowForm}
+                  showForm={item.ShowForm}
+                />
+              ))}
+          </ul>
+        </li>
       )}
     </>
   );

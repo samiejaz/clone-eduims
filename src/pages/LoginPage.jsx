@@ -43,7 +43,7 @@ const SignUp = () => {
           username: data.data[0].FirstName + " " + data.data[0].LastName,
           userID: data.data[0].LoginUserID,
           image: data.data[0]?.ProfilePic,
-          DepartmentID: data.data[0]?.DepartmentID,
+          DepartmentID: data.data[0].DepartmentID,
         };
         loginUser(dataToSerialize);
         toast("Login sucessful", {

@@ -49,9 +49,11 @@ export async function fetchAllProductsForSelect(
       apiUrl + "/Select/SelectProducts" + whereClause
     );
     return data.data || [];
-  } else {
+  } else if (selectWithoutBusinessUnits) {
     const { data } = await axios.post(apiUrl + "/Select/SelectProducts");
     return data.data || [];
+  } else {
+    return [];
   }
 }
 export async function fetchAllCustomerBranchesData(AccountID) {
@@ -70,11 +72,13 @@ export async function fetchAllServicesForSelect(BusinessUnitID) {
   let whereClause = "";
   if (BusinessUnitID !== 0) {
     whereClause = "?BusinessUnitID=" + BusinessUnitID;
+    const { data } = await axios.post(
+      apiUrl + "/Select/SelectServices" + whereClause
+    );
+    return data.data || [];
+  } else {
+    return [];
   }
-  const { data } = await axios.post(
-    apiUrl + "/Select/SelectServices" + whereClause
-  );
-  return data.data || [];
 }
 
 export async function fetchAllActivationCustomersForSelect(CustomerID = 0) {

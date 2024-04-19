@@ -43,6 +43,8 @@ import LeadsIntroductionViewer, {
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer";
 import LeadsComments from "./LeadsComments";
 import { encryptID } from "../../utils/crypto";
+import { SingleFileUploadField } from "../../components/Forms/form";
+import { ShowErrorToast } from "../../utils/CommonFunctions";
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -50,6 +52,27 @@ let newRoute = `${parentRoute}/new`;
 let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
 let IDENTITY = "LeadIntroductionID";
+
+const getSeverity = (status) => {
+  switch (status?.toLowerCase().replaceAll(" ", "")) {
+    case "newlead":
+      return "#34568B";
+    case "closed":
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+    case "quoted":
+      return "#22C55E";
+    case "finalized":
+      return "#B35DF7";
+    case "forwarded":
+      return "#9EBBF9";
+    case "acknowledged":
+      return "#FCB382";
+    case "meetingdone":
+      return "#FF6F61";
+    case "pending":
+      return "#DFCFBE";
+  }
+};
 
 export default function LeadIntroduction() {
   const { checkForUserRights } = useContext(UserRightsContext);
@@ -231,14 +254,17 @@ export function LeadIntroductionDetail({
     return (
       <React.Fragment>
         <div style={{ display: "flex" }}>
-          {ActionButtons(
-            encryptID(rowData.LeadIntroductionID),
-            () => showDeleteDialog(encryptID(rowData.LeadIntroductionID)),
-            () => showEditDialog(encryptID(rowData.LeadIntroductionID)),
-            handleView,
-            userRights[0]?.RoleEdit,
-            userRights[0]?.RoleDelete
-          )}
+          {ActionButtons({
+            ID: encryptID(rowData.LeadIntroductionID),
+            handleDelete: () =>
+              showDeleteDialog(encryptID(rowData.LeadIntroductionID)),
+            handleEdit: () =>
+              showEditDialog(encryptID(rowData.LeadIntroductionID)),
+            handleView: handleView,
+            showEditButton: userRights[0]?.RoleEdit,
+            showDeleteButton: userRights[0]?.RoleDelete,
+            viewBtnRoute: viewRoute + encryptID(rowData.LeadIntroductionID),
+          })}
           <div>
             <Button
               icon="pi pi-list"
@@ -289,21 +315,6 @@ export function LeadIntroductionDetail({
         style={{ background: getSeverity(rowData.Status) }}
       />
     );
-  };
-
-  const getSeverity = (status) => {
-    switch (status) {
-      case "New Lead":
-        return "linear-gradient(90deg, rgba(31, 17, 206, 1) 0%, rgba(229, 43, 43, 1) 100%)";
-      case "Closed":
-        return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
-      case "Quoted":
-        return "linear-gradient(90deg, rgba(200, 0, 158, 1) 0%, rgba(0, 128, 0, 1) 100%)";
-      case "Finalized":
-        return "linear-gradient(90deg, rgba(0, 255, 49, 1) 0%, rgba(0, 188, 212, 1) 100%, rgba(238, 130, 238, 1) 100%)";
-      case "Forwarded":
-        return "help";
-    }
   };
 
   return (
@@ -477,6 +488,7 @@ function LeadIntroductionForm({ mode, userRights }) {
         "ContactPersonMobileNo",
         LeadIntroductionData.data[0].ContactPersonMobileNo
       );
+
       method.setValue(
         "ContactPersonWhatsAppNo",
         LeadIntroductionData.data[0].ContactPersonWhatsAppNo
@@ -539,6 +551,17 @@ function LeadIntroductionForm({ mode, userRights }) {
   }
 
   function onSubmit(data) {
+    console.log(data);
+    data.ContactPersonWhatsAppNo = data.ContactPersonWhatsAppNo?.replaceAll(
+      "-",
+      ""
+    );
+    data.ContactPersonMobileNo = data.ContactPersonMobileNo?.replaceAll(
+      "-",
+      ""
+    );
+    console.log(data);
+
     mutation.mutate({
       formData: data,
       userID: user.userID,
@@ -636,7 +659,7 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const user = useUserData();
   const usersSelectData = useAllUsersSelectData();
   const departmentSelectData = useAllDepartmentsSelectData();
-  const productsSelectData = useProductsInfoSelectData();
+  const productsSelectData = useProductsInfoSelectData(0, true);
   const method = useForm({
     defaultValues: {
       Description: "",
@@ -667,7 +690,6 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
       />
     </>
   );
-  const headerContent = <></>;
   const dialogConent = (
     <>
       <Row>
@@ -870,6 +892,7 @@ function QuoteDialogComponent({ LeadIntroductionID }) {
 
 function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const method = useForm();
+  const fileRef = useRef();
   const queryClient = useQueryClient();
   const user = useUserData();
   const footerContent = (
@@ -892,10 +915,9 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
             File
             <span className="text-danger fw-bold ">*</span>
           </Form.Label>
-          <Form.Control
-            type="file"
-            {...method.register("AttachmentFile")}
-          ></Form.Control>
+          <div>
+            <SingleFileUploadField ref={fileRef} />
+          </div>
         </Form.Group>
       </Row>
       <Row>
@@ -939,12 +961,18 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
     },
   });
   function onSubmit(data) {
-    mutation.mutate({
-      from: "Quoted",
-      formData: data,
-      userID: user.userID,
-      LeadIntroductionID: LeadIntroductionID,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      fileRef.current?.setError();
+    } else {
+      data.AttachmentFile = file;
+      mutation.mutate({
+        from: "Quoted",
+        formData: data,
+        userID: user.userID,
+        LeadIntroductionID: LeadIntroductionID,
+      });
+    }
   }
 
   return (
@@ -955,7 +983,7 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
         visible={visible}
         draggable={false}
         onHide={() => setVisible(false)}
-        style={{ width: "75vw", height: "55vh" }}
+        style={{ width: "75vw", height: "80vh" }}
       >
         {dialogConent}
       </Dialog>
@@ -1012,6 +1040,8 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const user = useUserData();
   const method = useForm();
 
+  const fileRef = useRef(null);
+
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
@@ -1044,10 +1074,9 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
             File
             <span className="text-danger fw-bold ">*</span>
           </Form.Label>
-          <Form.Control
-            type="file"
-            {...method.register("AttachmentFile")}
-          ></Form.Control>
+          <div>
+            <SingleFileUploadField ref={fileRef} background="bg-primary" />
+          </div>
         </Form.Group>
       </Row>
       <Row>
@@ -1080,12 +1109,18 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   );
 
   function onSubmit(data) {
-    mutation.mutate({
-      from: "Finalized",
-      formData: data,
-      userID: user.userID,
-      LeadIntroductionID: LeadIntroductionID,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      fileRef.current?.setError();
+    } else {
+      data.AttachmentFile = file;
+      mutation.mutate({
+        from: "Finalized",
+        formData: data,
+        userID: user.userID,
+        LeadIntroductionID: LeadIntroductionID,
+      });
+    }
   }
 
   return (
@@ -1096,7 +1131,7 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         visible={visible}
         draggable={false}
         onHide={() => setVisible(false)}
-        style={{ width: "75vw", height: "55vh" }}
+        style={{ width: "75vw", height: "80vh" }}
       >
         {dialogConent}
       </Dialog>

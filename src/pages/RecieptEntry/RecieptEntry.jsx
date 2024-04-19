@@ -51,7 +51,6 @@ import {
 } from "../../api/SelectData";
 import CDatePicker from "../../components/Forms/CDatePicker";
 import CNumberInput from "../../components/Forms/CNumberInput";
-import { PrintReportInNewTab } from "../../utils/CommonFunctions";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
@@ -71,6 +70,7 @@ const instrumentTypeOptions = [
 let parentRoute = ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
+let viewRote = `${parentRoute}/`;
 let cashDetailColor = "#22C55E";
 let onlineDetailColor = "#F59E0B";
 let chequeDetailColor = "#3B82F6";
@@ -304,14 +304,17 @@ function ReceiptEntrySearch({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  rowData.ReceiptVoucherID,
-                  () => showDeleteDialog(rowData.ReceiptVoucherID),
-                  () => showEditDialog(rowData.ReceiptVoucherID),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.ReceiptVoucherID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.ReceiptVoucherID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.ReceiptVoucherID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.ReceiptVoucherID),
+                })
               }
               header="Actions"
               resizeable={false}
@@ -583,14 +586,12 @@ export function ReceiptEntryForm({ mode, userRights }) {
               saveLoading={receiptVoucherMutation.isPending}
               handleDelete={handleDelete}
               showPrint={userRights[0]?.RolePrint}
-              handlePrint={() =>
-                PrintReportInNewTab(
-                  "ReceiptVoucherPrint?ReceiptVoucherID=" + ReceiptVoucherID
-                )
-              }
               showAddNewButton={userRights[0]?.RoleNew}
               showEditButton={userRights[0]?.RoleEdit}
               showDelete={userRights[0]?.RoleDelete}
+              getPrintFromUrl={
+                "ReceiptVoucherPrint?ReceiptVoucherID=" + ReceiptVoucherID
+              }
             />
           </div>
           <form id="receiptVoucher" className="mt-4">

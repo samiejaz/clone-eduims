@@ -32,6 +32,8 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
 import { encryptID } from "../../utils/crypto";
+import { SingleFileUploadField } from "../../components/Forms/form";
+import { Avatar } from "primereact/avatar";
 
 let parentRoute = ROUTE_URLS.USER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -169,6 +171,15 @@ function UserDetail({ userRights }) {
     navigate(parentRoute + "/" + id);
   }
 
+  function profileTemplate(rowData) {
+    return (
+      <Avatar
+        image={"data:image/png;base64," + rowData?.ProfilePic}
+        shape="circle"
+      />
+    );
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -216,18 +227,26 @@ function UserDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.LoginUserID),
-                  () => showDeleteDialog(encryptID(rowData.LoginUserID)),
-                  () => showEditDialog(encryptID(rowData.LoginUserID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.LoginUserID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.LoginUserID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.LoginUserID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.LoginUserID),
+                })
               }
               header="Actions"
               resizeable={false}
               style={{ minWidth: "7rem", maxWidth: "10rem", width: "7rem" }}
+            ></Column>
+            <Column
+              field="ProfilePic"
+              header="User"
+              body={profileTemplate}
             ></Column>
             <Column
               field="FirstName"
@@ -272,7 +291,7 @@ function UserForm({ mode, userRights }) {
   document.title = "User Entry";
 
   const queryClient = useQueryClient();
-  const imageRef = useRef();
+  const fileRef = useRef();
 
   const navigate = useNavigate();
   const { UserID } = useParams();
@@ -317,8 +336,11 @@ function UserForm({ mode, userRights }) {
           setValue("Password", UserData?.data[0]?.Password);
           setValue("InActive", UserData?.data[0]?.InActive);
           setValue("DepartmentID", UserData?.data[0]?.DepartmentID);
-          imageRef.current.src =
-            "data:image/png;base64," + UserData?.data[0]?.ProfilePic;
+          if (UserData?.data[0]?.ProfilePic) {
+            fileRef.current?.setBase64File(
+              "data:image/png;base64," + UserData?.data[0]?.ProfilePic
+            );
+          }
         } catch (error) {}
       }
     }
@@ -363,16 +385,18 @@ function UserForm({ mode, userRights }) {
   function handleEdit() {
     navigate(editRoute + UserID);
   }
-
   function onSubmit(data) {
-    mutation.mutate({
-      formData: data,
-      userID: user?.userID,
-      UserID: UserID,
-      UserImage: imageRef.current?.src.includes(newRoute)
-        ? ""
-        : imageRef.current.src,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      fileRef.current?.setError();
+    } else {
+      data.UserImage = file;
+      mutation.mutate({
+        formData: data,
+        userID: user?.userID,
+        UserID: UserID,
+      });
+    }
   }
 
   return (
@@ -450,7 +474,7 @@ function UserForm({ mode, userRights }) {
                     optionValue="DepartmentID"
                     placeholder="Select a department"
                     options={departmentSelectData.data}
-                    //required={true}
+                    required={true}
                     disabled={mode === "view"}
                     focusOptions={() => setFocus("InActive")}
                   />
@@ -526,9 +550,12 @@ function UserForm({ mode, userRights }) {
               <FormColumn lg={6} xl={6} md={6}>
                 <FormLabel>Profie Pic</FormLabel>
                 <div>
-                  <ImageContainer
-                    imageRef={imageRef}
-                    hideButtons={mode === "view"}
+                  <SingleFileUploadField
+                    ref={fileRef}
+                    accept="image/*"
+                    chooseBtnLabel="Select Image"
+                    changeBtnLabel="Change Image"
+                    mode={mode}
                   />
                 </div>
               </FormColumn>

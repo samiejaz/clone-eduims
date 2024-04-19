@@ -209,14 +209,17 @@ export function BusinessNatureDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.BusinessNatureID),
-                  () => showDeleteDialog(encryptID(rowData?.BusinessNatureID)),
-                  () => showEditDialog(encryptID(rowData?.BusinessNatureID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.BusinessNatureID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.BusinessNatureID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.BusinessNatureID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.BusinessNatureID),
+                })
               }
               header="Actions"
               resizeable={false}

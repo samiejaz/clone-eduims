@@ -33,6 +33,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
 import { encryptID } from "../../utils/crypto";
+import { SingleFileUploadField } from "../../components/Forms/form";
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS;
 let editRoute = `${parentRoute}/edit/`;
@@ -222,14 +223,17 @@ function BusinessUnitDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.BusinessUnitID),
-                  () => showDeleteDialog(encryptID(rowData.BusinessUnitID)),
-                  () => showEditDialog(encryptID(rowData.BusinessUnitID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.BusinessUnitID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.BusinessUnitID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.BusinessUnitID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.BusinessUnitID),
+                })
               }
               header="Actions"
               resizeable={false}
@@ -283,6 +287,7 @@ function BusinessUnitForm({ mode, userRights }) {
 
   const queryClient = useQueryClient();
   const imageRef = useRef();
+  const fileRef = useRef();
 
   const navigate = useNavigate();
   const { BusinessUnitID } = useParams();
@@ -354,8 +359,11 @@ function BusinessUnitForm({ mode, userRights }) {
           g: BusinessUnitData?.data[0]?.GreenColor,
           b: BusinessUnitData?.data[0]?.BlueColor,
         });
-        imageRef.current.src =
-          "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo;
+        fileRef.current?.setBase64File(
+          "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo
+        );
+        // imageRef.current.src =
+        //   "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo;
       } catch (error) {}
     }
   }, [BusinessUnitID, BusinessUnitData.data]);
@@ -401,14 +409,17 @@ function BusinessUnitForm({ mode, userRights }) {
   }
 
   function onSubmit(data) {
-    mutation.mutate({
-      formData: data,
-      userID: user?.userID,
-      BusinessUnitID: BusinessUnitID,
-      BusinessUnitLogo: imageRef.current?.src.includes(newRoute)
-        ? ""
-        : imageRef.current.src,
-    });
+    const file = fileRef.current?.getFile();
+    if (file === null) {
+      fileRef.current?.setError();
+    } else {
+      data.Logo = file;
+      mutation.mutate({
+        formData: data,
+        userID: user?.userID,
+        BusinessUnitID: BusinessUnitID,
+      });
+    }
   }
 
   return (
@@ -580,19 +591,21 @@ function BusinessUnitForm({ mode, userRights }) {
               </FormColumn>
             </FormRow>
             <FormRow>
-              <FormColumn>
+              <FormColumn lg={12} xl={12}>
                 <FormLabel>Description</FormLabel>
-                <input
-                  as={"textarea"}
-                  rows={1}
-                  disabled={mode === "view"}
-                  className="form-control"
-                  style={{
-                    padding: "0.3rem 0.4rem",
-                    fontSize: "0.8em",
-                  }}
-                  {...register("Description")}
-                />
+                <div>
+                  <textarea
+                    rows={"1"}
+                    disabled={mode === "view"}
+                    className="p-inputtext"
+                    style={{
+                      padding: "0.3rem 0.4rem",
+                      fontSize: "0.8em",
+                      width: "100%",
+                    }}
+                    {...register("Description")}
+                  />
+                </div>
               </FormColumn>
             </FormRow>
             <FormRow>
@@ -609,28 +622,16 @@ function BusinessUnitForm({ mode, userRights }) {
             </FormRow>
 
             <FormRow>
-              <FormColumn lg={6} xl={6}>
-                <Tooltip target=".custom-target-icon" />
-                <FormLabel className="relative">
-                  Logo
-                  <i
-                    className="custom-target-icon pi pi-exclamation-circle p-text-secondary"
-                    data-pr-tooltip="Recommended Size (500x500px)"
-                    data-pr-position="right"
-                    data-pr-at="right+5 top"
-                    data-pr-my="left center-2"
-                    style={{
-                      cursor: "pointer",
-                      position: "absolute",
-                      right: "-20px",
-                      top: "1px",
-                    }}
-                  ></i>
-                </FormLabel>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>Profie Pic</FormLabel>
                 <div>
-                  <ImageContainer
-                    imageRef={imageRef}
-                    hideButtons={mode === "view"}
+                  <SingleFileUploadField
+                    ref={fileRef}
+                    accept="image/*"
+                    chooseBtnLabel="Select Image"
+                    changeBtnLabel="Change Image"
+                    mode={mode}
+                    errorMessage="Upload your logo"
                   />
                 </div>
               </FormColumn>

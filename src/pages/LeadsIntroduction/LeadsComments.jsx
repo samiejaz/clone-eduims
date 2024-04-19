@@ -24,6 +24,7 @@ import { CustomSpinner } from "../../components/CustomSpinner";
 import { ROUTE_URLS } from "../../utils/enums";
 import { CIconButton } from "../../components/Buttons/CButtons";
 import { decryptID } from "../../utils/crypto";
+import { Dialog } from "primereact/dialog";
 
 const LeadsComments = () => {
   const { LeadIntroductionID } = useParams();
@@ -63,7 +64,7 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
   const queryClient = useQueryClient();
   const [commentID, setCommentID] = useState(null);
   const [commentText, setCommentText] = useState(null);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["leadComments"],
     queryFn: () =>
       fetchAllLeadComments({
@@ -77,13 +78,13 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
   const cm = useRef(null);
 
   const items = [
-    {
-      label: "Edit",
-      icon: "pi pi-pencil",
-      command: () => {
-        handleClick(commentID, CONTEXT_ACTIONS.EDIT_ACTION, commentText);
-      },
-    },
+    // {
+    //   label: "Edit",
+    //   icon: "pi pi-pencil",
+    //   command: () => {
+    //     handleClick(commentID, CONTEXT_ACTIONS.EDIT_ACTION, commentText);
+    //   },
+    // },
     {
       label: "Delete",
       icon: "pi pi-trash",
@@ -145,9 +146,9 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
 
   return (
     <>
-      {isLoading ? (
+      {isLoading || isFetching ? (
         <>
-          <CustomSpinner message="Loading Chats..." />
+          <CustomSpinner message="Loading Comments..." />
         </>
       ) : (
         <>
@@ -259,14 +260,15 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
   const method = useForm({
     defaultValues: {
       Comment: "",
+      EditComment: "",
     },
   });
   const { comment, setComment } = useContext(LeadCommentContext);
 
   useEffect(() => {
     if (comment?.Comment !== null) {
-      method.setValue("Comment", comment.Comment);
-      method.setFocus("Comment");
+      method.setValue("EditComment", comment.Comment);
+      method.setFocus("EditComment");
     }
   }, [comment]);
 
@@ -305,7 +307,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
               id="Comment"
               name="Comment"
               control={method.control}
-              rules={{ required: true }}
+              rules={{ required: comment.CommentID === null }}
               render={({ field, fieldState }) => (
                 <>
                   <InputText
@@ -352,6 +354,45 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
           </div>
         </div>
       </div>
+      <Dialog
+        visible={comment.CommentID !== null}
+        onHide={() => {
+          setComment({
+            Comment: null,
+            CommentID: null,
+          });
+        }}
+        style={{ width: "80vw", height: "30vh" }}
+      >
+        <Controller
+          id="EditComment"
+          name="EditComment"
+          control={method.control}
+          rules={{ required: comment.CommentID !== null }}
+          render={({ field, fieldState }) => (
+            <>
+              <InputText
+                id={field.name}
+                name={field.name}
+                value={field.value}
+                ref={field.ref}
+                onChange={(e) => {
+                  field.onChange(e.target.value);
+                }}
+                placeholder="Type your comment..."
+                className={classNames("w-100 p-3", {
+                  "p-invalid": fieldState.error,
+                })}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && e.target.value !== "") {
+                    method.handleSubmit(onSubmit)();
+                  }
+                }}
+              />
+            </>
+          )}
+        />
+      </Dialog>
     </>
   );
 };

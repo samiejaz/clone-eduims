@@ -56,6 +56,7 @@ let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
 let cashDetailColor = "#22C55E";
 let queryKey = QUERY_KEYS.DEBIT_NODE_QUERY_KEY;
+let viewRoute = `${parentRoute}/`;
 let IDENTITY = "DebitNoteID";
 
 export default function BanckAccountOpening() {
@@ -237,14 +238,17 @@ function DebitNoteEntrySearch({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  rowData.DebitNoteID,
-                  () => showDeleteDialog(rowData.DebitNoteID),
-                  () => showEditDialog(rowData.DebitNoteID),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.DebitNoteID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.DebitNoteID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.DebitNoteID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.DebitNoteID),
+                })
               }
               header="Actions"
               resizeable={false}

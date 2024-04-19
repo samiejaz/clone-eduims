@@ -1,6 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const apiUrl = import.meta.env.VITE_APP_API_URL;
+
 export function FormatDate(dateString) {
   const formattedDate = `${dateString.slice(0, 4)}-${dateString.slice(
     5,
@@ -55,25 +57,29 @@ export function formatDateToMMDDYYYY(date) {
   return month + "/" + day + "/" + year;
 }
 
-export async function PrintReportInNewTab(url) {
-  const { data } = await axios.post(
-    `http://192.168.9.110:90/api/Reports/${url}&Export=p`
-  );
+export async function PrintReportInNewTab({ controllerName, fullUrl = "" }) {
+  try {
+    let url =
+      fullUrl !== "" ? fullUrl : `${apiUrl}/Reports/${controllerName}&Export=p`;
+    const { data } = await axios.post(url);
 
-  const win = window.open("");
-  let html = "";
+    const win = window.open("");
+    let html = "";
 
-  html += "<html>";
-  html += '<body style="margin:0!important">';
-  html +=
-    '<embed width="100%" height="100%" src="data:application/pdf;base64,' +
-    data +
-    '" type="application/pdf" />';
-  html += "</body>";
-  html += "</html>";
-  setTimeout(() => {
-    win.document.write(html);
-  }, 0);
+    html += "<html>";
+    html += '<body style="margin:0!important">';
+    html +=
+      '<embed width="100%" height="100%" src="data:application/pdf;base64,' +
+      data +
+      '" type="application/pdf" />';
+    html += "</body>";
+    html += "</html>";
+    setTimeout(() => {
+      win.document.write(html);
+    }, 0);
+  } catch (e) {
+    ShowErrorToast(e.message);
+  }
 }
 
 export function ShowErrorToast(message = "") {
@@ -88,4 +94,24 @@ export function ShowSuccessToast(message = "") {
   if (message !== "") {
     toast.success(message);
   }
+}
+
+export function formatDateAndTime(dateString) {
+  const date = new Date(dateString);
+
+  const day = date.getDate();
+  const month = date.toLocaleString("en-US", { month: "short" });
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+
+  const formattedDate = `${day}-${month}-${year} ${hours}:${
+    minutes < 10 ? "0" : ""
+  }${minutes} ${ampm}`;
+
+  return formattedDate;
 }

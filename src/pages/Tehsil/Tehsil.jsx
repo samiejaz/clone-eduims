@@ -212,14 +212,16 @@ function TehsilDetail({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.TehsilID),
-                  () => showDeleteDialog(encryptID(rowData.TehsilID)),
-                  () => showEditDialog(encryptID(rowData.TehsilID)),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: encryptID(rowData.TehsilID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.TehsilID)),
+                  handleEdit: () => showEditDialog(encryptID(rowData.TehsilID)),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + encryptID(rowData.TehsilID),
+                })
               }
               header="Actions"
               resizeable={false}
