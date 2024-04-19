@@ -216,11 +216,14 @@ export async function addLeadIntroductionOnAction({
 }
 
 export async function fetchAllDemonstrationLeadsData({ UserID, DepartmentID }) {
-  const { data } = await axios.post(
-    `${apiUrl}/UserLeadDashboard/GetLeadIntroductionWhereForUser?LoginUserID=${UserID}&DepartmentID=${DepartmentID}`
-  );
-
-  return data.data ?? [];
+  if (UserID && DepartmentID) {
+    const { data } = await axios.post(
+      `${apiUrl}/UserLeadDashboard/GetLeadIntroductionWhereForUser?LoginUserID=${UserID}&DepartmentID=${DepartmentID}`
+    );
+    return data.data ?? [];
+  } else {
+    return [];
+  }
 }
 
 export async function fetchDemonstrationLeadsDataByID({

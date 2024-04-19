@@ -1,6 +1,5 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Image } from "primereact/image";
 import { useForm } from "react-hook-form";
 import { SingleFileUploadField, TextInput } from "../Forms/form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,24 +7,23 @@ import axios from "axios";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import {
-  ShowErrorToast,
-  convertBase64StringToFile,
-} from "../../utils/CommonFunctions";
+import { ShowErrorToast } from "../../utils/CommonFunctions";
 import { useNavigate } from "react-router-dom";
 import { FormColumn, FormRow } from "../Layout/LayoutComponents";
 import { FormLabel } from "react-bootstrap";
+import { Image } from "primereact/image";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 function UserProfile({ showProfile, handleCloseProfile }) {
   const [isEnable, setIsEnable] = useState(true);
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const fileRef = useRef();
 
-  const { control, handleSubmit, setValue, register } = useForm({
+  const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
       FirstName: "",
       LastName: "",
@@ -45,18 +43,14 @@ function UserProfile({ showProfile, handleCloseProfile }) {
       if (localStorageUser === null) {
         navigate("/auth");
         setUser(null);
-      } else {
-        // loginUser(
-        //   {
-        //     userID: data?.data[0]?.LoginUserID,
-        //     username: `${data?.data[0]?.FirstName}  ${data?.data[0]?.LastName}`,
-        //     image: data?.data[0]?.ProfilePic,
-        //   },
-        //   false
-        // );
       }
-      return data;
+      if (data) {
+        return data;
+      } else {
+        return [];
+      }
     },
+    initialData: [],
   });
 
   const userProfileMutation = useMutation({
@@ -85,6 +79,16 @@ function UserProfile({ showProfile, handleCloseProfile }) {
           toast.success("Profile updated successfully!", {
             autoClose: 1000,
           });
+
+          loginUser(
+            {
+              userID: user.userID,
+              username: `${formData.FirstName}  ${formData.LastName}`,
+              image: formData.UserImage,
+              DepartmetnID: user.DepartmentID,
+            },
+            false
+          );
           queryClient.invalidateQueries({ queryKey: ["currentUser"] });
           handleCloseProfile();
           setIsEnable(true);
@@ -101,12 +105,9 @@ function UserProfile({ showProfile, handleCloseProfile }) {
       setValue("LastName", UserData?.data[0]?.LastName);
       setValue("Email", UserData?.data[0]?.Email);
       setValue("Username", UserData?.data[0]?.UserName);
-      console.log(UserData?.data[0].ProfilePic);
-      if (UserData?.data[0].ProfilePic) {
-        fileRef.current?.setBase64File(
-          "data:image/png;base64," + UserData?.data[0].ProfilePic
-        );
-      }
+      fileRef.current?.setBase64File(
+        "data:image/png;base64," + UserData?.data[0].ProfilePic
+      );
     }
   }, [user, UserData]);
 
@@ -159,7 +160,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
                     type="button"
                     severity="warning"
                     onClick={() => {
-                      handleCloseProfile();
+                      //  handleCloseProfile();
                       setIsEnable(true);
                     }}
                     className="p-button-success rounded"
@@ -210,34 +211,45 @@ function UserProfile({ showProfile, handleCloseProfile }) {
         <div>
           <form>
             <div style={{ textAlign: "center" }}>
-              <FormRow>
-                <FormColumn lg={12} xl={12} md={12}>
-                  <FormLabel>Profie Pic</FormLabel>
-                  <div>
-                    <SingleFileUploadField
-                      ref={fileRef}
-                      accept="image/*"
-                      chooseBtnLabel="Select Image"
-                      changeBtnLabel="Change Image"
-                      mode={"edit"}
-                    />
-                  </div>
-                </FormColumn>
-              </FormRow>
-              {/* <Image
-                src={"data:image/png;base64," + imgData}
-                alt="Image"
-                width="250"
-                preview
-                className="text-center"
-                pt={{
-                  previewContainer: {
-                    style: {
-                      borderRadius: "50%",
-                    },
-                  },
-                }}
-              /> */}
+              {!isEnable ? (
+                <>
+                  <FormRow>
+                    <FormColumn lg={12} xl={12} md={12}>
+                      <FormLabel>Profie Pic</FormLabel>
+                      <div>
+                        <SingleFileUploadField
+                          ref={fileRef}
+                          accept="image/*"
+                          chooseBtnLabel="Select Image"
+                          changeBtnLabel="Change Image"
+                          mode={"edit"}
+                        />
+                      </div>
+                    </FormColumn>
+                  </FormRow>
+                </>
+              ) : (
+                <>
+                  <Image
+                    src={
+                      UserData?.data?.length > 0
+                        ? "data:image/png;base64," +
+                          UserData?.data[0]?.ProfilePic
+                        : ""
+                    }
+                    width="100"
+                    height="100"
+                    pt={{
+                      image: {
+                        style: {
+                          borderRadius: "50%",
+                        },
+                      },
+                    }}
+                    preview
+                  />
+                </>
+              )}
             </div>
             <TextInput
               control={control}

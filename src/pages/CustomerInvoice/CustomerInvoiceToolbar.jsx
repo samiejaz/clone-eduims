@@ -121,7 +121,9 @@ export default function ButtonToolBar({
                   className: "hidden md:block lg:block",
                 },
                 root: {
-                  className: "bg-blue",
+                  style: {
+                    background: "#4169e1",
+                  },
                 },
               }}
             />

@@ -24,11 +24,11 @@ const CMaskInput = ({
           <InputMask
             id={field.name}
             name={field.name}
-            value={field.value}
+            value={field}
+            ref={field.ref}
             className={classNames({ "p-invalid": fieldState.error })}
             onChange={(e) => {
               field.onChange(e.target.value);
-
               if (onChange) {
                 onChange(e);
               }

@@ -271,7 +271,9 @@ function LeadsIntroductionDemonstratorTable() {
         emptyMessage="No Leads found!"
         filters={filters}
         filterDisplay="row"
+        sortMode="multiple"
         resizableColumns
+        multiSortMeta={"Ctrl"}
         size="small"
         className={"thead"}
         tableStyle={{ minWidth: "50rem" }}

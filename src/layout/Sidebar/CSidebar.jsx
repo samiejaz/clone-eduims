@@ -58,14 +58,8 @@ const CSidebar = ({ sideBarRef, searchInputRef }) => {
 
           <li>
             <div className="c-profile-details">
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div>
+              <div className="flex align-content-center justify-content-between w-full">
+                <div className="ml-2">
                   <div className="c-profile_name" style={{ marginLeft: "5px" }}>
                     {user?.username}
                   </div>
@@ -150,7 +144,11 @@ export const SignOut = () => {
 
   return (
     <>
-      <i className="pi pi-sign-out" onClick={confirmLogout}></i>
+      <i
+        className="pi pi-sign-out"
+        onClick={confirmLogout}
+        style={{ width: "50px", minWidth: "50px" }}
+      ></i>
     </>
   );
 };

@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { Form, Row, Col } from "react-bootstrap";
 import { fetchNewCustomerById } from "../../api/NewCustomerData";
 import { AuthContext } from "../../context/AuthContext";
+import { FormRow, FormColumn, FormLabel } from "../Layout/LayoutComponents";
+import TextInput from "../Forms/TextInput";
+import CheckBox from "../Forms/CheckBox";
 
 function CustomerEntry(props) {
   const { CustomerID, isEnable = true } = props;
@@ -14,6 +16,7 @@ function CustomerEntry(props) {
   const {
     register,
     setValue,
+    control,
     formState: { errors },
   } = useFormContext();
 
@@ -55,118 +58,116 @@ function CustomerEntry(props) {
   return (
     <>
       <form onKeyDown={preventFormByEnterKeySubmission}>
-        <Row>
-          <Form.Group as={Col} controlId="CustomerName">
-            <Form.Label>Customer Name</Form.Label>
+        <FormRow>
+          <FormColumn lg={6} xl={6} md={6}>
+            <FormLabel>Customer Name</FormLabel>
             <span className="text-danger fw-bold ">*</span>
-            <Form.Control
-              type="text"
-              required
-              aria-invalid={errors?.CustomerName ? true : false}
-              className="form-control"
-              {...register("CustomerName", {
-                required: "Please enter customer name!",
-              })}
-              disabled={!isEnable}
-            />
-            <p className="text-danger">{errors?.CustomerName?.message}</p>
-          </Form.Group>
-          <Form.Group as={Col} controlId="CustomerBusinessName">
-            <Form.Label>Customer Business Name</Form.Label>
+            <div>
+              <TextInput
+                control={control}
+                ID={"CustomerName"}
+                focusOptions={() => setFocus("CustomerBusinessName")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+          <FormColumn lg={6} xl={6} md={6}>
+            <FormLabel>Customer Business Name</FormLabel>
             <span className="text-danger fw-bold ">*</span>
-            <Form.Control
-              type="text"
-              required
-              aria-invalid={errors?.CustomerBusinessName ? "true" : "false"}
-              {...register("CustomerBusinessName", {
-                required: "Please enter customer business name!",
-              })}
-              disabled={!isEnable}
-            />
-            <p className="text-danger">
-              {errors?.CustomerBusinessName?.message}
-            </p>
-          </Form.Group>
-        </Row>
+            <div>
+              <TextInput
+                control={control}
+                ID={"CustomerBusinessName"}
+                focusOptions={() => setFocus("CustomerBusinessAddress")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
 
-        <Row>
-          <Form.Group controlId="CustomerBusinessAddress">
-            <Form.Label>Customer Business Address</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder=""
-              {...register("CustomerBusinessAddress", {
-                // disabled: !isEnable,
-              })}
-              disabled={!isEnable}
-            />
-          </Form.Group>
-        </Row>
+        <FormRow>
+          <FormColumn lg={12} xl={12} md={6}>
+            <FormLabel>Customer Business Address</FormLabel>
 
-        <Row>
-          <Form.Group as={Col} controlId="ContactPerson1Name">
-            <Form.Label>Contact Name</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder=""
-              {...register("ContactPerson1Name", {
-                // disabled: !isEnable,
-              })}
-              disabled={!isEnable}
-            />
-          </Form.Group>
+            <div>
+              <TextInput
+                control={control}
+                ID={"CustomerBusinessAddress"}
+                focusOptions={() => setFocus("ContactPerson1Name")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
 
-          <Form.Group as={Col} controlId="ContactPerson1No">
-            <Form.Label>Contact No</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder=""
-              {...register("ContactPerson1No", {
-                // disabled: !isEnable,
-              })}
-              disabled={!isEnable}
-            />
-          </Form.Group>
+        <FormRow>
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>Contact Name</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"ContactPerson1Name"}
+                focusOptions={() => setFocus("ContactPerson1No")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
 
-          <Form.Group as={Col} controlId="ContactPerson1Email">
-            <Form.Label> Email</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder=""
-              {...register("ContactPerson1Email", {
-                // disabled: !isEnable,
-              })}
-              disabled={!isEnable}
-            />
-          </Form.Group>
-        </Row>
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>Contact No</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"ContactPerson1No"}
+                focusOptions={() => setFocus("ContactPerson1Email")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
 
-        <Row>
-          <Form.Group as={Col} controlId="Description">
-            <Form.Label>Descripiton</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder=""
-              name="email"
-              {...register("Description", {
-                // disabled: !isEnable,
-              })}
-              disabled={!isEnable}
-            />
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} controlId="InActive">
-            <Form.Check
-              aria-label="Inactive"
-              label="Inactive"
-              {...register("InActive", {
-                // disabled: !isEnable,
-              })}
-              disabled={!isEnable}
-            />
-          </Form.Group>
-        </Row>
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel> Email</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"ContactPerson1Email"}
+                focusOptions={() => setFocus("Description")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+
+        <FormRow>
+          <FormColumn lg={12} xl={12} md={6}>
+            <FormLabel>Descripiton</FormLabel>
+            <div>
+              <textarea
+                rows={"1"}
+                disabled={isEnable}
+                className="p-inputtext"
+                style={{
+                  padding: "0.3rem 0.4rem",
+                  fontSize: "0.8em",
+                  width: "100%",
+                }}
+                {...register("Description")}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <div className="mt-2">
+              <CheckBox
+                control={control}
+                ID={"InActive"}
+                Label={"InActive"}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
       </form>
     </>
   );

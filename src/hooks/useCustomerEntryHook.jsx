@@ -177,6 +177,8 @@ const useCustomerEntryHook = () => {
       <Button
         label="Cancel"
         icon="pi pi-times"
+        type="button"
+        severity="danger"
         onClick={() => {
           setVisible(false);
           handleCancelClick();
@@ -210,6 +212,7 @@ const useCustomerEntryHook = () => {
                 setDialogIndex(dialogIndex - 1);
               }
             }}
+            type="button"
             disabled={dialogIndex === 0}
             className="p-button-p text-center"
           />

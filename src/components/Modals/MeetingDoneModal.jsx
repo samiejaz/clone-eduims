@@ -74,7 +74,7 @@ export const MeetingDoneFields = ({
   const [isEnable, setIsEnable] = useState(AreFieldsEnable);
 
   const user = useUserData();
-  const productsSelectData = useProductsInfoSelectData();
+  const productsSelectData = useProductsInfoSelectData(0, true);
 
   const method = useForm({
     defaultValues,

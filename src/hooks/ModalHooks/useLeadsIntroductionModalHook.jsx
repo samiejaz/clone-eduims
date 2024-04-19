@@ -447,7 +447,7 @@ export function LeadsIntroductionFormComponent({
           <FormColumn lg={3} xl={3} md={6}>
             <FormLabel>Contact Person Mobile No</FormLabel>
             <div>
-              {/* <TextInput
+              <TextInput
                 control={method.control}
                 ID={"ContactPersonMobileNo"}
                 required={true}
@@ -458,8 +458,8 @@ export function LeadsIntroductionFormComponent({
                     method.setValue("ContactPersonWhatsAppNo", e.target.value);
                   }
                 }}
-              /> */}
-              <CMaskInputField
+              />
+              {/* <CMaskInputField
                 control={method.control}
                 name={"ContactPersonMobileNo"}
                 required={true}
@@ -471,7 +471,7 @@ export function LeadsIntroductionFormComponent({
                     method.setValue("ContactPersonWhatsAppNo", e.value);
                   }
                 }}
-              />
+              /> */}
             </div>
           </FormColumn>
         </FormRow>
@@ -507,7 +507,7 @@ export function LeadsIntroductionFormComponent({
           <FormColumn lg={3} xl={3} md={6}>
             <FormLabel>Contact Person Whatsapp No</FormLabel>
             <div>
-              <CMaskInputField
+              {/* <CMaskInputField
                 control={method.control}
                 name={"ContactPersonWhatsAppNo"}
                 required={true}
@@ -516,14 +516,14 @@ export function LeadsIntroductionFormComponent({
                 }
                 focusOptions={() => method.setFocus("IsWANumberSameAsMobile")}
                 mask="9999-9999999"
-              />
-              {/* <TextInput
+              /> */}
+              <TextInput
                 control={method.control}
                 ID={"ContactPersonWhatsAppNo"}
                 required={true}
                 isEnable={mode !== "view"}
                 focusOptions={() => method.setFocus("IsWANumberSameAsMobile")}
-              /> */}
+              />
             </div>
           </FormColumn>
           {hideFieldsForDemo === false ? (

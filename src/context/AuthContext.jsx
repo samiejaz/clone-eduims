@@ -12,6 +12,7 @@ export const AuthProvier = ({ children }) => {
 
   function loginUser(data, navigateToDashBoard = true) {
     localStorage.setItem("user", JSON.stringify(data));
+    console.log(data);
     setUser(data);
     if (navigateToDashBoard) {
       navigate("/", { replace: true });

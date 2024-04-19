@@ -59,10 +59,7 @@ import CDatePicker from "../../components/Forms/CDatePicker";
 import CSwitchInput from "../../components/Forms/CSwitchInput";
 import { useUserData } from "../../context/AuthContext";
 import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
-import {
-  PrintReportInNewTab,
-  ShowErrorToast,
-} from "../../utils/CommonFunctions";
+import { ShowErrorToast } from "../../utils/CommonFunctions";
 import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCustomerInvoiceInstallmentModal";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
@@ -75,6 +72,7 @@ import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailT
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
+let viewRoute = `${parentRoute}/`;
 let onlineDetailColor = "#365abd";
 let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY;
 let IDENTITY = "CustomerInvoiceID";

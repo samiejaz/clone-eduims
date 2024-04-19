@@ -488,6 +488,7 @@ function LeadIntroductionForm({ mode, userRights }) {
         "ContactPersonMobileNo",
         LeadIntroductionData.data[0].ContactPersonMobileNo
       );
+
       method.setValue(
         "ContactPersonWhatsAppNo",
         LeadIntroductionData.data[0].ContactPersonWhatsAppNo
