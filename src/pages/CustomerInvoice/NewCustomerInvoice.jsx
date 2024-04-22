@@ -546,9 +546,12 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
                 showAddNewButton={userRights[0]?.RoleNew}
                 showEditButton={userRights[0]?.RoleEdit}
                 showDelete={userRights[0]?.RoleDelete}
-                getPrintFromUrl={`InvoicePrint?CustomerInvoiceID=${decryptID(
-                  CustomerInvoiceID
-                )}`}
+                getPrintFromUrl={
+                  mode !== "new" &&
+                  `InvoicePrint?CustomerInvoiceID=${decryptID(
+                    CustomerInvoiceID
+                  )}`
+                }
               />
             </div>
             <form id="CustomerInvoice" className="mt-4">

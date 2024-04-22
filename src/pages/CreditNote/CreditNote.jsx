@@ -42,6 +42,7 @@ import {
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
   fetchAllOldCustomersForSelect,
+  fetchAllSessionsForSelect,
 } from "../../api/SelectData";
 import CDatePicker from "../../components/Forms/CDatePicker";
 import CNumberInput from "../../components/Forms/CNumberInput";
@@ -50,6 +51,7 @@ import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -346,7 +348,7 @@ function CreditNoteEntryForm({ mode, userRights }) {
   });
 
   useEffect(() => {
-    if (+CreditNoteID !== null && CreditNoteData?.Master?.length > 0) {
+    if (CreditNoteID !== undefined && CreditNoteData?.Master?.length > 0) {
       // Setting Values
       method.setValue("SessionID", CreditNoteData?.Master[0]?.SessionID);
       method.setValue(
@@ -391,7 +393,7 @@ function CreditNoteEntryForm({ mode, userRights }) {
         })
       );
     }
-  }, [+CreditNoteID, CreditNoteData]);
+  }, [CreditNoteID, CreditNoteData]);
 
   function handleEdit() {
     navigate(`${editRoute}${CreditNoteID}`);
@@ -443,12 +445,7 @@ function CreditNoteEntryForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
@@ -551,12 +548,11 @@ function CreditNoteEntryForm({ mode, userRights }) {
 
 // New Master Fields
 function SessionSelect({ mode }) {
-  // const { data } = useQuery({
-  //   queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
-  //   queryFn: fetchAllSessionsForSelect,
-  //   initialData: [],
-  // });
-  const data = useSessionSelectData();
+  const { data } = useQuery({
+    queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
+    queryFn: fetchAllSessionsForSelect,
+    initialData: [],
+  });
 
   const method = useFormContext();
 
@@ -581,7 +577,7 @@ function SessionSelect({ mode }) {
             optionLabel="SessionTitle"
             optionValue="SessionID"
             placeholder="Select a session"
-            options={data.data}
+            options={data}
             required={true}
             disabled={mode === "view"}
             focusOptions={() => method.setFocus("BusinessUnitID")}

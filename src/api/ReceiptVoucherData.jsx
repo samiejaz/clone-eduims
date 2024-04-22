@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID } from "../utils/crypto";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -18,6 +19,8 @@ export async function fetchAllReceiptVoucheres(LoginUserID) {
 
 // URL: /data_ReceiptVoucher/GetReceiptVoucherWhere?ReceiptVoucherID=??&LoginUserID=??
 export async function fetchReceiptVoucherById(ReceiptVoucherID, LoginUserID) {
+  ReceiptVoucherID = decryptID(ReceiptVoucherID);
+
   if (ReceiptVoucherID === undefined || ReceiptVoucherID === 0) {
     return [];
   } else {

@@ -33,6 +33,7 @@ import { encryptID } from "../../utils/crypto";
 let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
+let viewRoute = `${parentRoute}/`;
 let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY;
 let IDENTITY = "BusinessNatureID";
 

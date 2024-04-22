@@ -1,5 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { decryptID, encryptID } from "../utils/crypto";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -18,6 +20,8 @@ export async function fetchAllCreditNotees(LoginUserID) {
 
 // URL: /data_CreditNote/GetCreditNoteWhere?CreditNoteID=??&LoginUserID=??
 export async function fetchCreditNoteById(CreditNoteID, LoginUserID) {
+  CreditNoteID = decryptID(CreditNoteID);
+
   if (CreditNoteID === undefined || CreditNoteID === 0) {
     return [];
   } else {
@@ -27,26 +31,27 @@ export async function fetchCreditNoteById(CreditNoteID, LoginUserID) {
       );
       return data ?? [];
     } catch (error) {
-      toast.error(error.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(error.message);
     }
   }
 }
 // URL: /data_CreditNote/CreditNoteDelete?CreditNoteID=??&LoginUserID=??
 export async function deleteCreditNoteByID({ CreditNoteID, LoginUserID }) {
-  const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CreditNoteID=${CreditNoteID}&LoginUserID=${LoginUserID}`
-  );
+  try {
+    CreditNoteID = decryptID(CreditNoteID);
+    const { data } = await axios.post(
+      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CreditNoteID=${CreditNoteID}&LoginUserID=${LoginUserID}`
+    );
 
-  if (data.success === true) {
-    toast.success("Credit Note sucessfully deleted!");
-    return true;
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    });
-    return false;
+    if (data.success === true) {
+      ShowSuccessToast("Credit Note sucessfully deleted!");
+      return true;
+    } else {
+      ShowErrorToast(data.message);
+      return false;
+    }
+  } catch (err) {
+    ShowErrorToast(err.message);
   }
 }
 //
@@ -57,7 +62,7 @@ export async function fetchMonthlyMaxCreditNoteNo(BusinesssUnitID) {
     );
     return data;
   } catch (error) {
-    toast.error(error, {
+    ShowErrorToast(error, {
       autoClose: false,
     });
   }
@@ -108,21 +113,19 @@ export async function addNewCreditNote({ formData, userID, CreditNoteID = 0 }) {
 
       if (data.success === true) {
         if (CreditNoteID !== 0) {
-          toast.success("Credit Note updated successfully!");
+          ShowSuccessToast("Credit Note updated successfully!");
         } else {
-          toast.success("Credit Note created successfully!");
+          ShowSuccessToast("Credit Note created successfully!");
         }
-        return { success: true, RecordID: data?.CreditNoteID };
+        return { success: true, RecordID: encryptID(data?.CreditNoteID) };
       } else {
-        toast.error(data.message);
+        ShowErrorToast(data.message);
         return { success: false, RecordID: CreditNoteID };
       }
     } catch (error) {
-      toast.error(error.message, {
-        autoClose: false,
-      });
+      ShowErrorToast(error.message);
     }
   } else {
-    toast.error("Please add atleast 1 row!");
+    ShowErrorToast("Please add atleast 1 row!");
   }
 }

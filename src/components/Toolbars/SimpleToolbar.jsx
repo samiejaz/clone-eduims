@@ -8,7 +8,7 @@ const SimpleToolbar = ({ startContent, title, onSaveClick }) => {
       <div className="flex align-content-center justify-content-between">
         <div className="flex-none">
           <p>
-            Use <Tag value={"Alt"} severity={"primary"} />{" "}
+            Use <Tag value={"Ctrl"} severity={"primary"} />{" "}
             <span className="font-bold">+</span>{" "}
             <Tag value={"S"} severity={"primary"} /> to save.
           </p>

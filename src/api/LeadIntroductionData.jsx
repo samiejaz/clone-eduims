@@ -145,15 +145,13 @@ export async function addLeadIntroductionOnAction({
       } else {
         newFormData.append(
           "AttachmentFile",
-          formData?.AttachmentFile !== undefined
-            ? formData?.AttachmentFile[0]
-            : ""
+          formData?.AttachmentFile !== undefined ? formData?.AttachmentFile : ""
         );
       }
       newFormData.append("Amount", formData.Amount ?? 1900);
-      newFormData.append("Description", formData.Description);
+      newFormData.append("Description", formData.Description ?? "");
       if (fileData) {
-        newFormData.append("FileType", formData.Description);
+        newFormData.append("FileType", formData.FileType);
         newFormData.append("FileName", formData.FileName);
         newFormData.append("FilePath", formData.FilePath);
         newFormData.append("FullFilePath", formData.FullFilePath);
@@ -161,7 +159,7 @@ export async function addLeadIntroductionOnAction({
       Status = from === "Quoted" ? "Quoted" : "Finalized";
     } else if (from === "Closed") {
       newFormData.append("Amount", formData.Amount ?? 100);
-      newFormData.append("Description", formData.Description);
+      newFormData.append("Description", formData.Description ?? "");
       Status = "Closed";
     } else if (from === "MeetingDone") {
       newFormData.append("MeetingTime", formData.MeetingTime.toUTCString());
@@ -182,10 +180,8 @@ export async function addLeadIntroductionOnAction({
       newFormData.append("LeadIntroductionDetailID", 0);
     }
     newFormData.append("EntryUserID", +userID);
-    console.log(LeadIntroductionID);
     LeadIntroductionID =
       LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
-    console.log(LeadIntroductionID);
 
     newFormData.append("LeadIntroductionID", LeadIntroductionID);
     newFormData.append("Status", Status);
@@ -244,14 +240,21 @@ export async function fetchDemonstrationLeadsDataByID({
 
 export async function getLeadsFile(filename) {
   try {
-    const { data } = await axios.get(
-      `${apiUrl}/data_LeadIntroduction/DownloadLeadProposal?filename=${filename}`
-    );
+    if (filename) {
+      const { data } = await axios.get(
+        `${apiUrl}/data_LeadIntroduction/DownloadLeadProposal?filename=${filename}`,
+        { responseType: "blob" }
+      );
+      const file = new File([data], filename, { type: data?.type });
 
-    console.log(data);
+      return file;
+    } else {
+      return { name: null };
+    }
   } catch (err) {
     ShowErrorToast(err.message, {
       autoClose: false,
     });
+    return null;
   }
 }

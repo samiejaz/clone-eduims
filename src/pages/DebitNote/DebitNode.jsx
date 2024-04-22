@@ -50,6 +50,7 @@ import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -344,7 +345,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
     },
   });
   useEffect(() => {
-    if (+DebitNoteID !== null && DebitNoteData?.Master?.length > 0) {
+    if (DebitNoteID !== undefined && DebitNoteData?.Master?.length > 0) {
       // Setting Values
       method.setValue("SessionID", DebitNoteData?.Master[0]?.SessionID);
       method.setValue(
@@ -386,7 +387,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
         })
       );
     }
-  }, [+DebitNoteID, DebitNoteData]);
+  }, [DebitNoteID, DebitNoteData]);
 
   function handleEdit() {
     navigate(`${editRoute}${DebitNoteID}`);
@@ -438,12 +439,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
@@ -1064,7 +1060,7 @@ function DebitNoteDetailTableRow({
             enterKeyOptions={() =>
               method.setFocus(`DebitNoteDetail.${index}.Amount`)
             }
-            disabled={disable}
+            disabled={true}
           />
         </td>
         <td>

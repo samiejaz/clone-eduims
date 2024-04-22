@@ -119,7 +119,6 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
         reject: () => {},
       });
     } else {
-      console.log("Wrong Action");
     }
   }
 
@@ -310,7 +309,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
               rules={{ required: comment.CommentID === null }}
               render={({ field, fieldState }) => (
                 <>
-                  <InputText
+                  <textarea
                     id={field.name}
                     name={field.name}
                     value={field.value}
@@ -318,16 +317,33 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                     onChange={(e) => {
                       field.onChange(e.target.value);
                     }}
+                    rows={1}
                     placeholder="Type your comment..."
-                    className={classNames("w-100 p-3", {
-                      "p-invalid": fieldState.error,
-                    })}
+                    className={classNames(
+                      "unresize-textarea p-inputtext w-100 p-3",
+                      {
+                        "p-invalid": fieldState.error,
+                      }
+                    )}
                     onKeyDown={(e) => {
+                      if (e.shiftKey && e.key === "Enter") {
+                        e.preventDefault(); // Prevent the default behavior of the Enter key
+                        const start = e.target.selectionStart;
+                        const end = e.target.selectionEnd;
+                        const newText =
+                          e.target.value.substring(0, start) +
+                          "\n" +
+                          e.target.value.substring(end);
+                        e.target.value = newText; // Update the textarea's value
+                        e.target.selectionStart = e.target.selectionEnd =
+                          start + 1;
+                      }
+
                       if (e.key === "Enter" && e.target.value !== "") {
                         method.handleSubmit(onSubmit)();
                       }
                     }}
-                  />
+                  ></textarea>
                 </>
               )}
             />
@@ -371,7 +387,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
           rules={{ required: comment.CommentID !== null }}
           render={({ field, fieldState }) => (
             <>
-              <InputText
+              <textarea
                 id={field.name}
                 name={field.name}
                 value={field.value}
@@ -380,15 +396,27 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                   field.onChange(e.target.value);
                 }}
                 placeholder="Type your comment..."
-                className={classNames("w-100 p-3", {
+                className={classNames("p-inputtext w-100 p-3", {
                   "p-invalid": fieldState.error,
                 })}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && e.target.value !== "") {
-                    method.handleSubmit(onSubmit)();
+                  if (e.key === "Enter" && e.shiftKey) {
+                    e.preventDefault();
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    const newText =
+                      e.target.value.substring(0, start) +
+                      "\n" +
+                      e.target.value.substring(end);
+                    e.target.value = newText;
+                    e.target.selectionStart = e.target.selectionEnd = start + 1;
                   }
+
+                  // if (e.key === "Enter" && e.target.value !== "") {
+                  //   method.handleSubmit(onSubmit)();
+                  // }
                 }}
-              />
+              ></textarea>
             </>
           )}
         />

@@ -35,7 +35,7 @@ export default function Customers() {
     });
     setUserRights([rights]);
   }, []);
-  console.log(userRights);
+
   return (
     <Routes>
       {userRights && userRights[0]?.ShowForm ? (

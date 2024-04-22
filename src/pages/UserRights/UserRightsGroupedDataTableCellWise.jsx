@@ -41,10 +41,8 @@ export default function UserRightsGroupedTableCellWise() {
     let _routesWithUserRights = [...routesWithUserRights];
     let { rowData, newValue, field, originalEvent: event } = e;
 
-    console.log(field);
     rowData[field] = newValue;
-    console.log(rowData);
-    console.log(_routesWithUserRights);
+
     //   setProducts(_products);
   };
 
