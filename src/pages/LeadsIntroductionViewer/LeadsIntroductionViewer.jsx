@@ -25,16 +25,15 @@ import {
 import { toast } from "react-toastify";
 import { MeetingDoneFields } from "../../components/Modals/MeetingDoneModal";
 import { RevertBackFields } from "../../components/Modals/RevertBackModal";
-import MultiFileUpload from "../../components/Forms/MultiFileUpload";
 import { decryptID, encryptID } from "../../utils/crypto";
 import { ShowErrorToast } from "../../utils/CommonFunctions";
 import { useUserData } from "../../context/AuthContext";
-import { CustomSpinner } from "../../components/CustomSpinner";
 import {
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
 import { SingleFileUploadField } from "../../components/Forms/form";
+import useLeadsFileViewerHook from "./useLeadsFileViewerHook";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -153,8 +152,6 @@ const LeadsIntroductionViewer = () => {
     initialData: [],
     enabled: LeadIntroductionID !== undefined,
   });
-
-  console.log(data);
 
   let newEvents = data.map((item) => {
     return {
@@ -366,8 +363,6 @@ function ForwardedFieldsContainer({
     initialData: [],
   });
 
-  console.log(data);
-
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
@@ -397,6 +392,12 @@ function ForwardedFieldsContainer({
       : "http://192.168.9.110:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
         data[0]?.FileName;
   let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1);
+
+  const { fileData } = useQuery({
+    queryKey: ["leadsFile"],
+    queryFn: () => getLeadsFile(data[0].FileName),
+  });
+
   // Forward Fields
   const ForwardFields = (
     <>
@@ -593,7 +594,6 @@ function QuotedFieldsContainer({
   const method = useForm();
   const fileInputRef = useRef();
   const [isEnable, setIsEnable] = useState(false);
-  const [filePath, setFilePath] = useState("");
 
   const user = useUserData();
 
@@ -622,21 +622,15 @@ function QuotedFieldsContainer({
     if (data.length > 0) {
       method.setValue("Amount", data[0].Amount);
       method.setValue("Description", data[0].Description);
-      //  let filePath = getLeadsFile(data[0]?.FileName);
-
-      setFilePath(
-        data[0]?.FileName === null
-          ? null
-          : "http://110.39.141.170:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
-              data[0]?.FileName
-      );
-      // setFileType(
       //   data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
       // );
     }
   }, [data]);
 
-  const fileRef = useRef();
+  const { render, getFileData, setFileError } = useLeadsFileViewerHook({
+    fileName: data[0]?.FileName,
+    mode: isEnable ? "edit" : "view",
+  });
 
   const QuotedFields = (
     <>
@@ -666,25 +660,24 @@ function QuotedFieldsContainer({
             {...method.register("Description")}
           />
         </Form.Group>
+        {render}
       </Row>
     </>
   );
 
   function onSubmit(data) {
-    mutation.mutate({
-      from: Type,
-      formData: data,
-      userID: user.userID,
-      LeadIntroductionID: LeadIntroductionID,
-      LeadIntroductionDetailID: LeadIntroductionDetailID,
-      fileData: {
-        FileType: data[0]?.FileType ?? "",
-        FilePath: data[0]?.FilePath ?? "",
-        FileName: data[0]?.FileName ?? "",
-        FullFilePath: data[0]?.FullFilePath ?? "",
-      },
-      file: fileInputRef.current?.getAllFiles(),
-    });
+    data.AttachmentFile = getFileData();
+    if (data.AttachmentFile !== null) {
+      mutation.mutate({
+        from: Type,
+        formData: data,
+        userID: user.userID,
+        LeadIntroductionID: LeadIntroductionID,
+        LeadIntroductionDetailID: LeadIntroductionDetailID,
+      });
+    } else {
+      setFileError();
+    }
   }
 
   return (
@@ -698,43 +691,6 @@ function QuotedFieldsContainer({
         isEnable={isEnable}
       />
       {QuotedFields}
-      {isEnable ? (
-        <>
-          <Row>
-            <Form.Group as={Col} controlId="AttachmentFile">
-              <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
-                Choose File
-                <span className="text-danger fw-bold ">*</span>
-              </Form.Label>
-              <Form.Control
-                type="file"
-                {...method.register("AttachmentFile")}
-              ></Form.Control>
-            </Form.Group>
-          </Row>
-        </>
-      ) : (
-        <></>
-      )}
-      {filePath !== null ? (
-        <>
-          <FormColumn lg={12} xl={12} md={12}>
-            <FormLabel>File</FormLabel>
-            <div>
-              <SingleFileUploadField
-                ref={fileRef}
-                accept="image/*"
-                chooseBtnLabel="Select Image"
-                changeBtnLabel="Change Image"
-                mode={"view"}
-                errorMessage="Upload your logo"
-              />
-            </div>
-          </FormColumn>
-        </>
-      ) : (
-        <></>
-      )}
     </>
   );
 }

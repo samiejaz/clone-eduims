@@ -274,7 +274,6 @@ function TehsilForm({ mode, userRights }) {
   const mutation = useMutation({
     mutationFn: addNewTehsil,
     onSuccess: ({ success, RecordID }) => {
-      console.log(success, RecordID);
       if (success) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
         navigate(`${parentRoute}/${RecordID}`);

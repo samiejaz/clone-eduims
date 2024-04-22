@@ -55,6 +55,7 @@ import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { encryptID } from "../../utils/crypto";
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -70,7 +71,7 @@ const instrumentTypeOptions = [
 let parentRoute = ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
 let newRoute = `${parentRoute}/new`;
-let viewRote = `${parentRoute}/`;
+let viewRoute = `${parentRoute}/`;
 let cashDetailColor = "#22C55E";
 let onlineDetailColor = "#F59E0B";
 let chequeDetailColor = "#3B82F6";
@@ -220,13 +221,17 @@ function ReceiptEntrySearch({ userRights }) {
     return (
       <Tag
         value={rowData.ReceiptMode}
-        severity={getSeverity(rowData.ReceiptMode)}
+        style={{ background: getSeverity(rowData.ReceiptMode) }}
       />
     );
   };
   const statusItemTemplate = (option) => {
-    console.log(option);
-    return <Tag value={option} severity={getSeverity(option)} />;
+    return (
+      <Tag
+        value={option}
+        style={{ background: getSeverity(rowData.ReceiptMode) }}
+      />
+    );
   };
 
   const [statuses] = useState(["Cash", "Online", "Instrument", "Cheque", "DD"]);
@@ -248,15 +253,15 @@ function ReceiptEntrySearch({ userRights }) {
   const getSeverity = (status) => {
     switch (status) {
       case "Online":
-        return "warning";
+        return "#F9A972";
       case "Cash":
-        return "success";
+        return "#10B981";
       case "Instrument":
-        return "help";
+        return "#3B82F6";
       case "DD":
         return "danger";
       default:
-        return "info";
+        return "#10B981";
     }
   };
 
@@ -406,7 +411,7 @@ export function ReceiptEntryForm({ mode, userRights }) {
   const receiptModeRef = useRef();
   // Form
   const method = useForm({
-    defaultValues,
+    defaultValues: defaultValues,
   });
 
   const { data: ReceiptVoucherData } = useQuery({
@@ -443,7 +448,10 @@ export function ReceiptEntryForm({ mode, userRights }) {
   });
 
   useEffect(() => {
-    if (+ReceiptVoucherID !== null && ReceiptVoucherData?.Master?.length > 0) {
+    if (
+      ReceiptVoucherID !== undefined &&
+      ReceiptVoucherData?.Master?.length > 0
+    ) {
       // Setting Values
       method.setValue("SessionID", ReceiptVoucherData?.Master[0]?.SessionID);
       method.setValue(
@@ -515,7 +523,7 @@ export function ReceiptEntryForm({ mode, userRights }) {
         })
       );
     }
-  }, [+ReceiptVoucherID, ReceiptVoucherData]);
+  }, [ReceiptVoucherID, ReceiptVoucherData]);
 
   function handleEdit() {
     navigate(`${editRoute}${ReceiptVoucherID}`);
@@ -567,12 +575,7 @@ export function ReceiptEntryForm({ mode, userRights }) {
         <>
           <div className="mt-4">
             <ButtonToolBar
-              editDisable={mode !== "view"}
-              cancelDisable={mode === "view"}
-              addNewDisable={mode === "edit" || mode === "new"}
-              deleteDisable={mode === "edit" || mode === "new"}
-              saveDisable={mode === "view"}
-              saveLabel={mode === "edit" ? "Update" : "Save"}
+              mode={mode}
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {

@@ -35,9 +35,13 @@ function AppConfiguration() {
   });
   const { user } = useContext(AuthContext);
 
-  useKeyCombinationHook(() => {
-    handleSubmit(onSubmit)();
-  }, "s");
+  useKeyCombinationHook(
+    () => {
+      handleSubmit(onSubmit)();
+    },
+    "s",
+    true
+  );
 
   useEffect(() => {
     async function fetchCompanyInfo() {

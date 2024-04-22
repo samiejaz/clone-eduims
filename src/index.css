@@ -726,3 +726,11 @@ a {
 .rounded {
   border-radius: 0.375rem;
 }
+
+.unresize-textarea {
+  resize: none;
+}
+
+.unresize-textarea::-webkit-scrollbar {
+  display: none;
+}

@@ -5,6 +5,7 @@ import React, { useRef, useState } from "react";
 import {
   ShowErrorToast,
   convertBase64StringToFile,
+  downloadFile,
 } from "../../utils/CommonFunctions";
 import { CustomSpinner } from "../CustomSpinner";
 import { useClickOutside } from "primereact/hooks";
@@ -34,7 +35,11 @@ const SingleFileUpload = React.forwardRef(
 
     React.useImperativeHandle(ref, () => ({
       getFile() {
-        return currentFile;
+        if (currentFile) {
+          return currentFile;
+        } else {
+          return inputRef.current?.files[0];
+        }
       },
       setFile(file) {
         setCurrentFile(file);
@@ -44,16 +49,16 @@ const SingleFileUpload = React.forwardRef(
       },
       setBase64File(base64String) {
         try {
-          //  setIsLoading(true);
-          console.log(base64String);
           const file = convertBase64StringToFile(base64String, true);
           setCurrentFile(file);
-          // setIsLoading(false);
         } catch (e) {
           ShowErrorToast(e.message);
         }
       },
       removeFile() {
+        setCurrentFile(null);
+      },
+      emptyInputField() {
         setCurrentFile(null);
       },
     }));
@@ -133,6 +138,7 @@ const SingleFileUpload = React.forwardRef(
                     />
                   </>
                 )}
+
                 <Button
                   label="Remove"
                   icon="pi pi-times"
@@ -145,6 +151,22 @@ const SingleFileUpload = React.forwardRef(
                   className="rounded w-full p-button-text"
                   disabled={currentFile === null || mode === "view"}
                 />
+
+                {mode === "view" && (
+                  <>
+                    <Button
+                      label="Download"
+                      icon="pi pi-download"
+                      onClick={() => {
+                        downloadFile(currentFile);
+                      }}
+                      severity="primary "
+                      type="button"
+                      className="rounded w-full"
+                      disabled={currentFile === null}
+                    />
+                  </>
+                )}
               </div>
 
               <input

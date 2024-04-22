@@ -551,7 +551,6 @@ function LeadIntroductionForm({ mode, userRights }) {
   }
 
   function onSubmit(data) {
-    console.log(data);
     data.ContactPersonWhatsAppNo = data.ContactPersonWhatsAppNo?.replaceAll(
       "-",
       ""
@@ -560,7 +559,6 @@ function LeadIntroductionForm({ mode, userRights }) {
       "-",
       ""
     );
-    console.log(data);
 
     mutation.mutate({
       formData: data,

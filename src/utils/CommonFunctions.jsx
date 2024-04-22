@@ -115,3 +115,13 @@ export function formatDateAndTime(dateString) {
 
   return formattedDate;
 }
+
+export const downloadFile = (file) => {
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", file.name);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
