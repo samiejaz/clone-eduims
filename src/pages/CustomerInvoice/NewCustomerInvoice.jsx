@@ -342,7 +342,6 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
   // Ref
   const detailTableRef = useRef();
   const customerCompRef = useRef();
-  const customerBranchRef = useRef();
   const invoiceInstallmentRef = useRef();
   const nullBranchRef = useRef();
   // Form
@@ -354,12 +353,13 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
     queryKey: [
       QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY,
       {
-        CustomerInvoiceID: +CustomerInvoiceID,
+        CustomerInvoiceID: CustomerInvoiceID,
       },
     ],
     queryFn: () => fetchCustomerInvoiceById(CustomerInvoiceID, user.userID),
     enabled: CustomerInvoiceID !== undefined,
     initialData: [],
+    refetchOnWindowFocus: false,
   });
 
   const { data: BusinessUnitSelectData } = useQuery({
@@ -367,6 +367,7 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
     enabled: mode !== "",
+    refetchOnWindowFocus: false,
   });
 
   const CustomerInvoiceMutation = useMutation({
@@ -722,13 +723,16 @@ function SessionSelect({ mode }) {
   const { data } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
     queryFn: fetchAllSessionsForSelect,
-    initialData: [],
+    // Caching data for 10 mins
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
 
   const method = useFormContext();
 
   useEffect(() => {
-    if (data.length > 0 && mode === "new") {
+    if (data && data.length > 0 && mode === "new") {
       method.setValue("SessionID", data[0]?.SessionID);
     }
   }, [data, mode]);
@@ -767,13 +771,17 @@ const CustomerDependentFields = React.forwardRef(
     const { data: customerSelectData } = useQuery({
       queryKey: [QUERY_KEYS.ALL_CUSTOMER_QUERY_KEY],
       queryFn: fetchAllOldCustomersForSelect,
-      initialData: [],
+      refetchOnWindowFocus: false,
+      staleTime: 600000,
+      refetchInterval: 600000,
     });
 
     const { data: CustomerAccounts } = useQuery({
       queryKey: [QUERY_KEYS.CUSTOMER_ACCOUNTS_QUERY_KEY, CustomerID],
       queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
-      initialData: [],
+      refetchOnWindowFocus: false,
+      staleTime: 600000,
+      refetchInterval: 600000,
     });
 
     React.useImperativeHandle(ref, () => ({
@@ -850,12 +858,14 @@ function BusinessUnitDependantFields({ mode }) {
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
-    initialData: [],
     enabled: mode !== "",
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
 
   useEffect(() => {
-    if (BusinessUnitSelectData.length > 0) {
+    if (BusinessUnitSelectData?.length > 0) {
       method.setValue(
         "BusinessUnitID",
         BusinessUnitSelectData[0].BusinessUnitID
@@ -1149,7 +1159,9 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
-    initialData: [],
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
   const { data: ProductsInfoSelectData } = useQuery({
     queryKey: [
@@ -1157,12 +1169,16 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
       BusinessUnitID,
     ],
     queryFn: () => fetchAllProductsForSelect(BusinessUnitID),
-    initialData: [],
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
   const { data: ServicesInfoSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.SERVICES_SELECT_QUERY_KEY, BusinessUnitID],
     queryFn: () => fetchAllServicesForSelect(BusinessUnitID),
-    initialData: [],
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
 
   React.useImperativeHandle(ref, () => ({
@@ -1380,6 +1396,7 @@ const BranchSelectField = () => {
     queryFn: () => fetchAllCustomerBranchesData(AccountID),
     enabled: AccountID !== 0,
     initialData: [],
+    refetchOnWindowFocus: false,
   });
 
   return (

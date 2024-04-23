@@ -218,7 +218,8 @@ export function CCard({
         </div>
         <div>
           <p style={{ fontSize: "0.9rem" }}>
-            <span style={{ color: "#22C55E" }}>23 new</span> since last week
+            <span style={{ color: "#22C55E" }}>{Value} new</span> since last
+            week
           </p>
         </div>
       </div>

@@ -50,7 +50,8 @@ function UserProfile({ showProfile, handleCloseProfile }) {
         return [];
       }
     },
-    initialData: [],
+    refetchOnWindowFocus: false,
+    staleTime: 100 * 60 * 60 * 60 * 24,
   });
 
   const userProfileMutation = useMutation({

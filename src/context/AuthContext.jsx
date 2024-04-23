@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -49,6 +49,6 @@ export const AuthProvier = ({ children }) => {
 };
 
 export function useUserData() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = useContext(AuthContext);
   return user;
 }

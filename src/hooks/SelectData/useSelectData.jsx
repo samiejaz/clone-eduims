@@ -21,7 +21,7 @@ import {
   fetchAllTehsilsForSelect,
   fetchAllUsersForSelect,
 } from "../../api/SelectData";
-import { QUERY_KEYS, SELECT_QUERY_KEYS } from "../../utils/enums";
+import { SELECT_QUERY_KEYS } from "../../utils/enums";
 
 // Activation Customers
 export function useActivationClientsSelectData(OldCustomerID = 0) {
@@ -223,7 +223,9 @@ export function useAllDepartmentsSelectData() {
   const data = useQuery({
     queryKey: [SELECT_QUERY_KEYS.DEPARTMENT_SELECT_QUERY_KEY],
     queryFn: () => fetchAllDepartmentsForSelect(),
-    initialData: [],
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
   return data;
 }
@@ -233,7 +235,9 @@ export function useAllUsersSelectData() {
   const data = useQuery({
     queryKey: [SELECT_QUERY_KEYS.USERS_SELECT_QUERY_KEY],
     queryFn: () => fetchAllUsersForSelect(),
-    initialData: [],
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
   });
   return data;
 }

@@ -12,11 +12,16 @@ const POSTMEHTOD = "LeadIntroductionInsertUpdate";
 
 // URL: /data_LeadIntroduction/GetLeadIntroductionWhere?LoginUserID=??
 export async function fetchAllLeadIntroductions(LoginUserID) {
-  const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LoginUserID=${LoginUserID}`
-  );
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LoginUserID=${LoginUserID}`
+    );
 
-  return data.data ?? [];
+    return data.data ?? [];
+  } catch (err) {
+    ShowErrorToast(err.message);
+    return [];
+  }
 }
 
 // URL: /data_LeadIntroduction/GetLeadIntroductionWhere?LeadIntroductionID=??&LoginUserID=??

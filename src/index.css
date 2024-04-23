@@ -734,3 +734,7 @@ a {
 .unresize-textarea::-webkit-scrollbar {
   display: none;
 }
+
+.p-dropdown-label.p-inputtext {
+  margin: auto;
+}

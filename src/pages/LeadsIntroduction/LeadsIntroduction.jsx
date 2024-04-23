@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { CustomSpinner } from "../../components/CustomSpinner";
 import { Button } from "primereact/button";
@@ -21,7 +21,6 @@ import {
 } from "../../api/LeadIntroductionData";
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
 import { LeadsIntroductionFormComponent } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook";
-import { Menu } from "primereact/menu";
 import { Dialog } from "primereact/dialog";
 import {
   useAllDepartmentsSelectData,
@@ -45,6 +44,7 @@ import LeadsComments from "./LeadsComments";
 import { encryptID } from "../../utils/crypto";
 import { SingleFileUploadField } from "../../components/Forms/form";
 import { ShowErrorToast } from "../../utils/CommonFunctions";
+import { Dropdown } from "primereact/dropdown";
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
 let editRoute = `${parentRoute}/edit/`;
@@ -193,8 +193,11 @@ export function LeadIntroductionDetail({
   });
 
   const [filters, setFilters] = useState({
-    Status: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    VoucherDate: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    Status: { value: null, matchMode: FilterMatchMode.EQUALS },
+    VoucherDate: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+    },
     CompanyName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ContactPersonName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ContactPersonMobileNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -317,6 +320,61 @@ export function LeadIntroductionDetail({
     );
   };
 
+  const statusItemTemplate = (option) => {
+    return <Tag value={option} style={{ background: getSeverity(option) }} />;
+  };
+
+  const [statuses] = useState([
+    "New Lead",
+    "Finalized",
+    "Quoted",
+    "Acknowledged",
+    "Meeting Done",
+    "Closed",
+    "Forwarded",
+  ]);
+
+  const statusRowFilterTemplate = (options) => {
+    return (
+      <Dropdown
+        value={options.value}
+        options={statuses}
+        onChange={(e) => options.filterApplyCallback(e.value)}
+        itemTemplate={statusItemTemplate}
+        placeholder="Select One"
+        className="p-column-filter"
+        showClear
+        style={{ minWidth: "12rem" }}
+      />
+    );
+  };
+
+  const dateFilterTemplate = (options) => {
+    console.log(options);
+    return (
+      <Calendar
+        value={options.value}
+        onChange={(e) => options.filterCallback(e.value, options.index)}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+      />
+    );
+  };
+
+  const dateBodyTemplate = (rowData) => {
+    return formatDate(rowData.VoucherDate);
+  };
+
+  const formatDate = (value) => {
+    value = new Date(value);
+    return value.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -371,7 +429,6 @@ export function LeadIntroductionDetail({
             ></Column>
             <Column
               field="Status"
-              filter
               filterPlaceholder="Search by status"
               sortable
               header="Current Status"
@@ -379,13 +436,19 @@ export function LeadIntroductionDetail({
               filterMenuStyle={{ width: "14rem" }}
               style={{ minWidth: "12rem" }}
               body={statusBodyTemplate}
+              filter
+              filterElement={statusRowFilterTemplate}
             ></Column>
             <Column
               field="VoucherDate"
-              filter
-              filterPlaceholder="Search by company"
-              sortable
               header="Date"
+              filterField="VoucherDate"
+              dataType="date"
+              style={{ minWidth: "10rem" }}
+              body={dateBodyTemplate}
+              filter
+              filterElement={dateFilterTemplate}
+              sortable
             ></Column>
             <Column
               field="CompanyName"

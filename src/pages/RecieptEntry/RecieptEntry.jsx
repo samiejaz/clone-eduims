@@ -1,4 +1,4 @@
-import { Row, Form, Col, Spinner, Dropdown } from "react-bootstrap";
+import { Row, Form, Col, Spinner } from "react-bootstrap";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
@@ -56,6 +56,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
 import { encryptID } from "../../utils/crypto";
+import { Dropdown } from "primereact/dropdown";
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -226,12 +227,7 @@ function ReceiptEntrySearch({ userRights }) {
     );
   };
   const statusItemTemplate = (option) => {
-    return (
-      <Tag
-        value={option}
-        style={{ background: getSeverity(rowData.ReceiptMode) }}
-      />
-    );
+    return <Tag value={option} style={{ background: getSeverity(option) }} />;
   };
 
   const [statuses] = useState(["Cash", "Online", "Instrument", "Cheque", "DD"]);
@@ -245,6 +241,7 @@ function ReceiptEntrySearch({ userRights }) {
         itemTemplate={statusItemTemplate}
         placeholder="Select One"
         className="p-column-filter"
+        showClear
         style={{ minWidth: "12rem" }}
       />
     );
