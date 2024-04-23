@@ -1,7 +1,7 @@
 ## Installation
 
 ```sh
-cd clone-eduims
+cd eduims
 npm i
 npm run dev
 ```
