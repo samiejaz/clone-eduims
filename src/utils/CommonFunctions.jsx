@@ -91,7 +91,7 @@ export async function PrintReportInNewTabWithLoadingToast({
   try {
     toast.loading(toastLoadingMessage, {
       toastId: "printReportLoading",
-      position: "bottom-left",
+      position: "top-right",
     });
 
     let url =
@@ -114,7 +114,7 @@ export async function PrintReportInNewTabWithLoadingToast({
     }, 0);
     toast.dismiss("printReportLoading");
     toast.success(toastSuccessMessage, {
-      position: "bottom-left",
+      position: "top-right",
     });
   } catch (e) {
     toast.dismiss("printReportLoading");

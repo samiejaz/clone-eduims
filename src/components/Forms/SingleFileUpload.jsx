@@ -36,7 +36,7 @@ const SingleFileUpload = React.forwardRef(
     React.useImperativeHandle(ref, () => ({
       getFile() {
         if (currentFile) {
-          return currentFile;
+          return inputRef.current?.files[0];
         } else {
           return inputRef.current?.files[0];
         }
@@ -135,7 +135,7 @@ const SingleFileUpload = React.forwardRef(
                       severity="info"
                       type="button"
                       className="rounded w-full"
-                      disabled={currentFile === null || mode === "view"}
+                      disabled={currentFile === null}
                     />
                   </>
                 )}

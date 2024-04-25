@@ -9,6 +9,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { confirmDialog } from "primereact/confirmdialog";
 import { InputText } from "primereact/inputtext";
 import { UserRightsContext } from "../../context/UserRightContext";
+import { finalFilteredRoutes } from "../../utils/routes";
 
 const CSidebar = ({ sideBarRef, searchInputRef }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -153,7 +154,7 @@ export const SignOut = () => {
 
 const SubSidebar = () => {
   const { filteredRoutes } = useContext(UserRightsContext);
-
+  console.log(filteredRoutes);
   return (
     <>
       {filteredRoutes?.map((route) => (
@@ -162,7 +163,7 @@ const SubSidebar = () => {
           menuGroupName={route.menuGroupName}
           subItems={route.subItems}
           icon={route.icon}
-          hideMenuGroup={route?.hideMenuGroup}
+          hideMenuGroup={!route?.AllowAllRoles}
         />
       ))}
     </>
