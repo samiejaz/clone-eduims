@@ -112,6 +112,10 @@ const useCustomerEntryHook = () => {
     customerAccountsForm.reset(customerAccountsForm);
   }
 
+  function handleSetCustomerID(id) {
+    setCustomerID(id);
+  }
+
   const dialogs = [
     {
       header: "Customer Entry",
@@ -197,8 +201,8 @@ const useCustomerEntryHook = () => {
                 customerEntryFrom.handleSubmit(customerHandleSubmit)();
               }
             }}
+            severity="success"
             loading={customerMutaion.isPending}
-            className="p-button-p text-center"
             disabled={dialogIndex === dialogs.length - 1}
           />
         </>
@@ -213,8 +217,8 @@ const useCustomerEntryHook = () => {
               }
             }}
             type="button"
+            severity="success"
             disabled={dialogIndex === 0}
-            className="p-button-p text-center"
           />
         </>
       )}

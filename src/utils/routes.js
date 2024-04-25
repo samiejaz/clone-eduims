@@ -50,7 +50,6 @@ export const routes = [
       },
     ],
   },
-
   {
     menuGroupName: "Users",
     icon: "pi pi-users",
@@ -175,29 +174,6 @@ export const routesWithUserRights = routes.map((route) => {
   return updatedRoute;
 });
 
-export const initRoutesWithUserRights = () => {
-  const userRights = JSON.parse(localStorage.getItem("userRights"));
-  if (userRights?.length > 0) {
-    return userRights;
-  } else {
-    const updatedRoutes = routes.map((route) => {
-      const updatedRoute = { ...route, AllowAllRoles: false };
-
-      updatedRoute.subItems = route.subItems.map((subItem) => ({
-        ...subItem,
-        RoleNew: true,
-        RoleEdit: true,
-        RoleDelete: true,
-        RolePrint: true,
-        ShowForm: true,
-      }));
-
-      return updatedRoute;
-    });
-    return updatedRoutes;
-  }
-};
-
 // Authorized Routes
 export let authorizedRoutes = ["allowAll"];
 
@@ -206,10 +182,9 @@ const filteredRoutes = routes.map((route) => {
   if (authorizedRoutes[0] === "allowAll") {
     return { ...route };
   } else {
-    const filteredSubItems = route.subItems.filter((subItem) =>
-      authorizedRoutes.includes(subItem.menuKey)
-    );
-
+    const filteredSubItems = route.subItems.filter((subItem) => {
+      return authorizedRoutes.includes(subItem.menuKey);
+    });
     if (filteredSubItems.length > 0) {
       return { ...route, subItems: filteredSubItems };
     }
@@ -243,3 +218,164 @@ export function checkForUserRights({
     },
   ];
 }
+
+export const initRoutesWithUserRights = (routes) => {
+  const userRights = [];
+
+  if (userRights?.length > 0) {
+    return userRights;
+  } else {
+    const updatedRoutes = finalFilteredRoutes.map((route) => {
+      const updatedRoute = { ...route, AllowAllRoles: true };
+
+      updatedRoute.subItems = route.subItems.map((subItem) => ({
+        ...subItem,
+        RoleNew: true,
+        RoleEdit: true,
+        RoleDelete: true,
+        RolePrint: true,
+        ShowForm: true,
+      }));
+
+      return updatedRoute;
+    });
+    return updatedRoutes;
+  }
+};
+
+// New Routes
+export const initAuthorizedMenus = (allForms) => {
+  // const allForms = [
+  //   {
+  //     menuName: "Users",
+  //     menuKey: "mnuUsers",
+  //     routeUrl: "/general/users",
+  //     menuGroupKey: "grpUsers",
+  //     menuGroupname: "Users",
+  //     RoleEdit: true,
+  //     RoleNew: true,
+  //     RoleDelete: true,
+  //     ShowForm: false,
+  //     RolePrint: true,
+  //   },
+  //   {
+  //     menuName: "Customers",
+  //     menuKey: "mnuCustomers",
+  //     routeUrl: "/general/customers",
+  //     menuGroupKey: "grpUsers",
+  //     menuGroupname: "Users",
+  //     RoleEdit: true,
+  //     RoleNew: true,
+  //     RoleDelete: true,
+  //     ShowForm: true,
+  //     RolePrint: true,
+  //   },
+  //   {
+  //     menuName: "Invoice",
+  //     menuKey: "mnuInvoices",
+  //     routeUrl: "/accounts/customerinvoice",
+  //     menuGroupKey: "grpAccounts",
+  //     menuGroupname: "Accounts",
+  //     RoleEdit: true,
+  //     RoleNew: true,
+  //     RoleDelete: true,
+  //     ShowForm: false,
+  //     RolePrint: true,
+  //   },
+  // ];
+
+  const menuGroupIcons = {
+    Users: "pi pi-users",
+    Accounts: "pi pi-dollar",
+    General: "pi pi-home",
+    Utilities: "pi pi-cog",
+    Leads: "pi pi-phone",
+  };
+
+  const groupedForms = allForms.reduce((acc, form) => {
+    if (!acc[form.menuGroupname]) {
+      acc[form.menuGroupname] = [];
+    }
+    acc[form.menuGroupname].push(form);
+    return acc;
+  }, {});
+
+  // const transformedRoutes = Object.entries(groupedForms).map(
+  //   ([menuGroupName, forms]) => ({
+  //     menuGroupName,
+  //     icon: menuGroupIcons[menuGroupName] || "pi pi-question",
+  //     menuGroupKey: forms[0].menuGroupKey,
+  //     subItems: forms.map((form) => ({
+  //       name: form.menuName,
+  //       menuKey: form.menuKey,
+  //       route: form.routeUrl,
+  //     })),
+  //   })
+  // );
+
+  const transformedRoutes = Object.entries(groupedForms).map(
+    ([menuGroupName, forms]) => {
+      const hideMenuGroup = forms.every((form) => !form.ShowForm);
+      return {
+        menuGroupName,
+        icon: menuGroupIcons[menuGroupName] || "pi pi-question",
+        menuGroupKey: forms[0].menuGroupKey,
+        subItems: forms.map((form) => ({
+          name: form.menuName,
+          menuKey: form.menuKey,
+          route: form.routeUrl,
+          RoleNew: form.RoleNew,
+          RoleEdit: form.RoleEdit,
+          RoleDelete: form.RoleDelete,
+          RolePrint: form.RolePrint,
+          ShowForm: form.ShowForm,
+        })),
+        hideMenuGroup,
+        AllowAllRoles: forms.some((form) => form.ShowForm === true),
+      };
+    }
+  );
+  // const userRightsRoutes =
+  //   initAuthorizedRoutesWithUserRights(transformedRoutes);
+  return transformedRoutes;
+};
+
+function convertBackToOriginal() {
+  let originalForms = [];
+
+  let transformedRoutes = initAuthorizedMenus();
+  transformedRoutes.forEach((group) => {
+    group.subItems.forEach((subItem) => {
+      originalForms.push({
+        menuName: subItem.name,
+        menuKey: subItem.menuKey,
+        routeUrl: subItem.route,
+        menuGroupKey: group.menuGroupKey,
+        menuGroupname: group.menuGroupName,
+        RoleEdit: subItem.RoleEdit,
+        RoleNew: subItem.RoleNew,
+        RoleDelete: subItem.RoleDelete,
+        ShowForm: subItem.ShowForm,
+        RolePrint: subItem.RolePrint,
+      });
+    });
+  });
+  return originalForms;
+}
+export const initAuthorizedRoutesWithUserRights = (routes) => {
+  const updatedRoutes = routes.map((route) => {
+    const updatedRoute = { ...route, AllowAllRoles: true };
+
+    updatedRoute.subItems = route.subItems.map((subItem) => ({
+      ...subItem,
+      RoleNew: true,
+      RoleEdit: true,
+      RoleDelete: true,
+      RolePrint: true,
+      ShowForm: true,
+    }));
+
+    return updatedRoute;
+  });
+  return updatedRoutes;
+};

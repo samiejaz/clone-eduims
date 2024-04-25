@@ -155,12 +155,12 @@ export async function addLeadIntroductionOnAction({
       }
       newFormData.append("Amount", formData.Amount ?? 1900);
       newFormData.append("Description", formData.Description ?? "");
-      if (fileData) {
-        newFormData.append("FileType", formData.FileType);
-        newFormData.append("FileName", formData.FileName);
-        newFormData.append("FilePath", formData.FilePath);
-        newFormData.append("FullFilePath", formData.FullFilePath);
-      }
+      // if (fileData) {
+      //   newFormData.append("FileType", formData.FileType);
+      //   newFormData.append("FileName", formData.FileName);
+      //   newFormData.append("FilePath", formData.FilePath);
+      //   newFormData.append("FullFilePath", formData.FullFilePath);
+      // }
       Status = from === "Quoted" ? "Quoted" : "Finalized";
     } else if (from === "Closed") {
       newFormData.append("Amount", formData.Amount ?? 100);
@@ -260,6 +260,6 @@ export async function getLeadsFile(filename) {
     ShowErrorToast(err.message, {
       autoClose: false,
     });
-    return null;
+    return { name: null };
   }
 }

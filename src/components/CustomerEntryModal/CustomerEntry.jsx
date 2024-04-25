@@ -17,6 +17,8 @@ function CustomerEntry(props) {
     register,
     setValue,
     control,
+    clearErrors,
+    reset,
     formState: { errors },
   } = useFormContext();
 
@@ -35,6 +37,7 @@ function CustomerEntry(props) {
 
   useEffect(() => {
     if (CustomerID !== 0 && CustomerData?.data) {
+      clearErrors();
       setValue("CustomerName", CustomerData?.data[0]?.CustomerName);
       setValue(
         "CustomerBusinessName",
@@ -42,16 +45,22 @@ function CustomerEntry(props) {
       );
       setValue(
         "CustomerBusinessAddress",
-        CustomerData?.data[0]?.CustomerBusinessAddress
+        CustomerData?.data[0]?.CustomerBusinessAddress ?? ""
       );
-      setValue("ContactPerson1Name", CustomerData?.data[0]?.ContactPerson1Name);
-      setValue("ContactPerson1No", CustomerData?.data[0]?.ContactPerson1No);
+      setValue(
+        "ContactPerson1Name",
+        CustomerData?.data[0]?.ContactPerson1Name ?? ""
+      );
+      setValue(
+        "ContactPerson1No",
+        CustomerData?.data[0]?.ContactPerson1No ?? ""
+      );
       setValue(
         "ContactPerson1Email",
-        CustomerData?.data[0]?.ContactPerson1Email
+        CustomerData?.data[0]?.ContactPerson1Email ?? ""
       );
-      setValue("Description", CustomerData?.data[0]?.Description);
-      setValue("InActive", CustomerData?.data[0]?.InActive);
+      setValue("Description", CustomerData?.data[0]?.Description ?? "");
+      setValue("InActive", CustomerData?.data[0]?.InActive ?? "");
     }
   }, [CustomerID, CustomerData]);
 
@@ -68,6 +77,7 @@ function CustomerEntry(props) {
                 ID={"CustomerName"}
                 focusOptions={() => setFocus("CustomerBusinessName")}
                 isEnable={isEnable}
+                required={true}
               />
             </div>
           </FormColumn>
@@ -80,6 +90,7 @@ function CustomerEntry(props) {
                 ID={"CustomerBusinessName"}
                 focusOptions={() => setFocus("CustomerBusinessAddress")}
                 isEnable={isEnable}
+                required={true}
               />
             </div>
           </FormColumn>

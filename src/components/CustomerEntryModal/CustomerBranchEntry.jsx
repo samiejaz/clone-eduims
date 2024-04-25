@@ -72,19 +72,21 @@ function CustomerBranchEntryHeader(props) {
   const { CustomerID, pageTitles, isEnable } = props;
   const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
-  const { control, handleSubmit, reset, setValue, watch } = useForm({
-    defaultValues: {
-      CustomerBranch: [],
-      BranchAddress: "",
-      ContactPersonName: "",
-      ContactPersonNo: "",
-      ContactPersonEmail: "",
-      Description: "",
-      InActive: false,
-      CreateNewAccount: false,
-      CustomerAccounts: [],
-    },
-  });
+  const { control, handleSubmit, reset, setValue, watch, resetField } = useForm(
+    {
+      defaultValues: {
+        CustomerBranch: [],
+        BranchAddress: "",
+        ContactPersonName: "",
+        ContactPersonNo: "",
+        ContactPersonEmail: "",
+        Description: "",
+        InActive: false,
+        CreateNewAccount: false,
+        CustomerAccounts: [],
+      },
+    }
+  );
 
   const { data: CustomersBranch } = useQuery({
     queryKey: ["customersBranch"],
@@ -101,11 +103,12 @@ function CustomerBranchEntryHeader(props) {
   const customerBranchMutation = useMutation({
     mutationFn: async (formData) => {
       let AccountIDs = [];
+      console.log(formData);
       if (formData?.CustomerAccounts?.length > 0) {
-        AccountIDs = formData?.CustomerAccounts?.map((b, i) => {
+        AccountIDs = formData?.CustomerAccounts?.map((AccountID, i) => {
           return {
             RowID: i + 1,
-            AccountID: b.AccountID,
+            AccountID: AccountID,
             CreateNewAccount: 0,
           };
         });
@@ -122,7 +125,7 @@ function CustomerBranchEntryHeader(props) {
       let DataToSend = {
         CustomerBranchID: 0,
         CustomerID: CustomerID,
-        BranchID: formData?.CustomerBranch?.BranchID,
+        BranchID: formData?.CustomerBranch,
         BranchAddress: formData?.BranchAddress,
         ContactPersonName: formData?.ContactPersonName,
         ContactPersonNo: formData?.ContactPersonNo,
@@ -166,6 +169,8 @@ function CustomerBranchEntryHeader(props) {
     }
   }
 
+  const createNewLedger = watch("CreateNewAccount");
+
   return (
     <>
       <form
@@ -192,6 +197,7 @@ function CustomerBranchEntryHeader(props) {
                 optionLabel="BranchTitle"
                 optionValue="BranchID"
                 placeholder="Select a branch"
+                required={true}
               />
             </div>
           </FormColumn>
@@ -205,11 +211,12 @@ function CustomerBranchEntryHeader(props) {
               <CMultiSelectField
                 control={control}
                 name="CustomerAccounts"
-                disabled={watch("CreateNewAccount")}
+                disabled={createNewLedger}
                 options={CustomerAccounts}
                 optionLabel="AccountTitle"
                 optionValue="AccountID"
                 placeholder="Select an account"
+                required={!createNewLedger}
               />
             </div>
           </FormColumn>
@@ -222,7 +229,7 @@ function CustomerBranchEntryHeader(props) {
                 Label={"Create New Ledger"}
                 isEnable={isEnable}
                 onChange={() => {
-                  setValue("CustomerAccounts", []);
+                  resetField("CustomerAccounts");
                 }}
               />
             </div>
@@ -373,11 +380,12 @@ function CustomerBranchesDataTable(props) {
   const customerAccountEntryMutation = useMutation({
     mutationFn: async (formData) => {
       let AccountIDs = [];
+      console.log(formData);
       if (formData?.CustomerAccounts?.length > 0) {
-        AccountIDs = formData?.CustomerAccounts?.map((b, i) => {
+        AccountIDs = formData?.CustomerAccounts?.map((AccountID, i) => {
           return {
             RowID: i + 1,
-            AccountID: b.AccountID,
+            AccountID: AccountID,
             CreateNewAccount: 0,
           };
         });
@@ -394,7 +402,7 @@ function CustomerBranchesDataTable(props) {
       let DataToSend = {
         CustomerBranchID: formData?.CustomerBranchID,
         CustomerID: CustomerID,
-        BranchID: formData?.CustomerBranch?.BranchID,
+        BranchID: formData?.CustomerBranch,
         BranchAddress: formData?.BranchAddress,
         ContactPersonName: formData?.ContactPersonName,
         ContactPersonNo: formData?.ContactPersonNo,
@@ -529,6 +537,8 @@ function CustomerBranchesDataTable(props) {
     handleDeleteClose();
     setIdToDelete(0);
   }
+
+  const createNewLedger = watch("CreateNewAccount");
 
   return (
     <>
@@ -699,6 +709,7 @@ function CustomerBranchesDataTable(props) {
                         optionLabel="BranchTitle"
                         optionValue="BranchID"
                         placeholder="Select a branch"
+                        required={true}
                       />
                     </div>
                   </FormColumn>
@@ -710,11 +721,12 @@ function CustomerBranchesDataTable(props) {
                     <CMultiSelectField
                       control={control}
                       name="CustomerAccounts"
-                      disabled={watch("CreateNewAccount")}
+                      disabled={createNewLedger}
                       options={CustomerAccounts}
                       optionLabel="AccountTitle"
                       optionValue="AccountID"
                       placeholder="Select an account"
+                      required={!createNewLedger}
                     />
                   </FormColumn>
                   <FormColumn lg={4} xl={4} md={6}>

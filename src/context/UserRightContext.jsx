@@ -17,6 +17,7 @@ export const UserRightsProivder = ({ children }) => {
     setRoutesWithUserRights(allRoutesWithUserRights);
   }, [routes]);
 
+  /* When all routes with rights will be saved */
   const checkForUserRights = useCallback(
     ({ MenuKey, MenuGroupKey }) => {
       let ShowForm = false;
