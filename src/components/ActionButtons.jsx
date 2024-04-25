@@ -6,10 +6,13 @@ function ActionButtons({
   handleDelete,
   handleEdit,
   handleView,
+  handlePrint,
   showEditButton = true,
   showDeleteButton = true,
   showViewButton = true,
   viewBtnRoute = "",
+  showPrintBtn = false,
+  children,
 }) {
   return (
     <>
@@ -53,7 +56,6 @@ function ActionButtons({
           ) : null}
         </>
       )}
-
       {showEditButton ? (
         <>
           <Button
@@ -79,7 +81,6 @@ function ActionButtons({
           </Button>
         </>
       ) : null}
-
       {!showDeleteButton ? null : (
         <>
           <Button
@@ -101,6 +102,21 @@ function ActionButtons({
           </Button>
         </>
       )}
+      {showPrintBtn && (
+        <>
+          <>
+            <Button
+              size="sm"
+              id="delete"
+              variant="outline-primary"
+              onClick={() => handlePrint()}
+            >
+              <i className="pi pi-print"></i>
+            </Button>
+          </>
+        </>
+      )}
+      {children}
     </>
   );
 }

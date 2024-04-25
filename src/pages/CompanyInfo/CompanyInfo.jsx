@@ -4,21 +4,17 @@ import { useMutation } from "@tanstack/react-query";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
-import {
-  convertBase64StringToFile,
-  preventFormByEnterKeySubmission,
-} from "../../utils/CommonFunctions";
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
 import {
   FormColumn,
   FormRow,
   FormLabel,
 } from "../../components/Layout/LayoutComponents";
-import TextInput from "../../components/Forms/TextInput";
-import ImageContainer from "../../components/ImageContainer";
+import { TextInput, TextAreaField } from "../../components/Forms/form";
 import { Tooltip } from "react-bootstrap";
-import { Button } from "primereact/button";
 import SimpleToolbar from "../../components/Toolbars/SimpleToolbar";
 import { useKeyCombinationHook } from "../../hooks/hooks";
+import SingleFileUpload from "../../components/Forms/SingleFileUpload";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -71,8 +67,10 @@ function CompanyInfo() {
         setValue("AuthorityPersonNo", data?.data[0]?.AuthorityPersonNo);
         setValue("AuthorityPersonEmail", data?.data[0]?.AuthorityPersonEmail);
         setValue("Description", data?.data[0]?.Description);
-        imageRef.current.src =
-          "data:image/png;base64," + data?.data[0]?.CompanyLogo;
+        imageRef.current.setBase64File(
+          "data:image/png;base64," + data?.data[0]?.CompanyLogo
+        );
+
         setReload(false);
       }
     }
@@ -107,13 +105,8 @@ function CompanyInfo() {
         newFormData.append("Description", formData?.Description || "");
         newFormData.append("EntryUserID", user.userID);
 
-        if (imageRef.current.src !== "" || imageRef.current.src !== undefined) {
-          let businessUnitFile = convertBase64StringToFile(
-            imageRef.current.src,
-            true
-          );
-          newFormData.append("logo", businessUnitFile);
-        }
+        let businessUnitFile = imageRef.current?.getFile();
+        newFormData.append("logo", businessUnitFile);
 
         const { data } = await axios.post(
           apiUrl + "/EduIMS/CompanyInfoInsertUpdate",
@@ -272,7 +265,7 @@ function CompanyInfo() {
           <FormRow>
             <FormColumn lg={12} xl={12} md={6}>
               <FormLabel>Description</FormLabel>
-              <input
+              {/* <input
                 as={"textarea"}
                 rows={1}
                 className="form-control"
@@ -281,12 +274,19 @@ function CompanyInfo() {
                   fontSize: "0.8em",
                 }}
                 {...register("Description")}
-              />
+              /> */}
+              <div>
+                <TextAreaField
+                  control={control}
+                  name={"Description"}
+                  autoResize={true}
+                />
+              </div>
             </FormColumn>
           </FormRow>
 
           <FormRow>
-            <FormColumn lg={6} xl={6}>
+            <FormColumn lg={12} xl={12}>
               <Tooltip target=".custom-target-icon" />
               <FormLabel className="relative">
                 Logo
@@ -305,7 +305,8 @@ function CompanyInfo() {
                 ></i>
               </FormLabel>
               <div>
-                <ImageContainer imageRef={imageRef} />
+                {/* <ImageContainer imageRef={imageRef} /> */}
+                <SingleFileUpload ref={imageRef} accept="image/*" />
               </div>
             </FormColumn>
           </FormRow>

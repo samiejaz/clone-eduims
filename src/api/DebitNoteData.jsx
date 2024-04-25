@@ -92,11 +92,8 @@ export async function addNewDebitNote({ formData, userID, DebitNoteID = 0 }) {
         DebitNoteDetail: JSON.stringify(DebitNoteDetail),
       };
 
-      if (
-        DebitNoteID === 0 ||
-        DebitNoteID === undefined ||
-        DebitNoteID === null
-      ) {
+      DebitNoteID = decryptID(DebitNoteID);
+      if (DebitNoteID === 0 || DebitNoteID === undefined) {
         DataToSend.DebitNoteID = 0;
       } else {
         DataToSend.DebitNoteID = DebitNoteID;

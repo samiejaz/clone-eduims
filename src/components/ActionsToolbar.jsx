@@ -1,10 +1,10 @@
 import React from "react";
 import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
-import useKeyCombination from "../../hooks/useKeyCombinationHook";
+import useKeyCombination from "../hooks/useKeyCombinationHook";
 import { confirmDialog } from "primereact/confirmdialog";
 import { useMutation } from "@tanstack/react-query";
-import { PrintReportInNewTab } from "../../utils/CommonFunctions";
+import { PrintReportInNewTab } from "../utils/CommonFunctions";
 
 export default function ButtonToolBar({
   printLoading = false,
@@ -241,11 +241,11 @@ export default function ButtonToolBar({
   );
 }
 
-const PrintRecordButton = ({ getPrintFromUrl, printDisable }) => {
+const PrintRecordButton = ({ getPrintFromUrl, printDisable, fullUrl }) => {
   const mutation = useMutation({
     mutationFn: () =>
       PrintReportInNewTab({
-        controllerName: getPrintFromUrl,
+        controllerName: getPrintFromUrl || fullUrl,
       }),
   });
 

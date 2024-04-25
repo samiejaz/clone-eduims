@@ -82,6 +82,46 @@ export async function PrintReportInNewTab({ controllerName, fullUrl = "" }) {
   }
 }
 
+export async function PrintReportInNewTabWithLoadingToast({
+  controllerName,
+  fullUrl = "",
+  toastLoadingMessage = "Generating report...",
+  toastSuccessMessage = "Report generated successfully",
+}) {
+  try {
+    toast.loading(toastLoadingMessage, {
+      toastId: "printReportLoading",
+      position: "bottom-left",
+    });
+
+    let url =
+      fullUrl !== "" ? fullUrl : `${apiUrl}/Reports/${controllerName}&Export=p`;
+    const { data } = await axios.post(url);
+
+    const win = window.open("");
+    let html = "";
+
+    html += "<html>";
+    html += '<body style="margin:0!important">';
+    html +=
+      '<embed width="100%" height="100%" src="data:application/pdf;base64,' +
+      data +
+      '" type="application/pdf" />';
+    html += "</body>";
+    html += "</html>";
+    setTimeout(() => {
+      win.document.write(html);
+    }, 0);
+    toast.dismiss("printReportLoading");
+    toast.success(toastSuccessMessage, {
+      position: "bottom-left",
+    });
+  } catch (e) {
+    toast.dismiss("printReportLoading");
+    toast.error("Error generating report: " + e.message);
+  }
+}
+
 export function ShowErrorToast(message = "") {
   if (message !== "") {
     toast.error(message, {

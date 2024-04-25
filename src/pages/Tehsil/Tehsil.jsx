@@ -8,7 +8,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm } from "react-hook-form";
-import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
+import ButtonToolBar from "../../components/ActionsToolbar";
 import TextInput from "../../components/Forms/TextInput";
 import CheckBox from "../../components/Forms/CheckBox";
 import { AuthContext, useUserData } from "../../context/AuthContext";

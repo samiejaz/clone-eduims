@@ -9,6 +9,7 @@ const CTextArea = ({
   required,
   rows = 1,
   cols = 1,
+  autoResize = false,
   ...options
 }) => {
   return (
@@ -24,6 +25,20 @@ const CTextArea = ({
             rows={rows}
             style={{ width: "100%" }}
             className={classNames({ "p-invalid": fieldState.error })}
+            autoResize={autoResize}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const start = e.target.selectionStart;
+                const end = e.target.selectionEnd;
+                const newText =
+                  e.target.value.substring(0, start) +
+                  "\n" +
+                  e.target.value.substring(end);
+                e.target.value = newText;
+                e.target.selectionStart = e.target.selectionEnd = start + 1;
+              }
+            }}
             {...options}
           />
         </>

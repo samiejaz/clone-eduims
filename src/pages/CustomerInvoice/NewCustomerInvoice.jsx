@@ -38,7 +38,7 @@ import {
   fetchCustomerInvoiceById,
   fetchAllCustomerInvoices,
 } from "../../api/CustomerInvoiceData";
-import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
+import ButtonToolBar from "../../components/ActionsToolbar";
 
 import {
   MENU_KEYS,
@@ -68,6 +68,8 @@ import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
 import { decryptID, encryptID } from "../../utils/crypto";
 import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields";
+import { TextAreaField } from "../../components/Forms/form";
+import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks";
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
 let editRoute = `${parentRoute}/edit/`;
@@ -171,6 +173,7 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
     handleDelete,
     handleEdit,
   });
+  const { handlePrintReport } = usePrintReportAsPDF();
 
   const [filters, setFilters] = useState({
     SessionBasedVoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -265,11 +268,17 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
                   showDeleteButton: userRights[0]?.RoleDelete,
                   viewBtnRoute:
                     viewRoute + encryptID(rowData.CustomerInvoiceID),
+                  showPrintBtn: true,
+                  handlePrint: () =>
+                    handlePrintReport({
+                      getPrintFromUrl:
+                        "InvoicePrint?CustomerInvoiceID=" +
+                        rowData.CustomerInvoiceID,
+                    }),
                 })
               }
               header="Actions"
               resizeable={false}
-              style={{ minWidth: "7rem", maxWidth: "7rem", width: "7rem" }}
             ></Column>
             <Column
               field="SessionBasedVoucherNo"
@@ -1107,7 +1116,7 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
         <Row>
           <Form.Group as={Col} className="col-9">
             <Form.Label>Description</Form.Label>
-            <Form.Control
+            {/* <Form.Control
               as={"textarea"}
               rows={1}
               className="form-control"
@@ -1116,7 +1125,8 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
                 fontSize: "0.8em",
               }}
               {...method.register("DetailDescription")}
-            />
+            /> */}
+            <TextAreaField control={method.control} name={"Description"} />
           </Form.Group>
           <Form.Group as={Col} className="col-1">
             <Form.Label>Is Free</Form.Label>

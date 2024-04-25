@@ -2,7 +2,6 @@ import { Row, Form, Col, Spinner } from "react-bootstrap";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
-import { toast } from "react-toastify";
 import {
   useForm,
   useFieldArray,
@@ -14,10 +13,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ActionButtons from "../../components/ActionButtons";
 import { FilterMatchMode } from "primereact/api";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+
 import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import TextInput from "../../components/Forms/TextInput";
@@ -33,7 +30,7 @@ import {
   fetchMonthlyMaxReceiptNo,
   fetchReceiptVoucherById,
 } from "../../api/ReceiptVoucherData";
-import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
+import ButtonToolBar from "../../components/ActionsToolbar";
 
 import { Tag } from "primereact/tag";
 import {
@@ -55,8 +52,10 @@ import { CustomSpinner } from "../../components/CustomSpinner";
 import useConfirmationModal from "../../hooks/useConfirmationModalHook";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+import { decryptID, encryptID } from "../../utils/crypto";
 import { Dropdown } from "primereact/dropdown";
+import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks";
+import { ShowErrorToast } from "../../utils/CommonFunctions";
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -175,6 +174,8 @@ function ReceiptEntrySearch({ userRights }) {
     handleDelete,
     handleEdit,
   });
+
+  const { handlePrintReport } = usePrintReportAsPDF();
 
   const [filters, setFilters] = useState({
     BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -316,11 +317,18 @@ function ReceiptEntrySearch({ userRights }) {
                   showEditButton: userRights[0]?.RoleEdit,
                   showDeleteButton: userRights[0]?.RoleDelete,
                   viewBtnRoute: viewRoute + encryptID(rowData.ReceiptVoucherID),
+                  showPrintBtn: true,
+                  handlePrint: () =>
+                    handlePrintReport({
+                      getPrintFromUrl:
+                        "ReceiptVoucherPrint?ReceiptVoucherID=" +
+                        rowData.ReceiptVoucherID,
+                    }),
                 })
               }
               header="Actions"
               resizeable={false}
-              style={{ minWidth: "7rem", maxWidth: "7rem", width: "7rem" }}
+              // style={{ minWidth: "7rem", maxWidth: "7rem", width: "7rem" }}
             ></Column>
             <Column
               field="BusinessUnitName"
@@ -414,8 +422,9 @@ export function ReceiptEntryForm({ mode, userRights }) {
   const { data: ReceiptVoucherData } = useQuery({
     queryKey: [QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY, +ReceiptVoucherID],
     queryFn: () => fetchReceiptVoucherById(ReceiptVoucherID, user.userID),
-    enabled: ReceiptVoucherID !== undefined,
+    enabled: mode !== "new",
     initialData: [],
+    refetchOnWindowFocus: false,
   });
 
   const { data: BusinessUnitSelectData } = useQuery({
@@ -449,7 +458,6 @@ export function ReceiptEntryForm({ mode, userRights }) {
       ReceiptVoucherID !== undefined &&
       ReceiptVoucherData?.Master?.length > 0
     ) {
-      // Setting Values
       method.setValue("SessionID", ReceiptVoucherData?.Master[0]?.SessionID);
       method.setValue(
         "BusinessUnitID",
@@ -519,6 +527,8 @@ export function ReceiptEntryForm({ mode, userRights }) {
           };
         })
       );
+    } else {
+      navigate(parentRoute);
     }
   }, [ReceiptVoucherID, ReceiptVoucherData]);
 
@@ -590,7 +600,8 @@ export function ReceiptEntryForm({ mode, userRights }) {
               showEditButton={userRights[0]?.RoleEdit}
               showDelete={userRights[0]?.RoleDelete}
               getPrintFromUrl={
-                "ReceiptVoucherPrint?ReceiptVoucherID=" + ReceiptVoucherID
+                "ReceiptVoucherPrint?ReceiptVoucherID=" +
+                decryptID(ReceiptVoucherID)
               }
             />
           </div>

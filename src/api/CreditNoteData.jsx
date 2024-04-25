@@ -96,11 +96,8 @@ export async function addNewCreditNote({ formData, userID, CreditNoteID = 0 }) {
         CreditNoteDetail: JSON.stringify(CreditNoteDetail),
       };
 
-      if (
-        CreditNoteID === 0 ||
-        CreditNoteID === undefined ||
-        CreditNoteID === null
-      ) {
+      CreditNoteID = decryptID(CreditNoteID);
+      if (CreditNoteID === 0 || CreditNoteID === undefined) {
         DataToSend.CreditNoteID = 0;
       } else {
         DataToSend.CreditNoteID = CreditNoteID;

@@ -85,37 +85,35 @@ const NotificationHandler = ({ toast }) => {
   const connection = signalRConnectionManager.getConnection();
 
   useEffect(() => {
-    if (connection?.state === "connected") {
-      connection.on("ReceiveNotification", (message, route) => {
-        toast.current.show({
-          severity: "success",
-          summary: message,
-          sticky: true,
-          content: (props) => (
-            <div
-              className="flex flex-column"
-              style={{ flex: "1", justifyContent: "start" }}
+    connection.on("ReceiveNotification", (message, route) => {
+      toast.current.show({
+        severity: "success",
+        summary: message,
+        sticky: true,
+        content: (props) => (
+          <div
+            className="flex flex-column"
+            style={{ flex: "1", justifyContent: "start" }}
+          >
+            <Link
+              to={route}
+              style={{ alignSelf: "start", color: "#1ea97c" }}
+              onClick={() => toast.current.clear()}
             >
-              <Link
-                to={route}
-                style={{ alignSelf: "start", color: "#1ea97c" }}
-                onClick={() => toast.current.clear()}
+              <div
+                className="font-medium text-lg my-3 text-900 text-green-700"
+                style={{}}
               >
-                <div
-                  className="font-medium text-lg my-3 text-900 text-green-700"
-                  style={{}}
-                >
-                  {props.message.summary}
-                </div>
-              </Link>
-            </div>
-          ),
-        });
+                {props.message.summary}
+              </div>
+            </Link>
+          </div>
+        ),
       });
-      connection.on("ReceiveAllNotification", (message) => {
-        toast.current.show(message);
-      });
-    }
+    });
+    connection.on("ReceiveAllNotification", (message) => {
+      toast.current.show(message);
+    });
 
     return () => {
       connection?.off("ReceiveNotification");
