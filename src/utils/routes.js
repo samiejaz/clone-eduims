@@ -340,11 +340,11 @@ export const initAuthorizedMenus = (allForms) => {
   return transformedRoutes;
 };
 
-function convertBackToOriginal() {
+export function convertBackToOriginal() {
   let originalForms = [];
-
-  let transformedRoutes = initAuthorizedMenus();
-  transformedRoutes.forEach((group) => {
+  // let transformedRoutes = initAuthorizedMenus(routes);
+  // console.log(transformedRoutes);
+  routes.forEach((group) => {
     group.subItems.forEach((subItem) => {
       originalForms.push({
         menuName: subItem.name,

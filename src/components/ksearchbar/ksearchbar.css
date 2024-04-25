@@ -1,0 +1,119 @@
+/* variables.css */
+:root {
+    --primary-color: #06B6D4;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+
+
+    --ksearchbar-text-color: #4b5563;
+
+    --header-background-color: #343a40;
+}
+   
+::-webkit-scrollbar {
+    width: 5px; 
+}
+   
+   
+   ::-webkit-scrollbar-track {
+    background: #f1f1f1;  
+   }
+   
+   
+   ::-webkit-scrollbar-thumb {
+    background: var(--primary-color); 
+   }
+   
+   
+   ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color); 
+   }
+
+.ksearchbar-overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+   }
+   
+.ksearchbar-inner {
+    width: 45vw; 
+    height: 80vh; 
+    background-color: white; 
+    border-radius: 10px; 
+    padding: 20px; 
+}
+   
+
+.ksearchbar-list-container {
+    max-height: 85%; 
+    overflow-y: auto; 
+    padding: 0 10px; 
+    scroll-behavior: smooth;
+   }
+
+   
+.ksearchbar-list-item:last-child {
+    border-bottom: none;
+   }
+
+.ksearchbar-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid #dfe7ef;
+    border-radius: 5px;
+    color: var(--ksearchbar-text-color);
+    font-size: 0.9em;
+}
+
+.ksearchbar-list-item:hover,
+.ksearchbar-list-item:focus
+{
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    outline: none;
+}
+.ksearchbar-list-item > li:hover,
+.ksearchbar-list-item > li:focus
+{
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    outline: none;
+}
+
+.action-icons {
+    height: 18px;
+    width: 18px;
+    color: inherit;
+}
+
+.action-icons:hover {
+    color: inherit;
+}
+
+.recentText {
+    color: var(--primary-color);
+    font-weight: 400;
+    font-size: 0.85em;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    margin-left: 10px;
+}
+
