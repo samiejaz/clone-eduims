@@ -49,6 +49,7 @@ const SingleFileUpload = React.forwardRef(
       },
       setBase64File(base64String) {
         try {
+          debugger;
           const file = convertBase64StringToFile(base64String, true);
           setCurrentFile(file);
         } catch (e) {

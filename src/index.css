@@ -666,7 +666,7 @@ a {
 }
 .c-sidebar.c-close ~ .c-home-section {
   left: 78px;
-  width: calc(100% - 78px);
+  width: calc(100% - 80px);
 }
 .c-home-section .c-home-content {
   height: 30px;

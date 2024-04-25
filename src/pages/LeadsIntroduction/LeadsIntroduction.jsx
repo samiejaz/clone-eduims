@@ -8,7 +8,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { useForm, FormProvider, Controller } from "react-hook-form";
-import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
+import ButtonToolBar from "../../components/ActionsToolbar";
 import { Col, Form, Row } from "react-bootstrap";
 
 import { AuthContext, useUserData } from "../../context/AuthContext";

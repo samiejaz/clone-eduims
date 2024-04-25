@@ -30,7 +30,7 @@ import {
   fetchCreditNoteById,
   deleteCreditNoteByID,
 } from "../../api/CreditNoteData";
-import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
+import ButtonToolBar from "../../components/ActionsToolbar";
 import {
   MENU_KEYS,
   QUERY_KEYS,

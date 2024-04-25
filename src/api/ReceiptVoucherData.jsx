@@ -1,6 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { decryptID } from "../utils/crypto";
+import { decryptID, verifyAndReturnEncryptedIDForForms } from "../utils/crypto";
+import { ShowErrorToast } from "../utils/CommonFunctions";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -19,8 +20,7 @@ export async function fetchAllReceiptVoucheres(LoginUserID) {
 
 // URL: /data_ReceiptVoucher/GetReceiptVoucherWhere?ReceiptVoucherID=??&LoginUserID=??
 export async function fetchReceiptVoucherById(ReceiptVoucherID, LoginUserID) {
-  ReceiptVoucherID = decryptID(ReceiptVoucherID);
-
+  ReceiptVoucherID = verifyAndReturnEncryptedIDForForms(ReceiptVoucherID);
   if (ReceiptVoucherID === undefined || ReceiptVoucherID === 0) {
     return [];
   } else {
@@ -107,11 +107,8 @@ export async function addNewReceiptVoucher({
         DataToSend.InstrumentNo = formData.TransactionID;
       }
 
-      if (
-        ReceiptVoucherID === 0 ||
-        ReceiptVoucherID === undefined ||
-        ReceiptVoucherID === null
-      ) {
+      ReceiptVoucherID = decryptID(ReceiptVoucherID);
+      if (ReceiptVoucherID === 0 || ReceiptVoucherID === undefined) {
         DataToSend.ReceiptVoucherID = 0;
       } else {
         DataToSend.ReceiptVoucherID = ReceiptVoucherID;

@@ -9,7 +9,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import ActionButtons from "../../components/ActionButtons";
 import { Controller, useForm } from "react-hook-form";
-import ButtonToolBar from "../CustomerInvoice/CustomerInvoiceToolbar";
+import ButtonToolBar from "../../components/ActionsToolbar";
 import {
   FormRow,
   FormColumn,

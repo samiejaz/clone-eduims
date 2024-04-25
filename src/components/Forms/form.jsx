@@ -7,3 +7,4 @@ export { default as CNumberInput } from "./CNumberInput";
 export { default as CDropDownField } from "./CDropdown";
 export { default as CMultiSelectField } from "./CMultiSelect";
 export { default as SingleFileUploadField } from "./SingleFileUpload";
+export { default as TextAreaField } from "./CTextArea";
