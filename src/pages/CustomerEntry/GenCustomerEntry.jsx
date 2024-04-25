@@ -156,14 +156,15 @@ export function GenCustomerEntry({ userRights }) {
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  rowData.CustomerID,
-                  () => showDeleteDialog(rowData.CustomerID),
-                  () => showEditDialog(rowData.CustomerID),
-                  handleView,
-                  userRights[0]?.RoleEdit,
-                  userRights[0]?.RoleDelete
-                )
+                ActionButtons({
+                  ID: rowData.CustomerID,
+                  handleDelete: () => showDeleteDialog(rowData.CustomerID),
+                  handleEdit: () => showEditDialog(rowData.CustomerID),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + rowData.CustomerID,
+                })
               }
               header="Actions"
               resizeable={false}

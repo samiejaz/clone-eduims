@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { Form, Row, Col, ButtonGroup } from "react-bootstrap";
+import { Form, Col, ButtonGroup } from "react-bootstrap";
 import { Button } from "primereact/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Select from "react-select";
@@ -21,9 +21,14 @@ import { CustomerAccountEntryModal } from "../Modals/CustomerAccountEntryModal";
 import { AppConfigurationContext } from "../../context/AppConfigurationContext";
 import { deleteCustomerBranchByID } from "../../api/CustomerBranchData";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
-import { CustomSpinner } from "../CustomSpinner";
-import { CDropDownField, CMultiSelectField } from "../Forms/form";
+import {
+  CDropDownField,
+  CMultiSelectField,
+  TextInput,
+  CheckBox,
+} from "../Forms/form";
 import { AllCustomersBranchEntryModal } from "../Modals/AllCustomersBranchEntryModal";
+import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents";
 
 const BranchEntryContext = createContext();
 
@@ -67,15 +72,7 @@ function CustomerBranchEntryHeader(props) {
   const { CustomerID, pageTitles, isEnable } = props;
   const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
-  const {
-    register,
-    control,
-    handleSubmit,
-    watch,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm({
+  const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: {
       CustomerBranch: [],
       BranchAddress: "",
@@ -175,140 +172,146 @@ function CustomerBranchEntryHeader(props) {
         onSubmit={handleSubmit(onSubmit)}
         onKeyDown={preventFormByEnterKeySubmission}
       >
-        <Row>
-          <Form.Group as={Col} controlId="CustomerBranch">
-            <Form.Label>
+        <FormRow className="place-items-center">
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>
               {pageTitles?.branch || "Customer Branch"} Title
-            </Form.Label>
-            <span className="text-danger fw-bold ">*</span>
-            <AllCustomersBranchEntryModal
-              CustomerID={CustomerID}
-              pageTitles={pageTitles}
-            />
-            <CDropDownField
-              control={control}
-              name="CustomerBranch"
-              disabled={!isEnable}
-              options={CustomersBranch}
-              optionLabel="BranchTitle"
-              optionValue="BranchID"
-            />
-            <p className="text-danger">
-              {errors?.CustomerBusinessName?.message}
-            </p>
-          </Form.Group>
-          <Form.Group as={Col} controlId="CustomerAccounts">
-            <Form.Label>Customer Ledgers</Form.Label>
-            <span className="text-danger fw-bold ">*</span>
-            <CustomerAccountEntryModal CustomerID={CustomerID} />
-            <CMultiSelectField
-              control={control}
-              name="CustomerAccounts"
-              disabled={!isEnable}
-              options={CustomerAccounts}
-              optionLabel="AccountTitle"
-              optionValue="AccountID"
-            />
-          </Form.Group>
-          <Form.Group as={Col} controlId="CreateNewAccount">
-            <Form.Label></Form.Label>
-            <div className="form-control" style={{ marginTop: "5px" }}>
-              <Controller
+              <span className="text-danger fw-bold ">*</span>
+              <AllCustomersBranchEntryModal
+                CustomerID={CustomerID}
+                pageTitles={pageTitles}
+              />
+            </FormLabel>
+
+            <div>
+              <CDropDownField
                 control={control}
-                name="CreateNewAccount"
-                render={({ field: { onChange, value } }) => (
-                  <Form.Check
-                    disabled={!isEnable}
-                    aria-label="CreateNewAccount"
-                    label="Create New Ledger"
-                    value={value}
-                    onChange={(v) => {
-                      onChange(v);
-                      setValue("CustomerAccounts", []);
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </Form.Group>
-        </Row>
-
-        <Row>
-          <Form.Group controlId="BranchAddress">
-            <Form.Label>
-              {pageTitles?.branch || "Customer Branch"} Address
-            </Form.Label>
-            <Form.Control
-              disabled={!isEnable}
-              type="text"
-              placeholder=""
-              {...register("BranchAddress")}
-            />
-          </Form.Group>
-        </Row>
-
-        <Row>
-          <Form.Group as={Col} controlId="ContactPersonName">
-            <Form.Label>Contact Person Name</Form.Label>
-            <Form.Control
-              disabled={!isEnable}
-              type="text"
-              placeholder=""
-              {...register("ContactPersonName")}
-            />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId="ContactPersonNo">
-            <Form.Label>Contact Person No</Form.Label>
-            <Form.Control
-              disabled={!isEnable}
-              type="text"
-              placeholder=""
-              {...register("ContactPersonNo")}
-            />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId="ContactPersonEmail">
-            <Form.Label>Contact Person Email</Form.Label>
-            <Form.Control
-              disabled={!isEnable}
-              type="email"
-              placeholder=""
-              {...register("ContactPersonEmail")}
-            />
-          </Form.Group>
-        </Row>
-
-        <Row>
-          <Form.Group as={Col} controlId="Description">
-            <Form.Label>Descripiton</Form.Label>
-            <Form.Control
-              disabled={!isEnable}
-              type="text"
-              placeholder=""
-              name="email"
-              {...register("Description")}
-            />
-          </Form.Group>
-        </Row>
-
-        <Row>
-          <Form.Group as={Col} controlId="InActiveG" className="mt-2">
-            <div className="d-flex gap-2">
-              <Form.Check
+                name="CustomerBranch"
                 disabled={!isEnable}
-                aria-label="InActive"
-                id="InActive"
-                name="InActive"
-                {...register("InActive")}
+                options={CustomersBranch}
+                optionLabel="BranchTitle"
+                optionValue="BranchID"
+                placeholder="Select a branch"
               />
-              <Form.Label>InActive</Form.Label>
             </div>
-          </Form.Group>
-        </Row>
+          </FormColumn>
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>
+              Customer Ledgers
+              <span className="text-danger fw-bold ">*</span>
+              <CustomerAccountEntryModal CustomerID={CustomerID} />
+            </FormLabel>
+            <div>
+              <CMultiSelectField
+                control={control}
+                name="CustomerAccounts"
+                disabled={watch("CreateNewAccount")}
+                options={CustomerAccounts}
+                optionLabel="AccountTitle"
+                optionValue="AccountID"
+                placeholder="Select an account"
+              />
+            </div>
+          </FormColumn>
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel></FormLabel>
+            <div>
+              <CheckBox
+                control={control}
+                ID={"CreateNewAccount"}
+                Label={"Create New Ledger"}
+                isEnable={isEnable}
+                onChange={() => {
+                  setValue("CustomerAccounts", []);
+                }}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
 
-        <Row className="mt-2 mb-2">
-          <ButtonGroup className="gap-2">
+        <FormRow>
+          <FormColumn lg={12} xl={12} md={12}>
+            <FormLabel>
+              {pageTitles?.branch || "Customer Branch"} Address
+            </FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"BranchAddress"}
+                focusOptions={() => setFocus("ContactPersonName")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+
+        <FormRow>
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>Contact Person Name</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"ContactPersonName"}
+                focusOptions={() => setFocus("ContactPersonNo")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>Contact Person No</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"ContactPersonNo"}
+                focusOptions={() => setFocus("ContactPersonEmail")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+
+          <FormColumn lg={4} xl={4} md={6}>
+            <FormLabel>Contact Person Email</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"ContactPersonEmail"}
+                focusOptions={() => setFocus("Description")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+
+        <FormRow>
+          <FormColumn lg={12} xl={12} md={6}>
+            <FormLabel>Descripiton</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"Description"}
+                focusOptions={() => setFocus("InActive")}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+
+        <FormRow>
+          <FormColumn lg={4} xl={4} md={6}>
+            <div className="mt-2">
+              <CheckBox
+                control={control}
+                ID={"InActive"}
+                Label={"InActive"}
+                isEnable={isEnable}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+
+        <FormRow>
+          <div className="flex align-items-center gap-2 ml-2 mt-2">
             <Button
               disabled={!isEnable || customerBranchMutation.isPending}
               label={customerBranchMutation?.isPending ? `Adding...` : "Add"}
@@ -338,8 +341,8 @@ function CustomerBranchEntryHeader(props) {
               }}
               onClick={() => reset()}
             />
-          </ButtonGroup>
-        </Row>
+          </div>
+        </FormRow>
       </form>
     </>
   );
@@ -492,10 +495,7 @@ function CustomerBranchesDataTable(props) {
         "CustomerBranchID",
         CustomerBranchData?.BracnhInfo[0].CustomerBranchID
       );
-      setValue("CustomerBranch", {
-        BranchID: CustomerBranchData?.BracnhInfo[0].BranchID,
-        BranchTitle: CustomerBranchData?.BracnhInfo[0].BranchTitle,
-      });
+      setValue("CustomerBranch", CustomerBranchData?.BracnhInfo[0].BranchID);
       setValue(
         "BranchAddress",
         CustomerBranchData?.BracnhInfo[0].BranchAddress
@@ -514,7 +514,10 @@ function CustomerBranchesDataTable(props) {
       );
       setValue("Description", CustomerBranchData?.BracnhInfo[0].Description);
       setValue("InActive", CustomerBranchData?.BracnhInfo[0].InActive);
-      setValue("CustomerAccounts", CustomerBranchData?.Accounts);
+      setValue(
+        "CustomerAccounts",
+        CustomerBranchData?.Accounts.map((acc) => acc.AccountID)
+      );
     }
   }, [CustomerBranchID, CustomerBranchData]);
 
@@ -627,7 +630,7 @@ function CustomerBranchesDataTable(props) {
               header={`Edit ${pageTitles?.branch || "Customer Branch"}`}
               visible={visible}
               onHide={() => setVisible(false)}
-              style={{ width: "70vw", height: "65vh" }}
+              style={{ width: "80vw", height: "75vh" }}
               footer={
                 <>
                   {!isEnable ? (
@@ -676,163 +679,140 @@ function CustomerBranchesDataTable(props) {
                 onSubmit={handleSubmit(onSubmit)}
                 onKeyDown={preventFormByEnterKeySubmission}
               >
-                <Row>
-                  <Form.Group as={Col} controlId="CustomerBranchTitle">
-                    <Form.Label>
+                <FormRow className="place-items-center">
+                  <FormColumn lg={4} xl={4} md={6}>
+                    <FormLabel>
                       {pageTitles?.branch || "Customer Branch"} Title
-                    </Form.Label>
-                    <span className="text-danger fw-bold ">*</span>
-                    <AllCustomersBranchEntryModal
-                      CustomerID={CustomerID}
-                      pageTitles={pageTitles}
-                    />
-                    <Controller
-                      control={control}
-                      name="CustomerBranch"
-                      render={({ field: { onChange, value } }) => (
-                        <Select
-                          isDisabled={!isEnable}
-                          options={CustomersBranch}
-                          getOptionValue={(option) => option.BranchID}
-                          getOptionLabel={(option) => option.BranchTitle}
-                          value={value}
-                          onChange={(selectedOption) =>
-                            onChange(selectedOption)
-                          }
-                          placeholder={`Select a ${
-                            pageTitles?.branch || "Customer Branch"
-                          }`}
-                          noOptionsMessage={() =>
-                            `No ${
-                              pageTitles?.branch?.toLowerCase() ||
-                              "customer branch"
-                            } found!`
-                          }
-                        />
-                      )}
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col} controlId="Customers">
-                    <Form.Label>Customer Ledgers</Form.Label>
+                      <span className="text-danger fw-bold ">*</span>
+                      <AllCustomersBranchEntryModal
+                        CustomerID={CustomerID}
+                        pageTitles={pageTitles}
+                      />
+                    </FormLabel>
+
+                    <div>
+                      <CDropDownField
+                        control={control}
+                        name="CustomerBranch"
+                        disabled={!isEnable}
+                        options={CustomersBranch}
+                        optionLabel="BranchTitle"
+                        optionValue="BranchID"
+                        placeholder="Select a branch"
+                      />
+                    </div>
+                  </FormColumn>
+                  <FormColumn lg={4} xl={4} md={6}>
+                    <FormLabel>Customer Ledgers</FormLabel>
                     <span className="text-danger fw-bold ">*</span>
                     <CustomerAccountEntryModal CustomerID={CustomerID} />
-                    <Controller
+
+                    <CMultiSelectField
                       control={control}
                       name="CustomerAccounts"
-                      render={({ field: { onChange, value } }) => (
-                        <Select
-                          isDisabled={watch("CreateNewAccount") || !isEnable}
-                          options={CustomerAccounts}
-                          getOptionValue={(option) => option.AccountID}
-                          getOptionLabel={(option) => option.AccountTitle}
-                          value={value}
-                          onChange={(selectedOption) =>
-                            onChange(selectedOption)
-                          }
-                          placeholder="Select a ledger"
-                          noOptionsMessage={() => "No ledgers found!"}
-                          isClearable
-                          isMulti
-                        />
-                      )}
+                      disabled={watch("CreateNewAccount")}
+                      options={CustomerAccounts}
+                      optionLabel="AccountTitle"
+                      optionValue="AccountID"
+                      placeholder="Select an account"
                     />
-                  </Form.Group>
-                  <Form.Group as={Col} controlId="CreateNewAccount">
-                    <Form.Label></Form.Label>
+                  </FormColumn>
+                  <FormColumn lg={4} xl={4} md={6}>
+                    <FormLabel></FormLabel>
                     <div className="form-control" style={{ marginTop: "5px" }}>
-                      <Controller
+                      <CheckBox
                         control={control}
-                        name="CreateNewAccount"
-                        render={({ field: { onChange, value } }) => (
-                          <Form.Check
-                            aria-label="CreateNewAccount"
-                            label="Create New Ledger"
-                            value={value}
-                            onChange={(v) => {
-                              onChange(v);
-                              setValue("CustomerAccounts", []);
-                            }}
-                            disabled={!isEnable}
-                          />
-                        )}
+                        ID={"CreateNewAccount"}
+                        Label={"Create New Ledger"}
+                        isEnable={isEnable}
+                        onChange={() => {
+                          setValue("CustomerAccounts", []);
+                        }}
                       />
                     </div>
-                  </Form.Group>
-                </Row>
+                  </FormColumn>
+                </FormRow>
 
-                <Row>
-                  <Form.Group controlId="BranchAddress">
-                    <Form.Label>
+                <FormRow>
+                  <FormColumn>
+                    <FormLabel>
                       {pageTitles?.branch || "Customer Branch"} Address
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder=""
-                      {...register("BranchAddress")}
-                      disabled={!isEnable}
-                    />
-                  </Form.Group>
-                </Row>
-
-                <Row>
-                  <Form.Group as={Col} controlId="ContactPersonName">
-                    <Form.Label>Contact Person Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder=""
-                      {...register("ContactPersonName")}
-                      disabled={!isEnable}
-                    />
-                  </Form.Group>
-
-                  <Form.Group as={Col} controlId="ContactPersonNo">
-                    <Form.Label>Contact Person No</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder=""
-                      {...register("ContactPersonNo")}
-                      disabled={!isEnable}
-                    />
-                  </Form.Group>
-
-                  <Form.Group as={Col} controlId="ContactPersonEmail">
-                    <Form.Label>Contact Person Email</Form.Label>
-                    <Form.Control
-                      type="email"
-                      placeholder=""
-                      {...register("ContactPersonEmail")}
-                      disabled={!isEnable}
-                    />
-                  </Form.Group>
-                </Row>
-
-                <Row>
-                  <Form.Group as={Col} controlId="Description">
-                    <Form.Label>Descripiton</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder=""
-                      name="email"
-                      {...register("Description")}
-                      disabled={!isEnable}
-                    />
-                  </Form.Group>
-                </Row>
-
-                <Row>
-                  <Form.Group as={Col} controlId="InActiveG" className="mt-2">
-                    <div className="d-flex gap-2">
-                      <Form.Check
-                        aria-label="InActive"
-                        id="InActive"
-                        name="InActive"
-                        {...register("InActive")}
-                        disabled={!isEnable}
+                    </FormLabel>
+                    <div>
+                      <TextInput
+                        control={control}
+                        ID={"BranchAddress"}
+                        focusOptions={() => setFocus("ContactPersonName")}
+                        isEnable={isEnable}
                       />
-                      <Form.Label>InActive</Form.Label>
                     </div>
-                  </Form.Group>
-                </Row>
+                  </FormColumn>
+                </FormRow>
+
+                <FormRow>
+                  <FormColumn lg={4} xl={4} md={6}>
+                    <FormLabel>Contact Person Name</FormLabel>
+                    <div>
+                      <TextInput
+                        control={control}
+                        ID={"ContactPersonName"}
+                        focusOptions={() => setFocus("ContactPersonNo")}
+                        isEnable={isEnable}
+                      />
+                    </div>
+                  </FormColumn>
+
+                  <FormColumn lg={4} xl={4} md={6}>
+                    <FormLabel>Contact Person No</FormLabel>
+                    <div>
+                      <TextInput
+                        control={control}
+                        ID={"ContactPersonNo"}
+                        focusOptions={() => setFocus("ContactPersonEmail")}
+                        isEnable={isEnable}
+                      />
+                    </div>
+                  </FormColumn>
+
+                  <FormColumn lg={4} xl={4} md={6}>
+                    <FormLabel>Contact Person Email</FormLabel>
+                    <div>
+                      <TextInput
+                        control={control}
+                        ID={"ContactPersonEmail"}
+                        focusOptions={() => setFocus("Description")}
+                        isEnable={isEnable}
+                      />
+                    </div>
+                  </FormColumn>
+                </FormRow>
+
+                <FormRow>
+                  <FormColumn lg={12} xl={12} md={6}>
+                    <FormLabel>Descripiton</FormLabel>
+                    <div>
+                      <TextInput
+                        control={control}
+                        ID={"Description"}
+                        focusOptions={() => setFocus("InActive")}
+                        isEnable={isEnable}
+                      />
+                    </div>
+                  </FormColumn>
+                </FormRow>
+
+                <FormRow>
+                  <FormColumn lg={12} xl={12} md={6}>
+                    <div className="mt-2">
+                      <CheckBox
+                        control={control}
+                        ID={"InActive"}
+                        Label={"InActive"}
+                        isEnable={isEnable}
+                      />
+                    </div>
+                  </FormColumn>
+                </FormRow>
               </form>
             </Dialog>
           </div>

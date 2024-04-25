@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { Form, Row, Col, ButtonGroup } from "react-bootstrap";
+import { Form, ButtonGroup } from "react-bootstrap";
 import { Button } from "primereact/button";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,10 @@ import { Column } from "primereact/column";
 import { FilterMatchMode } from "primereact/api";
 import { Dialog } from "primereact/dialog";
 import useDeleteModal from "../../hooks/useDeleteModalHook";
+import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents";
+import TextInput from "../Forms/TextInput";
+import CheckBox from "../Forms/CheckBox";
+import { confirmDialog } from "primereact/confirmdialog";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -45,12 +49,7 @@ function CustomerAccountDataTableHeader(props) {
   const { CustomerID, isEnable, pageTitles } = props;
   const { user } = useContext(AuthContext);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
+  const { handleSubmit, reset, control } = useForm({
     defaultValues: {
       BranchTitle: "",
     },
@@ -97,67 +96,48 @@ function CustomerAccountDataTableHeader(props) {
 
   return (
     <>
-      <form
-        // onSubmit={handleSubmit(onSubmit)}
-        onKeyDown={preventFormByEnterKeySubmission}
-      >
-        <Row>
-          <Form.Group as={Col} controlId="BranchTitle">
-            <Form.Label>
+      <form onKeyDown={preventFormByEnterKeySubmission}>
+        <FormRow className="place-items-end">
+          <FormColumn lg={11} xl={11} sm={11}>
+            <FormLabel>
               {pageTitles?.branch || "Customer Branch"} Title
-            </Form.Label>
-            <div className="d-flex gap-2">
-              <Form.Control
-                type="text"
-                placeholder=""
-                disabled={!isEnable}
-                className="form-control"
-                {...register("BranchTitle", {
-                  required: `${
-                    pageTitles?.branch || "Customer Branch"
-                  } Title is required!`,
-                })}
+            </FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"BranchTitle"}
+                isEnable={isEnable}
+                required={true}
               />
-              <Button
-                severity="info"
-                className="px-4 py-2 rounded-1 "
-                onClick={() => {
-                  handleSubmit(onSubmit)();
-                }}
-                type="button"
-                disabled={
-                  !isEnable || AllCustomersBranchEntryMutation.isPending
-                }
-                label={
-                  AllCustomersBranchEntryMutation?.isPending
-                    ? `Adding...`
-                    : "Add"
-                }
-                loadingIcon={"pi pi-spin pi-spinner"}
-                loading={AllCustomersBranchEntryMutation.isPending}
-              ></Button>
             </div>
-            <p className="text-danger">{errors?.BranchTitle?.message}</p>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group
-            as={Col}
-            controlId="InActiveG"
-            style={{ marginTop: "-15px" }}
-          >
-            <div className="d-flex gap-2">
-              <Form.Check
-                aria-label="InActive"
-                id="InActive"
-                name="InActive"
-                {...register("InActive")}
-                disabled={!isEnable}
-              />
-              <Form.Label>InActive</Form.Label>
-            </div>
-          </Form.Group>
-        </Row>
+          </FormColumn>
+          <FormColumn lg={1} xl={1} sm={1}>
+            <Button
+              severity="info"
+              className="px-4 py-2 rounded-1 "
+              onClick={() => {
+                handleSubmit(onSubmit)();
+              }}
+              type="button"
+              disabled={!isEnable || AllCustomersBranchEntryMutation.isPending}
+              label={
+                AllCustomersBranchEntryMutation?.isPending ? `Adding...` : "Add"
+              }
+              loadingIcon={"pi pi-spin pi-spinner"}
+              loading={AllCustomersBranchEntryMutation.isPending}
+            ></Button>
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={2} xl={2} sm={2}>
+            <CheckBox
+              control={control}
+              ID={"InActive"}
+              Label={"InActive"}
+              isEnable={isEnable}
+            />
+          </FormColumn>
+        </FormRow>
       </form>
     </>
   );
@@ -172,20 +152,13 @@ function AllCustomersBranchDetailTable(props) {
   });
 
   const { user } = useContext(AuthContext);
-  const { register, setValue, handleSubmit } = useForm();
+  const { register, setValue, handleSubmit, control } = useForm();
 
   const { data: CustomerBranches } = useQuery({
     queryKey: ["allCustomerBranchesDetail"],
     queryFn: () => fetchAllCustomersBranch(user.userID),
     initialData: [],
   });
-
-  const {
-    render: DeleteModal,
-    handleShow: handleDeleteShow,
-    handleClose: handleDeleteClose,
-    setIdToDelete,
-  } = useDeleteModal(handleDelete);
 
   const AllCustomersBranchEntryMutation = useMutation({
     mutationFn: async (formData) => {
@@ -241,10 +214,20 @@ function AllCustomersBranchDetailTable(props) {
       BranchID: BranchID,
       LoginUserID: user.userID,
     });
-
-    handleDeleteClose();
-    setIdToDelete(0);
   }
+
+  const confirmDelete = (id) => {
+    confirmDialog({
+      message: "Are you sure you want to delete this record?",
+      header: "Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      position: "top",
+      accept: () => handleDelete(id),
+      reject: () => {},
+    });
+  };
 
   return (
     <>
@@ -297,7 +280,7 @@ function AllCustomersBranchDetailTable(props) {
                     width: "30px",
                   }}
                   onClick={() => {
-                    handleDeleteShow(rowData?.BranchID);
+                    confirmDelete(rowData?.BranchID);
                   }}
                 />
               </ButtonGroup>
@@ -359,37 +342,33 @@ function AllCustomersBranchDetailTable(props) {
               className="visually-hidden "
               style={{ display: "none" }}
             />
-            <Row>
-              <Form.Group as={Col} controlId="BranchTitle">
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={12} xl={12} sm={12}>
+                <FormLabel>
                   {pageTitles?.branch || "Customer Branch"} Title
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder=""
-                  required
-                  className="form-control"
-                  {...register("BranchTitle")}
-                />
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col} controlId="InActiveG" className="mt-2">
-                <div className="d-flex gap-2">
-                  <Form.Check
-                    aria-label="InActive"
-                    id="InActive"
-                    name="InActive"
-                    {...register("InActive")}
-                    disabled={!isEnable}
+                </FormLabel>
+                <div>
+                  <TextInput
+                    control={control}
+                    ID={"BranchTitle"}
+                    isEnable={isEnable}
+                    required={true}
                   />
-                  <Form.Label>InActive</Form.Label>
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={2} xl={2} sm={2}>
+                <CheckBox
+                  control={control}
+                  ID={"InActive"}
+                  Label={"InActive"}
+                  isEnable={isEnable}
+                />
+              </FormColumn>
+            </FormRow>
           </Dialog>
         </div>
-        {DeleteModal}
       </form>
     </>
   );

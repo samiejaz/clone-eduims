@@ -198,7 +198,6 @@ function CountryDetail({ userRights }) {
             resizableColumns
             size="small"
             selectionMode="single"
-            style={{ backgroundColor: "red" }}
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
           >
