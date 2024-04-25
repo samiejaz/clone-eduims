@@ -1,18 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Controller, FormProvider, useFormContext } from "react-hook-form";
+import React, { useContext, useEffect, useState } from "react"
+import { Controller, FormProvider, useFormContext } from "react-hook-form"
 import {
   fetchAllCustomerBranchesData,
   fetchAllProductsForSelect,
   fetchAllServicesForSelect,
-} from "../../../api/SelectData";
-import { useQuery } from "@tanstack/react-query";
-import { SELECT_QUERY_KEYS } from "../../../utils/enums";
-import { NumberInput } from "../../../components/Forms/form";
-import { InputSwitch } from "primereact/inputswitch";
-import { classNames } from "primereact/utils";
-import { Button } from "primereact/button";
-import CDropdown from "../../../components/Forms/CDropdown";
-import { CustomerBranchDataContext } from "../NewCustomerInvoice";
+} from "../../../api/SelectData"
+import { useQuery } from "@tanstack/react-query"
+import { SELECT_QUERY_KEYS } from "../../../utils/enums"
+import { NumberInput } from "../../../components/Forms/form"
+import { InputSwitch } from "primereact/inputswitch"
+import { classNames } from "primereact/utils"
+import { Button } from "primereact/button"
+import CDropdown from "../../../components/Forms/CDropdown"
+import { CustomerBranchDataContext } from "../NewCustomerInvoice"
 
 export const CustomerInvoiceDetailTableRowComponent = ({
   item,
@@ -23,16 +23,16 @@ export const CustomerInvoiceDetailTableRowComponent = ({
   pageTitles,
   remove,
 }) => {
-  const method = useFormContext();
-  const [invoiceType, setInvoiceType] = useState("");
-  const [isFree, setIsFree] = useState(false);
+  const method = useFormContext()
+  const [invoiceType, setInvoiceType] = useState("")
+  const [isFree, setIsFree] = useState(false)
 
   useEffect(() => {
     setInvoiceType(
       method.getValues(`CustomerInvoiceDetail.${index}.InvoiceType`)
-    );
-    setIsFree(method.getValues(`CustomerInvoiceDetail.${index}.IsFree`));
-  }, []);
+    )
+    setIsFree(method.getValues(`CustomerInvoiceDetail.${index}.IsFree`))
+  }, [])
 
   return (
     <>
@@ -60,22 +60,22 @@ export const CustomerInvoiceDetailTableRowComponent = ({
                   disabled={disable}
                   className={classNames({ "p-invalid": fieldState.error })}
                   onChange={(e) => {
-                    field.onChange(e.value);
-                    setIsFree(e.value);
+                    field.onChange(e.value)
+                    setIsFree(e.value)
                     if (e.value) {
-                      method.setValue(`CustomerInvoiceDetail.${index}.Rate`, 0);
+                      method.setValue(`CustomerInvoiceDetail.${index}.Rate`, 0)
                       method.setValue(
                         `CustomerInvoiceDetail.${index}.Amount`,
                         0
-                      );
+                      )
                       method.setValue(
                         `CustomerInvoiceDetail.${index}.Discount`,
                         0
-                      );
+                      )
                       method.setValue(
                         `CustomerInvoiceDetail.${index}.NetAmount`,
                         0
-                      );
+                      )
                     }
                   }}
                 />
@@ -94,12 +94,12 @@ export const CustomerInvoiceDetailTableRowComponent = ({
             disabled={disable}
             focusOptions={() => method.setFocus(`detail.${index}.BusinessUnit`)}
             onChange={(e) => {
-              setInvoiceType(e.value);
+              setInvoiceType(e.value)
               if (e.value === "Product") {
                 method.setValue(
                   `CustomerInvoiceDetail.${index}.ServiceInfoID`,
                   null
-                );
+                )
               }
             }}
           />
@@ -128,19 +128,19 @@ export const CustomerInvoiceDetailTableRowComponent = ({
             onChange={(e) => {
               const rate = parseFloat(
                 0 + method.getValues([`CustomerInvoiceDetail.${index}.Rate`])
-              );
+              )
               const disc = parseFloat(
                 0 +
                   method.getValues([`CustomerInvoiceDetail.${index}.Discount`])
-              );
+              )
               method.setValue(
                 `CustomerInvoiceDetail.${index}.Amount`,
                 e.value * rate
-              );
+              )
               method.setValue(
                 `CustomerInvoiceDetail.${index}.NetAmount`,
                 e.value * rate - disc
-              );
+              )
             }}
             disabled={disable}
             inputClassName="form-control"
@@ -155,19 +155,19 @@ export const CustomerInvoiceDetailTableRowComponent = ({
             onChange={(e) => {
               const qty = parseFloat(
                 0 + method.getValues([`CustomerInvoiceDetail.${index}.Qty`])
-              );
+              )
               const disc = parseFloat(
                 0 + method.getValues([`detail.${index}.Discount`])
-              );
+              )
               method.setValue(
                 `CustomerInvoiceDetail.${index}.Amount`,
                 e.value * qty
-              );
+              )
               method.setValue(
                 `CustomerInvoiceDetail.${index}.NetAmount`,
                 e.value * qty - disc
-              );
-              method.setValue(`CustomerInvoiceDetail.${index}.Rate`, e.value);
+              )
+              method.setValue(`CustomerInvoiceDetail.${index}.Rate`, e.value)
             }}
             disabled={disable || isFree}
             mode="decimal"
@@ -181,7 +181,7 @@ export const CustomerInvoiceDetailTableRowComponent = ({
             id={`CustomerInvoiceDetail.${index}.CGS`}
             control={method.control}
             onChange={(e) => {
-              method.setValue(`CustomerInvoiceDetail.${index}.CGS`, e.value);
+              method.setValue(`CustomerInvoiceDetail.${index}.CGS`, e.value)
             }}
             disabled={disable}
             mode="decimal"
@@ -208,12 +208,12 @@ export const CustomerInvoiceDetailTableRowComponent = ({
             onChange={(e) => {
               const amount = parseFloat(
                 0 + method.getValues([`CustomerInvoiceDetail.${index}.Amount`])
-              );
+              )
 
               method.setValue(
                 `CustomerInvoiceDetail.${index}.NetAmount`,
                 amount - e.value
-              );
+              )
             }}
             disabled={disable || isFree}
             mode="decimal"
@@ -265,8 +265,8 @@ export const CustomerInvoiceDetailTableRowComponent = ({
         </td>
       </tr>
     </>
-  );
-};
+  )
+}
 
 const BusinessUnitDependantRowFields = ({
   index,
@@ -275,9 +275,9 @@ const BusinessUnitDependantRowFields = ({
   invoiceType,
   pageTitles,
 }) => {
-  const [BusinessUnitID, setBusinessUnitID] = useState(0);
+  const [BusinessUnitID, setBusinessUnitID] = useState(0)
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   const { data: ProductsInfoSelectData } = useQuery({
     queryKey: [
@@ -287,7 +287,7 @@ const BusinessUnitDependantRowFields = ({
     ],
     queryFn: () => fetchAllProductsForSelect(BusinessUnitID),
     initialData: [],
-  });
+  })
   const { data: ServicesInfoSelectData } = useQuery({
     queryKey: [
       SELECT_QUERY_KEYS.SERVICES_SELECT_QUERY_KEY,
@@ -296,13 +296,13 @@ const BusinessUnitDependantRowFields = ({
     ],
     queryFn: () => fetchAllServicesForSelect(BusinessUnitID),
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     setBusinessUnitID(
       method.getValues(`CustomerInvoiceDetail.${index}.BusinessUnitID`)
-    );
-  }, []);
+    )
+  }, [])
 
   return (
     <>
@@ -317,8 +317,8 @@ const BusinessUnitDependantRowFields = ({
           required={true}
           disabled={disable}
           onChange={(e) => {
-            setBusinessUnitID(e.value);
-            method.setValue(`CustomerInvoiceDetail.${index}.ProductInfoID`, []);
+            setBusinessUnitID(e.value)
+            method.setValue(`CustomerInvoiceDetail.${index}.ProductInfoID`, [])
           }}
           filter={true}
           focusOptions={() => method.setFocus(`detail.${index}.BranchID`)}
@@ -358,19 +358,19 @@ const BusinessUnitDependantRowFields = ({
         />
       </td>
     </>
-  );
-};
+  )
+}
 
 const CustomerBranchDetailField = ({ pageTitles, index, disable }) => {
-  const method = useFormContext();
-  const { AccountID } = useContext(CustomerBranchDataContext);
+  const method = useFormContext()
+  const { AccountID } = useContext(CustomerBranchDataContext)
 
   const { data } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.CUSTOMER_BRANCHES_SELECT_QUERY_KEY, AccountID],
     queryFn: () => fetchAllCustomerBranchesData(AccountID),
     enabled: AccountID !== 0,
     initialData: [],
-  });
+  })
   return (
     <>
       <td>
@@ -392,5 +392,5 @@ const CustomerBranchDetailField = ({ pageTitles, index, disable }) => {
         />
       </td>
     </>
-  );
-};
+  )
+}

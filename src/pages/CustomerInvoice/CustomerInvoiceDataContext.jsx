@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { createContext } from "react";
+import { useState } from "react"
+import { createContext } from "react"
 
-export const CustomerInvoiceDataContext = createContext();
+export const CustomerInvoiceDataContext = createContext()
 
 export const CustomerInvoiceDataProivder = ({ children }) => {
-  const [CustomerInvoiceID, setCustomerInvoiceID] = useState(0);
-  const [isEnable, setIsEnable] = useState(true);
+  const [CustomerInvoiceID, setCustomerInvoiceID] = useState(0)
+  const [isEnable, setIsEnable] = useState(true)
 
   return (
     <CustomerInvoiceDataContext.Provider
@@ -18,13 +18,13 @@ export const CustomerInvoiceDataProivder = ({ children }) => {
     >
       {children}
     </CustomerInvoiceDataContext.Provider>
-  );
-};
+  )
+}
 
-export const InvoiceDataContext = createContext();
+export const InvoiceDataContext = createContext()
 
 export const InvoiceDataProivder = ({ children }) => {
-  const [BusinessUnitID, setBusinessUnitID] = useState(0);
+  const [BusinessUnitID, setBusinessUnitID] = useState(0)
 
   return (
     <InvoiceDataContext.Provider
@@ -35,5 +35,5 @@ export const InvoiceDataProivder = ({ children }) => {
     >
       {children}
     </InvoiceDataContext.Provider>
-  );
-};
+  )
+}

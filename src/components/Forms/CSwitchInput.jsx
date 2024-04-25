@@ -1,7 +1,7 @@
-import { InputSwitch } from "primereact/inputswitch";
-import { classNames } from "primereact/utils";
-import React from "react";
-import { Controller } from "react-hook-form";
+import { InputSwitch } from "primereact/inputswitch"
+import { classNames } from "primereact/utils"
+import React from "react"
+import { Controller } from "react-hook-form"
 
 const CSwitchInput = React.forwardRef(
   (
@@ -30,10 +30,10 @@ const CSwitchInput = React.forwardRef(
                 disabled={disabled}
                 className={classNames({ "p-invalid": fieldState.error })}
                 onChange={(e) => {
-                  field.onChange(e.value);
+                  field.onChange(e.value)
 
                   if (onChange) {
-                    onChange(e);
+                    onChange(e)
                   }
                 }}
               />
@@ -41,8 +41,8 @@ const CSwitchInput = React.forwardRef(
           )}
         />
       </>
-    );
+    )
   }
-);
+)
 
-export default CSwitchInput;
+export default CSwitchInput

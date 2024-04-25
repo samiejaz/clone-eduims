@@ -1,22 +1,22 @@
-import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
+import { toast } from "react-toastify"
+import { useForm } from "react-hook-form"
+import { useMutation } from "@tanstack/react-query"
+import { useContext, useEffect, useRef, useState } from "react"
+import { AuthContext } from "../../context/AuthContext"
+import axios from "axios"
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
 import {
   FormColumn,
   FormRow,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import { TextInput, TextAreaField } from "../../components/Forms/form";
-import { Tooltip } from "react-bootstrap";
-import SimpleToolbar from "../../components/Toolbars/SimpleToolbar";
-import { useKeyCombinationHook } from "../../hooks/hooks";
-import SingleFileUpload from "../../components/Forms/SingleFileUpload";
+} from "../../components/Layout/LayoutComponents"
+import { TextInput, TextAreaField } from "../../components/Forms/form"
+import { Tooltip } from "react-bootstrap"
+import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
+import { useKeyCombinationHook } from "../../hooks/hooks"
+import SingleFileUpload from "../../components/Forms/SingleFileUpload"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const defaultValues = {
   CompanyName: "",
@@ -29,84 +29,84 @@ const defaultValues = {
   AuthorityPersonNo: "",
   AuthorityPersonEmail: "",
   Description: "",
-};
+}
 
 function CompanyInfo() {
-  document.title = "Company Info";
-  const [CompanyInfo, setCompanyInfo] = useState([]);
-  const [reload, setReload] = useState(true);
-  const imageRef = useRef();
+  document.title = "Company Info"
+  const [CompanyInfo, setCompanyInfo] = useState([])
+  const [reload, setReload] = useState(true)
+  const imageRef = useRef()
 
   const { register, handleSubmit, control, setValue, setFocus } = useForm({
     defaultValues,
-  });
-  const { user } = useContext(AuthContext);
+  })
+  const { user } = useContext(AuthContext)
 
   useKeyCombinationHook(
     () => {
-      handleSubmit(onSubmit)();
+      handleSubmit(onSubmit)()
     },
     "s",
     true
-  );
+  )
 
   useEffect(() => {
     async function fetchCompanyInfo() {
       const { data } = await axios.post(
         `${apiUrl}/EduIMS/GetCompany?LoginUserID=${user.userID}`
-      );
+      )
       if (data.success === true) {
-        setCompanyInfo(data.data);
-        setValue("CompanyName", data?.data[0]?.CompanyName);
-        setValue("Address", data?.data[0]?.Address);
-        setValue("LandlineNo", data?.data[0]?.LandlineNo);
-        setValue("MobileNo", data?.data[0]?.MobileNo);
-        setValue("Email", data?.data[0]?.Email);
-        setValue("Website", data?.data[0]?.Website);
-        setValue("AuthorityPersonName", data?.data[0]?.AuthorityPersonName);
-        setValue("AuthorityPersonNo", data?.data[0]?.AuthorityPersonNo);
-        setValue("AuthorityPersonEmail", data?.data[0]?.AuthorityPersonEmail);
-        setValue("Description", data?.data[0]?.Description);
+        setCompanyInfo(data.data)
+        setValue("CompanyName", data?.data[0]?.CompanyName)
+        setValue("Address", data?.data[0]?.Address)
+        setValue("LandlineNo", data?.data[0]?.LandlineNo)
+        setValue("MobileNo", data?.data[0]?.MobileNo)
+        setValue("Email", data?.data[0]?.Email)
+        setValue("Website", data?.data[0]?.Website)
+        setValue("AuthorityPersonName", data?.data[0]?.AuthorityPersonName)
+        setValue("AuthorityPersonNo", data?.data[0]?.AuthorityPersonNo)
+        setValue("AuthorityPersonEmail", data?.data[0]?.AuthorityPersonEmail)
+        setValue("Description", data?.data[0]?.Description)
         imageRef.current.setBase64File(
           "data:image/png;base64," + data?.data[0]?.CompanyLogo
-        );
+        )
 
-        setReload(false);
+        setReload(false)
       }
     }
     if (reload) {
-      fetchCompanyInfo();
+      fetchCompanyInfo()
     }
-  }, [reload]);
+  }, [reload])
 
   const companyMutation = useMutation({
     mutationFn: async (formData) => {
       try {
-        let newFormData = new FormData();
-        newFormData.append("CompanyID", CompanyInfo[0]?.CompanyID);
-        newFormData.append("CompanyName", formData.CompanyName);
-        newFormData.append("Address", formData?.Address || "");
-        newFormData.append("LandlineNo", formData?.LandlineNo || "");
-        newFormData.append("MobileNo", formData?.MobileNo || "");
-        newFormData.append("Email", formData?.Email || "");
-        newFormData.append("Website", formData?.Website || "");
+        let newFormData = new FormData()
+        newFormData.append("CompanyID", CompanyInfo[0]?.CompanyID)
+        newFormData.append("CompanyName", formData.CompanyName)
+        newFormData.append("Address", formData?.Address || "")
+        newFormData.append("LandlineNo", formData?.LandlineNo || "")
+        newFormData.append("MobileNo", formData?.MobileNo || "")
+        newFormData.append("Email", formData?.Email || "")
+        newFormData.append("Website", formData?.Website || "")
         newFormData.append(
           "AuthorityPersonName",
           formData?.AuthorityPersonName || ""
-        );
+        )
         newFormData.append(
           "AuthorityPersonNo",
           formData?.AuthorityPersonNo || ""
-        );
+        )
         newFormData.append(
           "AuthorityPersonEmail",
           formData?.AuthorityPersonEmail || ""
-        );
-        newFormData.append("Description", formData?.Description || "");
-        newFormData.append("EntryUserID", user.userID);
+        )
+        newFormData.append("Description", formData?.Description || "")
+        newFormData.append("EntryUserID", user.userID)
 
-        let businessUnitFile = imageRef.current?.getFile();
-        newFormData.append("logo", businessUnitFile);
+        let businessUnitFile = imageRef.current?.getFile()
+        newFormData.append("logo", businessUnitFile)
 
         const { data } = await axios.post(
           apiUrl + "/EduIMS/CompanyInfoInsertUpdate",
@@ -116,26 +116,26 @@ function CompanyInfo() {
               "Content-Type": "multipart/form-data",
             },
           }
-        );
+        )
 
         if (data.success === true) {
-          toast.success("Company Info updated successfully!");
-          setReload(true);
+          toast.success("Company Info updated successfully!")
+          setReload(true)
         } else {
           toast.error(data.message, {
             autoClose: false,
-          });
+          })
         }
       } catch (error) {
         toast.error(error.message, {
           autoClose: false,
-        });
+        })
       }
     },
-  });
+  })
 
   function onSubmit(data) {
-    companyMutation.mutate(data);
+    companyMutation.mutate(data)
   }
 
   return (
@@ -313,7 +313,7 @@ function CompanyInfo() {
         </form>
       </div>
     </>
-  );
+  )
 }
 
-export default CompanyInfo;
+export default CompanyInfo

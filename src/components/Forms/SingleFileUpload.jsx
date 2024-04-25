@@ -1,15 +1,15 @@
-import { Button } from "primereact/button";
+import { Button } from "primereact/button"
 
-import { Image } from "primereact/image";
-import React, { useRef, useState } from "react";
+import { Image } from "primereact/image"
+import React, { useRef, useState } from "react"
 import {
   ShowErrorToast,
   convertBase64StringToFile,
   downloadFile,
-} from "../../utils/CommonFunctions";
-import { CustomSpinner } from "../CustomSpinner";
-import { useClickOutside } from "primereact/hooks";
-import { useKeyDownListnerHook } from "../../hooks/hooks";
+} from "../../utils/CommonFunctions"
+import { CustomSpinner } from "../CustomSpinner"
+import { useClickOutside } from "primereact/hooks"
+import { useKeyDownListnerHook } from "../../hooks/hooks"
 
 const SingleFileUpload = React.forwardRef(
   (
@@ -24,65 +24,65 @@ const SingleFileUpload = React.forwardRef(
     },
     ref
   ) => {
-    const [currentFile, setCurrentFile] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(false);
-    const [showPdf, setShowPdf] = useState(false);
+    const [currentFile, setCurrentFile] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(false)
+    const [showPdf, setShowPdf] = useState(false)
 
-    const imageRef = useRef();
-    const inputRef = useRef();
-    const overLayRef = useRef();
+    const imageRef = useRef()
+    const inputRef = useRef()
+    const overLayRef = useRef()
 
     React.useImperativeHandle(ref, () => ({
       getFile() {
         if (currentFile) {
-          return inputRef.current?.files[0];
+          return inputRef.current?.files[0]
         } else {
-          return inputRef.current?.files[0];
+          return inputRef.current?.files[0]
         }
       },
       setFile(file) {
-        setCurrentFile(file);
+        setCurrentFile(file)
       },
       setError() {
-        setError(true);
+        setError(true)
       },
       setBase64File(base64String) {
         try {
-          debugger;
-          const file = convertBase64StringToFile(base64String, true);
-          setCurrentFile(file);
+          debugger
+          const file = convertBase64StringToFile(base64String, true)
+          setCurrentFile(file)
         } catch (e) {
-          ShowErrorToast(e.message);
+          ShowErrorToast(e.message)
         }
       },
       removeFile() {
-        setCurrentFile(null);
+        setCurrentFile(null)
       },
       emptyInputField() {
-        setCurrentFile(null);
+        setCurrentFile(null)
       },
-    }));
+    }))
 
     const onFileChange = (e) => {
-      const file = e.target.files[0];
+      const file = e.target.files[0]
       if (file) {
-        setCurrentFile(file);
-        setError(false);
+        setCurrentFile(file)
+        setError(false)
       }
-    };
+    }
 
     useClickOutside(overLayRef, () => {
-      setShowPdf(false);
-    });
+      setShowPdf(false)
+    })
 
     useKeyDownListnerHook(
       () => {
-        setShowPdf(false);
+        setShowPdf(false)
       },
       ["Escape"],
       showPdf
-    );
+    )
 
     return (
       <>
@@ -144,8 +144,8 @@ const SingleFileUpload = React.forwardRef(
                   label="Remove"
                   icon="pi pi-times"
                   onClick={() => {
-                    setShowPdf(false);
-                    setCurrentFile(null);
+                    setShowPdf(false)
+                    setCurrentFile(null)
                   }}
                   severity="danger"
                   type="button"
@@ -159,7 +159,7 @@ const SingleFileUpload = React.forwardRef(
                       label="Download"
                       icon="pi pi-download"
                       onClick={() => {
-                        downloadFile(currentFile);
+                        downloadFile(currentFile)
                       }}
                       severity="primary "
                       type="button"
@@ -271,8 +271,8 @@ const SingleFileUpload = React.forwardRef(
           </>
         )}
       </>
-    );
+    )
   }
-);
+)
 
-export default SingleFileUpload;
+export default SingleFileUpload

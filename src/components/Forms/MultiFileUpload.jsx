@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./MultiFileUpload.css";
+import React, { useEffect, useRef, useState } from "react"
+import "./MultiFileUpload.css"
 import {
   Download,
   Eye,
@@ -9,57 +9,57 @@ import {
   X,
   ZoomIn,
   ZoomOut,
-} from "lucide-react";
+} from "lucide-react"
 
 const MultiFileUpload = React.forwardRef((props, ref) => {
   React.useImperativeHandle(ref, () => ({
     setAllFiles(data) {
-      setAllFiles(data);
+      setAllFiles(data)
     },
     getAllFiles,
-  }));
-  const { name, id } = props;
-  const [files, setFiles] = useState([]);
-  const [currentImage, setCurrentImage] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  }))
+  const { name, id } = props
+  const [files, setFiles] = useState([])
+  const [currentImage, setCurrentImage] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const fileInputRef = useRef();
+  const fileInputRef = useRef()
 
   function uploadBtnClick() {
-    fileInputRef.current?.click();
+    fileInputRef.current?.click()
   }
 
   function getAllFiles() {
-    return files;
+    return files
   }
 
   function setAllFiles(files) {
-    setFiles(files);
+    setFiles(files)
   }
 
   function onFileChange(e) {
-    const newFiles = Array.from(e.target.files);
-    setFiles([...files, ...newFiles]);
+    const newFiles = Array.from(e.target.files)
+    setFiles([...files, ...newFiles])
   }
 
   function removeFile(index) {
-    const updatedFiles = files.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
+    const updatedFiles = files.filter((_, i) => i !== index)
+    setFiles(updatedFiles)
   }
 
   function downloadFile(file) {
-    const url = URL.createObjectURL(file);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = file.name;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const url = URL.createObjectURL(file)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = file.name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   function openImageViewer(file) {
-    setCurrentImage(URL.createObjectURL(file));
-    setIsModalOpen(true);
+    setCurrentImage(URL.createObjectURL(file))
+    setIsModalOpen(true)
   }
 
   return (
@@ -164,31 +164,31 @@ const MultiFileUpload = React.forwardRef((props, ref) => {
         multiple
       />
     </>
-  );
-});
+  )
+})
 
-export default MultiFileUpload;
+export default MultiFileUpload
 
 // ImageViewerModal.js
 
 const ImageViewerModal = ({ isOpen, onClose, imageSrc }) => {
-  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomLevel, setZoomLevel] = useState(1)
 
-  const zoomIn = () => setZoomLevel((prev) => prev + 0.1);
-  const zoomOut = () => setZoomLevel((prev) => prev - 0.1);
+  const zoomIn = () => setZoomLevel((prev) => prev + 0.1)
+  const zoomOut = () => setZoomLevel((prev) => prev - 0.1)
 
   useEffect(() => {
     const closeOnEscapePressed = (e) => {
       if (e.key === "Escape") {
-        onClose();
+        onClose()
       }
-    };
+    }
 
-    window.addEventListener("keydown", closeOnEscapePressed);
-    return () => window.removeEventListener("keydown", closeOnEscapePressed);
-  }, [onClose]);
+    window.addEventListener("keydown", closeOnEscapePressed)
+    return () => window.removeEventListener("keydown", closeOnEscapePressed)
+  }, [onClose])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="s-modal-overlay" onClick={onClose}>
@@ -209,8 +209,8 @@ const ImageViewerModal = ({ isOpen, onClose, imageSrc }) => {
         >
           <SIconButton
             onClick={() => {
-              onClose();
-              setZoomLevel(1);
+              onClose()
+              setZoomLevel(1)
             }}
             icon={<X />}
             color="#fff"
@@ -231,8 +231,8 @@ const ImageViewerModal = ({ isOpen, onClose, imageSrc }) => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
 const SIconButton = ({ icon, onClick, color = "cyan" }) => {
   return (
@@ -246,5 +246,5 @@ const SIconButton = ({ icon, onClick, color = "cyan" }) => {
         {icon}
       </button>
     </>
-  );
-};
+  )
+}

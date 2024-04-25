@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { routes, routesWithUserRights } from "../../utils/routes";
-import { InputSwitch } from "primereact/inputswitch";
+import React, { useState, useEffect, useRef } from "react"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { routes, routesWithUserRights } from "../../utils/routes"
+import { InputSwitch } from "primereact/inputswitch"
 
 export default function UserRightsGroupedTableCellWise() {
-  const [expandedRows, setExpandedRows] = useState([]);
+  const [expandedRows, setExpandedRows] = useState([])
 
   const headerTemplate = (data) => {
     return (
@@ -14,37 +14,37 @@ export default function UserRightsGroupedTableCellWise() {
           {data.menuGroupName}
         </span>
       </React.Fragment>
-    );
-  };
+    )
+  }
   const RoleEditor = (options) => {
     return (
       <InputSwitch
         checked={options.value}
         onChange={(e) => options.editorCallback(e.value)}
       />
-    );
-  };
+    )
+  }
   const RoleEditTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleEdit} />;
-  };
+    return <InputSwitch checked={rowData.RoleEdit} />
+  }
   const RoleDeleteTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleDelete} />;
-  };
+    return <InputSwitch checked={rowData.RoleDelete} />
+  }
   const RoleNewTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleNew} />;
-  };
+    return <InputSwitch checked={rowData.RoleNew} />
+  }
   const RolePrintTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RolePrint} />;
-  };
+    return <InputSwitch checked={rowData.RolePrint} />
+  }
 
   const onCellEditComplete = (e) => {
-    let _routesWithUserRights = [...routesWithUserRights];
-    let { rowData, newValue, field, originalEvent: event } = e;
+    let _routesWithUserRights = [...routesWithUserRights]
+    let { rowData, newValue, field, originalEvent: event } = e
 
-    rowData[field] = newValue;
+    rowData[field] = newValue
 
     //   setProducts(_products);
-  };
+  }
 
   const bodyTemplate = (rowData) => {
     return (
@@ -94,8 +94,8 @@ export default function UserRightsGroupedTableCellWise() {
           ></Column>
         </DataTable>
       </>
-    );
-  };
+    )
+  }
 
   return (
     <div className="card">
@@ -118,5 +118,5 @@ export default function UserRightsGroupedTableCellWise() {
         ></Column>
       </DataTable>
     </div>
-  );
+  )
 }

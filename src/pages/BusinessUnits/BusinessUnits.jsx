@@ -1,58 +1,58 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 
-import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState, useRef, useContext } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { Controller, useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
+import { FilterMatchMode } from "primereact/api"
+import { useEffect, useState, useRef, useContext } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { Controller, useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+} from "../../components/Layout/LayoutComponents"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewBusinessUnit,
   deleteBusinessUnitByID,
   fetchAllBusinessUnits,
   fetchBusinessUnitById,
-} from "../../api/BusinessUnitData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import ImageContainer from "../../components/ImageContainer";
-import { ColorPicker } from "primereact/colorpicker";
-import { classNames } from "primereact/utils";
-import { Tooltip } from "primereact/tooltip";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
-import { SingleFileUploadField } from "../../components/Forms/form";
+} from "../../api/BusinessUnitData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import ImageContainer from "../../components/ImageContainer"
+import { ColorPicker } from "primereact/colorpicker"
+import { classNames } from "primereact/utils"
+import { Tooltip } from "primereact/tooltip"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
+import { SingleFileUploadField } from "../../components/Forms/form"
 
-let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY;
-let IDENTITY = "BusinessUnitID";
+let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY
+let IDENTITY = "BusinessUnitID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.BUSINESS_UNIT_FORM_KEY,
       MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -125,19 +125,19 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function BusinessUnitDetail({ userRights }) {
-  document.title = "Business Units";
+  document.title = "Business Units"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -145,38 +145,38 @@ function BusinessUnitDetail({ userRights }) {
     LandlineNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     MobileNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     Email: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllBusinessUnits(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessUnitByID,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
-      });
+      })
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       BusinessUnitID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -278,20 +278,20 @@ function BusinessUnitDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 
 function BusinessUnitForm({ mode, userRights }) {
-  document.title = "Business Unit Entry";
+  document.title = "Business Unit Entry"
 
-  const queryClient = useQueryClient();
-  const imageRef = useRef();
-  const fileRef = useRef();
+  const queryClient = useQueryClient()
+  const imageRef = useRef()
+  const fileRef = useRef()
 
-  const navigate = useNavigate();
-  const { BusinessUnitID } = useParams();
+  const navigate = useNavigate()
+  const { BusinessUnitID } = useParams()
 
-  const user = useUserData();
+  const user = useUserData()
   const { control, handleSubmit, setFocus, setValue, reset, register } =
     useForm({
       defaultValues: {
@@ -309,14 +309,14 @@ function BusinessUnitForm({ mode, userRights }) {
         Description: "",
         InActive: false,
       },
-    });
+    })
 
   const BusinessUnitData = useQuery({
     queryKey: [queryKey, BusinessUnitID],
     queryFn: () => fetchBusinessUnitById(BusinessUnitID, user.userID),
     enabled: BusinessUnitID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (+BusinessUnitID !== undefined && BusinessUnitData?.data?.length > 0) {
@@ -324,100 +324,100 @@ function BusinessUnitForm({ mode, userRights }) {
         setValue(
           "BusinessUnitName",
           BusinessUnitData?.data[0]?.BusinessUnitName ?? undefined
-        );
-        setValue("Address", BusinessUnitData?.data[0]?.Address ?? undefined);
+        )
+        setValue("Address", BusinessUnitData?.data[0]?.Address ?? undefined)
         setValue(
           "LandlineNo",
           BusinessUnitData?.data[0]?.LandlineNo ?? undefined
-        );
-        setValue("MobileNo", BusinessUnitData?.data[0]?.MobileNo ?? undefined);
-        setValue("Email", BusinessUnitData?.data[0]?.Email ?? undefined);
-        setValue("Website", BusinessUnitData?.data[0]?.Website ?? undefined);
+        )
+        setValue("MobileNo", BusinessUnitData?.data[0]?.MobileNo ?? undefined)
+        setValue("Email", BusinessUnitData?.data[0]?.Email ?? undefined)
+        setValue("Website", BusinessUnitData?.data[0]?.Website ?? undefined)
         setValue(
           "AuthorityPersonName",
           BusinessUnitData?.data[0]?.AuthorityPersonName ?? undefined
-        );
+        )
         setValue(
           "AuthorityPersonNo",
           BusinessUnitData?.data[0]?.AuthorityPersonNo ?? undefined
-        );
+        )
         setValue(
           "AuthorityPersonEmail",
           BusinessUnitData?.data[0]?.AuthorityPersonEmail ?? undefined
-        );
-        setValue("NTNno", BusinessUnitData?.data[0]?.NTNno ?? undefined);
-        setValue("STRNo", BusinessUnitData?.data[0]?.STRNo ?? undefined);
+        )
+        setValue("NTNno", BusinessUnitData?.data[0]?.NTNno ?? undefined)
+        setValue("STRNo", BusinessUnitData?.data[0]?.STRNo ?? undefined)
         setValue(
           "Description",
           BusinessUnitData?.data[0]?.Description ?? undefined
-        );
-        setValue("InActive", BusinessUnitData?.data[0]?.InActive);
+        )
+        setValue("InActive", BusinessUnitData?.data[0]?.InActive)
 
         setValue("PrimaryColor", {
           r: BusinessUnitData?.data[0]?.RedColor,
           g: BusinessUnitData?.data[0]?.GreenColor,
           b: BusinessUnitData?.data[0]?.BlueColor,
-        });
+        })
         fileRef.current?.setBase64File(
           "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo
-        );
+        )
         // imageRef.current.src =
         //   "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo;
       } catch (error) {}
     }
-  }, [BusinessUnitID, BusinessUnitData.data]);
+  }, [BusinessUnitID, BusinessUnitData.data])
 
   const mutation = useMutation({
     mutationFn: addNewBusinessUnit,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessUnitByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       BusinessUnitID: BusinessUnitID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + BusinessUnitID);
+      navigate(viewRoute + BusinessUnitID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + BusinessUnitID);
+    navigate(editRoute + BusinessUnitID)
   }
 
   function onSubmit(data) {
-    const file = fileRef.current?.getFile();
+    const file = fileRef.current?.getFile()
     if (file === null) {
-      fileRef.current?.setError();
+      fileRef.current?.setError()
     } else {
-      data.Logo = file;
+      data.Logo = file
       mutation.mutate({
         formData: data,
         userID: user?.userID,
         BusinessUnitID: BusinessUnitID,
-      });
+      })
     }
   }
 
@@ -436,10 +436,10 @@ function BusinessUnitForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -663,5 +663,5 @@ function BusinessUnitForm({ mode, userRights }) {
         </div>
       )}
     </>
-  );
+  )
 }

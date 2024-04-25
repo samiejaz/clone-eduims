@@ -1,6 +1,6 @@
-import { Tag } from "primereact/tag";
-import React from "react";
-import { Button } from "primereact/button";
+import { Tag } from "primereact/tag"
+import React from "react"
+import { Button } from "primereact/button"
 
 const SimpleToolbar = ({ startContent, title, onSaveClick }) => {
   return (
@@ -33,7 +33,7 @@ const SimpleToolbar = ({ startContent, title, onSaveClick }) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default SimpleToolbar;
+export default SimpleToolbar

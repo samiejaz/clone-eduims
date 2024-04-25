@@ -1,55 +1,55 @@
-import axios from "axios";
-import { decryptID, encryptID } from "../utils/crypto";
-import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
+import axios from "axios"
+import { decryptID, encryptID } from "../utils/crypto"
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
-const CONTROLLER = "data_DebitNote";
-const WHEREMETHOD = "GetDebitNoteWhere";
-const DELETEMETHOD = "DebitNoteDelete";
-const POSTMETHOD = "DebitNoteInsertUpdate";
+const CONTROLLER = "data_DebitNote"
+const WHEREMETHOD = "GetDebitNoteWhere"
+const DELETEMETHOD = "DebitNoteDelete"
+const POSTMETHOD = "DebitNoteInsertUpdate"
 // URL: /data_DebitNote/GetDebitNoteWhere?LoginUserID=??
 export async function fetchAllDebitNotees(LoginUserID) {
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/GetDebitNoteData?LoginUserID=${LoginUserID}`
-  );
+  )
 
-  return data.data ?? [];
+  return data.data ?? []
 }
 
 // URL: /data_DebitNote/GetDebitNoteWhere?DebitNoteID=??&LoginUserID=??
 export async function fetchDebitNoteById(DebitNoteID, LoginUserID) {
-  DebitNoteID = decryptID(DebitNoteID);
+  DebitNoteID = decryptID(DebitNoteID)
   if (DebitNoteID === undefined || DebitNoteID === 0) {
-    return [];
+    return []
   } else {
     try {
       const { data } = await axios.post(
         `${apiUrl}/${CONTROLLER}/GetDebitNoteWhere?DebitNoteID=${DebitNoteID}&LoginUserID=${LoginUserID}`
-      );
-      return data ?? [];
+      )
+      return data ?? []
     } catch (error) {
-      ShowErrorToast(error.message);
+      ShowErrorToast(error.message)
     }
   }
 }
 // URL: /data_DebitNote/DebitNoteDelete?DebitNoteID=??&LoginUserID=??
 export async function deleteDebitNoteByID({ DebitNoteID, LoginUserID }) {
-  DebitNoteID = decryptID(DebitNoteID);
+  DebitNoteID = decryptID(DebitNoteID)
   try {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?DebitNoteID=${DebitNoteID}&LoginUserID=${LoginUserID}`
-    );
+    )
 
     if (data.success === true) {
-      ShowSuccessToast("Branch sucessfully deleted!");
-      return true;
+      ShowSuccessToast("Branch sucessfully deleted!")
+      return true
     } else {
-      ShowErrorToast(data.message);
-      return false;
+      ShowErrorToast(data.message)
+      return false
     }
   } catch (err) {
-    ShowErrorToast(err.message);
+    ShowErrorToast(err.message)
   }
 }
 //
@@ -57,10 +57,10 @@ export async function fetchMonthlyMaxDebitNoteNo(BusinesssUnitID) {
   try {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/GetDebitNoteNo?BusinesssUnitID=${BusinesssUnitID}`
-    );
-    return data;
+    )
+    return data
   } catch (error) {
-    ShowErrorToast(error);
+    ShowErrorToast(error)
   }
 }
 
@@ -74,8 +74,8 @@ export async function addNewDebitNote({ formData, userID, DebitNoteID = 0 }) {
           DetailBusinessUnitID: item.BusinessUnitID,
           Amount: parseFloat(0 + item.Amount),
           DetailDescription: item.Description,
-        };
-      });
+        }
+      })
 
       let DataToSend = {
         SessionID: formData.SessionID,
@@ -90,35 +90,35 @@ export async function addNewDebitNote({ formData, userID, DebitNoteID = 0 }) {
         Description: formData.Description,
         EntryUserID: userID,
         DebitNoteDetail: JSON.stringify(DebitNoteDetail),
-      };
+      }
 
-      DebitNoteID = decryptID(DebitNoteID);
+      DebitNoteID = decryptID(DebitNoteID)
       if (DebitNoteID === 0 || DebitNoteID === undefined) {
-        DataToSend.DebitNoteID = 0;
+        DataToSend.DebitNoteID = 0
       } else {
-        DataToSend.DebitNoteID = DebitNoteID;
+        DataToSend.DebitNoteID = DebitNoteID
       }
 
       const { data } = await axios.post(
         apiUrl + `/${CONTROLLER}/${POSTMETHOD}`,
         DataToSend
-      );
+      )
 
       if (data.success === true) {
         if (DebitNoteID !== 0) {
-          ShowSuccessToast("Debit Note updated successfully!");
+          ShowSuccessToast("Debit Note updated successfully!")
         } else {
-          ShowSuccessToast("Debit Note created successfully!");
+          ShowSuccessToast("Debit Note created successfully!")
         }
-        return { success: true, RecordID: encryptID(data?.DebitNoteID) };
+        return { success: true, RecordID: encryptID(data?.DebitNoteID) }
       } else {
-        ShowErrorToast(data.message, {});
-        return { success: false, RecordID: DebitNoteID };
+        ShowErrorToast(data.message, {})
+        return { success: false, RecordID: DebitNoteID }
       }
     } catch (error) {
-      ShowErrorToast(error.message);
+      ShowErrorToast(error.message)
     }
   } else {
-    ShowErrorToast("Please add atleast 1 row!");
+    ShowErrorToast("Please add atleast 1 row!")
   }
 }

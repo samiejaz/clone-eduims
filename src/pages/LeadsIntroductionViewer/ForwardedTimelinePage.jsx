@@ -1,37 +1,37 @@
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
 import {
   useAllDepartmentsSelectData,
   useAllUsersSelectData,
   useProductsInfoSelectData,
-} from "../../hooks/SelectData/useSelectData";
-import { useUserData } from "../../context/AuthContext";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getLeadsTimelineDetail } from "./LeadsTimelineData";
-import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData";
-import CDropdown from "../../components/Forms/CDropdown";
+} from "../../hooks/SelectData/useSelectData"
+import { useUserData } from "../../context/AuthContext"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { getLeadsTimelineDetail } from "./LeadsTimelineData"
+import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData"
+import CDropdown from "../../components/Forms/CDropdown"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import { LeadsViewerButtonToolBar } from "./LeadsIntroductionViewer";
-import { Calendar } from "primereact/calendar";
-import { classNames } from "primereact/utils";
+} from "../../components/Layout/LayoutComponents"
+import { LeadsViewerButtonToolBar } from "./LeadsIntroductionViewer"
+import { Calendar } from "primereact/calendar"
+import { classNames } from "primereact/utils"
 
-let queryKey2 = "key2";
+let queryKey2 = "key2"
 export default function ForwardedTimelinePage({
   LeadIntroductionDetailID,
   LeadIntroductionID,
 }) {
-  const [isEnable, setIsEnable] = useState(false);
+  const [isEnable, setIsEnable] = useState(false)
 
-  const method = useForm();
+  const method = useForm()
 
-  const departmentSelectData = useAllDepartmentsSelectData();
-  const usersSelectData = useAllUsersSelectData();
-  const productsSelectData = useProductsInfoSelectData();
-  const user = useUserData();
+  const departmentSelectData = useAllDepartmentsSelectData()
+  const usersSelectData = useAllUsersSelectData()
+  const productsSelectData = useProductsInfoSelectData()
+  const user = useUserData()
 
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
@@ -41,37 +41,37 @@ export default function ForwardedTimelinePage({
         LoginUserID: user.userID,
       }),
     initialData: [],
-  });
+  })
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        setIsEnable(false);
-        toast.success("Updated successfully");
-        method.clearErrors();
+        setIsEnable(false)
+        toast.success("Updated successfully")
+        method.clearErrors()
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (data.length > 0 && !method.formState.isDirty) {
-      method.setValue("DepartmentID", data[0].DepartmentID);
-      method.setValue("UserID", data[0].UserID);
-      method.setValue("MeetingPlace", data[0].MeetingPlace);
-      method.setValue("MeetingTime", parseISO(data[0].MeetingTime));
-      method.setValue("DepartmentID", data[0].DepartmentID);
-      method.setValue("ProductInfoID", data[0].RecommendedProductID);
-      method.setValue("Description", data[0].Description);
+      method.setValue("DepartmentID", data[0].DepartmentID)
+      method.setValue("UserID", data[0].UserID)
+      method.setValue("MeetingPlace", data[0].MeetingPlace)
+      method.setValue("MeetingTime", parseISO(data[0].MeetingTime))
+      method.setValue("DepartmentID", data[0].DepartmentID)
+      method.setValue("ProductInfoID", data[0].RecommendedProductID)
+      method.setValue("Description", data[0].Description)
     }
-  }, [data]);
+  }, [data])
 
   let filePath =
     data[0]?.FileName === null
       ? null
       : "http://192.168.9.110:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
-        data[0]?.FileName;
-  let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1);
+        data[0]?.FileName
+  let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
   // Forward Fields
   const ForwardFields = (
     <>
@@ -203,15 +203,15 @@ export default function ForwardedTimelinePage({
         </FormColumn>
       </FormRow>
     </>
-  );
+  )
 
   function onSubmit(data) {
     if (
       (data.DepartmentID === undefined || data.DepartmentID === null) &&
       (data.UserID === undefined || data.DepartmentID === null)
     ) {
-      method.setError("DepartmentID", { type: "required" });
-      method.setError("UserID", { type: "required" });
+      method.setError("DepartmentID", { type: "required" })
+      method.setError("UserID", { type: "required" })
     } else {
       mutation.mutate({
         from: "Forward",
@@ -219,7 +219,7 @@ export default function ForwardedTimelinePage({
         userID: user.userID,
         LeadIntroductionID: LeadIntroductionID,
         LeadIntroductionDetailID: LeadIntroductionDetailID,
-      });
+      })
     }
   }
 
@@ -243,5 +243,5 @@ export default function ForwardedTimelinePage({
         <></>
       )}
     </>
-  );
+  )
 }

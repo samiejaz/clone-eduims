@@ -1,8 +1,8 @@
-import useCustomerEntryHook from "../hooks/useCustomerEntryHook";
-import { Button as PrimeButton } from "primereact/button";
+import useCustomerEntryHook from "../hooks/useCustomerEntryHook"
+import { Button as PrimeButton } from "primereact/button"
 
 export function CustomerEntryForm({ IconButton = false }) {
-  const { render, setVisible } = useCustomerEntryHook();
+  const { render, setVisible } = useCustomerEntryHook()
 
   return (
     <>
@@ -43,5 +43,5 @@ export function CustomerEntryForm({ IconButton = false }) {
       )}
       {render}
     </>
-  );
+  )
 }

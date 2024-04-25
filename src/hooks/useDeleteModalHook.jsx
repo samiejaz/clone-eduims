@@ -1,8 +1,8 @@
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog"
 
 const useDeleteModal = (handleDelete) => {
-  const reject = () => {};
-  const setIdToDelete = () => {};
+  const reject = () => {}
+  const setIdToDelete = () => {}
   const confirm = (id) => {
     confirmDialog({
       message: "Do you want to delete this record?",
@@ -13,8 +13,8 @@ const useDeleteModal = (handleDelete) => {
       position: "top",
       accept: () => handleDelete(id),
       reject,
-    });
-  };
+    })
+  }
   return {
     handleShow: confirm,
     handleClose: reject,
@@ -38,7 +38,7 @@ const useDeleteModal = (handleDelete) => {
         }}
       />
     ),
-  };
-};
+  }
+}
 
-export default useDeleteModal;
+export default useDeleteModal

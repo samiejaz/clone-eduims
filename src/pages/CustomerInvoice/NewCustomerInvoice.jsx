@@ -1,8 +1,8 @@
-import { Row, Form, Col, Spinner, Table } from "react-bootstrap";
-import { DataTable } from "primereact/datatable";
-import { Button } from "primereact/button";
-import { Column } from "primereact/column";
-import { toast } from "react-toastify";
+import { Row, Form, Col, Spinner, Table } from "react-bootstrap"
+import { DataTable } from "primereact/datatable"
+import { Button } from "primereact/button"
+import { Column } from "primereact/column"
+import { toast } from "react-toastify"
 import {
   useForm,
   useFieldArray,
@@ -10,42 +10,42 @@ import {
   FormProvider,
   useWatch,
   Controller,
-} from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import ActionButtons from "../../components/ActionButtons";
-import { FilterMatchMode } from "primereact/api";
+} from "react-hook-form"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import ActionButtons from "../../components/ActionButtons"
+import { FilterMatchMode } from "primereact/api"
 import React, {
   createContext,
   useContext,
   useEffect,
   useRef,
   useState,
-} from "react";
+} from "react"
 
-import { AuthContext } from "../../context/AuthContext";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 
-import TextInput from "../../components/Forms/TextInput";
-import NumberInput from "../../components/Forms/NumberInput";
+import TextInput from "../../components/Forms/TextInput"
+import NumberInput from "../../components/Forms/NumberInput"
 
-import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons";
-import CDropdown from "../../components/Forms/CDropdown";
-import { DevTool } from "@hookform/devtools";
+import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
+import CDropdown from "../../components/Forms/CDropdown"
+import { DevTool } from "@hookform/devtools"
 import {
   addNewCustomerInvoice,
   deleteCustomerInvoiceByID,
   fetchMonthlyMaxCustomerInvoiceNo,
   fetchCustomerInvoiceById,
   fetchAllCustomerInvoices,
-} from "../../api/CustomerInvoiceData";
-import ButtonToolBar from "../../components/ActionsToolbar";
+} from "../../api/CustomerInvoiceData"
+import ButtonToolBar from "../../components/ActionsToolbar"
 
 import {
   MENU_KEYS,
   QUERY_KEYS,
   ROUTE_URLS,
   SELECT_QUERY_KEYS,
-} from "../../utils/enums";
+} from "../../utils/enums"
 import {
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
@@ -54,42 +54,42 @@ import {
   fetchAllProductsForSelect,
   fetchAllServicesForSelect,
   fetchAllSessionsForSelect,
-} from "../../api/SelectData";
-import CDatePicker from "../../components/Forms/CDatePicker";
-import CSwitchInput from "../../components/Forms/CSwitchInput";
-import { useUserData } from "../../context/AuthContext";
-import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
-import { ShowErrorToast } from "../../utils/CommonFunctions";
-import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCustomerInvoiceInstallmentModal";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { decryptID, encryptID } from "../../utils/crypto";
-import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields";
-import { TextAreaField } from "../../components/Forms/form";
-import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks";
+} from "../../api/SelectData"
+import CDatePicker from "../../components/Forms/CDatePicker"
+import CSwitchInput from "../../components/Forms/CSwitchInput"
+import { useUserData } from "../../context/AuthContext"
+import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent"
+import { ShowErrorToast } from "../../utils/CommonFunctions"
+import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCustomerInvoiceInstallmentModal"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { decryptID, encryptID } from "../../utils/crypto"
+import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields"
+import { TextAreaField } from "../../components/Forms/form"
+import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
 
-let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let onlineDetailColor = "#365abd";
-let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY;
-let IDENTITY = "CustomerInvoiceID";
+let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let onlineDetailColor = "#365abd"
+let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY
+let IDENTITY = "CustomerInvoiceID"
 
 export default function CustomerInvoice() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.ACCOUNTS.CUSTOMER_INVOICE_FORM_KEY,
       MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -162,18 +162,18 @@ export default function CustomerInvoice() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function NewCustomerInvoiceEntrySearch({ userRights }) {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
-  const { handlePrintReport } = usePrintReportAsPDF();
+  })
+  const { handlePrintReport } = usePrintReportAsPDF()
 
   const [filters, setFilters] = useState({
     SessionBasedVoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -182,35 +182,35 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CustomerInvoiceMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
     TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllCustomerInvoices(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteCustomerInvoiceByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ CustomerInvoiceID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ CustomerInvoiceID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -321,7 +321,7 @@ function NewCustomerInvoiceEntrySearch({ userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 const defaultValues = {
@@ -338,25 +338,25 @@ const defaultValues = {
   CustomerLedgers: "",
   CustomerInvoiceDetail: [],
   installments: [],
-};
+}
 
 function NewCustomerInvoiceEntryForm({ mode, userRights }) {
-  document.title = "Customer Invoice";
-  const queryClient = useQueryClient();
-  const { CustomerInvoiceID } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  document.title = "Customer Invoice"
+  const queryClient = useQueryClient()
+  const { CustomerInvoiceID } = useParams()
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+  const { user } = useContext(AuthContext)
 
   // Ref
-  const detailTableRef = useRef();
-  const customerCompRef = useRef();
-  const invoiceInstallmentRef = useRef();
-  const nullBranchRef = useRef();
+  const detailTableRef = useRef()
+  const customerCompRef = useRef()
+  const invoiceInstallmentRef = useRef()
+  const nullBranchRef = useRef()
   // Form
   const method = useForm({
     defaultValues,
-  });
+  })
 
   const { data: CustomerInvoiceData } = useQuery({
     queryKey: [
@@ -369,7 +369,7 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
     enabled: CustomerInvoiceID !== undefined,
     initialData: [],
     refetchOnWindowFocus: false,
-  });
+  })
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
@@ -377,75 +377,75 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
     initialData: [],
     enabled: mode !== "",
     refetchOnWindowFocus: false,
-  });
+  })
 
   const CustomerInvoiceMutation = useMutation({
     mutationFn: addNewCustomerInvoice,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteCustomerInvoiceByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (
       CustomerInvoiceID !== undefined &&
       CustomerInvoiceData?.Master?.length > 0
     ) {
-      method.setValue("SessionID", CustomerInvoiceData?.Master[0]?.SessionID);
+      method.setValue("SessionID", CustomerInvoiceData?.Master[0]?.SessionID)
       method.setValue(
         "BusinessUnitID",
         CustomerInvoiceData?.Master[0]?.BusinessUnitID
-      );
-      method.setValue("Customer", CustomerInvoiceData?.Master[0]?.CustomerID);
-      method.setValue("VoucherNo", CustomerInvoiceData?.Master[0]?.InvoiceNo);
+      )
+      method.setValue("Customer", CustomerInvoiceData?.Master[0]?.CustomerID)
+      method.setValue("VoucherNo", CustomerInvoiceData?.Master[0]?.InvoiceNo)
       method.setValue(
         "SessionBasedVoucherNo",
         CustomerInvoiceData?.Master[0]?.InvoiceNo1
-      );
+      )
       method.setValue(
         "VoucherDate",
         new Date(CustomerInvoiceData?.Master[0]?.InvoiceDate)
-      );
+      )
       method.setValue(
         "VoucherDueDate",
         new Date(CustomerInvoiceData?.Master[0]?.InvoiceDueDate)
-      );
+      )
       customerCompRef.current?.setCustomerID(
         CustomerInvoiceData?.Master[0]?.CustomerID
-      );
+      )
       method.setValue(
         "CustomerLedgers",
         CustomerInvoiceData?.Master[0]?.AccountID
-      );
+      )
 
       nullBranchRef.current?.setAccountID(
         CustomerInvoiceData?.Master[0]?.AccountID
-      );
+      )
 
       method.setValue(
         "DocumentNo",
         CustomerInvoiceData?.Master[0]?.DocumentNo ?? undefined
-      );
+      )
       method.setValue(
         "InvoiceTitle",
         CustomerInvoiceData?.Master[0]?.InvoiceTitle
-      );
+      )
       method.setValue(
         "Description",
         CustomerInvoiceData?.Master[0]?.MasterDescription ?? undefined
-      );
+      )
       method.setValue(
         "CustomerInvoiceDetail",
         CustomerInvoiceData.Detail?.map((invoice, index) => {
@@ -457,46 +457,46 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
             BusinessUnitID: invoice.BusinessUnitID,
             Qty: invoice.Quantity,
             ...invoice,
-          };
+          }
         })
-      );
+      )
       method.setValue(
         "installments",
         CustomerInvoiceData?.InstallmentDetail.map((item, index) => {
           return {
             IDate: new Date(item.DueDate),
             Amount: item.Amount,
-          };
+          }
         })
-      );
+      )
 
-      method.setValue("TotalAmount", CustomerInvoiceData?.Master[0]?.TotalCGS);
+      method.setValue("TotalAmount", CustomerInvoiceData?.Master[0]?.TotalCGS)
       method.setValue(
         "TotalNetAmount",
         CustomerInvoiceData?.Master[0]?.TotalNetAmount
-      );
+      )
       method.setValue(
         "TotalDiscount",
         CustomerInvoiceData?.Master[0]?.TotalDiscount
-      );
-      method.setValue("TotalRate", CustomerInvoiceData?.Master[0]?.TotalRate);
+      )
+      method.setValue("TotalRate", CustomerInvoiceData?.Master[0]?.TotalRate)
     }
-  }, [CustomerInvoiceID, CustomerInvoiceData]);
+  }, [CustomerInvoiceID, CustomerInvoiceData])
 
   function handleEdit() {
-    navigate(`${editRoute}${CustomerInvoiceID}`);
+    navigate(`${editRoute}${CustomerInvoiceID}`)
   }
 
   function handleAddNew() {
-    method.reset();
-    navigate(newRoute);
+    method.reset()
+    navigate(newRoute)
   }
 
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(`${parentRoute}/${CustomerInvoiceID}`);
+      navigate(`${parentRoute}/${CustomerInvoiceID}`)
     }
   }
 
@@ -504,8 +504,8 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
     deleteMutation.mutate({
       CustomerInvoiceID: CustomerInvoiceID,
       LoginUserID: user.userID,
-    });
-    navigate(parentRoute);
+    })
+    navigate(parentRoute)
   }
 
   function onSubmit(data) {
@@ -514,9 +514,9 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
         formData: data,
         userID: user.userID,
         CustomerInvoiceID: CustomerInvoiceID,
-      });
+      })
     } else {
-      ShowErrorToast("Please add atleast 1 row!");
+      ShowErrorToast("Please add atleast 1 row!")
     }
   }
 
@@ -542,10 +542,10 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
                 handleGoBack={() => navigate(parentRoute)}
                 handleEdit={() => handleEdit()}
                 handleCancel={() => {
-                  handleCancel();
+                  handleCancel()
                 }}
                 handleAddNew={() => {
-                  handleAddNew();
+                  handleAddNew()
                 }}
                 handleSave={() => method.handleSubmit(onSubmit)()}
                 GoBackLabel="CustomerInvoices"
@@ -724,7 +724,7 @@ function NewCustomerInvoiceEntryForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 // New Master Fields
@@ -736,15 +736,15 @@ function SessionSelect({ mode }) {
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   useEffect(() => {
     if (data && data.length > 0 && mode === "new") {
-      method.setValue("SessionID", data[0]?.SessionID);
+      method.setValue("SessionID", data[0]?.SessionID)
     }
-  }, [data, mode]);
+  }, [data, mode])
 
   return (
     <>
@@ -769,13 +769,13 @@ function SessionSelect({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const CustomerDependentFields = React.forwardRef(
   ({ mode, removeAllRows }, ref) => {
-    const { setAccountID } = useContext(CustomerBranchDataContext);
-    const [CustomerID, setCustomerID] = useState(0);
+    const { setAccountID } = useContext(CustomerBranchDataContext)
+    const [CustomerID, setCustomerID] = useState(0)
 
     const { data: customerSelectData } = useQuery({
       queryKey: [QUERY_KEYS.ALL_CUSTOMER_QUERY_KEY],
@@ -783,7 +783,7 @@ const CustomerDependentFields = React.forwardRef(
       refetchOnWindowFocus: false,
       staleTime: 600000,
       refetchInterval: 600000,
-    });
+    })
 
     const { data: CustomerAccounts } = useQuery({
       queryKey: [QUERY_KEYS.CUSTOMER_ACCOUNTS_QUERY_KEY, CustomerID],
@@ -791,13 +791,13 @@ const CustomerDependentFields = React.forwardRef(
       refetchOnWindowFocus: false,
       staleTime: 600000,
       refetchInterval: 600000,
-    });
+    })
 
     React.useImperativeHandle(ref, () => ({
       setCustomerID,
-    }));
+    }))
 
-    const method = useFormContext();
+    const method = useFormContext()
 
     return (
       <>
@@ -824,8 +824,8 @@ const CustomerDependentFields = React.forwardRef(
               required={true}
               filter={true}
               onChange={(e) => {
-                setCustomerID(e.value);
-                removeAllRows();
+                setCustomerID(e.value)
+                removeAllRows()
               }}
               focusOptions={() => method.setFocus("CustomerLedgers")}
             />
@@ -849,20 +849,20 @@ const CustomerDependentFields = React.forwardRef(
               required={true}
               filter={true}
               onChange={(e) => {
-                setAccountID(e.value);
-                removeAllRows();
+                setAccountID(e.value)
+                removeAllRows()
               }}
               focusOptions={() => method.setFocus("CustomerInvoiceMode")}
             />
           </div>
         </Form.Group>
       </>
-    );
+    )
   }
-);
+)
 
 function BusinessUnitDependantFields({ mode }) {
-  const [BusinesssUnitID, setBusinessUnitID] = useState(0);
+  const [BusinesssUnitID, setBusinessUnitID] = useState(0)
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
@@ -871,32 +871,32 @@ function BusinessUnitDependantFields({ mode }) {
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
+  })
 
   useEffect(() => {
     if (BusinessUnitSelectData?.length > 0) {
       method.setValue(
         "BusinessUnitID",
         BusinessUnitSelectData[0].BusinessUnitID
-      );
-      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID);
+      )
+      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID)
     }
-  }, [BusinessUnitSelectData]);
+  }, [BusinessUnitSelectData])
 
   useEffect(() => {
     async function fetchCustomerInvoiceNo() {
-      const data = await fetchMonthlyMaxCustomerInvoiceNo(BusinesssUnitID);
-      method.setValue("BusinessUnitID", BusinesssUnitID);
-      method.setValue("VoucherNo", data[0]?.InvoiceNo);
-      method.setValue("SessionBasedVoucherNo", data[0]?.SessionBasedVoucherNo);
+      const data = await fetchMonthlyMaxCustomerInvoiceNo(BusinesssUnitID)
+      method.setValue("BusinessUnitID", BusinesssUnitID)
+      method.setValue("VoucherNo", data[0]?.InvoiceNo)
+      method.setValue("SessionBasedVoucherNo", data[0]?.SessionBasedVoucherNo)
     }
 
     if (BusinesssUnitID !== 0 && mode === "new") {
-      fetchCustomerInvoiceNo();
+      fetchCustomerInvoiceNo()
     }
-  }, [BusinesssUnitID, mode]);
+  }, [BusinesssUnitID, mode])
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -918,7 +918,7 @@ function BusinessUnitDependantFields({ mode }) {
             required={true}
             focusOptions={() => method.setFocus("Customer")}
             onChange={(e) => {
-              setBusinessUnitID(e.value);
+              setBusinessUnitID(e.value)
             }}
           />
         </div>
@@ -956,13 +956,13 @@ function BusinessUnitDependantFields({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 // New Detail Header Form
 function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
-  const invoiceTypeRef = useRef();
-  const { pageTitles } = useContext(AppConfigurationContext);
+  const invoiceTypeRef = useRef()
+  const { pageTitles } = useContext(AppConfigurationContext)
 
   const method = useForm({
     defaultValues: {
@@ -981,17 +981,17 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
       Description: "",
       CustomerBranch: "",
     },
-  });
+  })
 
   function onSubmit(data) {
-    appendSingleRow(data);
-    method.reset();
+    appendSingleRow(data)
+    method.reset()
   }
 
   const typesOptions = [
     { label: `${pageTitles?.product || "Product"}`, value: "Product" },
     { label: "Service", value: "Service" },
-  ];
+  ]
 
   return (
     <>
@@ -1010,7 +1010,7 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
                 required={true}
                 focusOptions={() => method.setFocus("BusinessUnit")}
                 onChange={(e) => {
-                  invoiceTypeRef.current?.setInvoiceType(e.value);
+                  invoiceTypeRef.current?.setInvoiceType(e.value)
                 }}
               />
             </div>
@@ -1029,11 +1029,11 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               id={"Qty"}
               control={method.control}
               onChange={(e) => {
-                const rate = method.getValues(["Rate"]);
-                method.setValue("Amount", e.value * rate);
-                const amount = method.getValues(["Amount"]);
-                const discount = method.getValues(["Discount"]);
-                method.setValue("NetAmount", amount - discount);
+                const rate = method.getValues(["Rate"])
+                method.setValue("Amount", e.value * rate)
+                const amount = method.getValues(["Amount"])
+                const discount = method.getValues(["Discount"])
+                method.setValue("NetAmount", amount - discount)
               }}
               inputClassName="form-control"
               useGrouping={false}
@@ -1046,10 +1046,10 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               id={"Rate"}
               control={method.control}
               onChange={(e) => {
-                const qty = method.getValues(["Qty"]);
-                method.setValue("Amount", e.value * qty);
-                const disc = method.getValues(["Discount"]);
-                method.setValue("NetAmount", e.value * qty - disc);
+                const qty = method.getValues(["Qty"])
+                method.setValue("Amount", e.value * qty)
+                const disc = method.getValues(["Discount"])
+                method.setValue("NetAmount", e.value * qty - disc)
               }}
               mode="decimal"
               maxFractionDigits={2}
@@ -1089,8 +1089,8 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               id={"Discount"}
               control={method.control}
               onChange={(e) => {
-                const amount = method.getValues(["Amount"]);
-                method.setValue("NetAmount", amount - e.value);
+                const amount = method.getValues(["Amount"])
+                method.setValue("NetAmount", amount - e.value)
               }}
               mode="decimal"
               maxFractionDigits={2}
@@ -1136,10 +1136,10 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
                 name={"IsFree"}
                 onChange={(e) => {
                   if (e.value) {
-                    method.setValue("Rate", 0);
-                    method.setValue("Amount", 0);
-                    method.setValue("Discount", 0);
-                    method.setValue("NetAmount", 0);
+                    method.setValue("Rate", 0)
+                    method.setValue("Amount", 0)
+                    method.setValue("Discount", 0)
+                    method.setValue("NetAmount", 0)
                   }
                 }}
               />
@@ -1157,14 +1157,14 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
         <DevTool control={method.control} />
       </form>
     </>
-  );
+  )
 }
 
 const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
-  const [InvoiceType, setInvoiceType] = useState();
-  const [BusinessUnitID, setBusinessUnitID] = useState(0);
+  const [InvoiceType, setInvoiceType] = useState()
+  const [BusinessUnitID, setBusinessUnitID] = useState(0)
 
-  const { pageTitles } = useContext(AppConfigurationContext);
+  const { pageTitles } = useContext(AppConfigurationContext)
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
@@ -1172,7 +1172,7 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
+  })
   const { data: ProductsInfoSelectData } = useQuery({
     queryKey: [
       SELECT_QUERY_KEYS.PRODUCTS_INFO_SELECT_QUERY_KEY,
@@ -1182,20 +1182,20 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
+  })
   const { data: ServicesInfoSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.SERVICES_SELECT_QUERY_KEY, BusinessUnitID],
     queryFn: () => fetchAllServicesForSelect(BusinessUnitID),
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
+  })
 
   React.useImperativeHandle(ref, () => ({
     setInvoiceType,
-  }));
+  }))
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1216,9 +1216,9 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             required={true}
             focusOptions={() => method.setFocus("Customer")}
             onChange={(e) => {
-              setBusinessUnitID(e.value);
-              method.resetField("ProductInfoID");
-              method.resetField("ServiceInfoID");
+              setBusinessUnitID(e.value)
+              method.resetField("ProductInfoID")
+              method.resetField("ServiceInfoID")
             }}
           />
         </div>
@@ -1264,12 +1264,12 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
         </div>
       </Form.Group>
     </>
-  );
-});
+  )
+})
 
 const CustomerInvoiceDetailTable = React.forwardRef(
   ({ mode, BusinessUnitSelectData }, ref) => {
-    const method = useFormContext();
+    const method = useFormContext()
 
     const { fields, append, remove } = useFieldArray({
       control: method.control,
@@ -1277,23 +1277,23 @@ const CustomerInvoiceDetailTable = React.forwardRef(
       rules: {
         required: true,
       },
-    });
+    })
 
     React.useImperativeHandle(ref, () => ({
       appendSingleRow(data) {
-        append(data);
+        append(data)
       },
       removeAllRows() {
-        remove();
+        remove()
       },
-    }));
+    }))
 
-    const { pageTitles } = useContext(AppConfigurationContext);
+    const { pageTitles } = useContext(AppConfigurationContext)
 
     const typesOptions = [
       { label: `${pageTitles?.product || "Product"}`, value: "Product" },
       { label: "Service", value: "Service" },
-    ];
+    ]
 
     return (
       <>
@@ -1319,15 +1319,15 @@ const CustomerInvoiceDetailTable = React.forwardRef(
                     typesOptions={typesOptions}
                     pageTitles={pageTitles}
                   />
-                );
+                )
               })}
             </FormProvider>
           </tbody>
         </Table>
       </>
-    );
+    )
   }
-);
+)
 
 function CustomerInvoiceDetailTableRow({
   item,
@@ -1338,7 +1338,7 @@ function CustomerInvoiceDetailTableRow({
   typesOptions,
   pageTitles,
 }) {
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <FormProvider {...method}>
@@ -1352,54 +1352,54 @@ function CustomerInvoiceDetailTableRow({
         remove={remove}
       />
     </FormProvider>
-  );
+  )
 }
 
 // Total
 function CustomerInvoiceDetailTotal() {
-  const method = useFormContext();
+  const method = useFormContext()
 
   const details = useWatch({
     control: method.control,
     name: "CustomerInvoiceDetail",
-  });
+  })
 
   useEffect(() => {
-    calculateTotal(details);
-  }, [details]);
+    calculateTotal(details)
+  }, [details])
 
   function calculateTotal(details) {
-    let rateSum = 0;
-    let cgsSum = 0;
-    let discountSum = 0;
-    let amountSum = 0;
+    let rateSum = 0
+    let cgsSum = 0
+    let discountSum = 0
+    let amountSum = 0
 
     details.forEach((item, index) => {
-      const rate = parseFloat(item.Rate || 0);
-      const cgs = parseFloat(item.CGS || 0);
-      const discount = parseFloat(item.Discount || 0);
-      const amount = parseFloat(item.NetAmount || 0);
-      const qty = parseFloat(item.Qty || 0);
+      const rate = parseFloat(item.Rate || 0)
+      const cgs = parseFloat(item.CGS || 0)
+      const discount = parseFloat(item.Discount || 0)
+      const amount = parseFloat(item.NetAmount || 0)
+      const qty = parseFloat(item.Qty || 0)
 
-      rateSum += rate * qty;
-      cgsSum += cgs;
-      discountSum += discount;
-      amountSum += amount;
-    });
-    method.setValue("TotalNetAmount", amountSum);
-    method.setValue("TotalDiscount", discountSum);
-    method.setValue("TotalAmount", cgsSum);
-    method.setValue("TotalRate", rateSum);
+      rateSum += rate * qty
+      cgsSum += cgs
+      discountSum += discount
+      amountSum += amount
+    })
+    method.setValue("TotalNetAmount", amountSum)
+    method.setValue("TotalDiscount", discountSum)
+    method.setValue("TotalAmount", cgsSum)
+    method.setValue("TotalRate", rateSum)
   }
 
-  return null;
+  return null
 }
 
 const BranchSelectField = () => {
-  const { AccountID } = useContext(CustomerBranchDataContext);
+  const { AccountID } = useContext(CustomerBranchDataContext)
 
-  const method = useFormContext();
-  const { pageTitles } = useContext(AppConfigurationContext);
+  const method = useFormContext()
+  const { pageTitles } = useContext(AppConfigurationContext)
 
   const { data } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.CUSTOMER_BRANCHES_SELECT_QUERY_KEY, AccountID],
@@ -1407,7 +1407,7 @@ const BranchSelectField = () => {
     enabled: AccountID !== 0,
     initialData: [],
     refetchOnWindowFocus: false,
-  });
+  })
 
   return (
     <>
@@ -1433,28 +1433,28 @@ const BranchSelectField = () => {
         </div>
       </Form.Group>
     </>
-  );
-};
-export const CustomerBranchDataContext = createContext();
+  )
+}
+export const CustomerBranchDataContext = createContext()
 
 const CustomerBranchDataProvider = ({ children }) => {
-  const [AccountID, setAccountID] = useState(0);
+  const [AccountID, setAccountID] = useState(0)
 
   return (
     <CustomerBranchDataContext.Provider value={{ setAccountID, AccountID }}>
       {children}
     </CustomerBranchDataContext.Provider>
-  );
-};
+  )
+}
 
 const NullBranchContext = React.forwardRef((_, ref) => {
-  const { setAccountID } = useContext(CustomerBranchDataContext);
+  const { setAccountID } = useContext(CustomerBranchDataContext)
   React.useImperativeHandle(ref, () => ({
     setAccountID,
-  }));
+  }))
 
-  return null;
-});
+  return null
+})
 
 const DetailTableHeadings = ({ pageTitles }) => {
   return (
@@ -1510,5 +1510,5 @@ const DetailTableHeadings = ({ pageTitles }) => {
         Actions
       </th>
     </tr>
-  );
-};
+  )
+}

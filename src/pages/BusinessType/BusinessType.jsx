@@ -1,52 +1,52 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { AuthContext, useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { AuthContext, useUserData } from "../../context/AuthContext"
 import {
   addNewBusinessType,
   deleteBusinessTypeByID,
   fetchAllBusinessTypes,
   fetchBusinessTypeById,
-} from "../../api/BusinessTypeData";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+} from "../../api/BusinessTypeData"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.BUSINESS_TYPE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY;
+let parentRoute = ROUTE_URLS.BUSINESS_TYPE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY
 
 export function BusinessType() {
-  const { checkForUserRights } = useContext(UserRightsContext);
+  const { checkForUserRights } = useContext(UserRightsContext)
 
-  const [userRights, setUserRights] = useState([]);
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     let data = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
       MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    });
-    setUserRights([data]);
-  }, []);
+    })
+    setUserRights([data])
+  }, [])
   return (
     <>
       <Routes>
@@ -120,51 +120,51 @@ export function BusinessType() {
         )}
       </Routes>
     </>
-  );
+  )
 }
 export function BusinessTypeDetail({ userRights }) {
-  document.title = "Business Types";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Business Types"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     BusinessTypeTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllBusinessTypes(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessTypeByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       BusinessTypeID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -237,81 +237,81 @@ export function BusinessTypeDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 export function BusinessTypeForm({ mode, userRights }) {
-  document.title = "Business Type Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { BusinessTypeID } = useParams();
+  document.title = "Business Type Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { BusinessTypeID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       BusinessTypeTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext)
 
   const BusinessTypeData = useQuery({
     queryKey: [queryKey, BusinessTypeID],
     queryFn: () => fetchBusinessTypeById(BusinessTypeID, user.userID),
     enabled: BusinessTypeID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (BusinessTypeID !== undefined && BusinessTypeData.data.length > 0) {
-      setValue("BusinessTypeTitle", BusinessTypeData.data[0].BusinessTypeTitle);
-      setValue("InActive", BusinessTypeData.data[0].InActive);
+      setValue("BusinessTypeTitle", BusinessTypeData.data[0].BusinessTypeTitle)
+      setValue("InActive", BusinessTypeData.data[0].InActive)
     }
-  }, [BusinessTypeID, BusinessTypeData]);
+  }, [BusinessTypeID, BusinessTypeData])
 
   const mutation = useMutation({
     mutationFn: addNewBusinessType,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessTypeByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       BusinessTypeID: BusinessTypeID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + BusinessTypeID);
+      navigate(viewRoute + BusinessTypeID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + BusinessTypeID);
+    navigate(editRoute + BusinessTypeID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       BusinessTypeID: BusinessTypeID,
-    });
+    })
   }
 
   return (
@@ -329,10 +329,10 @@ export function BusinessTypeForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -376,5 +376,5 @@ export function BusinessTypeForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

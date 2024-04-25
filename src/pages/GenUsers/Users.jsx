@@ -1,57 +1,57 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useRef, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useRef, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewUser,
   deleteUserByID,
   fetchAllUsers,
   fetchUserById,
-} from "../../api/UserData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import { useAllDepartmentsSelectData } from "../../hooks/SelectData/useSelectData";
-import CDropdown from "../../components/Forms/CDropdown";
-import ImageContainer from "../../components/ImageContainer";
+} from "../../api/UserData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import { useAllDepartmentsSelectData } from "../../hooks/SelectData/useSelectData"
+import CDropdown from "../../components/Forms/CDropdown"
+import ImageContainer from "../../components/ImageContainer"
 import {
   FormRow,
   FormColumn,
   FormLabel,
   FormField,
-} from "../../components/Layout/LayoutComponents";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
-import { SingleFileUploadField } from "../../components/Forms/form";
-import { Avatar } from "primereact/avatar";
+} from "../../components/Layout/LayoutComponents"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
+import { SingleFileUploadField } from "../../components/Forms/form"
+import { Avatar } from "primereact/avatar"
 
-let parentRoute = ROUTE_URLS.USER_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.USER_QUERY_KEY;
-let IDENTITY = "UserID";
+let parentRoute = ROUTE_URLS.USER_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.USER_QUERY_KEY
+let IDENTITY = "UserID"
 export default function Users() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.USERS.USERS_FORM_KEY,
       MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -121,54 +121,54 @@ export default function Users() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function UserDetail({ userRights }) {
-  document.title = "Users";
+  document.title = "Users"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     FirstName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     LastName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     UserName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     Email: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllUsers(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteUserByID,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
-      });
+      })
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ UserID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ UserID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   function profileTemplate(rowData) {
@@ -177,7 +177,7 @@ function UserDetail({ userRights }) {
         image={"data:image/png;base64," + rowData?.ProfilePic}
         shape="circle"
       />
-    );
+    )
   }
 
   return (
@@ -284,18 +284,18 @@ function UserDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 
 function UserForm({ mode, userRights }) {
-  document.title = "User Entry";
+  document.title = "User Entry"
 
-  const queryClient = useQueryClient();
-  const fileRef = useRef();
+  const queryClient = useQueryClient()
+  const fileRef = useRef()
 
-  const navigate = useNavigate();
-  const { UserID } = useParams();
-  const user = useUserData();
+  const navigate = useNavigate()
+  const { UserID } = useParams()
+  const user = useUserData()
 
   const {
     control,
@@ -314,88 +314,88 @@ function UserForm({ mode, userRights }) {
       InActive: "",
       DepartmentID: [],
     },
-  });
+  })
 
-  const departmentSelectData = useAllDepartmentsSelectData();
+  const departmentSelectData = useAllDepartmentsSelectData()
 
   const UserData = useQuery({
     queryKey: [queryKey, UserID],
     queryFn: () => fetchUserById(UserID, user.userID),
     enabled: UserID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (!isDirty) {
       if (+UserID !== undefined && UserData?.data?.length > 0) {
         try {
-          setValue("FirstName", UserData?.data[0]?.FirstName);
-          setValue("LastName", UserData?.data[0]?.LastName);
-          setValue("Email", UserData?.data[0]?.Email);
-          setValue("UserName", UserData?.data[0]?.UserName);
-          setValue("Password", UserData?.data[0]?.Password);
-          setValue("InActive", UserData?.data[0]?.InActive);
-          setValue("DepartmentID", UserData?.data[0]?.DepartmentID);
+          setValue("FirstName", UserData?.data[0]?.FirstName)
+          setValue("LastName", UserData?.data[0]?.LastName)
+          setValue("Email", UserData?.data[0]?.Email)
+          setValue("UserName", UserData?.data[0]?.UserName)
+          setValue("Password", UserData?.data[0]?.Password)
+          setValue("InActive", UserData?.data[0]?.InActive)
+          setValue("DepartmentID", UserData?.data[0]?.DepartmentID)
           if (UserData?.data[0]?.ProfilePic) {
             fileRef.current?.setBase64File(
               "data:image/png;base64," + UserData?.data[0]?.ProfilePic
-            );
+            )
           }
         } catch (error) {}
       }
     }
-  }, [UserID, UserData]);
+  }, [UserID, UserData])
 
   const mutation = useMutation({
     mutationFn: addNewUser,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteUserByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       UserID: UserID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + UserID);
+      navigate(viewRoute + UserID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + UserID);
+    navigate(editRoute + UserID)
   }
   function onSubmit(data) {
-    const file = fileRef.current?.getFile();
+    const file = fileRef.current?.getFile()
     if (file === null) {
-      fileRef.current?.setError();
+      fileRef.current?.setError()
     } else {
-      data.UserImage = file;
+      data.UserImage = file
       mutation.mutate({
         formData: data,
         userID: user?.userID,
         UserID: UserID,
-      });
+      })
     }
   }
 
@@ -414,10 +414,10 @@ function UserForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -564,5 +564,5 @@ function UserForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

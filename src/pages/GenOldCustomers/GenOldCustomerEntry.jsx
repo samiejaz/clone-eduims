@@ -1,85 +1,85 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { MultiSelect } from "primereact/multiselect";
-import ActionButtons from "../../components/ActionButtons";
-import { Controller, useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { MultiSelect } from "primereact/multiselect"
+import ActionButtons from "../../components/ActionButtons"
+import { Controller, useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewGenOldCustomer,
   deleteGenOldCustomerByID,
   fetchAllGenOldCustomers,
   fetchGenOldCustomerById,
-} from "../../api/GenOldCustomerData";
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums";
+} from "../../api/GenOldCustomerData"
+import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums"
 import {
   useActivationClientsSelectData,
   useSoftwareClientsSelectData,
-} from "../../hooks/SelectData/useSelectData";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import { decryptID, encryptID } from "../../utils/crypto";
+} from "../../hooks/SelectData/useSelectData"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import { decryptID, encryptID } from "../../utils/crypto"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
+} from "../../components/Layout/LayoutComponents"
 
-let parentRoute = ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.OLD_CUSTOMERS_QUERY_KEY;
+let parentRoute = ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.OLD_CUSTOMERS_QUERY_KEY
 
 export function GenOldCustomerDetail() {
-  document.title = "Old Customers";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Old Customers"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllGenOldCustomers(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteGenOldCustomerByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       CustomerID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -145,34 +145,34 @@ export function GenOldCustomerDetail() {
         </>
       )}
     </div>
-  );
+  )
 }
 export function GenOldCustomerForm({ mode }) {
-  document.title = "Old Customer Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const user = useUserData();
-  const { CustomerID } = useParams();
+  document.title = "Old Customer Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const user = useUserData()
+  const { CustomerID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       CustomerName: "",
       SoftwareMgtDbID: null,
       ActivationDbID: null,
     },
-  });
+  })
 
   const activationClients = useActivationClientsSelectData(
     CustomerID ? decryptID(CustomerID) : 0
-  );
+  )
   const softwareClients = useSoftwareClientsSelectData(
     CustomerID ? decryptID(CustomerID) : 0
-  );
+  )
 
   const GenOldCustomerData = useQuery({
     queryKey: [queryKey, CustomerID],
     queryFn: () => fetchGenOldCustomerById(CustomerID, user.userID),
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (CustomerID !== undefined && GenOldCustomerData.data?.data?.length > 0) {
@@ -180,64 +180,64 @@ export function GenOldCustomerForm({ mode }) {
         setValue(
           "ActivationDbID",
           GenOldCustomerData?.data?.dataAct?.map((item) => item.ACTCustomerID)
-        );
+        )
       }
       if (GenOldCustomerData?.data?.data[0]?.SoftwareMgtDbID !== 0) {
         setValue(
           "SoftwareMgtDbID",
           GenOldCustomerData?.data?.dataSoft?.map((item) => item.SoftCustomerID)
-        );
+        )
       }
-      setValue("CustomerName", GenOldCustomerData?.data?.data[0]?.CustomerName);
-      setValue("InActive", GenOldCustomerData?.data?.data[0]?.InActive);
+      setValue("CustomerName", GenOldCustomerData?.data?.data[0]?.CustomerName)
+      setValue("InActive", GenOldCustomerData?.data?.data[0]?.InActive)
     }
-  }, [CustomerID, GenOldCustomerData.data.data]);
+  }, [CustomerID, GenOldCustomerData.data.data])
 
   const mutation = useMutation({
     mutationFn: addNewGenOldCustomer,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteGenOldCustomerByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       CustomerID: CustomerID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + CustomerID);
+      navigate(viewRoute + CustomerID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + CustomerID);
+    navigate(editRoute + CustomerID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       CustomerID: CustomerID,
-    });
+    })
   }
 
   return (
@@ -255,10 +255,10 @@ export function GenOldCustomerForm({ mode }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -283,7 +283,7 @@ export function GenOldCustomerForm({ mode }) {
                         value={field.value}
                         options={activationClients.data}
                         onChange={(e) => {
-                          field.onChange(e.value);
+                          field.onChange(e.value)
                         }}
                         optionLabel="ACTCustomerName"
                         optionValue="ACTCustomerID"
@@ -373,5 +373,5 @@ export function GenOldCustomerForm({ mode }) {
         </>
       )}
     </>
-  );
+  )
 }

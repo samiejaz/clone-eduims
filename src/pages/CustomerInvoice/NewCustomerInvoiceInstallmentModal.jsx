@@ -1,51 +1,51 @@
-import React, { useEffect, useState } from "react";
-import { Dialog } from "primereact/dialog";
-import ModalActionButtons from "../ModalActionButtons";
+import React, { useEffect, useState } from "react"
+import { Dialog } from "primereact/dialog"
+import ModalActionButtons from "../ModalActionButtons"
 import {
   Controller,
   FormProvider,
   useFieldArray,
   useFormContext,
   useWatch,
-} from "react-hook-form";
-import ReactDatePicker from "react-datepicker";
-import { Button } from "primereact/button";
-import NumberInput from "../Forms/NumberInput";
-import { toast } from "react-toastify";
-import CDatePicker from "../Forms/CDatePicker";
+} from "react-hook-form"
+import ReactDatePicker from "react-datepicker"
+import { Button } from "primereact/button"
+import NumberInput from "../Forms/NumberInput"
+import { toast } from "react-toastify"
+import CDatePicker from "../Forms/CDatePicker"
 
 const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   React.useImperativeHandle(ref, () => ({
     openDialog(val) {
-      setVisible(val);
+      setVisible(val)
     },
-  }));
+  }))
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   const installmentsFieldArray = useFieldArray({
     control: method.control,
     name: "installments",
-  });
+  })
 
   async function handleSaveClick() {
     let InstallmentTotalRemaining = method.getValues(
       "InstallmentTotalRemaining"
-    );
+    )
     if (InstallmentTotalRemaining === 0) {
       if (!method.formState.errors?.installments) {
-        setVisible(false);
+        setVisible(false)
       }
     } else if (InstallmentTotalRemaining > 0) {
       toast.error("Installment Amounts must be equal to Total Net Amount", {
         position: "top-right",
-      });
+      })
     } else {
       toast.error("Installment Amounts cannot exceed Total Net Amount", {
         position: "top-right",
-      });
+      })
     }
   }
 
@@ -58,9 +58,9 @@ const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
         draggable={false}
         style={{ width: "80vw", height: "80vh" }}
         onHide={() => {
-          setVisible(false);
+          setVisible(false)
           if (mode === "new") {
-            method.resetField("installments");
+            method.resetField("installments")
           }
         }}
         footer={
@@ -70,8 +70,8 @@ const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
                 saveLabel="Save Installments"
                 cancelLabel="Cancel"
                 handleCancelClick={() => {
-                  setVisible(false);
-                  method.resetField("installments");
+                  setVisible(false)
+                  method.resetField("installments")
                 }}
                 handleSaveClick={handleSaveClick}
               />
@@ -196,7 +196,7 @@ const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
                   </div>
                 </div>
               </React.Fragment>
-            );
+            )
           })}
         </div>
         <FormProvider {...method}>
@@ -204,42 +204,42 @@ const NewCustomerInvoiceIntallmentsModal = React.forwardRef(({ mode }, ref) => {
         </FormProvider>
       </Dialog>
     </>
-  );
-});
+  )
+})
 
 function CalculateInstallmentTotal() {
-  const method = useFormContext();
+  const method = useFormContext()
 
   const details = useWatch({
     control: method.control,
     name: "installments",
-  });
+  })
 
   useEffect(() => {
-    calculateTotal(details);
-  }, [details]);
+    calculateTotal(details)
+  }, [details])
 
   function calculateTotal(details = []) {
-    let totalInstallment = parseFloat(0 + method.getValues("TotalNetAmount"));
-    let totalRemainingInstallment = 0;
+    let totalInstallment = parseFloat(0 + method.getValues("TotalNetAmount"))
+    let totalRemainingInstallment = 0
 
     if (details?.length > 0) {
       details.forEach((item, index) => {
-        const amount = parseFloat(item.Amount || 0);
-        totalRemainingInstallment += amount;
-      });
-      method.setValue("InstallmentTotalAmount", totalInstallment);
+        const amount = parseFloat(item.Amount || 0)
+        totalRemainingInstallment += amount
+      })
+      method.setValue("InstallmentTotalAmount", totalInstallment)
       method.setValue(
         "InstallmentTotalRemaining",
         totalInstallment - totalRemainingInstallment
-      );
+      )
     } else {
-      method.setValue("InstallmentTotalAmount", totalInstallment);
-      method.setValue("InstallmentTotalRemaining", totalInstallment);
+      method.setValue("InstallmentTotalAmount", totalInstallment)
+      method.setValue("InstallmentTotalRemaining", totalInstallment)
     }
   }
 
-  return null;
+  return null
 }
 
-export default NewCustomerInvoiceIntallmentsModal;
+export default NewCustomerInvoiceIntallmentsModal

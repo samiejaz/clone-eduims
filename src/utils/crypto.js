@@ -1,43 +1,43 @@
-import { ShowErrorToast } from "./CommonFunctions";
+import { ShowErrorToast } from "./CommonFunctions"
 
 export function encryptID(id) {
-  return btoa(id);
+  return btoa(id)
 }
 
 export function decryptID(encryptedId) {
   try {
-    return atob(encryptedId);
+    return atob(encryptedId)
   } catch (err) {
-    return 0;
+    return 0
   }
 }
 
 export function verifyAndReturnEncryptedIDForForms(encryptedID) {
   try {
-    let message = "";
-    let decryptedID;
-    let isCorrect = true;
+    let message = ""
+    let decryptedID
+    let isCorrect = true
 
-    let falseCondtions = ["", "new", "view", "edit", undefined, null, 0, "0"];
+    let falseCondtions = ["", "new", "view", "edit", undefined, null, 0, "0"]
 
     if (falseCondtions.some((condtion) => condtion === encryptedID)) {
-      isCorrect = false;
-      message = "Invalid ID!";
+      isCorrect = false
+      message = "Invalid ID!"
     }
 
     if (isCorrect) {
-      decryptedID = decryptID(encryptedID);
+      decryptedID = decryptID(encryptedID)
 
       if (falseCondtions.some((condtion) => condtion === decryptedID)) {
-        message = "The record you are trying to access does not exists!";
-        ShowErrorToast("CRYPTO::" + message);
+        message = "The record you are trying to access does not exists!"
+        ShowErrorToast("CRYPTO::" + message)
       } else {
-        return decryptedID;
+        return decryptedID
       }
     } else {
-      ShowErrorToast("CRYPTO::" + message);
+      ShowErrorToast("CRYPTO::" + message)
     }
   } catch (e) {
-    ShowErrorToast("CRYPTO::" + e.message);
+    ShowErrorToast("CRYPTO::" + e.message)
   }
 }

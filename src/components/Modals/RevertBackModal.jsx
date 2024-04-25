@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Row, Form, Col } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import CDropdown from "../Forms/CDropdown";
-import { CDatePicker } from "../Forms/form";
-import { useProductsInfoSelectData } from "../../hooks/SelectData/useSelectData";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useUserData } from "../../context/AuthContext";
-import { toast } from "react-toastify";
-import axios from "axios";
-import { LeadsViewerButtonToolBar } from "../../pages/LeadsIntroductionViewer/LeadsIntroductionViewer";
-import { QUERY_KEYS } from "../../utils/enums";
-import { getLeadsTimelineDetail } from "../../pages/LeadsIntroductionViewer/LeadsTimelineData";
+import React, { useEffect, useState } from "react"
+import { Row, Form, Col } from "react-bootstrap"
+import { useForm } from "react-hook-form"
+import CDropdown from "../Forms/CDropdown"
+import { CDatePicker } from "../Forms/form"
+import { useProductsInfoSelectData } from "../../hooks/SelectData/useSelectData"
+import { Dialog } from "primereact/dialog"
+import { Button } from "primereact/button"
+import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useUserData } from "../../context/AuthContext"
+import { toast } from "react-toastify"
+import axios from "axios"
+import { LeadsViewerButtonToolBar } from "../../pages/LeadsIntroductionViewer/LeadsIntroductionViewer"
+import { QUERY_KEYS } from "../../utils/enums"
+import { getLeadsTimelineDetail } from "../../pages/LeadsIntroductionViewer/LeadsTimelineData"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const defaultValues = {
   Description: "",
-};
+}
 
 const RevertBackModal = ({
   visible,
@@ -40,15 +40,15 @@ const RevertBackModal = ({
         setVisible={setVisible}
       />
     </Dialog>
-  );
-};
-export default RevertBackModal;
+  )
+}
+export default RevertBackModal
 
 export const useRevertBackModalHook = ({
   LeadsIntroductionID = 0,
   LeadIntroductionDetailID = 0,
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   return {
     setVisible,
@@ -60,8 +60,8 @@ export const useRevertBackModalHook = ({
         LeadIntroductionDetailID={LeadIntroductionDetailID}
       />
     ),
-  };
-};
+  }
+}
 
 export const RevertBackFields = ({
   LeadIntroductionID = 0,
@@ -71,14 +71,14 @@ export const RevertBackFields = ({
   AreFieldsEnable = true,
   setVisible,
 }) => {
-  const queryClient = useQueryClient();
-  const [isEnable, setIsEnable] = useState(AreFieldsEnable);
+  const queryClient = useQueryClient()
+  const [isEnable, setIsEnable] = useState(AreFieldsEnable)
 
-  const user = useUserData();
+  const user = useUserData()
 
   const method = useForm({
     defaultValues,
-  });
+  })
 
   const { data } = useQuery({
     queryKey: ["key2", LeadIntroductionDetailID],
@@ -87,32 +87,32 @@ export const RevertBackFields = ({
         LeadIntroductionDetailID,
         LoginUserID: user.userID,
       }),
-  });
+  })
 
   useEffect(() => {
     if (LeadIntroductionDetailID !== 0 && data && data.length > 0) {
-      method.setValue("Description", data[0].Description);
+      method.setValue("Description", data[0].Description)
     }
-  }, [LeadIntroductionDetailID, data]);
+  }, [LeadIntroductionDetailID, data])
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Retruned successfully!");
+        toast.success("Retruned successfully!")
         if (ResetFields) {
-          method.reset();
+          method.reset()
 
           queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.LEADS_DEMO_DATA],
-          });
-          setVisible(false);
+          })
+          setVisible(false)
         } else {
-          setIsEnable(false);
+          setIsEnable(false)
         }
       }
     },
-  });
+  })
 
   const onSubmit = (data) => {
     mutation.mutate({
@@ -121,8 +121,8 @@ export const RevertBackFields = ({
       LeadIntroductionDetailID: LeadIntroductionDetailID,
       userID: user.userID,
       from: "Pending",
-    });
-  };
+    })
+  }
 
   const dialogContent = (
     <>
@@ -180,7 +180,7 @@ export const RevertBackFields = ({
         </div>
       </form>
     </>
-  );
+  )
 
-  return <>{dialogContent}</>;
-};
+  return <>{dialogContent}</>
+}

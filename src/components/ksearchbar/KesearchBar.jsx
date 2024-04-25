@@ -1,39 +1,39 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./ksearchbar.css";
-import { Star, X } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react"
+import "./ksearchbar.css"
+import { Star, X } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
 import {
   useClickOutside,
   useCtrlKeyDown,
   useKeydown,
   useLocalStorageListener,
-} from "./KsearchBarHooks";
-import { convertBackToOriginal } from "../../utils/routes";
+} from "./KsearchBarHooks"
+import { convertBackToOriginal } from "../../utils/routes"
 
-const routes = convertBackToOriginal();
+const routes = convertBackToOriginal()
 
 const KesearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [ids, setIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("")
+  const [ids, setIds] = useState([])
   const [items, setItems] = useState({
     recentRoutes: false,
     routes: routes,
-  });
-  const [visible, setVisible] = useState(false);
-  const listContainerRef = useRef();
-  const divRef = useRef();
+  })
+  const [visible, setVisible] = useState(false)
+  const listContainerRef = useRef()
+  const divRef = useRef()
 
-  console.log(visible);
-  useCtrlKeyDown(() => setVisible(true), "k");
-  useKeydown(() => setVisible(false), "Escape");
+  console.log(visible)
+  useCtrlKeyDown(() => setVisible(true), "k")
+  useKeydown(() => setVisible(false), "Escape")
   useClickOutside(() => {
-    setVisible(false);
-  }, divRef);
+    setVisible(false)
+  }, divRef)
 
   useEffect(() => {
-    const storedIds = JSON.parse(localStorage.getItem("favouriteRoutes")) || [];
-    setIds(storedIds);
-  }, []);
+    const storedIds = JSON.parse(localStorage.getItem("favouriteRoutes")) || []
+    setIds(storedIds)
+  }, [])
 
   useEffect(() => {
     if (ids && searchQuery === "") {
@@ -45,30 +45,30 @@ const KesearchBar = () => {
             return {
               ...item,
               isFavourite: true,
-            };
+            }
           }),
-      });
+      })
     } else {
       if (searchQuery !== "") {
-        setItems({ recentRoutes: false, routes: routes });
+        setItems({ recentRoutes: false, routes: routes })
       }
     }
-  }, [searchQuery, ids]);
+  }, [searchQuery, ids])
 
   function favouriteRoute(id, removeRoute = false) {
-    let favouriteArray = JSON.parse(localStorage.getItem("favouriteRoutes"));
+    let favouriteArray = JSON.parse(localStorage.getItem("favouriteRoutes"))
     if (favouriteArray === null) {
-      favouriteArray = [];
+      favouriteArray = []
     }
     if (favouriteArray.includes(id) && removeRoute) {
-      favouriteArray = favouriteArray.filter((item) => item !== id);
+      favouriteArray = favouriteArray.filter((item) => item !== id)
     } else {
-      favouriteArray.push(id);
+      favouriteArray.push(id)
     }
 
-    localStorage.setItem("favouriteRoutes", JSON.stringify(favouriteArray));
+    localStorage.setItem("favouriteRoutes", JSON.stringify(favouriteArray))
 
-    setIds(favouriteArray);
+    setIds(favouriteArray)
   }
 
   return (
@@ -117,19 +117,19 @@ const KesearchBar = () => {
         </>
       ) : null}
     </>
-  );
-};
+  )
+}
 
 const KesearchBarInput = ({
   searchQuery,
   setSearchQuery,
   focusOnFirstItem,
 }) => {
-  const inputRef = useRef();
+  const inputRef = useRef()
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    inputRef.current?.focus()
+  }, [])
 
   return (
     <>
@@ -154,14 +154,14 @@ const KesearchBarInput = ({
         onKeyDown={(e) => {
           if (e.key === "ArrowDown") {
             if (focusOnFirstItem) {
-              focusOnFirstItem();
+              focusOnFirstItem()
             }
           }
         }}
       />
     </>
-  );
-};
+  )
+}
 
 const KesearchBarList = React.forwardRef(
   ({ searchQuery, items, favouriteRoute }, ref) => {
@@ -170,36 +170,36 @@ const KesearchBarList = React.forwardRef(
         .replaceAll(" ", "")
         .toLowerCase()
         .includes(searchQuery.replaceAll(" ", "").toLowerCase())
-    );
+    )
 
     React.useImperativeHandle(ref, () => ({
       focusOnFirstItem,
-    }));
+    }))
 
-    const divs = useRef([]);
-    const navigate = useNavigate();
+    const divs = useRef([])
+    const navigate = useNavigate()
 
     function focusOnFirstItem() {
       if (divs.current.length > 0) {
-        divs.current[0]?.focus();
+        divs.current[0]?.focus()
       }
     }
 
     const handleKeyDown = (event) => {
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-        event.preventDefault();
+        event.preventDefault()
         const currentIndex = divs.current.findIndex(
           (div) => document.activeElement === div
-        );
+        )
         if (currentIndex !== -1) {
           const nextIndex =
-            event.key === "ArrowDown" ? currentIndex + 1 : currentIndex - 1;
+            event.key === "ArrowDown" ? currentIndex + 1 : currentIndex - 1
           if (nextIndex >= 0 && nextIndex < divs.current.length) {
-            divs.current[nextIndex].focus();
+            divs.current[nextIndex].focus()
           }
         }
       }
-    };
+    }
     return (
       <>
         <ul
@@ -241,9 +241,9 @@ const KesearchBarList = React.forwardRef(
           )}
         </ul>
       </>
-    );
+    )
   }
-);
+)
 
 const KesearchBarListItem = React.forwardRef((props, ref) => {
   const {
@@ -255,20 +255,20 @@ const KesearchBarListItem = React.forwardRef((props, ref) => {
     showIcon,
     isFavourite,
     favouriteRoute,
-  } = props;
+  } = props
   return (
     <div
       tabIndex={"0"}
       onKeyDown={(e) => {
         if (e.ctrlKey && e.key === "Enter") {
-          window.open(path, "_blank");
-          favouriteRoute(id);
+          window.open(path, "_blank")
+          favouriteRoute(id)
         } else {
           if (e.key === "Enter") {
-            navigate(path);
-            favouriteRoute(id);
+            navigate(path)
+            favouriteRoute(id)
           } else {
-            handleKeyPress(e);
+            handleKeyPress(e)
           }
         }
       }}
@@ -326,7 +326,7 @@ const KesearchBarListItem = React.forwardRef((props, ref) => {
         </>
       ) : null}
     </div>
-  );
-});
+  )
+})
 
-export default KesearchBar;
+export default KesearchBar

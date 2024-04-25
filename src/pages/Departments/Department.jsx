@@ -1,52 +1,52 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewDepartment,
   deleteDepartmentByID,
   fetchAllDepartments,
   fetchDepartmentById,
-} from "../../api/DepartmentData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
+} from "../../api/DepartmentData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.DEPARTMENT;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.DEPARTMENT_QUERY_KEY;
-let IDENTITY = "DepartmentID";
+let parentRoute = ROUTE_URLS.DEPARTMENT
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.DEPARTMENT_QUERY_KEY
+let IDENTITY = "DepartmentID"
 
 export default function DepartmentOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.USERS.DEPARTMENTS_FORM_KEY,
       MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -116,51 +116,51 @@ export default function DepartmentOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function DepartmentDetail({ userRights }) {
-  document.title = "Departments";
+  document.title = "Departments"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     DepartmentName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllDepartments(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteDepartmentByID,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
-      });
+      })
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ DepartmentID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ DepartmentID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -233,73 +233,73 @@ function DepartmentDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 function DepartmentForm({ mode, userRights }) {
-  document.title = "Department Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { DepartmentID } = useParams();
+  document.title = "Department Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { DepartmentID } = useParams()
   const { control, handleSubmit, setFocus, setValue } = useForm({
     defaultValues: {
       DepartmentName: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const DepartmentData = useQuery({
     queryKey: [queryKey, DepartmentID],
     queryFn: () => fetchDepartmentById(DepartmentID, user.userID),
     enabled: DepartmentID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (DepartmentID !== undefined && DepartmentData?.data?.length > 0) {
-      setValue("DepartmentName", DepartmentData.data[0].DepartmentName);
-      setValue("InActive", DepartmentData.data[0].InActive);
+      setValue("DepartmentName", DepartmentData.data[0].DepartmentName)
+      setValue("InActive", DepartmentData.data[0].InActive)
     }
-  }, [DepartmentID, DepartmentData]);
+  }, [DepartmentID, DepartmentData])
 
   const mutation = useMutation({
     mutationFn: addNewDepartment,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteDepartmentByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       DepartmentID: DepartmentID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    navigate(newRoute);
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + DepartmentID);
+      navigate(viewRoute + DepartmentID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + DepartmentID);
+    navigate(editRoute + DepartmentID)
   }
 
   function onSubmit(data) {
@@ -307,7 +307,7 @@ function DepartmentForm({ mode, userRights }) {
       formData: data,
       userID: user.userID,
       DepartmentID: DepartmentID,
-    });
+    })
   }
 
   return (
@@ -325,10 +325,10 @@ function DepartmentForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -372,5 +372,5 @@ function DepartmentForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

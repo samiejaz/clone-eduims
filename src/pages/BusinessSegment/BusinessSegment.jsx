@@ -1,52 +1,52 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewBusinessSegment,
   deleteBusinessSegmentByID,
   fetchAllBusinessSegments,
   fetchBusinessSegmentById,
-} from "../../api/BusinessSegmentData";
-import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+} from "../../api/BusinessSegmentData"
+import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.BUSINESS_SEGMENT_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.BUSINESS_SEGMENT_QUERY_KEY;
-let IDENTITY = "BusinessSegmentID";
+let parentRoute = ROUTE_URLS.BUSINESS_SEGMENT_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.BUSINESS_SEGMENT_QUERY_KEY
+let IDENTITY = "BusinessSegmentID"
 
 export default function BusinessSegmentOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.BUSINESS_SEGMENT_FORM_KEY,
       MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -119,55 +119,55 @@ export default function BusinessSegmentOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 export function BusinessSegmentDetail({ userRights }) {
-  document.title = "Business Segments";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Business Segments"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     BusinessSegmentTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllBusinessSegments(user.userID),
 
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessSegmentByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(parentRoute);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(parentRoute)
       }
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       BusinessSegmentID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -241,28 +241,28 @@ export function BusinessSegmentDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 export function BusinessSegmentForm({ mode, userRights }) {
-  document.title = "Business Segment Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { BusinessSegmentID } = useParams();
+  document.title = "Business Segment Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { BusinessSegmentID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       BusinessSegmentTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const BusinessSegmentData = useQuery({
     queryKey: [queryKey, BusinessSegmentID],
     queryFn: () => fetchBusinessSegmentById(BusinessSegmentID, user.userID),
     enabled: BusinessSegmentID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (
@@ -272,56 +272,56 @@ export function BusinessSegmentForm({ mode, userRights }) {
       setValue(
         "BusinessSegmentTitle",
         BusinessSegmentData.data[0].BusinessSegmentTitle
-      );
-      setValue("InActive", BusinessSegmentData.data[0].InActive);
+      )
+      setValue("InActive", BusinessSegmentData.data[0].InActive)
     }
-  }, [BusinessSegmentID, BusinessSegmentData]);
+  }, [BusinessSegmentID, BusinessSegmentData])
 
   const mutation = useMutation({
     mutationFn: addNewBusinessSegment,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessSegmentByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       BusinessSegmentID: BusinessSegmentID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + BusinessSegmentID);
+      navigate(viewRoute + BusinessSegmentID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + BusinessSegmentID);
+    navigate(editRoute + BusinessSegmentID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       BusinessSegmentID: BusinessSegmentID,
-    });
+    })
   }
 
   return (
@@ -339,10 +339,10 @@ export function BusinessSegmentForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -386,5 +386,5 @@ export function BusinessSegmentForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

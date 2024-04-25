@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "primereact/button";
+import React from "react"
+import { Button } from "primereact/button"
 
 export const CIconButton = ({
   onClick,
@@ -33,5 +33,5 @@ export const CIconButton = ({
         {...options}
       />
     </>
-  );
-};
+  )
+}

@@ -1,10 +1,10 @@
-import React from "react";
-import { Toolbar } from "primereact/toolbar";
-import { Button } from "primereact/button";
-import useKeyCombination from "../hooks/useKeyCombinationHook";
-import { confirmDialog } from "primereact/confirmdialog";
-import { useMutation } from "@tanstack/react-query";
-import { PrintReportInNewTab } from "../utils/CommonFunctions";
+import React from "react"
+import { Toolbar } from "primereact/toolbar"
+import { Button } from "primereact/button"
+import useKeyCombination from "../hooks/useKeyCombinationHook"
+import { confirmDialog } from "primereact/confirmdialog"
+import { useMutation } from "@tanstack/react-query"
+import { PrintReportInNewTab } from "../utils/CommonFunctions"
 
 export default function ButtonToolBar({
   printLoading = false,
@@ -41,9 +41,9 @@ export default function ButtonToolBar({
 }) {
   useKeyCombination(() => {
     if (mode === "edit" || mode === "new") {
-      handleSave();
+      handleSave()
     }
-  }, "s");
+  }, "s")
 
   useKeyCombination(() => {
     if (mode === "view") {
@@ -56,27 +56,27 @@ export default function ButtonToolBar({
         position: "top",
         accept: () => handleDelete(),
         reject: () => {},
-      });
+      })
     }
-  }, "d");
+  }, "d")
 
   useKeyCombination(() => {
     if (mode === "view") {
-      handleEdit();
+      handleEdit()
     }
-  }, "e");
+  }, "e")
 
   useKeyCombination(() => {
     if (mode !== "view") {
-      handleCancel();
+      handleCancel()
     }
-  }, "c");
+  }, "c")
 
   useKeyCombination(() => {
     if (mode !== "new") {
-      handleAddNew();
+      handleAddNew()
     }
-  }, "n");
+  }, "n")
 
   const startContent = (
     <Button
@@ -84,10 +84,10 @@ export default function ButtonToolBar({
       tooltip={GoBackLabel}
       className="p-button-text"
       onClick={() => {
-        handleGoBack();
+        handleGoBack()
       }}
     />
-  );
+  )
   const centerContent = (
     <React.Fragment>
       <div className="w-full flex gap-1 flex-wrap">
@@ -167,7 +167,7 @@ export default function ButtonToolBar({
                   position: "top",
                   accept: () => handleDelete(),
                   reject: () => {},
-                });
+                })
               }}
               className="p-button-success rounded"
               pt={{
@@ -185,8 +185,8 @@ export default function ButtonToolBar({
                 saveLabel !== "Save"
                   ? saveLabel
                   : mode === "edit"
-                  ? "Update"
-                  : "Save"
+                    ? "Update"
+                    : "Save"
               }
               icon="pi pi-check"
               type="submit"
@@ -220,7 +220,7 @@ export default function ButtonToolBar({
         {utilityContent}
       </div>
     </React.Fragment>
-  );
+  )
 
   return (
     <>
@@ -238,7 +238,7 @@ export default function ButtonToolBar({
         }}
       />
     </>
-  );
+  )
 }
 
 const PrintRecordButton = ({ getPrintFromUrl, printDisable, fullUrl }) => {
@@ -247,7 +247,7 @@ const PrintRecordButton = ({ getPrintFromUrl, printDisable, fullUrl }) => {
       PrintReportInNewTab({
         controllerName: getPrintFromUrl || fullUrl,
       }),
-  });
+  })
 
   return (
     <>
@@ -268,5 +268,5 @@ const PrintRecordButton = ({ getPrintFromUrl, printDisable, fullUrl }) => {
         }}
       />
     </>
-  );
-};
+  )
+}

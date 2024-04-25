@@ -1,1 +1,1 @@
-export { default as usePrintReportAsPDF } from "./usePrintReportPDFHook";
+export { default as usePrintReportAsPDF } from "./usePrintReportPDFHook"

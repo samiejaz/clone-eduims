@@ -1,96 +1,96 @@
-import { Row, Form, Col, Spinner } from "react-bootstrap";
-import { DataTable } from "primereact/datatable";
-import { Button } from "primereact/button";
-import { Column } from "primereact/column";
+import { Row, Form, Col, Spinner } from "react-bootstrap"
+import { DataTable } from "primereact/datatable"
+import { Button } from "primereact/button"
+import { Column } from "primereact/column"
 import {
   useForm,
   useFieldArray,
   useFormContext,
   FormProvider,
   useWatch,
-} from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import ActionButtons from "../../components/ActionButtons";
-import { FilterMatchMode } from "primereact/api";
-import React, { useContext, useEffect, useRef, useState } from "react";
+} from "react-hook-form"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import ActionButtons from "../../components/ActionButtons"
+import { FilterMatchMode } from "primereact/api"
+import React, { useContext, useEffect, useRef, useState } from "react"
 
-import { AuthContext } from "../../context/AuthContext";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 
-import TextInput from "../../components/Forms/TextInput";
-import NumberInput from "../../components/Forms/NumberInput";
+import TextInput from "../../components/Forms/TextInput"
+import NumberInput from "../../components/Forms/NumberInput"
 
-import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons";
-import CDropdown from "../../components/Forms/CDropdown";
-import { DevTool } from "@hookform/devtools";
+import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
+import CDropdown from "../../components/Forms/CDropdown"
+import { DevTool } from "@hookform/devtools"
 import {
   addNewReceiptVoucher,
   deleteReceiptVoucherByID,
   fetchAllReceiptVoucheres,
   fetchMonthlyMaxReceiptNo,
   fetchReceiptVoucherById,
-} from "../../api/ReceiptVoucherData";
-import ButtonToolBar from "../../components/ActionsToolbar";
+} from "../../api/ReceiptVoucherData"
+import ButtonToolBar from "../../components/ActionsToolbar"
 
-import { Tag } from "primereact/tag";
+import { Tag } from "primereact/tag"
 import {
   MENU_KEYS,
   QUERY_KEYS,
   ROUTE_URLS,
   SELECT_QUERY_KEYS,
-} from "../../utils/enums";
+} from "../../utils/enums"
 import {
   fetchAllBankAccountsForSelect,
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
   fetchAllOldCustomersForSelect,
   fetchAllSessionsForSelect,
-} from "../../api/SelectData";
-import CDatePicker from "../../components/Forms/CDatePicker";
-import CNumberInput from "../../components/Forms/CNumberInput";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { decryptID, encryptID } from "../../utils/crypto";
-import { Dropdown } from "primereact/dropdown";
-import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks";
-import { ShowErrorToast } from "../../utils/CommonFunctions";
+} from "../../api/SelectData"
+import CDatePicker from "../../components/Forms/CDatePicker"
+import CNumberInput from "../../components/Forms/CNumberInput"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { decryptID, encryptID } from "../../utils/crypto"
+import { Dropdown } from "primereact/dropdown"
+import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
+import { ShowErrorToast } from "../../utils/CommonFunctions"
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
   { label: "Online Transfer", value: "Online" },
   { label: "Instrument", value: "Instrument" },
-];
+]
 
 const instrumentTypeOptions = [
   { value: "Cheque", label: "Cheque" },
   { value: "DD", label: "DD" },
-];
+]
 
-let parentRoute = ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let cashDetailColor = "#22C55E";
-let onlineDetailColor = "#F59E0B";
-let chequeDetailColor = "#3B82F6";
-let ddDetailColor = "#8f48d2";
-let queryKey = QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY;
+let parentRoute = ROUTE_URLS.ACCOUNTS.RECIEPT_VOUCHER_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let cashDetailColor = "#22C55E"
+let onlineDetailColor = "#F59E0B"
+let chequeDetailColor = "#3B82F6"
+let ddDetailColor = "#8f48d2"
+let queryKey = QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY
 
-let IDENTITY = "ReceiptVoucherID";
+let IDENTITY = "ReceiptVoucherID"
 
 export default function ReceiptVoucher() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
       MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -163,19 +163,19 @@ export default function ReceiptVoucher() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function ReceiptEntrySearch({ userRights }) {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
-  const { handlePrintReport } = usePrintReportAsPDF();
+  const { handlePrintReport } = usePrintReportAsPDF()
 
   const [filters, setFilters] = useState({
     BusinessUnitName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -184,39 +184,39 @@ function ReceiptEntrySearch({ userRights }) {
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ReceiptMode: { value: null, matchMode: FilterMatchMode.EQUALS },
     TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext)
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllReceiptVoucheres(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteReceiptVoucherByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   if (isLoading) {
-    return <h1>Loading...</h1>;
+    return <h1>Loading...</h1>
   }
 
   function handleDelete(id) {
-    deleteMutation.mutate({ ReceiptVoucherID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ ReceiptVoucherID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   const statusBodyTemplate = (rowData) => {
@@ -225,13 +225,13 @@ function ReceiptEntrySearch({ userRights }) {
         value={rowData.ReceiptMode}
         style={{ background: getSeverity(rowData.ReceiptMode) }}
       />
-    );
-  };
+    )
+  }
   const statusItemTemplate = (option) => {
-    return <Tag value={option} style={{ background: getSeverity(option) }} />;
-  };
+    return <Tag value={option} style={{ background: getSeverity(option) }} />
+  }
 
-  const [statuses] = useState(["Cash", "Online", "Instrument", "Cheque", "DD"]);
+  const [statuses] = useState(["Cash", "Online", "Instrument", "Cheque", "DD"])
 
   const statusRowFilterTemplate = (options) => {
     return (
@@ -245,23 +245,23 @@ function ReceiptEntrySearch({ userRights }) {
         showClear
         style={{ minWidth: "12rem" }}
       />
-    );
-  };
+    )
+  }
 
   const getSeverity = (status) => {
     switch (status) {
       case "Online":
-        return "#F9A972";
+        return "#F9A972"
       case "Cash":
-        return "#10B981";
+        return "#10B981"
       case "Instrument":
-        return "#3B82F6";
+        return "#3B82F6"
       case "DD":
-        return "danger";
+        return "danger"
       default:
-        return "#10B981";
+        return "#10B981"
     }
-  };
+  }
 
   return (
     <>
@@ -381,7 +381,7 @@ function ReceiptEntrySearch({ userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 const defaultValues = {
@@ -400,23 +400,23 @@ const defaultValues = {
   InstrumentDate: new Date(),
   VoucherDate: new Date(),
   receiptDetail: [],
-};
+}
 
 export function ReceiptEntryForm({ mode, userRights }) {
-  document.title = "Receipt Voucher Entry";
-  const queryClient = useQueryClient();
-  const { ReceiptVoucherID } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  document.title = "Receipt Voucher Entry"
+  const queryClient = useQueryClient()
+  const { ReceiptVoucherID } = useParams()
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+  const { user } = useContext(AuthContext)
   // Ref
-  const detailTableRef = useRef();
-  const customerCompRef = useRef();
-  const receiptModeRef = useRef();
+  const detailTableRef = useRef()
+  const customerCompRef = useRef()
+  const receiptModeRef = useRef()
   // Form
   const method = useForm({
     defaultValues: defaultValues,
-  });
+  })
 
   const { data: ReceiptVoucherData } = useQuery({
     queryKey: [QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY, +ReceiptVoucherID],
@@ -424,96 +424,93 @@ export function ReceiptEntryForm({ mode, userRights }) {
     enabled: mode !== "new",
     initialData: [],
     refetchOnWindowFocus: false,
-  });
+  })
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
     enabled: mode !== "",
-  });
+  })
 
   const receiptVoucherMutation = useMutation({
     mutationFn: addNewReceiptVoucher,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteReceiptVoucherByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (
       ReceiptVoucherID !== undefined &&
       ReceiptVoucherData?.Master?.length > 0
     ) {
-      method.setValue("SessionID", ReceiptVoucherData?.Master[0]?.SessionID);
+      method.setValue("SessionID", ReceiptVoucherData?.Master[0]?.SessionID)
       method.setValue(
         "BusinessUnitID",
         ReceiptVoucherData?.Master[0]?.BusinessUnitID
-      );
-      method.setValue("Customer", ReceiptVoucherData?.Master[0]?.CustomerID);
+      )
+      method.setValue("Customer", ReceiptVoucherData?.Master[0]?.CustomerID)
 
       customerCompRef.current.setCustomerID(
         ReceiptVoucherData?.Master[0]?.CustomerID
-      );
+      )
 
       method.setValue(
         "CustomerLedgers",
         ReceiptVoucherData?.Master[0]?.AccountID
-      );
-      method.setValue("DocumentNo", ReceiptVoucherData?.Master[0]?.DocumentNo);
-      method.setValue("VoucherNo", ReceiptVoucherData?.Master[0]?.VoucherNo);
+      )
+      method.setValue("DocumentNo", ReceiptVoucherData?.Master[0]?.DocumentNo)
+      method.setValue("VoucherNo", ReceiptVoucherData?.Master[0]?.VoucherNo)
       method.setValue(
         "SessionBasedVoucherNo",
         ReceiptVoucherData?.Master[0]?.SessionBasedVoucherNo
-      );
-      method.setValue(
-        "ReceiptMode",
-        ReceiptVoucherData?.Master[0]?.ReceiptMode
-      );
+      )
+      method.setValue("ReceiptMode", ReceiptVoucherData?.Master[0]?.ReceiptMode)
       receiptModeRef.current?.setReceiptMode(
         ReceiptVoucherData?.Master[0]?.ReceiptMode === "Instrument"
           ? ReceiptVoucherData?.Master[0]?.InstrumentType
           : ReceiptVoucherData?.Master[0]?.ReceiptMode
-      );
+      )
       method.setValue(
         "InstrumentType",
         ReceiptVoucherData?.Master[0]?.InstrumentType
-      );
+      )
       method.setValue(
         "Description",
         ReceiptVoucherData?.Master[0]?.Description ?? undefined
-      );
-      method.setValue("FromBank", ReceiptVoucherData?.Master[0]?.FromBank);
+      )
+      method.setValue("FromBank", ReceiptVoucherData?.Master[0]?.FromBank)
       method.setValue(
         "TransactionID",
         ReceiptVoucherData?.Master[0]?.TransactionID === null
           ? ReceiptVoucherData?.Master[0]?.InstrumentNo
           : ReceiptVoucherData?.Master[0]?.TransactionID
-      );
+      )
       method.setValue(
         "ReceivedInBankID",
         ReceiptVoucherData?.Master[0]?.ReceivedInBankID
-      );
+      )
       method.setValue(
         "InstrumentDate",
         new Date(ReceiptVoucherData?.Master[0]?.InstrumentDate)
-      );
+      )
       method.setValue(
         "VoucherDate",
         new Date(ReceiptVoucherData?.Master[0]?.VoucherDate)
-      );
+      )
 
       method.setValue(
         "receiptDetail",
@@ -523,28 +520,28 @@ export function ReceiptEntryForm({ mode, userRights }) {
             Amount: item.Amount,
             Description: item.DetailDescription,
             Balance: item.Balance,
-          };
+          }
         })
-      );
+      )
     } else {
-      navigate(parentRoute);
+      navigate(parentRoute)
     }
-  }, [ReceiptVoucherID, ReceiptVoucherData]);
+  }, [ReceiptVoucherID, ReceiptVoucherData])
 
   function handleEdit() {
-    navigate(`${editRoute}${ReceiptVoucherID}`);
+    navigate(`${editRoute}${ReceiptVoucherID}`)
   }
 
   function handleAddNew() {
-    method.reset();
-    navigate(newRoute);
+    method.reset()
+    navigate(newRoute)
   }
 
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(`${parentRoute}/${ReceiptVoucherID}`);
+      navigate(`${parentRoute}/${ReceiptVoucherID}`)
     }
   }
 
@@ -552,8 +549,8 @@ export function ReceiptEntryForm({ mode, userRights }) {
     deleteMutation.mutate({
       ReceiptVoucherID: ReceiptVoucherID,
       LoginUserID: user.userID,
-    });
-    navigate(parentRoute);
+    })
+    navigate(parentRoute)
   }
 
   function onSubmit(data) {
@@ -561,7 +558,7 @@ export function ReceiptEntryForm({ mode, userRights }) {
       formData: data,
       userID: user.userID,
       ReceiptVoucherID: ReceiptVoucherID,
-    });
+    })
   }
 
   return (
@@ -585,10 +582,10 @@ export function ReceiptEntryForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleSave={() => method.handleSubmit(onSubmit)()}
               GoBackLabel="Receipts"
@@ -685,7 +682,7 @@ export function ReceiptEntryForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 // New Master Fields
@@ -694,15 +691,15 @@ function SessionSelect({ mode }) {
     queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
     queryFn: fetchAllSessionsForSelect,
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   useEffect(() => {
     if (data.length > 0 && mode === "new") {
-      method.setValue("SessionID", data[0]?.SessionID);
+      method.setValue("SessionID", data[0]?.SessionID)
     }
-  }, [data, mode]);
+  }, [data, mode])
 
   return (
     <>
@@ -727,30 +724,30 @@ function SessionSelect({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const CustomerDependentFields = React.forwardRef(
   ({ mode, removeAllRows }, ref) => {
-    const [CustomerID, setCustomerID] = useState(0);
+    const [CustomerID, setCustomerID] = useState(0)
 
     React.useImperativeHandle(ref, () => ({
       setCustomerID,
-    }));
+    }))
 
     const { data: customerSelectData } = useQuery({
       queryKey: [QUERY_KEYS.ALL_CUSTOMER_QUERY_KEY],
       queryFn: fetchAllOldCustomersForSelect,
       initialData: [],
-    });
+    })
 
     const { data: CustomerAccounts } = useQuery({
       queryKey: [QUERY_KEYS.CUSTOMER_ACCOUNTS_QUERY_KEY, CustomerID],
       queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
       initialData: [],
-    });
+    })
 
-    const method = useFormContext();
+    const method = useFormContext()
 
     return (
       <>
@@ -772,8 +769,8 @@ const CustomerDependentFields = React.forwardRef(
               required={true}
               filter={true}
               onChange={(e) => {
-                setCustomerID(e.value);
-                removeAllRows();
+                setCustomerID(e.value)
+                removeAllRows()
               }}
               focusOptions={() => method.setFocus("CustomerLedgers")}
             />
@@ -797,53 +794,53 @@ const CustomerDependentFields = React.forwardRef(
               required={true}
               filter={true}
               onChange={() => {
-                removeAllRows();
+                removeAllRows()
               }}
               focusOptions={() => method.setFocus("ReceiptMode")}
             />
           </div>
         </Form.Group>
       </>
-    );
+    )
   }
-);
+)
 
 function BusinessUnitDependantFields({ mode }) {
-  const [BusinesssUnitID, setBusinessUnitID] = useState(0);
+  const [BusinesssUnitID, setBusinessUnitID] = useState(0)
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
     enabled: mode !== "",
-  });
+  })
   useEffect(() => {
     if (BusinessUnitSelectData.length > 0) {
       method.setValue(
         "BusinessUnitID",
         BusinessUnitSelectData[0].BusinessUnitID
-      );
-      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID);
+      )
+      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID)
     }
-  }, [BusinessUnitSelectData]);
+  }, [BusinessUnitSelectData])
 
   useEffect(() => {
     async function fetchReceiptNo() {
-      const data = await fetchMonthlyMaxReceiptNo(BusinesssUnitID);
-      method.setValue("BusinessUnitID", BusinesssUnitID);
-      method.setValue("VoucherNo", data.data[0]?.VoucherNo);
+      const data = await fetchMonthlyMaxReceiptNo(BusinesssUnitID)
+      method.setValue("BusinessUnitID", BusinesssUnitID)
+      method.setValue("VoucherNo", data.data[0]?.VoucherNo)
       method.setValue(
         "SessionBasedVoucherNo",
         data.data[0]?.SessionBasedVoucherNo
-      );
+      )
     }
 
     if (BusinesssUnitID !== 0 && mode === "new") {
-      fetchReceiptNo();
+      fetchReceiptNo()
     }
-  }, [BusinesssUnitID, mode]);
+  }, [BusinesssUnitID, mode])
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -865,7 +862,7 @@ function BusinessUnitDependantFields({ mode }) {
             required={true}
             focusOptions={() => method.setFocus("Customer")}
             onChange={(e) => {
-              setBusinessUnitID(e.value);
+              setBusinessUnitID(e.value)
             }}
           />
         </div>
@@ -904,18 +901,18 @@ function BusinessUnitDependantFields({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const ReceiptModeDependantFields = React.forwardRef(
   ({ mode, removeAllRows }, ref) => {
-    const [receiptMode, setReceiptMode] = useState("");
+    const [receiptMode, setReceiptMode] = useState("")
 
     React.useImperativeHandle(ref, () => ({
       setReceiptMode,
-    }));
+    }))
 
-    const method = useFormContext();
+    const method = useFormContext()
 
     function ShowSection() {
       if (receiptMode === "Online") {
@@ -923,7 +920,7 @@ const ReceiptModeDependantFields = React.forwardRef(
           <>
             <MasterBankFields mode={mode} />
           </>
-        );
+        )
       } else if (receiptMode === "DD" || receiptMode === "Cheque") {
         return (
           <>
@@ -946,15 +943,15 @@ const ReceiptModeDependantFields = React.forwardRef(
               </div>
             </Form.Group>
           </>
-        );
+        )
       }
     }
 
     function emptyAllFieldsOnReceiptModeChange() {
-      method.resetField("FromBank");
-      method.resetField("InstrumentDate");
-      method.resetField("ReceivedInBankID");
-      method.resetField("TransactionID");
+      method.resetField("FromBank")
+      method.resetField("InstrumentDate")
+      method.resetField("ReceivedInBankID")
+      method.resetField("TransactionID")
     }
 
     return (
@@ -973,17 +970,17 @@ const ReceiptModeDependantFields = React.forwardRef(
               name={`ReceiptMode`}
               placeholder="Select receipt mode"
               onChange={(e) => {
-                setReceiptMode(e.value);
-                method.setValue("InstrumentType", []);
-                removeAllRows();
-                emptyAllFieldsOnReceiptModeChange();
+                setReceiptMode(e.value)
+                method.setValue("InstrumentType", [])
+                removeAllRows()
+                emptyAllFieldsOnReceiptModeChange()
               }}
               showOnFocus={true}
               disabled={mode === "view"}
               focusOptions={(e) => {
                 method.setFocus(
                   e.value === "Instrument" ? "InstrumentType" : "Description"
-                );
+                )
               }}
             />
           </div>
@@ -1007,9 +1004,9 @@ const ReceiptModeDependantFields = React.forwardRef(
               }
               focusOptions={() => method.setFocus("Description")}
               onChange={(e) => {
-                setReceiptMode(e.value);
-                removeAllRows();
-                emptyAllFieldsOnReceiptModeChange();
+                setReceiptMode(e.value)
+                removeAllRows()
+                emptyAllFieldsOnReceiptModeChange()
               }}
             />
           </div>
@@ -1019,9 +1016,9 @@ const ReceiptModeDependantFields = React.forwardRef(
           <ShowSection />
         </Row>
       </>
-    );
+    )
   }
-);
+)
 
 const MasterBankFields = ({
   mode,
@@ -1033,9 +1030,9 @@ const MasterBankFields = ({
     queryKey: [SELECT_QUERY_KEYS.BANKS_SELECT_QUERY_KEY],
     queryFn: fetchAllBankAccountsForSelect,
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1080,8 +1077,8 @@ const MasterBankFields = ({
         </div>
       </Form.Group>
     </>
-  );
-};
+  )
+}
 
 // New Detail Header Form
 function ReceiptDetailHeaderForm({ appendSingleRow }) {
@@ -1091,11 +1088,11 @@ function ReceiptDetailHeaderForm({ appendSingleRow }) {
       Amount: 0,
       Description: "",
     },
-  });
+  })
 
   function onSubmit(data) {
-    appendSingleRow(data);
-    method.reset();
+    appendSingleRow(data)
+    method.reset()
   }
 
   return (
@@ -1131,7 +1128,7 @@ function ReceiptDetailHeaderForm({ appendSingleRow }) {
         <DevTool control={method.control} />
       </form>
     </>
-  );
+  )
 }
 
 function DetailHeaderBusinessUnitDependents() {
@@ -1139,9 +1136,9 @@ function DetailHeaderBusinessUnitDependents() {
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1189,12 +1186,12 @@ function DetailHeaderBusinessUnitDependents() {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const ReceiptDetailTable = React.forwardRef(
   ({ mode, BusinessUnitSelectData }, ref) => {
-    const method = useFormContext();
+    const method = useFormContext()
 
     const { fields, append, remove } = useFieldArray({
       control: method.control,
@@ -1202,16 +1199,16 @@ const ReceiptDetailTable = React.forwardRef(
       rules: {
         required: true,
       },
-    });
+    })
 
     React.useImperativeHandle(ref, () => ({
       appendSingleRow(data) {
-        append(data);
+        append(data)
       },
       removeAllRows() {
-        remove();
+        remove()
       },
-    }));
+    }))
 
     return (
       <>
@@ -1274,15 +1271,15 @@ const ReceiptDetailTable = React.forwardRef(
                     BusinessUnitSelectData={BusinessUnitSelectData}
                     remove={remove}
                   />
-                );
+                )
               })}
             </FormProvider>
           </tbody>
         </table>
       </>
-    );
+    )
   }
-);
+)
 
 function ReceiptDetailTableRow({
   item,
@@ -1291,7 +1288,7 @@ function ReceiptDetailTableRow({
   remove,
   disable = false,
 }) {
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1370,28 +1367,28 @@ function ReceiptDetailTableRow({
         </td>
       </tr>
     </>
-  );
+  )
 }
 
 // Total
 function ReceiptDetailTotal() {
-  const method = useFormContext();
+  const method = useFormContext()
 
   const details = useWatch({
     control: method.control,
     name: "receiptDetail",
-  });
+  })
 
   useEffect(() => {
-    calculateTotal(details);
-  }, [details]);
+    calculateTotal(details)
+  }, [details])
 
   function calculateTotal(details) {
     let total = details?.reduce((accumulator, item) => {
-      return accumulator + parseFloat(item.Amount);
-    }, 0);
-    method.setValue("TotalNetAmount", total);
+      return accumulator + parseFloat(item.Amount)
+    }, 0)
+    method.setValue("TotalNetAmount", total)
   }
 
-  return null;
+  return null
 }

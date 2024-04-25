@@ -1,5 +1,5 @@
-import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Button } from "react-bootstrap"
+import { Link } from "react-router-dom"
 
 function ActionButtons({
   ID,
@@ -118,7 +118,7 @@ function ActionButtons({
       )}
       {children}
     </>
-  );
+  )
 }
 
-export default ActionButtons;
+export default ActionButtons

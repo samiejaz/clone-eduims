@@ -1,59 +1,59 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewSession,
   deleteSessionByID,
   fetchAllSessions,
   fetchSessionById,
-} from "../../api/SessionData";
+} from "../../api/SessionData"
 import {
   ROUTE_URLS,
   QUERY_KEYS,
   SELECT_QUERY_KEYS,
   MENU_KEYS,
-} from "../../utils/enums";
-import CDatePicker from "../../components/Forms/CDatePicker";
-import { parseISO } from "date-fns";
+} from "../../utils/enums"
+import CDatePicker from "../../components/Forms/CDatePicker"
+import { parseISO } from "date-fns"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY;
-let IDENTITY = "SessionID";
+let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY
+let IDENTITY = "SessionID"
 
 export default function SessionInfoOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY,
       MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -123,52 +123,52 @@ export default function SessionInfoOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 export function SessionDetail({ userRights }) {
-  document.title = "Session Info";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Session Info"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     SessionTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllSessions(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteSessionByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       SessionID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -253,94 +253,94 @@ export function SessionDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 export function SessionForm({ mode, userRights }) {
-  document.title = "Session Info Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { SessionID } = useParams();
+  document.title = "Session Info Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { SessionID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       SessionTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const SessionData = useQuery({
     queryKey: [queryKey, SessionID],
     queryFn: () => fetchSessionById(SessionID, user?.userID),
     enabled: SessionID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (+SessionID !== 0 && SessionData.data.length > 0) {
-      setValue("SessionTitle", SessionData?.data[0]?.SessionTitle);
+      setValue("SessionTitle", SessionData?.data[0]?.SessionTitle)
       setValue(
         "SessionOpeningDate",
         parseISO(SessionData?.data[0]?.SessionOpeningDate)
-      );
+      )
       setValue(
         "SessionClosingDate",
         parseISO(SessionData?.data[0]?.SessionClosingDate)
-      );
+      )
     }
-  }, [SessionID, SessionData.data]);
+  }, [SessionID, SessionData.data])
 
   const mutation = useMutation({
     mutationFn: addNewSession,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
         queryClient.invalidateQueries({
           queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
-        });
-        navigate(`${parentRoute}/${RecordID}`);
+        })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteSessionByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
       queryClient.invalidateQueries({
         queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
-      });
-      navigate(parentRoute);
+      })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       SessionID: SessionID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + SessionID);
+      navigate(viewRoute + SessionID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + SessionID);
+    navigate(editRoute + SessionID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       SessionID: SessionID,
-    });
+    })
   }
 
   return (
@@ -358,10 +358,10 @@ export function SessionForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -434,5 +434,5 @@ export function SessionForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

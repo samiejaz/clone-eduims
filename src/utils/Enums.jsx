@@ -47,7 +47,7 @@ export const ROUTE_URLS = {
   CONFIGURATION: {
     USER_RIGHTS_ROUTE: "/configuration/userrights",
   },
-};
+}
 
 export const QUERY_KEYS = {
   BUSINESS_TYPE_QUERY_KEY: "businessTypes",
@@ -73,7 +73,7 @@ export const QUERY_KEYS = {
   // Select
   ALL_CUSTOMER_QUERY_KEY: "oldcustomers",
   CUSTOMER_ACCOUNTS_QUERY_KEY: "customerAccounts",
-};
+}
 
 export const SELECT_QUERY_KEYS = {
   COUNTRIES_SELECT_QUERY_KEY: "countriesSelect",
@@ -93,12 +93,12 @@ export const SELECT_QUERY_KEYS = {
   ACTIVATION_CLIENTS_SELECT_QUERY_KEY: "activationClientsSelect",
   SOFTWARE_CLIENTS_SELECT_QUERY_KEY: "softwareClientsSelect",
   PRODUCT_CATEGORIES_SELECT_QUERY_KEY: "productCategoriesSelect",
-};
+}
 
 export const TOAST_CONTAINER_IDS = {
   CLOSE_ON_CLICK: "closeOnClick",
   AUTO_CLOSE: "autoClose",
-};
+}
 
 export const MENU_KEYS = {
   GENERAL: {
@@ -150,8 +150,8 @@ export const MENU_KEYS = {
     GROUP_KEY: "mnuConfiguration",
     USER_RIGHTS_ROUTE: "mnuUserRights",
   },
-};
+}
 
 export const MOVEABLE_COMPNENTS_NAMES = {
   LEADS_DASHBOARD_CARDS: "InfoCardsContainer",
-};
+}

@@ -1,26 +1,26 @@
-import axios from "axios";
-import { toast } from "react-toastify";
-import { decryptID, encryptID } from "../utils/crypto";
-import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
+import axios from "axios"
+import { toast } from "react-toastify"
+import { decryptID, encryptID } from "../utils/crypto"
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
-const CONTROLLER = "data_LeadIntroduction";
-const WHEREMETHOD = "GetLeadIntroductionWhere";
-const DELETEMETHOD = "LeadIntroductionDelete";
-const POSTMEHTOD = "LeadIntroductionInsertUpdate";
+const CONTROLLER = "data_LeadIntroduction"
+const WHEREMETHOD = "GetLeadIntroductionWhere"
+const DELETEMETHOD = "LeadIntroductionDelete"
+const POSTMEHTOD = "LeadIntroductionInsertUpdate"
 
 // URL: /data_LeadIntroduction/GetLeadIntroductionWhere?LoginUserID=??
 export async function fetchAllLeadIntroductions(LoginUserID) {
   try {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LoginUserID=${LoginUserID}`
-    );
+    )
 
-    return data.data ?? [];
+    return data.data ?? []
   } catch (err) {
-    ShowErrorToast(err.message);
-    return [];
+    ShowErrorToast(err.message)
+    return []
   }
 }
 
@@ -30,13 +30,13 @@ export async function fetchLeadIntroductionById(
   LoginUserID
 ) {
   if (LeadIntroductionID !== undefined || LeadIntroductionID !== 0) {
-    LeadIntroductionID = decryptID(LeadIntroductionID);
+    LeadIntroductionID = decryptID(LeadIntroductionID)
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LeadIntroductionID=${LeadIntroductionID}&LoginUserID=${LoginUserID}`
-    );
-    return data.data ?? [];
+    )
+    return data.data ?? []
   } else {
-    return [];
+    return []
   }
 }
 // URL: /data_LeadIntroduction/LeadIntroductionDelete?LeadIntroductionID=??&LoginUserID=??
@@ -45,20 +45,20 @@ export async function deleteLeadIntroductionByID({
   LoginUserID,
 }) {
   try {
-    LeadIntroductionID = decryptID(LeadIntroductionID);
+    LeadIntroductionID = decryptID(LeadIntroductionID)
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?LeadIntroductionID=${LeadIntroductionID}&LoginUserID=${LoginUserID}`
-    );
+    )
 
     if (data.success === true) {
-      ShowSuccessToast("Lead sucessfully deleted!");
-      return true;
+      ShowSuccessToast("Lead sucessfully deleted!")
+      return true
     } else {
-      ShowErrorToast(data.message);
-      return false;
+      ShowErrorToast(data.message)
+      return false
     }
   } catch (e) {
-    ShowErrorToast(e.message);
+    ShowErrorToast(e.message)
   }
 }
 // URL: /data_LeadIntroduction/LeadIntroductionInsertUpdate
@@ -82,36 +82,36 @@ export async function addNewLeadIntroduction({
       LeadSourceID: formData.LeadSourceID,
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
-    };
-    DataToSend.ContactPersonMobileNo = formData.ContactPersonMobileNo;
+    }
+    DataToSend.ContactPersonMobileNo = formData.ContactPersonMobileNo
 
-    DataToSend.ContactPersonWhatsAppNo = formData.ContactPersonWhatsAppNo;
+    DataToSend.ContactPersonWhatsAppNo = formData.ContactPersonWhatsAppNo
 
     LeadIntroductionID =
-      LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
+      LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID)
     if (LeadIntroductionID === 0 || LeadIntroductionID === undefined) {
-      DataToSend.LeadIntroductionID = 0;
+      DataToSend.LeadIntroductionID = 0
     } else {
-      DataToSend.LeadIntroductionID = LeadIntroductionID;
+      DataToSend.LeadIntroductionID = LeadIntroductionID
     }
 
     const { data } = await axios.post(
       apiUrl + `/${CONTROLLER}/${POSTMEHTOD}`,
       DataToSend
-    );
+    )
     if (data.success === true) {
       if (LeadIntroductionID !== 0) {
-        ShowSuccessToast("Lead updated successfully!");
+        ShowSuccessToast("Lead updated successfully!")
       } else {
-        ShowSuccessToast("Lead created successfully!");
+        ShowSuccessToast("Lead created successfully!")
       }
-      return { success: true, RecordID: encryptID(data?.LeadIntroductionID) };
+      return { success: true, RecordID: encryptID(data?.LeadIntroductionID) }
     } else {
-      ShowErrorToast(data.message);
-      return { success: false, RecordID: LeadIntroductionID };
+      ShowErrorToast(data.message)
+      return { success: false, RecordID: LeadIntroductionID }
     }
   } catch (e) {
-    ShowErrorToast(e.message);
+    ShowErrorToast(e.message)
   }
 }
 
@@ -125,71 +125,71 @@ export async function addLeadIntroductionOnAction({
   file,
 }) {
   try {
-    let Status = "";
+    let Status = ""
 
-    let newFormData = new FormData();
+    let newFormData = new FormData()
     if (from === "Forward") {
       newFormData.append(
         "UserID",
         formData.UserID === undefined || formData.UserID === null
           ? ""
           : formData.UserID
-      );
-      newFormData.append("MeetingPlace", formData.MeetingPlace);
+      )
+      newFormData.append("MeetingPlace", formData.MeetingPlace)
       newFormData.append(
         "DepartmentID",
         formData.DepartmentID === undefined ? "" : formData.DepartmentID
-      );
-      newFormData.append("MeetingTime", formData.MeetingTime.toUTCString());
-      newFormData.append("RecommendedProductID", formData.ProductInfoID);
-      newFormData.append("Description", formData.Description ?? "");
-      Status = "Forwarded";
+      )
+      newFormData.append("MeetingTime", formData.MeetingTime.toUTCString())
+      newFormData.append("RecommendedProductID", formData.ProductInfoID)
+      newFormData.append("Description", formData.Description ?? "")
+      Status = "Forwarded"
     } else if (from === "Quoted" || from === "Finalized") {
       if (file && file.length > 0) {
-        newFormData.append("AttachmentFile", file[0]);
+        newFormData.append("AttachmentFile", file[0])
       } else {
         newFormData.append(
           "AttachmentFile",
           formData?.AttachmentFile !== undefined ? formData?.AttachmentFile : ""
-        );
+        )
       }
-      newFormData.append("Amount", formData.Amount ?? 1900);
-      newFormData.append("Description", formData.Description ?? "");
+      newFormData.append("Amount", formData.Amount ?? 1900)
+      newFormData.append("Description", formData.Description ?? "")
       // if (fileData) {
       //   newFormData.append("FileType", formData.FileType);
       //   newFormData.append("FileName", formData.FileName);
       //   newFormData.append("FilePath", formData.FilePath);
       //   newFormData.append("FullFilePath", formData.FullFilePath);
       // }
-      Status = from === "Quoted" ? "Quoted" : "Finalized";
+      Status = from === "Quoted" ? "Quoted" : "Finalized"
     } else if (from === "Closed") {
-      newFormData.append("Amount", formData.Amount ?? 100);
-      newFormData.append("Description", formData.Description ?? "");
-      Status = "Closed";
+      newFormData.append("Amount", formData.Amount ?? 100)
+      newFormData.append("Description", formData.Description ?? "")
+      Status = "Closed"
     } else if (from === "MeetingDone") {
-      newFormData.append("MeetingTime", formData.MeetingTime.toUTCString());
-      newFormData.append("RecommendedProductID", formData.ProductInfoID);
-      newFormData.append("Description", formData.Description ?? "");
-      Status = "Meeting Done";
+      newFormData.append("MeetingTime", formData.MeetingTime.toUTCString())
+      newFormData.append("RecommendedProductID", formData.ProductInfoID)
+      newFormData.append("Description", formData.Description ?? "")
+      Status = "Meeting Done"
     } else if (from === "Pending") {
-      newFormData.append("Description", formData.Description ?? "");
-      Status = "Pending";
+      newFormData.append("Description", formData.Description ?? "")
+      Status = "Pending"
     } else if (from === "Acknowledged") {
-      Status = "Acknowledged";
+      Status = "Acknowledged"
     }
     LeadIntroductionDetailID =
-      LeadIntroductionDetailID === 0 ? 0 : decryptID(LeadIntroductionDetailID);
+      LeadIntroductionDetailID === 0 ? 0 : decryptID(LeadIntroductionDetailID)
     if (LeadIntroductionDetailID !== 0) {
-      newFormData.append("LeadIntroductionDetailID", LeadIntroductionDetailID);
+      newFormData.append("LeadIntroductionDetailID", LeadIntroductionDetailID)
     } else {
-      newFormData.append("LeadIntroductionDetailID", 0);
+      newFormData.append("LeadIntroductionDetailID", 0)
     }
-    newFormData.append("EntryUserID", +userID);
+    newFormData.append("EntryUserID", +userID)
     LeadIntroductionID =
-      LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID);
+      LeadIntroductionID === 0 ? 0 : decryptID(LeadIntroductionID)
 
-    newFormData.append("LeadIntroductionID", LeadIntroductionID);
-    newFormData.append("Status", Status);
+    newFormData.append("LeadIntroductionID", LeadIntroductionID)
+    newFormData.append("Status", Status)
 
     const { data } = await axios.post(
       apiUrl + `/${CONTROLLER}/LeadIntroductionOnAction`,
@@ -199,20 +199,20 @@ export async function addLeadIntroductionOnAction({
           "Content-Type": "multipart/form-data",
         },
       }
-    );
+    )
 
     if (data.success === true) {
-      return { success: true };
+      return { success: true }
     } else {
       ShowErrorToast(data.message, {
         autoClose: false,
-      });
-      return { success: false };
+      })
+      return { success: false }
     }
   } catch (error) {
     ShowErrorToast(error.message, {
       autoClose: false,
-    });
+    })
   }
 }
 
@@ -220,10 +220,10 @@ export async function fetchAllDemonstrationLeadsData({ UserID, DepartmentID }) {
   if (UserID && DepartmentID) {
     const { data } = await axios.post(
       `${apiUrl}/UserLeadDashboard/GetLeadIntroductionWhereForUser?LoginUserID=${UserID}&DepartmentID=${DepartmentID}`
-    );
-    return data.data ?? [];
+    )
+    return data.data ?? []
   } else {
-    return [];
+    return []
   }
 }
 
@@ -235,11 +235,11 @@ export async function fetchDemonstrationLeadsDataByID({
   if (LeadIntroductionDetailID !== 0) {
     const { data } = await axios.post(
       `${apiUrl}/UserLeadDashboard/GetLeadIntroductionWhereForUser?LoginUserID=${UserID}&DepartmentID=${DepartmentID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-    );
+    )
 
-    return data.data ?? [];
+    return data.data ?? []
   } else {
-    return [];
+    return []
   }
 }
 
@@ -249,17 +249,17 @@ export async function getLeadsFile(filename) {
       const { data } = await axios.get(
         `${apiUrl}/data_LeadIntroduction/DownloadLeadProposal?filename=${filename}`,
         { responseType: "blob" }
-      );
-      const file = new File([data], filename, { type: data?.type });
+      )
+      const file = new File([data], filename, { type: data?.type })
 
-      return file;
+      return file
     } else {
-      return { name: null };
+      return { name: null }
     }
   } catch (err) {
     ShowErrorToast(err.message, {
       autoClose: false,
-    });
-    return { name: null };
+    })
+    return { name: null }
   }
 }

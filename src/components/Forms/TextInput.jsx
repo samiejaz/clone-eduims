@@ -1,6 +1,6 @@
-import { InputText } from "primereact/inputtext";
-import { classNames } from "primereact/utils";
-import { Controller } from "react-hook-form";
+import { InputText } from "primereact/inputtext"
+import { classNames } from "primereact/utils"
+import { Controller } from "react-hook-form"
 
 function TextInput({
   Label = "",
@@ -29,9 +29,9 @@ function TextInput({
               value={field.value}
               ref={field.ref}
               onChange={(e) => {
-                field.onChange(e.target.value);
+                field.onChange(e.target.value)
                 if (onChange) {
-                  onChange(e);
+                  onChange(e)
                 }
               }}
               style={{
@@ -45,7 +45,7 @@ function TextInput({
               onKeyDown={(e) => {
                 if (focusOptions) {
                   if (e.key === "Enter") {
-                    focusOptions();
+                    focusOptions()
                   }
                 }
               }}
@@ -62,7 +62,7 @@ function TextInput({
         </>
       )}
     />
-  );
+  )
 }
 
-export default TextInput;
+export default TextInput

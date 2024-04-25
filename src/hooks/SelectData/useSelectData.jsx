@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query"
 import {
   fetchAllActivationCustomersForSelect,
   fetchAllBankAccountsForSelect,
@@ -20,8 +20,8 @@ import {
   fetchAllSoftwareCustomersForSelect,
   fetchAllTehsilsForSelect,
   fetchAllUsersForSelect,
-} from "../../api/SelectData";
-import { SELECT_QUERY_KEYS } from "../../utils/enums";
+} from "../../api/SelectData"
+import { SELECT_QUERY_KEYS } from "../../utils/enums"
 
 // Activation Customers
 export function useActivationClientsSelectData(OldCustomerID = 0) {
@@ -29,8 +29,8 @@ export function useActivationClientsSelectData(OldCustomerID = 0) {
     queryKey: ["activationClients", OldCustomerID],
     queryFn: () => fetchAllActivationCustomersForSelect(OldCustomerID),
     initialData: [],
-  });
-  return activationClients;
+  })
+  return activationClients
 }
 
 // Software Mgt. Customers
@@ -39,8 +39,8 @@ export function useSoftwareClientsSelectData(OldCustomerID = 0) {
     queryKey: ["softwareClients", OldCustomerID],
     queryFn: () => fetchAllSoftwareCustomersForSelect(OldCustomerID),
     initialData: [],
-  });
-  return softwareClients;
+  })
+  return softwareClients
 }
 // All Customers
 export function useOldCustomerSelectData() {
@@ -48,8 +48,8 @@ export function useOldCustomerSelectData() {
     queryKey: ["oldcustomers"],
     queryFn: () => fetchAllOldCustomersForSelect(),
     initialData: [],
-  });
-  return oldCustomers;
+  })
+  return oldCustomers
 }
 
 // All Customer Branches
@@ -58,8 +58,8 @@ export function useAllCustomersBranchSelectData() {
     queryKey: ["customersBranch"],
     queryFn: () => fetchAllCustomersBranch(),
     initialData: [],
-  });
-  return customersBranch;
+  })
+  return customersBranch
 }
 
 // Customer Accounts
@@ -69,8 +69,8 @@ export function useCustomerLedgersSelectData(CustomerID = 0) {
     queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
     enabled: CustomerID !== 0,
     initialData: [],
-  });
-  return CustomerAccounts;
+  })
+  return CustomerAccounts
 }
 // All Sessions
 export function useSessionSelectData() {
@@ -78,9 +78,9 @@ export function useSessionSelectData() {
     queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
     queryFn: fetchAllSessionsForSelect,
     staleTime: 24 * 1000 * 60 * 60,
-  });
+  })
 
-  return sessionSelectData;
+  return sessionSelectData
 }
 
 // All Business Units
@@ -89,8 +89,8 @@ export function useBusinessUnitsSelectData() {
     queryKey: ["businessUnits"],
     queryFn: () => fetchAllBusinessUnitsForSelect(),
     initialData: [],
-  });
-  return businessSelectData;
+  })
+  return businessSelectData
 }
 
 // All Products
@@ -103,8 +103,8 @@ export function useProductsInfoSelectData(
     queryFn: () =>
       fetchAllProductsForSelect(BusinessUnitID, selectWithoutBusinessUnits),
     initialData: [],
-  });
-  return productsInfoSelectData;
+  })
+  return productsInfoSelectData
 }
 
 // All Product Categories
@@ -113,9 +113,9 @@ export function useProductsCategoriesSelectData() {
     queryKey: ["productCategories"],
     queryFn: () => fetchAllProductCategoriesForSelect(),
     initialData: [],
-  });
+  })
 
-  return productCategories;
+  return productCategories
 }
 
 // All Services
@@ -124,8 +124,8 @@ export function useServicesInfoSelectData(BusinessUnitID = 0) {
     queryKey: ["servicesInfo", BusinessUnitID],
     queryFn: () => fetchAllServicesForSelect(BusinessUnitID),
     initialData: [],
-  });
-  return servicesInfoSelectData;
+  })
+  return servicesInfoSelectData
 }
 
 // All Invoices
@@ -135,7 +135,7 @@ export function useCustomerInvoicesSelectData(CustomerID = 0) {
   //   queryFn: () => fetchAllCustomerInvoices(CustomerID),
   //   initialData: [],
   // });
-  return [];
+  return []
 }
 // All Invoices
 export function useCustomerInvoiceInstallments(CustomerID = 0, AccountID = 0) {
@@ -143,8 +143,8 @@ export function useCustomerInvoiceInstallments(CustomerID = 0, AccountID = 0) {
     queryKey: ["customerLedgers", CustomerID, AccountID],
     queryFn: () => fetchAllInvoiceInstallmetns(CustomerID, AccountID),
     initialData: [],
-  });
-  return customerInvoiceInstallmentsSelectData;
+  })
+  return customerInvoiceInstallmentsSelectData
 }
 
 // Bank Accounts
@@ -153,8 +153,8 @@ export function useBankAccountsSelectData() {
     queryKey: ["bankAccounts"],
     queryFn: () => fetchAllBankAccountsForSelect(),
     initialData: [],
-  });
-  return data;
+  })
+  return data
 }
 
 // Countries
@@ -163,8 +163,8 @@ export function useAllCountiesSelectData() {
     queryKey: [SELECT_QUERY_KEYS.COUNTRIES_SELECT_QUERY_KEY],
     queryFn: () => fetchAllCountriesForSelect(),
     initialData: [],
-  });
-  return data;
+  })
+  return data
 }
 
 // Tehsils
@@ -174,8 +174,8 @@ export function useAllTehsilsSelectData(CountryID = 0) {
     queryFn: () => fetchAllTehsilsForSelect(CountryID),
     enabled: CountryID !== 0,
     initialData: [],
-  });
-  return bankAccountsSelectData;
+  })
+  return bankAccountsSelectData
 }
 
 // Business Types
@@ -184,8 +184,8 @@ export function useAllBusinessTypesSelectData() {
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_TYPES_SELECT_QUERY_KEY],
     queryFn: () => fetchAllBusinessTypesForSelect(),
     initialData: [],
-  });
-  return data;
+  })
+  return data
 }
 
 // Business Natures
@@ -194,8 +194,8 @@ export function useAllBusinessNatureSelectData(forAutoComplete = false) {
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_NATURE_SELECT_QUERY_KEY],
     queryFn: () => fetchAllBusinessNatureForSelect(forAutoComplete),
     initialData: [],
-  });
-  return data;
+  })
+  return data
 }
 
 // Business Segments
@@ -204,8 +204,8 @@ export function useAllBusinessSegmentsSelectData() {
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_SEGMENTS_SELECT_QUERY_KEY],
     queryFn: () => fetchAllBusinessSegmentsForSelect(),
     initialData: [],
-  });
-  return data;
+  })
+  return data
 }
 
 // Lead Sources
@@ -214,8 +214,8 @@ export function useAllLeadsSouceSelectData() {
     queryKey: [SELECT_QUERY_KEYS.LEAD_SOURCE_SELECT_QUERY_KEY],
     queryFn: () => fetchAllLeadSourcesForSelect(),
     initialData: [],
-  });
-  return data;
+  })
+  return data
 }
 
 // Departments
@@ -226,8 +226,8 @@ export function useAllDepartmentsSelectData() {
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
-  return data;
+  })
+  return data
 }
 
 // Users
@@ -238,6 +238,6 @@ export function useAllUsersSelectData() {
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,
-  });
-  return data;
+  })
+  return data
 }

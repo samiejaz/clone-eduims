@@ -1,4 +1,4 @@
-import { Dock } from "primereact/dock";
+import { Dock } from "primereact/dock"
 
 const CustomerInvoiceDock = () => {
   const items = [
@@ -42,8 +42,8 @@ const CustomerInvoiceDock = () => {
         />
       ),
     },
-  ];
-  return <Dock model={items} position={"right"} />;
-};
+  ]
+  return <Dock model={items} position={"right"} />
+}
 
-export default CustomerInvoiceDock;
+export default CustomerInvoiceDock

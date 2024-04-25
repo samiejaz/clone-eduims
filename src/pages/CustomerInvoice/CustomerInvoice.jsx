@@ -1,19 +1,19 @@
-import { Form, Row, Col, Spinner } from "react-bootstrap";
-import { Button } from "primereact/button";
+import { Form, Row, Col, Spinner } from "react-bootstrap"
+import { Button } from "primereact/button"
 import {
   Controller,
   FormProvider,
   useFieldArray,
   useForm,
   useFormContext,
-} from "react-hook-form";
-import CustomerInvoiceDetailTable from "./CustomerInvoiceDetailTable";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import ReactDatePicker from "react-datepicker";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
-import CustomerInvoiceHeader from "./CustomerInvoiceHeader";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+} from "react-hook-form"
+import CustomerInvoiceDetailTable from "./CustomerInvoiceDetailTable"
+import React, { useContext, useEffect, useRef, useState } from "react"
+import ReactDatePicker from "react-datepicker"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent"
+import CustomerInvoiceHeader from "./CustomerInvoiceHeader"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
@@ -22,72 +22,72 @@ import {
   fetchAllProductsForSelect,
   fetchAllServicesForSelect,
   fetchAllSessionsForSelect,
-} from "../../api/SelectData";
+} from "../../api/SelectData"
 import {
   CustomerInvoiceDataContext,
   CustomerInvoiceDataProivder,
   InvoiceDataContext,
   InvoiceDataProivder,
-} from "./CustomerInvoiceDataContext";
-import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
-import { toast } from "react-toastify";
-import useEditModal from "../../hooks/useEditModalHook";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+} from "./CustomerInvoiceDataContext"
+import { AuthContext } from "../../context/AuthContext"
+import axios from "axios"
+import { toast } from "react-toastify"
+import useEditModal from "../../hooks/useEditModalHook"
+import useDeleteModal from "../../hooks/useDeleteModalHook"
 import {
   deleteCustomerInvoiceByID,
   fetchAllCustomerInvoices,
   fetchCustomerInvoiceById,
   fetchMaxInvoiceNo,
   fetchMaxSessionBasedVoucherNo,
-} from "../../api/CustomerInvoiceData";
-import { FilterMatchMode } from "primereact/api";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { parseISO } from "date-fns";
-import { CustomSpinner } from "../../components/CustomSpinner";
+} from "../../api/CustomerInvoiceData"
+import { FilterMatchMode } from "primereact/api"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { parseISO } from "date-fns"
+import { CustomSpinner } from "../../components/CustomSpinner"
 import {
   useBusinessUnitsSelectData,
   useCustomerLedgersSelectData,
   useOldCustomerSelectData,
   useProductsInfoSelectData,
   useServicesInfoSelectData,
-} from "../../hooks/SelectData/useSelectData";
-import { CustomerInvoiceInstallmentForm } from "../../components/CustomerInoivceInstallmentsComponent";
-import { useNavigate, useParams } from "react-router-dom";
-import ButtonToolBar from "./CustomerInvoiceToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CDropdown from "../../components/Forms/CDropdown";
-import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+} from "../../hooks/SelectData/useSelectData"
+import { CustomerInvoiceInstallmentForm } from "../../components/CustomerInoivceInstallmentsComponent"
+import { useNavigate, useParams } from "react-router-dom"
+import ButtonToolBar from "./CustomerInvoiceToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CDropdown from "../../components/Forms/CDropdown"
+import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums"
 
-let parentRoute = ROUTE_URLS.ACCOUNTS.CUSTOMER_INVOICE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let cashDetailColor = "#22C55E";
-let onlineDetailColor = "#F59E0B";
-let chequeDetailColor = "#3B82F6";
-let ddDetailColor = "#8f48d2";
-let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY;
+let parentRoute = ROUTE_URLS.ACCOUNTS.CUSTOMER_INVOICE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let cashDetailColor = "#22C55E"
+let onlineDetailColor = "#F59E0B"
+let chequeDetailColor = "#3B82F6"
+let ddDetailColor = "#8f48d2"
+let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 function CustomerInvoice() {
-  const { pageTitles } = useContext(AppConfigurationContext);
-  document.title = "Customer Invoice";
+  const { pageTitles } = useContext(AppConfigurationContext)
+  document.title = "Customer Invoice"
   return (
     <>
       <CustomerInvoiceDataProivder>
         <CustomerInvoiceSearch />
       </CustomerInvoiceDataProivder>
     </>
-  );
+  )
 }
 
 function CustomerInvoiceSearch() {
-  const queryClient = useQueryClient();
-  const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const { user } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   const [filters, setFilters] = useState({
     InvoiceTitle: {
@@ -110,25 +110,25 @@ function CustomerInvoiceSearch() {
       value: null,
       matchMode: FilterMatchMode.CONTAINS,
     },
-  });
+  })
 
   const {
     render: EditModal,
     handleShow: handleEditShow,
     handleClose: handleEditClose,
     setIdToEdit,
-  } = useEditModal(handleEdit);
+  } = useEditModal(handleEdit)
 
   const {
     render: DeleteModal,
     handleShow: handleDeleteShow,
     handleClose: handleDeleteClose,
     setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  } = useDeleteModal(handleDelete)
 
   const { setIsEnable, setCustomerInvoiceID } = useContext(
     CustomerInvoiceDataContext
-  );
+  )
 
   const {
     data: CustomerInvoices,
@@ -138,33 +138,33 @@ function CustomerInvoiceSearch() {
     queryKey: ["customerInvoices"],
     queryFn: () => fetchAllCustomerInvoices(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteCustomerInvoiceByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   function handleEdit(CustomerInvoiceID) {
-    navigate(parentRoute + "/edit/" + CustomerInvoiceID);
-    handleEditClose();
-    setIdToEdit(0);
+    navigate(parentRoute + "/edit/" + CustomerInvoiceID)
+    handleEditClose()
+    setIdToEdit(0)
   }
   function handleDelete(CustomerInvoiceID) {
     deleteMutation.mutate({
       CustomerInvoiceID,
       LoginUserID: user.userID,
-    });
-    handleDeleteClose();
-    setIdToDelete(0);
-    setCustomerInvoiceID(null);
+    })
+    handleDeleteClose()
+    setIdToDelete(0)
+    setCustomerInvoiceID(null)
   }
   function handleView(CustomerInvoiceID) {
-    navigate(parentRoute + "/" + CustomerInvoiceID);
+    navigate(parentRoute + "/" + CustomerInvoiceID)
   }
 
   return (
@@ -274,7 +274,7 @@ function CustomerInvoiceSearch() {
         </div>
       )}
     </>
-  );
+  )
 }
 
 export function CustomerInvoiceFormMaster({ pageTitles, mode }) {
@@ -282,69 +282,69 @@ export function CustomerInvoiceFormMaster({ pageTitles, mode }) {
     <InvoiceDataProivder>
       <CustomerInvoiceForm pageTitles={pageTitles} mode={mode} />
     </InvoiceDataProivder>
-  );
+  )
 }
-let renderCount = 0;
+let renderCount = 0
 function CustomerInvoiceForm({ pageTitles, mode }) {
-  renderCount++;
-  const queryClient = useQueryClient();
-  const [CustomerID, setCustomerID] = useState(0);
-  const [AccountID, setAccountID] = useState(0);
-  const [CustomerInvoice, setCustomerInvoice] = useState([]);
-  const [CustomerInvoiceID, setCustomerInvoiceID] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [printLoading, setPrintLoading] = useState(false);
-  const { BusinessUnitID } = useContext(InvoiceDataContext);
-  const { user } = useContext(AuthContext);
-  const [isEnable, setIsEnable] = useState(false);
-  const params = useParams();
-  const navigate = useNavigate();
+  renderCount++
+  const queryClient = useQueryClient()
+  const [CustomerID, setCustomerID] = useState(0)
+  const [AccountID, setAccountID] = useState(0)
+  const [CustomerInvoice, setCustomerInvoice] = useState([])
+  const [CustomerInvoiceID, setCustomerInvoiceID] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [printLoading, setPrintLoading] = useState(false)
+  const { BusinessUnitID } = useContext(InvoiceDataContext)
+  const { user } = useContext(AuthContext)
+  const [isEnable, setIsEnable] = useState(false)
+  const params = useParams()
+  const navigate = useNavigate()
 
   useEffect(() => {
     function pageSetup() {
       if (mode === "view") {
-        setIsEnable(false);
-        setCustomerInvoiceID(params?.CustomerInvoiceID);
+        setIsEnable(false)
+        setCustomerInvoiceID(params?.CustomerInvoiceID)
       }
       if (mode === "edit") {
-        setIsEnable(true);
-        setCustomerInvoiceID(params?.CustomerInvoiceID);
+        setIsEnable(true)
+        setCustomerInvoiceID(params?.CustomerInvoiceID)
       }
       if (mode === "new") {
-        method.reset();
-        invoiceHeaderForm.reset();
-        setCustomerInvoice([]);
-        setCustomerInvoiceID(0);
-        setIsEnable(true);
-        method.setValue("Session", 1);
+        method.reset()
+        invoiceHeaderForm.reset()
+        setCustomerInvoice([])
+        setCustomerInvoiceID(0)
+        setIsEnable(true)
+        method.setValue("Session", 1)
       }
     }
 
-    pageSetup();
-  }, [mode]);
+    pageSetup()
+  }, [mode])
 
   const { data: sessionSelectData } = useQuery({
     queryKey: ["sessionsData"],
     queryFn: () => fetchAllSessionsForSelect(),
     initialData: [],
-  });
+  })
 
-  const customerSelectData = useOldCustomerSelectData();
-  const CustomerAccounts = useCustomerLedgersSelectData(CustomerID);
-  const businessSelectData = useBusinessUnitsSelectData();
-  const productsInfoSelectData = useProductsInfoSelectData(BusinessUnitID);
-  const servicesInfoSelectData = useServicesInfoSelectData(BusinessUnitID);
+  const customerSelectData = useOldCustomerSelectData()
+  const CustomerAccounts = useCustomerLedgersSelectData(CustomerID)
+  const businessSelectData = useBusinessUnitsSelectData()
+  const productsInfoSelectData = useProductsInfoSelectData(BusinessUnitID)
+  const servicesInfoSelectData = useServicesInfoSelectData(BusinessUnitID)
   const typesOptions = [
     { label: pageTitles?.product || "Product", value: "Product" },
     { label: "Service", value: "Service" },
-  ];
+  ]
 
   const { data: customerBranchSelectData } = useQuery({
     queryKey: ["customerBranches", AccountID],
     queryFn: () => fetchAllCustomerBranchesData(AccountID),
     enabled: AccountID !== 0,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     async function fetchCustomerInvoice() {
@@ -353,42 +353,42 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
         CustomerInvoiceID !== null &&
         CustomerInvoiceID !== 0
       ) {
-        setIsLoading(true);
+        setIsLoading(true)
         const data = await fetchCustomerInvoiceById(
           CustomerInvoiceID,
           user.userID
-        );
+        )
 
         if (!data) {
-          toast.error("Network Error Occured!");
+          toast.error("Network Error Occured!")
         }
 
         if (data.success === true) {
-          setCustomerInvoice(data);
-          setIsLoading(false);
-          setAccountID(data?.Master[0].AccountID);
-          setCustomerID(data?.Master[0].CustomerID);
+          setCustomerInvoice(data)
+          setIsLoading(false)
+          setAccountID(data?.Master[0].AccountID)
+          setCustomerID(data?.Master[0].CustomerID)
         } else {
-          method.reset();
-          setCustomerInvoice([]);
+          method.reset()
+          setCustomerInvoice([])
           toast.error("No Data Found!", {
             autoClose: 1500,
-          });
-          setIsEnable(true);
+          })
+          setIsEnable(true)
         }
       } else {
-        setCustomerInvoice([]);
+        setCustomerInvoice([])
         setTimeout(() => {
-          method.reset();
-          setIsEnable(true);
-        }, 200);
+          method.reset()
+          setIsEnable(true)
+        }, 200)
       }
     }
 
     if (CustomerInvoiceID !== 0) {
-      fetchCustomerInvoice();
+      fetchCustomerInvoice()
     }
-  }, [CustomerInvoiceID]);
+  }, [CustomerInvoiceID])
 
   const invoiceHeaderForm = useForm({
     defaultValues: {
@@ -405,7 +405,7 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
       NetAmount: 0,
       DetailDescription: "",
     },
-  });
+  })
   const method = useForm({
     defaultValues: {
       Customer: [],
@@ -419,7 +419,7 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
       detail: [],
       installments: [],
     },
-  });
+  })
 
   const { appendAllRows, fields, appendSingleRow, removeAllRows, render } =
     useCustomerInvoiceDetail(
@@ -430,18 +430,18 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
       pageTitles,
       method.setValue,
       businessSelectData.data
-    );
+    )
   const installmentsFieldArray = useFieldArray({
     control: method.control,
     name: "installments",
-  });
+  })
 
   const customerInvoiceMutation = useMutation({
     mutationFn: async (formData) => {
       if (formData?.detail.length === 0) {
         toast.error("Please add atleast 1 item!", {
           position: "top-left",
-        });
+        })
       } else {
         let InvoiceDetail = formData?.detail?.map((item, index) => {
           return {
@@ -460,18 +460,18 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
             NetAmount: item.NetAmount,
             DetailDescription: item.DetailDescription,
             IsFree: item.IsFree ? 1 : 0,
-          };
-        });
+          }
+        })
 
-        let InstallmentDetail = [];
+        let InstallmentDetail = []
         if (formData?.installments.length > 0) {
           InstallmentDetail = formData?.installments?.map((item, index) => {
             return {
               InstallmentRowID: index + 1,
               InstallmentDueDate: item.IDate ?? new Date(),
               InstallmentAmount: item.Amount,
-            };
-          });
+            }
+          })
         }
         // else {
         //   InstallmentDetail = [
@@ -499,11 +499,11 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
           TotalDiscount: formData?.Total_Discount,
           TotalNetAmount: formData?.Total_Amount,
           InvoiceDetail: JSON.stringify(InvoiceDetail),
-        };
+        }
 
         if (InstallmentDetail.length > 0) {
           DataToSend.InvoiceInstallmentDetail =
-            JSON.stringify(InstallmentDetail);
+            JSON.stringify(InstallmentDetail)
         }
 
         // if (
@@ -519,61 +519,61 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
         const { data } = await axios.post(
           apiUrl + `/CustomerInvoice/CustomerInvoiceInsertUpdate`,
           DataToSend
-        );
+        )
 
         if (data.success === true) {
-          queryClient.invalidateQueries({ queryKey: ["customerInvoices"] });
+          queryClient.invalidateQueries({ queryKey: ["customerInvoices"] })
           if (CustomerInvoiceID !== 0) {
-            toast.success("Invoice updated successfully!");
-            navigate(`${parentRoute}/${CustomerInvoiceID}`);
+            toast.success("Invoice updated successfully!")
+            navigate(`${parentRoute}/${CustomerInvoiceID}`)
           } else {
-            toast.success("Invoice created successfully!");
-            navigate(`${parentRoute}/${data?.CustomerInvoiceID}`);
+            toast.success("Invoice created successfully!")
+            navigate(`${parentRoute}/${data?.CustomerInvoiceID}`)
           }
         } else {
-          toast.error(data.message);
+          toast.error(data.message)
         }
       }
     },
     onError: (err) => {},
-  });
+  })
 
   useEffect(() => {
     if (CustomerInvoiceID !== 0 && CustomerInvoice?.Master) {
       // Master Values
-      method.setValue("InvoiceTitle", CustomerInvoice?.Master[0]?.InvoiceTitle);
-      method.setValue("InvoiceNo", CustomerInvoice?.Master[0]?.InvoiceNo);
+      method.setValue("InvoiceTitle", CustomerInvoice?.Master[0]?.InvoiceTitle)
+      method.setValue("InvoiceNo", CustomerInvoice?.Master[0]?.InvoiceNo)
       method.setValue(
         "BusinessUnitID",
         CustomerInvoice?.Master[0]?.BusinessUnitID
-      );
+      )
       method.setValue(
         "SessionBasedInvoiceNo",
         CustomerInvoice?.Master[0]?.SessionBasedVoucherNo
-      );
-      method.setValue("Customer", CustomerInvoice?.Master[0]?.CustomerID);
-      method.setValue("Session", CustomerInvoice?.Master[0]?.SessionID);
-      method.setValue("CustomerLedgers", CustomerInvoice?.Master[0]?.AccountID);
-      method.setValue("Description", CustomerInvoice?.Master[0]?.Description);
+      )
+      method.setValue("Customer", CustomerInvoice?.Master[0]?.CustomerID)
+      method.setValue("Session", CustomerInvoice?.Master[0]?.SessionID)
+      method.setValue("CustomerLedgers", CustomerInvoice?.Master[0]?.AccountID)
+      method.setValue("Description", CustomerInvoice?.Master[0]?.Description)
       method.setValue(
         "InoviceDate",
         parseISO(CustomerInvoice?.Master[0]?.InvoiceDate)
-      );
+      )
       method.setValue(
         "DueDate",
         parseISO(CustomerInvoice?.Master[0]?.InvoiceDueDate)
-      );
+      )
 
       method.setValue(
         "Total_Amount",
         CustomerInvoice?.Master[0]?.TotalNetAmount
-      );
-      method.setValue("Total_CGS", CustomerInvoice?.Master[0]?.TotalCGS);
+      )
+      method.setValue("Total_CGS", CustomerInvoice?.Master[0]?.TotalCGS)
       method.setValue(
         "Total_Discount",
         CustomerInvoice?.Master[0]?.TotalDiscount
-      );
-      method.setValue("Total_Rate", CustomerInvoice?.Master[0]?.TotalRate);
+      )
+      method.setValue("Total_Rate", CustomerInvoice?.Master[0]?.TotalRate)
 
       // Detail Values
       method.setValue(
@@ -582,29 +582,29 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
           return {
             IDate: parseISO(item.DueDate),
             Amount: item.Amount,
-          };
+          }
         })
-      );
-      appendAllRows(CustomerInvoice?.Detail);
+      )
+      appendAllRows(CustomerInvoice?.Detail)
     }
-  }, [CustomerInvoiceID, CustomerInvoice]);
+  }, [CustomerInvoiceID, CustomerInvoice])
 
   function handleEdit() {
-    navigate(`${parentRoute}/edit/${CustomerInvoiceID}`);
+    navigate(`${parentRoute}/edit/${CustomerInvoiceID}`)
   }
 
   function handleAddNew() {
-    navigate(`${parentRoute}/new`);
-    method.setValue("InvoiceDate", new Date());
-    method.setValue("DueDate", new Date());
-    method.setValue("Session", sessionSelectData[0] ?? 1);
+    navigate(`${parentRoute}/new`)
+    method.setValue("InvoiceDate", new Date())
+    method.setValue("DueDate", new Date())
+    method.setValue("Session", sessionSelectData[0] ?? 1)
   }
 
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(`${parentRoute}/${CustomerInvoiceID}`);
+      navigate(`${parentRoute}/${CustomerInvoiceID}`)
     }
   }
 
@@ -616,30 +616,30 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
   }
 
   async function handleOpenPdfInNewTab(InvoiceID) {
-    setPrintLoading(true);
+    setPrintLoading(true)
     const { data } = await axios.post(
       `http://192.168.9.110:90/api/Reports/InvoicePrint?CustomerInvoiceID=${InvoiceID}&Export=p`
-    );
+    )
 
-    const win = window.open("");
-    let html = "";
+    const win = window.open("")
+    let html = ""
 
-    html += "<html>";
-    html += '<body style="margin:0!important">';
+    html += "<html>"
+    html += '<body style="margin:0!important">'
     html +=
       '<embed width="100%" height="100%" src="data:application/pdf;base64,' +
       data +
-      '" type="application/pdf" />';
-    html += "</body>";
-    html += "</html>";
-    setPrintLoading(false);
+      '" type="application/pdf" />'
+    html += "</body>"
+    html += "</html>"
+    setPrintLoading(false)
     setTimeout(() => {
-      win.document.write(html);
-    }, 0);
+      win.document.write(html)
+    }, 0)
   }
 
   function onSubmit(data) {
-    customerInvoiceMutation.mutate(data);
+    customerInvoiceMutation.mutate(data)
   }
   return (
     <div>
@@ -666,10 +666,10 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleSave={() => method.handleSubmit(onSubmit)()}
               GoBackLabel="Customer Invoices"
@@ -784,8 +784,8 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
                     required={true}
                     filter={true}
                     onChange={(e) => {
-                      setCustomerID(e.value);
-                      removeAllRows();
+                      setCustomerID(e.value)
+                      removeAllRows()
                     }}
                     focusOptions={() => method.setFocus("CustomerLedgers")}
                   />
@@ -808,8 +808,8 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
                     disabled={!isEnable}
                     required={true}
                     onChange={(e) => {
-                      setAccountID(e.value);
-                      removeAllRows();
+                      setAccountID(e.value)
+                      removeAllRows()
                     }}
                     focusOptions={() => method.setFocus("Description")}
                   />
@@ -861,10 +861,10 @@ function CustomerInvoiceForm({ pageTitles, mode }) {
         </>
       )}
     </div>
-  );
+  )
 }
 
-export default CustomerInvoice;
+export default CustomerInvoice
 
 function useCustomerInvoiceDetail(
   control,
@@ -876,18 +876,18 @@ function useCustomerInvoiceDetail(
   businessSelectData
 ) {
   async function filteredProductsBasedOnRow(SelectedBusinessUnitID, index) {
-    const data = await fetchAllProductsForSelect(SelectedBusinessUnitID);
-    setValue(`detail.${index}.products`, JSON.stringify(data));
+    const data = await fetchAllProductsForSelect(SelectedBusinessUnitID)
+    setValue(`detail.${index}.products`, JSON.stringify(data))
   }
   async function filteredServicesBasedOnRow(selectedOption, index) {
-    const data = await fetchAllServicesForSelect(selectedOption);
-    setValue(`detail.${index}.services`, JSON.stringify(data));
+    const data = await fetchAllServicesForSelect(selectedOption)
+    setValue(`detail.${index}.services`, JSON.stringify(data))
   }
 
   const useInvoiceDetailArray = useFieldArray({
     control: control,
     name: "detail",
-  });
+  })
 
   function appendAllRows(data) {
     setValue(
@@ -901,27 +901,27 @@ function useCustomerInvoiceDetail(
           BusinessUnit: invoice.BusinessUnitID,
           Qty: invoice.Quantity,
           ...invoice,
-        };
+        }
       })
-    );
+    )
     if (data.length > 0) {
       data.forEach((item, index) => {
-        filteredProductsBasedOnRow(item.BusinessUnitID, index);
-        filteredServicesBasedOnRow(item.BusinessUnitID, index);
-      });
+        filteredProductsBasedOnRow(item.BusinessUnitID, index)
+        filteredServicesBasedOnRow(item.BusinessUnitID, index)
+      })
     }
   }
 
   function appendSingleRow(data) {
-    useInvoiceDetailArray.append(data);
+    useInvoiceDetailArray.append(data)
   }
 
   function removeAllRows() {
-    useInvoiceDetailArray.remove();
+    useInvoiceDetailArray.remove()
   }
 
   function removeSingleRow(index) {
-    useInvoiceDetailArray.remove(index);
+    useInvoiceDetailArray.remove(index)
   }
 
   return {
@@ -945,28 +945,28 @@ function useCustomerInvoiceDetail(
         />
       </>
     ),
-  };
+  }
 }
 
 function BusinessUnitDependantFields({ mode }) {
-  const [BusinessUnitID, setBusinessUnitID] = useState(0);
+  const [BusinessUnitID, setBusinessUnitID] = useState(0)
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
     enabled: mode !== "",
-  });
+  })
 
   useEffect(() => {
     if (BusinessUnitSelectData.length > 0) {
       method.setValue(
         "BusinessUnitID",
         BusinessUnitSelectData[0].BusinessUnitID
-      );
-      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID);
+      )
+      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID)
     }
-  }, [BusinessUnitSelectData]);
+  }, [BusinessUnitSelectData])
 
   useEffect(() => {
     async function fetchInvoiceAndRefNo() {
@@ -976,25 +976,25 @@ function BusinessUnitDependantFields({ mode }) {
             const { data } = await axios.post(
               apiUrl +
                 `/CustomerInvoice/GetInvoiceNo?BusinessUnitID=${BusinessUnitID}`
-            );
+            )
 
             if (data.data.length > 0) {
-              method.setValue("InvoiceNo", data.data[0].InvoiceNo);
+              method.setValue("InvoiceNo", data.data[0].InvoiceNo)
               method.setValue(
                 "SessionBasedInvoiceNo",
                 data.data[0].SessionBasedVoucherNo
-              );
+              )
             }
           }
         } catch (e) {
-          toast.error(e.message);
+          toast.error(e.message)
         }
       }
     }
-    fetchInvoiceAndRefNo();
-  }, [BusinessUnitID, mode]);
+    fetchInvoiceAndRefNo()
+  }, [BusinessUnitID, mode])
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1016,7 +1016,7 @@ function BusinessUnitDependantFields({ mode }) {
             required={true}
             focusOptions={() => method.setFocus("InvoiceTitle")}
             onChange={(e) => {
-              setBusinessUnitID(e.value);
+              setBusinessUnitID(e.value)
             }}
           />
         </div>
@@ -1042,25 +1042,25 @@ function BusinessUnitDependantFields({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 function CustomerDependentFields({ mode }) {
-  const [CustomerID, setCustomerID] = useState(0);
+  const [CustomerID, setCustomerID] = useState(0)
 
   const { data: customerSelectData } = useQuery({
     queryKey: [QUERY_KEYS.ALL_CUSTOMER_QUERY_KEY],
     queryFn: fetchAllOldCustomersForSelect,
     initialData: [],
-  });
+  })
 
   const { data: CustomerAccounts } = useQuery({
     queryKey: [QUERY_KEYS.CUSTOMER_ACCOUNTS_QUERY_KEY, CustomerID],
     queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1087,7 +1087,7 @@ function CustomerDependentFields({ mode }) {
             required={true}
             filter={true}
             onChange={(e) => {
-              setCustomerID(e.value);
+              setCustomerID(e.value)
               // removeAllRows();
             }}
             focusOptions={() => method.setFocus("CustomerLedgers")}
@@ -1111,7 +1111,7 @@ function CustomerDependentFields({ mode }) {
             disabled={mode === "view"}
             required={true}
             onChange={(e) => {
-              setAccountID(e.value);
+              setAccountID(e.value)
               // removeAllRows();
             }}
             focusOptions={() => method.setFocus("Description")}
@@ -1119,5 +1119,5 @@ function CustomerDependentFields({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }

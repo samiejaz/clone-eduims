@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Row, Col, Form, ButtonGroup, Button, Table } from "react-bootstrap";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
-import ReactSelect from "react-select";
+import React, { useEffect, useState } from "react"
+import { Row, Col, Form, ButtonGroup, Button, Table } from "react-bootstrap"
+import { Controller, useFormContext, useWatch } from "react-hook-form"
+import ReactSelect from "react-select"
 import {
   fetchAllProductsForSelect,
   fetchAllServicesForSelect,
-} from "../../api/SelectData";
-import NumberInput from "../../components/Forms/NumberInput";
-import CDropdown from "../../components/Forms/CDropdown";
+} from "../../api/SelectData"
+import NumberInput from "../../components/Forms/NumberInput"
+import CDropdown from "../../components/Forms/CDropdown"
 
 function CustomerInvoiceDetailTable(props) {
   const {
@@ -19,7 +19,7 @@ function CustomerInvoiceDetailTable(props) {
     businessSelectData,
     isEnable,
     typesOption,
-  } = props;
+  } = props
 
   const {
     register,
@@ -30,34 +30,34 @@ function CustomerInvoiceDetailTable(props) {
     watch,
     unregister,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext()
 
   useEffect(() => {
-    handleNetAmountTotal();
-  }, [append, fields]);
+    handleNetAmountTotal()
+  }, [append, fields])
 
   function handleNetAmountTotal() {
-    let rateSum = 0;
-    let cgsSum = 0;
-    let discountSum = 0;
-    let amountSum = 0;
+    let rateSum = 0
+    let cgsSum = 0
+    let discountSum = 0
+    let amountSum = 0
 
     fields.forEach((item, index) => {
-      const rate = parseFloat(getValues(`detail.${index}.Rate`) || 0);
-      const cgs = parseFloat(getValues(`detail.${index}.CGS`) || 0);
-      const discount = parseFloat(getValues(`detail.${index}.Discount`) || 0);
-      const amount = parseFloat(getValues(`detail.${index}.NetAmount`) || 0);
+      const rate = parseFloat(getValues(`detail.${index}.Rate`) || 0)
+      const cgs = parseFloat(getValues(`detail.${index}.CGS`) || 0)
+      const discount = parseFloat(getValues(`detail.${index}.Discount`) || 0)
+      const amount = parseFloat(getValues(`detail.${index}.NetAmount`) || 0)
 
-      rateSum += rate;
-      cgsSum += cgs;
-      discountSum += discount;
-      amountSum += amount;
-    });
+      rateSum += rate
+      cgsSum += cgs
+      discountSum += discount
+      amountSum += amount
+    })
 
-    setValue("Total_Rate", rateSum);
-    setValue("Total_CGS", cgsSum);
-    setValue("Total_Discount", discountSum);
-    setValue("Total_Amount", amountSum);
+    setValue("Total_Rate", rateSum)
+    setValue("Total_CGS", cgsSum)
+    setValue("Total_Discount", discountSum)
+    setValue("Total_Amount", amountSum)
   }
 
   return (
@@ -145,7 +145,7 @@ function CustomerInvoiceDetailTable(props) {
                       customerBranchSelectData={customerBranchSelectData}
                     />
                   </>
-                );
+                )
               })}
             </tbody>
           </Table>
@@ -169,7 +169,7 @@ function CustomerInvoiceDetailTable(props) {
                 disabled
                 {...register("Total_Amount")}
                 onInput={(e) => {
-                  setValue("InstallmentTotalAmount", e.target.value);
+                  setValue("InstallmentTotalAmount", e.target.value)
                 }}
               />
             </Form.Group>
@@ -177,10 +177,10 @@ function CustomerInvoiceDetailTable(props) {
         </form>
       </div>
     </>
-  );
+  )
 }
 
-export default React.memo(CustomerInvoiceDetailTable);
+export default React.memo(CustomerInvoiceDetailTable)
 
 function DetailRow({
   item,
@@ -193,21 +193,21 @@ function DetailRow({
   customerBranchSelectData,
 }) {
   const { register, control, setValue, unregister, watch, getValues } =
-    useFormContext();
+    useFormContext()
 
   async function filteredProductsBasedOnRow(selectedOption, index) {
-    const data = await fetchAllProductsForSelect(selectedOption);
-    setValue(`detail.${index}.products`, JSON.stringify(data));
+    const data = await fetchAllProductsForSelect(selectedOption)
+    setValue(`detail.${index}.products`, JSON.stringify(data))
   }
   async function filteredServicesBasedOnRow(selectedOption, index) {
-    const data = await fetchAllServicesForSelect(selectedOption);
-    setValue(`detail.${index}.services`, JSON.stringify(data));
+    const data = await fetchAllServicesForSelect(selectedOption)
+    setValue(`detail.${index}.services`, JSON.stringify(data))
   }
 
-  const [isFree, setIsFree] = useState(false);
+  const [isFree, setIsFree] = useState(false)
 
   function toggleIsFree(val) {
-    setIsFree(val);
+    setIsFree(val)
   }
 
   return (
@@ -229,13 +229,13 @@ function DetailRow({
             disabled={!isEnable}
             onChange={(e) => {
               if (e.target.checked) {
-                setValue(`detail.${index}.CGS`, 0);
-                setValue(`detail.${index}.Amount`, 0);
-                setValue(`detail.${index}.Discount`, 0);
-                setValue(`detail.${index}.NetAmount`, 0);
-                setValue(`detail.${index}.Rate`, 0);
+                setValue(`detail.${index}.CGS`, 0)
+                setValue(`detail.${index}.Amount`, 0)
+                setValue(`detail.${index}.Discount`, 0)
+                setValue(`detail.${index}.NetAmount`, 0)
+                setValue(`detail.${index}.Rate`, 0)
               }
-              toggleIsFree(e.target.checked);
+              toggleIsFree(e.target.checked)
             }}
           />
         </td>
@@ -250,9 +250,9 @@ function DetailRow({
             focusOptions={() => setFocus(`detail.${index}.BusinessUnit`)}
             onChange={(e) => {
               if (e.value === "Product") {
-                unregister(`detail.${index}.Service`);
+                unregister(`detail.${index}.Service`)
               } else {
-                register(`detail.${index}.Service`);
+                register(`detail.${index}.Service`)
               }
             }}
           />
@@ -268,9 +268,9 @@ function DetailRow({
             required={true}
             disabled={!isEnable}
             onChange={(e) => {
-              filteredProductsBasedOnRow(e.value, index);
-              filteredServicesBasedOnRow(e.value, index);
-              setValue(`detail.${index}.ProductInfo`, []);
+              filteredProductsBasedOnRow(e.value, index)
+              filteredServicesBasedOnRow(e.value, index)
+              setValue(`detail.${index}.ProductInfo`, [])
             }}
             filter={true}
             focusOptions={() => setFocus(`detail.${index}.CustomerBranch`)}
@@ -338,13 +338,13 @@ function DetailRow({
             id={`detail.${index}.Qty`}
             control={control}
             onChange={(e) => {
-              const rate = parseFloat(0 + getValues([`detail.${index}.Rate`]));
+              const rate = parseFloat(0 + getValues([`detail.${index}.Rate`]))
               const disc = parseFloat(
                 0 + getValues([`detail.${index}.Discount`])
-              );
-              setValue(`detail.${index}.Amount`, e.value * rate);
-              setValue(`detail.${index}.NetAmount`, e.value * rate - disc);
-              handleNetAmountTotal();
+              )
+              setValue(`detail.${index}.Amount`, e.value * rate)
+              setValue(`detail.${index}.NetAmount`, e.value * rate - disc)
+              handleNetAmountTotal()
             }}
             disabled={!isEnable}
             inputClassName="form-control"
@@ -357,14 +357,14 @@ function DetailRow({
             id={`detail.${index}.Rate`}
             control={control}
             onChange={(e) => {
-              const qty = parseFloat(0 + getValues([`detail.${index}.Qty`]));
+              const qty = parseFloat(0 + getValues([`detail.${index}.Qty`]))
               const disc = parseFloat(
                 0 + getValues([`detail.${index}.Discount`])
-              );
-              setValue(`detail.${index}.Amount`, e.value * qty);
-              setValue(`detail.${index}.NetAmount`, e.value * qty - disc);
-              setValue(`detail.${index}.Rate`, e.value);
-              handleNetAmountTotal();
+              )
+              setValue(`detail.${index}.Amount`, e.value * qty)
+              setValue(`detail.${index}.NetAmount`, e.value * qty - disc)
+              setValue(`detail.${index}.Rate`, e.value)
+              handleNetAmountTotal()
             }}
             disabled={!isEnable || isFree}
             mode="decimal"
@@ -378,8 +378,8 @@ function DetailRow({
             id={`detail.${index}.CGS`}
             control={control}
             onChange={(e) => {
-              setValue(`detail.${index}.CGS`, e.value);
-              handleNetAmountTotal();
+              setValue(`detail.${index}.CGS`, e.value)
+              handleNetAmountTotal()
             }}
             disabled={!isEnable}
             mode="decimal"
@@ -393,8 +393,8 @@ function DetailRow({
             id={`detail.${index}.Amount`}
             control={control}
             onChange={(e) => {
-              setValue(`detail.${index}.CGS`, e.value);
-              handleNetAmountTotal();
+              setValue(`detail.${index}.CGS`, e.value)
+              handleNetAmountTotal()
             }}
             disabled={true}
             mode="decimal"
@@ -410,10 +410,10 @@ function DetailRow({
             onChange={(e) => {
               const amount = parseFloat(
                 0 + getValues([`detail.${index}.Amount`])
-              );
-              setValue(`detail.${index}.NetAmount`, amount - e.target.value);
-              setValue(`detail.${index}.Discount`, e.target.value);
-              handleNetAmountTotal();
+              )
+              setValue(`detail.${index}.NetAmount`, amount - e.target.value)
+              setValue(`detail.${index}.Discount`, e.target.value)
+              handleNetAmountTotal()
             }}
             disabled={!isEnable || isFree}
             mode="decimal"
@@ -468,10 +468,10 @@ function DetailRow({
                   Amount: 0,
                   NetAmount: 0,
                   Description: "",
-                });
+                })
                 setTimeout(() => {
-                  setFocus(`detail.${fields.length}.BusinessUnit`);
-                }, 200);
+                  setFocus(`detail.${fields.length}.BusinessUnit`)
+                }, 200)
               }}
             >
               +
@@ -481,8 +481,8 @@ function DetailRow({
               variant="danger"
               size="sm"
               onClick={() => {
-                remove(index);
-                handleNetAmountTotal();
+                remove(index)
+                handleNetAmountTotal()
               }}
             >
               -
@@ -491,5 +491,5 @@ function DetailRow({
         </td>
       </tr>
     </>
-  );
+  )
 }

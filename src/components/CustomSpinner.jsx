@@ -1,4 +1,4 @@
-import { ProgressSpinner } from "primereact/progressspinner";
+import { ProgressSpinner } from "primereact/progressspinner"
 
 export function CustomSpinner({ message = "" }) {
   return (
@@ -18,5 +18,5 @@ export function CustomSpinner({ message = "" }) {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,54 +1,54 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { AuthContext, useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { AuthContext, useUserData } from "../../context/AuthContext"
 import {
   addNewTehsil,
   deleteTehsilByID,
   fetchAllTehsiles,
   fetchTehsilById,
-} from "../../api/TehsilData";
-import CDropdown from "../../components/Forms/CDropdown";
-import { useAllCountiesSelectData } from "../../hooks/SelectData/useSelectData";
-import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
+} from "../../api/TehsilData"
+import CDropdown from "../../components/Forms/CDropdown"
+import { useAllCountiesSelectData } from "../../hooks/SelectData/useSelectData"
+import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.TEHSIL_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.TEHSIL_QUERY_KEY;
-let IDENTITY = "TehsilID";
+let parentRoute = ROUTE_URLS.TEHSIL_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.TEHSIL_QUERY_KEY
+let IDENTITY = "TehsilID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.TEHSIL_FORM_KEY,
       MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -118,49 +118,49 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function TehsilDetail({ userRights }) {
-  document.title = "Tehsils";
+  document.title = "Tehsils"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     TehsilTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllTehsiles(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteTehsilByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ TehsilID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ TehsilID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -237,74 +237,74 @@ function TehsilDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 function TehsilForm({ mode, userRights }) {
-  document.title = "Tehsil Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { TehsilID } = useParams();
+  document.title = "Tehsil Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { TehsilID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       TehsilTitle: "",
       Country: [],
       InActive: false,
     },
-  });
+  })
 
-  const countriesSelectData = useAllCountiesSelectData();
-  const { user } = useContext(AuthContext);
+  const countriesSelectData = useAllCountiesSelectData()
+  const { user } = useContext(AuthContext)
 
   const TehsilData = useQuery({
     queryKey: [queryKey, TehsilID],
     queryFn: () => fetchTehsilById(TehsilID, user?.userID),
     enabled: TehsilID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (TehsilID !== undefined && TehsilData.data.length > 0) {
-      setValue("TehsilTitle", TehsilData.data[0].TehsilTitle);
-      setValue("Country", TehsilData.data[0].CountryID);
-      setValue("InActive", TehsilData.data[0].InActive);
+      setValue("TehsilTitle", TehsilData.data[0].TehsilTitle)
+      setValue("Country", TehsilData.data[0].CountryID)
+      setValue("InActive", TehsilData.data[0].InActive)
     }
-  }, [TehsilID, TehsilData]);
+  }, [TehsilID, TehsilData])
 
   const mutation = useMutation({
     mutationFn: addNewTehsil,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteTehsilByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
-    deleteMutation.mutate({ TehsilID: TehsilID, LoginUserID: user.userID });
+    deleteMutation.mutate({ TehsilID: TehsilID, LoginUserID: user.userID })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + TehsilID);
+      navigate(viewRoute + TehsilID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + TehsilID);
+    navigate(editRoute + TehsilID)
   }
 
   function onSubmit(data) {
@@ -312,7 +312,7 @@ function TehsilForm({ mode, userRights }) {
       formData: data,
       userID: user.userID,
       TehsilID: TehsilID,
-    });
+    })
   }
 
   return (
@@ -330,10 +330,10 @@ function TehsilForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -397,5 +397,5 @@ function TehsilForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

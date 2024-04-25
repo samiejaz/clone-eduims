@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import { Dialog } from "primereact/dialog";
-import ModalActionButtons from "../ModalActionButtons";
-import { Controller } from "react-hook-form";
-import ReactDatePicker from "react-datepicker";
-import { Button } from "primereact/button";
-import NumberInput from "../Forms/NumberInput";
-import { toast } from "react-toastify";
+import React, { useEffect } from "react"
+import { Dialog } from "primereact/dialog"
+import ModalActionButtons from "../ModalActionButtons"
+import { Controller } from "react-hook-form"
+import ReactDatePicker from "react-datepicker"
+import { Button } from "primereact/button"
+import NumberInput from "../Forms/NumberInput"
+import { toast } from "react-toastify"
 
 function CustomerInvoiceIntallmentsModal({
   visible,
@@ -16,46 +16,46 @@ function CustomerInvoiceIntallmentsModal({
   isEnable,
 }) {
   useEffect(() => {
-    method.setValue("InstallmentTotalRemaining", method.watch(`Total_Amount`));
-  }, [method.watch(`Total_Amount`)]);
+    method.setValue("InstallmentTotalRemaining", method.watch(`Total_Amount`))
+  }, [method.watch(`Total_Amount`)])
 
   useEffect(() => {
-    handleNetAmountTotal();
+    handleNetAmountTotal()
   }, [
     installmentsFieldArray.fields,
     installmentsFieldArray.append,
     installmentsFieldArray.remove,
-  ]);
+  ])
 
   function handleNetAmountTotal() {
-    let remainingAmountSum = 0;
-    let TotalNetAmount = method.getValues(`Total_Amount`) || 0;
+    let remainingAmountSum = 0
+    let TotalNetAmount = method.getValues(`Total_Amount`) || 0
     installmentsFieldArray.fields.forEach((item, index) => {
       const amount = parseFloat(
         method.getValues(`installments.${index}.Amount`) || 0
-      );
-      remainingAmountSum += amount;
-    });
+      )
+      remainingAmountSum += amount
+    })
     method.setValue(
       "InstallmentTotalRemaining",
       TotalNetAmount - remainingAmountSum
-    );
+    )
   }
 
   function handleSaveClick() {
     let InstallmentTotalRemaining = method.getValues(
       "InstallmentTotalRemaining"
-    );
+    )
     if (InstallmentTotalRemaining === 0) {
-      setVisible(false);
+      setVisible(false)
     } else if (InstallmentTotalRemaining > 0) {
       toast.error("Installment Amounts must be equal to Total Net Amount", {
         position: "top-right",
-      });
+      })
     } else {
       toast.error("Installment Amounts cannot exceed Total Net Amount", {
         position: "top-right",
-      });
+      })
     }
   }
 
@@ -177,8 +177,8 @@ function CustomerInvoiceIntallmentsModal({
                           method.setValue(
                             `installments.${index}.Amount`,
                             e.value
-                          );
-                          handleNetAmountTotal();
+                          )
+                          handleNetAmountTotal()
                         }}
                         prefix="Rs "
                         rules={{
@@ -218,12 +218,12 @@ function CustomerInvoiceIntallmentsModal({
                   </div>
                 </div>
               </React.Fragment>
-            );
+            )
           })}
         </div>
       </Dialog>
     </>
-  );
+  )
 }
 
-export default CustomerInvoiceIntallmentsModal;
+export default CustomerInvoiceIntallmentsModal

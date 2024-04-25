@@ -1,18 +1,18 @@
-import { useContext, useState } from "react";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { ButtonGroup } from "react-bootstrap";
-import CustomerEntry from "../components/CustomerEntryModal/CustomerEntry";
-import CustomerBranchEntry from "../components/CustomerEntryModal/CustomerBranchEntry";
+import { useContext, useState } from "react"
+import { Button } from "primereact/button"
+import { Dialog } from "primereact/dialog"
+import { ButtonGroup } from "react-bootstrap"
+import CustomerEntry from "../components/CustomerEntryModal/CustomerEntry"
+import CustomerBranchEntry from "../components/CustomerEntryModal/CustomerBranchEntry"
 
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { AuthContext } from "../context/AuthContext";
-import { AppConfigurationContext } from "../context/AppConfigurationContext";
-import { Dropdown } from "primereact/dropdown";
-import { useOldCustomerSelectData } from "./SelectData/useSelectData";
+import { Controller, FormProvider, useForm } from "react-hook-form"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import axios from "axios"
+import { toast } from "react-toastify"
+import { AuthContext } from "../context/AuthContext"
+import { AppConfigurationContext } from "../context/AppConfigurationContext"
+import { Dropdown } from "primereact/dropdown"
+import { useOldCustomerSelectData } from "./SelectData/useSelectData"
 
 const customerEntryDefaultValues = {
   CustomerName: "",
@@ -24,7 +24,7 @@ const customerEntryDefaultValues = {
   Description: "",
   InActive: false,
   Customers: null,
-};
+}
 
 const customerBranchDefaultValues = {
   CustomerBranchTitle: "",
@@ -36,29 +36,29 @@ const customerBranchDefaultValues = {
   ContactPersonEmail: "",
   Description: "",
   InActive: false,
-};
+}
 const customerAccountDefaultValues = {
   accountsDetail: [],
-};
+}
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 const useCustomerEntryHook = () => {
-  const queryClient = useQueryClient();
-  const { user } = useContext(AuthContext);
-  const { pageTitles } = useContext(AppConfigurationContext);
-  const [visible, setVisible] = useState(false);
-  const [CustomerID, setCustomerID] = useState(0);
-  const [dialogIndex, setDialogIndex] = useState(0);
+  const queryClient = useQueryClient()
+  const { user } = useContext(AuthContext)
+  const { pageTitles } = useContext(AppConfigurationContext)
+  const [visible, setVisible] = useState(false)
+  const [CustomerID, setCustomerID] = useState(0)
+  const [dialogIndex, setDialogIndex] = useState(0)
 
-  const oldCustomers = useOldCustomerSelectData();
+  const oldCustomers = useOldCustomerSelectData()
   const customerEntryFrom = useForm({
     defaultValues: customerEntryDefaultValues,
-  });
+  })
   const customerAccountsForm = useForm({
     defaultValues: customerAccountDefaultValues,
-  });
+  })
 
-  const customerBranchFrom = useForm(customerBranchDefaultValues);
+  const customerBranchFrom = useForm(customerBranchDefaultValues)
   let customerMutaion = useMutation({
     mutationFn: async (formData) => {
       let DataToSend = {
@@ -72,48 +72,48 @@ const useCustomerEntryHook = () => {
         Description: formData?.Description,
         InActive: formData?.InActive === false ? 0 : 1,
         EntryUserID: user.userID,
-      };
+      }
 
       const { data } = await axios.post(
         apiUrl + "/EduIMS/NewCustomerInsert",
         DataToSend
-      );
+      )
 
       if (data.success === true) {
-        setCustomerID(data.CustomerID);
+        setCustomerID(data.CustomerID)
         if (CustomerID) {
-          toast.success("Customer updated successfully!");
+          toast.success("Customer updated successfully!")
         } else {
-          toast.success("Customer saved successfully!");
+          toast.success("Customer saved successfully!")
         }
-        setDialogIndex(dialogIndex + 1);
+        setDialogIndex(dialogIndex + 1)
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   function customerHandleSubmit(data) {
-    customerMutaion.mutate(data);
+    customerMutaion.mutate(data)
   }
 
   function handleCancelClick() {
-    queryClient.invalidateQueries({ queryKey: ["Customers"] });
-    queryClient.invalidateQueries({ queryKey: ["oldcustomers"] });
-    setDialogIndex(0);
-    setCustomerID(0);
-    customerEntryFrom.reset(customerEntryDefaultValues);
-    customerBranchFrom.reset(customerBranchDefaultValues);
-    customerAccountsForm.reset(customerAccountsForm);
+    queryClient.invalidateQueries({ queryKey: ["Customers"] })
+    queryClient.invalidateQueries({ queryKey: ["oldcustomers"] })
+    setDialogIndex(0)
+    setCustomerID(0)
+    customerEntryFrom.reset(customerEntryDefaultValues)
+    customerBranchFrom.reset(customerBranchDefaultValues)
+    customerAccountsForm.reset(customerAccountsForm)
   }
 
   function handleSetCustomerID(id) {
-    setCustomerID(id);
+    setCustomerID(id)
   }
 
   const dialogs = [
@@ -142,13 +142,13 @@ const useCustomerEntryHook = () => {
                   options={oldCustomers.data}
                   focusInputRef={field.ref}
                   onChange={(e) => {
-                    field.onChange(e.value);
+                    field.onChange(e.value)
 
                     if (e.value === undefined) {
-                      customerEntryFrom.reset();
-                      setCustomerID(0);
+                      customerEntryFrom.reset()
+                      setCustomerID(0)
                     } else {
-                      setCustomerID(e.value);
+                      setCustomerID(e.value)
                     }
                   }}
                   style={{ width: "49.2%" }}
@@ -174,7 +174,7 @@ const useCustomerEntryHook = () => {
         </>
       ),
     },
-  ];
+  ]
 
   const footerContent = (
     <ButtonGroup className="gap-1">
@@ -184,8 +184,8 @@ const useCustomerEntryHook = () => {
         type="button"
         severity="danger"
         onClick={() => {
-          setVisible(false);
-          handleCancelClick();
+          setVisible(false)
+          handleCancelClick()
         }}
         className="p-button-text text-center"
       />
@@ -198,7 +198,7 @@ const useCustomerEntryHook = () => {
             icon="pi pi-arrow-right"
             onClick={() => {
               if (dialogIndex === 0) {
-                customerEntryFrom.handleSubmit(customerHandleSubmit)();
+                customerEntryFrom.handleSubmit(customerHandleSubmit)()
               }
             }}
             severity="success"
@@ -213,7 +213,7 @@ const useCustomerEntryHook = () => {
             icon="pi pi-arrow-left"
             onClick={() => {
               if (dialogIndex > 0) {
-                setDialogIndex(dialogIndex - 1);
+                setDialogIndex(dialogIndex - 1)
               }
             }}
             type="button"
@@ -223,16 +223,16 @@ const useCustomerEntryHook = () => {
         </>
       )}
     </ButtonGroup>
-  );
+  )
 
   function dialogHeight() {
     switch (dialogIndex) {
       case 0:
-        return "70vh";
+        return "70vh"
       case 1:
-        return "80vh";
+        return "80vh"
       default:
-        return "90vh";
+        return "90vh"
     }
   }
 
@@ -246,9 +246,9 @@ const useCustomerEntryHook = () => {
           maximizable
           style={{ width: "80vw", height: dialogHeight() }}
           onHide={() => {
-            setVisible(false);
-            queryClient.invalidateQueries({ queryKey: ["Customers"] });
-            queryClient.invalidateQueries({ queryKey: ["oldcustomers"] });
+            setVisible(false)
+            queryClient.invalidateQueries({ queryKey: ["Customers"] })
+            queryClient.invalidateQueries({ queryKey: ["oldcustomers"] })
           }}
           footer={footerContent}
         >
@@ -256,7 +256,7 @@ const useCustomerEntryHook = () => {
         </Dialog>
       </>
     ),
-  };
-};
+  }
+}
 
-export default useCustomerEntryHook;
+export default useCustomerEntryHook

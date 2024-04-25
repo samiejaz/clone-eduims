@@ -1,21 +1,21 @@
-import { Button } from "primereact/button";
-import React, { useRef } from "react";
+import { Button } from "primereact/button"
+import React, { useRef } from "react"
 
 const ImageContainer = ({ imageRef, hideButtons = false }) => {
-  const imputRef = useRef();
+  const imputRef = useRef()
 
   async function previewImage(e) {
-    const reader = new FileReader();
+    const reader = new FileReader()
     reader.addEventListener("load", () => {
-      let base64Data;
+      let base64Data
       if (reader.result.includes("data:image/png;base64,")) {
-        base64Data = reader.result.replace(/^data:image\/png;base64,/, "");
+        base64Data = reader.result.replace(/^data:image\/png;base64,/, "")
       } else {
-        base64Data = reader.result.replace(/^data:image\/jpeg;base64,/, "");
+        base64Data = reader.result.replace(/^data:image\/jpeg;base64,/, "")
       }
-      imageRef.current.src = "data:image/png;base64," + base64Data;
-    });
-    reader.readAsDataURL(e.target.files[0]);
+      imageRef.current.src = "data:image/png;base64," + base64Data
+    })
+    reader.readAsDataURL(e.target.files[0])
   }
 
   return (
@@ -47,7 +47,7 @@ const ImageContainer = ({ imageRef, hideButtons = false }) => {
               text
               type="button"
               onClick={() => {
-                imputRef.current.click();
+                imputRef.current.click()
               }}
             />
 
@@ -69,8 +69,8 @@ const ImageContainer = ({ imageRef, hideButtons = false }) => {
               text
               type="button"
               onClick={() => {
-                imputRef.current.value = "";
-                imageRef.current.src = "";
+                imputRef.current.value = ""
+                imageRef.current.src = ""
               }}
             />
           </div>
@@ -97,7 +97,7 @@ const ImageContainer = ({ imageRef, hideButtons = false }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default React.memo(ImageContainer);
+export default React.memo(ImageContainer)

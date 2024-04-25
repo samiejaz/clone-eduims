@@ -1,17 +1,17 @@
-import { useContext, useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { fetchNewCustomerById } from "../../api/NewCustomerData";
-import { AuthContext } from "../../context/AuthContext";
-import { FormRow, FormColumn, FormLabel } from "../Layout/LayoutComponents";
-import TextInput from "../Forms/TextInput";
-import CheckBox from "../Forms/CheckBox";
+import { useContext, useEffect, useState } from "react"
+import { useFormContext } from "react-hook-form"
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
+import { fetchNewCustomerById } from "../../api/NewCustomerData"
+import { AuthContext } from "../../context/AuthContext"
+import { FormRow, FormColumn, FormLabel } from "../Layout/LayoutComponents"
+import TextInput from "../Forms/TextInput"
+import CheckBox from "../Forms/CheckBox"
 
 function CustomerEntry(props) {
-  const { CustomerID, isEnable = true } = props;
-  const { user } = useContext(AuthContext);
-  const [CustomerData, setCustomerData] = useState();
-  const [isLoading, setIsLoading] = useState(true);
+  const { CustomerID, isEnable = true } = props
+  const { user } = useContext(AuthContext)
+  const [CustomerData, setCustomerData] = useState()
+  const [isLoading, setIsLoading] = useState(true)
 
   const {
     register,
@@ -20,49 +20,49 @@ function CustomerEntry(props) {
     clearErrors,
     reset,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext()
 
   useEffect(() => {
     async function fetchOldCustomer() {
       if (CustomerID !== undefined && CustomerID !== 0 && CustomerID !== null) {
-        const data = await fetchNewCustomerById(CustomerID, user.userID);
-        setCustomerData(data);
-        setIsLoading(false);
+        const data = await fetchNewCustomerById(CustomerID, user.userID)
+        setCustomerData(data)
+        setIsLoading(false)
       }
     }
     if (CustomerID !== 0 && CustomerID !== undefined) {
-      fetchOldCustomer();
+      fetchOldCustomer()
     }
-  }, [CustomerID]);
+  }, [CustomerID])
 
   useEffect(() => {
     if (CustomerID !== 0 && CustomerData?.data) {
-      clearErrors();
-      setValue("CustomerName", CustomerData?.data[0]?.CustomerName);
+      clearErrors()
+      setValue("CustomerName", CustomerData?.data[0]?.CustomerName)
       setValue(
         "CustomerBusinessName",
         CustomerData?.data[0]?.CustomerBusinessName
-      );
+      )
       setValue(
         "CustomerBusinessAddress",
         CustomerData?.data[0]?.CustomerBusinessAddress ?? ""
-      );
+      )
       setValue(
         "ContactPerson1Name",
         CustomerData?.data[0]?.ContactPerson1Name ?? ""
-      );
+      )
       setValue(
         "ContactPerson1No",
         CustomerData?.data[0]?.ContactPerson1No ?? ""
-      );
+      )
       setValue(
         "ContactPerson1Email",
         CustomerData?.data[0]?.ContactPerson1Email ?? ""
-      );
-      setValue("Description", CustomerData?.data[0]?.Description ?? "");
-      setValue("InActive", CustomerData?.data[0]?.InActive ?? "");
+      )
+      setValue("Description", CustomerData?.data[0]?.Description ?? "")
+      setValue("InActive", CustomerData?.data[0]?.InActive ?? "")
     }
-  }, [CustomerID, CustomerData]);
+  }, [CustomerID, CustomerData])
 
   return (
     <>
@@ -181,7 +181,7 @@ function CustomerEntry(props) {
         </FormRow>
       </form>
     </>
-  );
+  )
 }
 
-export default CustomerEntry;
+export default CustomerEntry

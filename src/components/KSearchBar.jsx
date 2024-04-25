@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useKeyCombinationHook } from "../hooks/hooks";
-import { Controller, useForm } from "react-hook-form";
-import { routes } from "../utils/routes";
-import { Dropdown } from "primereact/dropdown";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react"
+import { useKeyCombinationHook } from "../hooks/hooks"
+import { Controller, useForm } from "react-hook-form"
+import { routes } from "../utils/routes"
+import { Dropdown } from "primereact/dropdown"
+import { useNavigate } from "react-router-dom"
 
 export const KSearchBar = () => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
-  const method = useForm();
-  const navigate = useNavigate();
+  const method = useForm()
+  const navigate = useNavigate()
 
   useKeyCombinationHook(
     () => {
-      setVisible((prev) => !prev);
-      method.setFocus("KSearchBar");
+      setVisible((prev) => !prev)
+      method.setFocus("KSearchBar")
     },
     "l",
     true
-  );
+  )
 
   return (
     <>
@@ -62,7 +62,7 @@ export const KSearchBar = () => {
                     },
                   }}
                   onChange={(e) => {
-                    field.onChange(e.value);
+                    field.onChange(e.value)
 
                     if (
                       e.originalEvent.key === "ArrowDown" ||
@@ -70,15 +70,15 @@ export const KSearchBar = () => {
                     ) {
                     } else {
                       if (e.value) {
-                        navigate(e.value);
-                        setVisible(false);
+                        navigate(e.value)
+                        setVisible(false)
                       }
                     }
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      navigate(field.value);
-                      setVisible(false);
+                      navigate(field.value)
+                      setVisible(false)
                     }
                   }}
                   style={{ width: "50%" }}
@@ -91,5 +91,5 @@ export const KSearchBar = () => {
         </div>
       )}
     </>
-  );
-};
+  )
+}

@@ -1,30 +1,30 @@
-import { useState, useContext } from "react";
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { Form, ButtonGroup } from "react-bootstrap";
-import { Button } from "primereact/button";
-import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AuthContext } from "../../context/AuthContext";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { useState, useContext } from "react"
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
+import { Form, ButtonGroup } from "react-bootstrap"
+import { Button } from "primereact/button"
+import { useForm } from "react-hook-form"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { AuthContext } from "../../context/AuthContext"
+import { toast } from "react-toastify"
+import axios from "axios"
 import {
   deleteAllCustomersBranchByID,
   fetchAllCustomersBranch,
-} from "./CustomerEntryAPI";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { FilterMatchMode } from "primereact/api";
-import { Dialog } from "primereact/dialog";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
-import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents";
-import TextInput from "../Forms/TextInput";
-import CheckBox from "../Forms/CheckBox";
-import { confirmDialog } from "primereact/confirmdialog";
+} from "./CustomerEntryAPI"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { FilterMatchMode } from "primereact/api"
+import { Dialog } from "primereact/dialog"
+import useDeleteModal from "../../hooks/useDeleteModalHook"
+import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents"
+import TextInput from "../Forms/TextInput"
+import CheckBox from "../Forms/CheckBox"
+import { confirmDialog } from "primereact/confirmdialog"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 function AllCustomersBranchEntry(props) {
-  const { CustomerID, isEnable = true } = props;
+  const { CustomerID, isEnable = true } = props
   return (
     <>
       <CustomerAccountDataTableHeader
@@ -38,22 +38,22 @@ function AllCustomersBranchEntry(props) {
         />
       </div>
     </>
-  );
+  )
 }
 
-export default AllCustomersBranchEntry;
+export default AllCustomersBranchEntry
 
 function CustomerAccountDataTableHeader(props) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  const { CustomerID, isEnable, pageTitles } = props;
-  const { user } = useContext(AuthContext);
+  const { CustomerID, isEnable, pageTitles } = props
+  const { user } = useContext(AuthContext)
 
   const { handleSubmit, reset, control } = useForm({
     defaultValues: {
       BranchTitle: "",
     },
-  });
+  })
 
   const AllCustomersBranchEntryMutation = useMutation({
     mutationFn: async (formData) => {
@@ -62,35 +62,35 @@ function CustomerAccountDataTableHeader(props) {
         BranchTitle: formData?.BranchTitle,
         EntryUserID: user.userID,
         InActive: formData?.InActive ? 1 : 0,
-      };
+      }
       const { data } = await axios.post(
         apiUrl + "/Branch/BranchInsertUpdate",
         DataToSend
-      );
+      )
       if (data.success === true) {
-        reset();
+        reset()
         toast.success(
           `${pageTitles?.branch || "Customer Branch"} saved successfully!`
-        );
+        )
         queryClient.invalidateQueries({
           queryKey: ["allCustomerBranchesDetail"],
-        });
+        })
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   function onSubmit(data) {
     if (CustomerID === 0) {
-      toast.error("No Customer Found!!");
+      toast.error("No Customer Found!!")
     } else {
-      AllCustomersBranchEntryMutation.mutate(data);
+      AllCustomersBranchEntryMutation.mutate(data)
     }
   }
 
@@ -116,7 +116,7 @@ function CustomerAccountDataTableHeader(props) {
               severity="info"
               className="px-4 py-2 rounded-1 "
               onClick={() => {
-                handleSubmit(onSubmit)();
+                handleSubmit(onSubmit)()
               }}
               type="button"
               disabled={!isEnable || AllCustomersBranchEntryMutation.isPending}
@@ -140,25 +140,25 @@ function CustomerAccountDataTableHeader(props) {
         </FormRow>
       </form>
     </>
-  );
+  )
 }
 
 function AllCustomersBranchDetailTable(props) {
-  const queryClient = useQueryClient();
-  const [visible, setVisible] = useState(false);
-  const { CustomerID, isEnable, pageTitles } = props;
+  const queryClient = useQueryClient()
+  const [visible, setVisible] = useState(false)
+  const { CustomerID, isEnable, pageTitles } = props
   const [filters, setFilters] = useState({
     BranchTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const { user } = useContext(AuthContext);
-  const { register, setValue, handleSubmit, control } = useForm();
+  const { user } = useContext(AuthContext)
+  const { register, setValue, handleSubmit, control } = useForm()
 
   const { data: CustomerBranches } = useQuery({
     queryKey: ["allCustomerBranchesDetail"],
     queryFn: () => fetchAllCustomersBranch(user.userID),
     initialData: [],
-  });
+  })
 
   const AllCustomersBranchEntryMutation = useMutation({
     mutationFn: async (formData) => {
@@ -168,31 +168,31 @@ function AllCustomersBranchDetailTable(props) {
         CustomerID: CustomerID,
         EntryUserID: user.userID,
         InActive: formData?.InActive ? 1 : 0,
-      };
+      }
       const { data } = await axios.post(
         apiUrl + "/Branch/BranchInsertUpdate",
         DataToSend
-      );
+      )
 
       if (data.success === true) {
         toast.success(
           `${pageTitles?.branch || "Customer Branch"} updated successfully!`
-        );
+        )
         queryClient.invalidateQueries({
           queryKey: ["allCustomerBranchesDetail"],
-        });
-        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] });
-        setVisible(false);
+        })
+        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] })
+        setVisible(false)
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteAllCustomersBranchByID,
@@ -200,20 +200,20 @@ function AllCustomersBranchDetailTable(props) {
       if (response === true) {
         queryClient.invalidateQueries({
           queryKey: ["allCustomerBranchesDetail"],
-        });
+        })
       }
     },
-  });
+  })
 
   function onSubmit(data) {
-    AllCustomersBranchEntryMutation.mutate(data);
+    AllCustomersBranchEntryMutation.mutate(data)
   }
 
   function handleDelete(BranchID) {
     deleteMutation.mutate({
       BranchID: BranchID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   const confirmDelete = (id) => {
@@ -226,8 +226,8 @@ function AllCustomersBranchDetailTable(props) {
       position: "top",
       accept: () => handleDelete(id),
       reject: () => {},
-    });
-  };
+    })
+  }
 
   return (
     <>
@@ -264,9 +264,9 @@ function AllCustomersBranchDetailTable(props) {
                   disabled={!isEnable}
                   type="button"
                   onClick={() => {
-                    setVisible(true);
-                    setValue("BranchTitle", rowData?.BranchTitle);
-                    setValue("BranchID", rowData?.BranchID);
+                    setVisible(true)
+                    setValue("BranchTitle", rowData?.BranchTitle)
+                    setValue("BranchID", rowData?.BranchID)
                   }}
                 />
                 <Button
@@ -280,7 +280,7 @@ function AllCustomersBranchDetailTable(props) {
                     width: "30px",
                   }}
                   onClick={() => {
-                    confirmDelete(rowData?.BranchID);
+                    confirmDelete(rowData?.BranchID)
                   }}
                 />
               </ButtonGroup>
@@ -313,7 +313,7 @@ function AllCustomersBranchDetailTable(props) {
             header={`Edit ${pageTitles?.branch || "Customer Branch"} Title`}
             visible={visible}
             onHide={() => {
-              setVisible(false);
+              setVisible(false)
             }}
             style={{ width: "40vw" }}
             footer={
@@ -329,7 +329,7 @@ function AllCustomersBranchDetailTable(props) {
                 loading={AllCustomersBranchEntryMutation.isPending}
                 loadingIcon="pi pi-spin pi-spinner"
                 onClick={() => {
-                  handleSubmit(onSubmit)();
+                  handleSubmit(onSubmit)()
                 }}
               />
             }
@@ -371,5 +371,5 @@ function AllCustomersBranchDetailTable(props) {
         </div>
       </form>
     </>
-  );
+  )
 }

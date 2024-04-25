@@ -1,5 +1,5 @@
-import { Button } from "primereact/button";
-import React from "react";
+import { Button } from "primereact/button"
+import React from "react"
 
 const DetailHeaderActionButtons = ({ handleAdd, handleClear }) => {
   return (
@@ -27,7 +27,7 @@ const DetailHeaderActionButtons = ({ handleAdd, handleClear }) => {
         onClick={handleClear}
       />
     </div>
-  );
-};
+  )
+}
 
-export default DetailHeaderActionButtons;
+export default DetailHeaderActionButtons

@@ -1,19 +1,19 @@
-import axios from "axios";
-import { ShowErrorToast } from "../../utils/CommonFunctions";
-import { decryptID } from "../../utils/crypto";
+import axios from "axios"
+import { ShowErrorToast } from "../../utils/CommonFunctions"
+import { decryptID } from "../../utils/crypto"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
   if (LeadIntroductionID !== undefined) {
-    LeadIntroductionID = decryptID(LeadIntroductionID);
+    LeadIntroductionID = decryptID(LeadIntroductionID)
     const { data } = await axios.post(
       apiUrl +
         `/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=${LoginUserID}&LeadIntroductionID=${LeadIntroductionID}`
-    );
-    return data.data;
+    )
+    return data.data
   } else {
-    return [];
+    return []
   }
 }
 export async function getLeadsTimelineDetail({
@@ -25,17 +25,17 @@ export async function getLeadsTimelineDetail({
       LeadIntroductionDetailID !== undefined &&
       LeadIntroductionDetailID !== 0
     ) {
-      LeadIntroductionDetailID = decryptID(LeadIntroductionDetailID);
+      LeadIntroductionDetailID = decryptID(LeadIntroductionDetailID)
 
       const { data } = await axios.post(
         apiUrl +
           `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${LoginUserID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-      return data.data;
+      )
+      return data.data
     } else {
-      return [];
+      return []
     }
   } catch (e) {
-    ShowErrorToast(e.message);
+    ShowErrorToast(e.message)
   }
 }

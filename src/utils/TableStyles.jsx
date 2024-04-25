@@ -15,4 +15,4 @@ export const tableCustomStyles = {
       fontWeight: "medium",
     },
   },
-};
+}

@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { PanelMenu } from "primereact/panelmenu";
-import { Sidebar } from "primereact/sidebar";
-import { Button } from "primereact/button";
-import { classNames } from "primereact/utils";
-import Logo from "../images/logo.png";
-import { BsList } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react"
+import { PanelMenu } from "primereact/panelmenu"
+import { Sidebar } from "primereact/sidebar"
+import { Button } from "primereact/button"
+import { classNames } from "primereact/utils"
+import Logo from "../images/logo.png"
+import { BsList } from "react-icons/bs"
+import { useNavigate } from "react-router-dom"
 
 export default function BasicDemo() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const itemsModel = [
     {
@@ -152,17 +152,17 @@ export default function BasicDemo() {
         },
       ],
     },
-  ];
+  ]
 
-  const [visible, setVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredItems, setFilteredItems] = useState([]);
+  const [visible, setVisible] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filteredItems, setFilteredItems] = useState([])
   const handleSearch = (event) => {
-    const newSearchTerm = event.target.value.toLowerCase();
-    setSearchTerm(newSearchTerm);
-    const filteredMenuItems = filterMenuItems(newSearchTerm, itemsModel);
-    setFilteredItems(filteredMenuItems);
-  };
+    const newSearchTerm = event.target.value.toLowerCase()
+    setSearchTerm(newSearchTerm)
+    const filteredMenuItems = filterMenuItems(newSearchTerm, itemsModel)
+    setFilteredItems(filteredMenuItems)
+  }
 
   return (
     <>
@@ -180,8 +180,8 @@ export default function BasicDemo() {
             <input
               value={searchTerm}
               onChange={(event) => {
-                setSearchTerm(event.value);
-                handleSearch(event);
+                setSearchTerm(event.value)
+                handleSearch(event)
               }}
               className="form-control"
               placeholder="Search for routes!"
@@ -200,7 +200,7 @@ export default function BasicDemo() {
         <div className={classNames("layout-topbar-menu", {})}></div>
       </div>
     </>
-  );
+  )
 }
 
 function BasicDemoMenu({ model }) {
@@ -216,24 +216,24 @@ function BasicDemoMenu({ model }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 function filterMenuItems(searchTerm, menuItems) {
-  const filteredItems = [];
+  const filteredItems = []
   menuItems.forEach((item) => {
     if (
       item?.label?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       item?.url?.toLowerCase().includes(searchTerm?.toLowerCase())
     ) {
-      filteredItems.push(item);
+      filteredItems.push(item)
     } else if (item.items) {
-      const childItems = filterMenuItems(searchTerm, item.items);
+      const childItems = filterMenuItems(searchTerm, item.items)
       if (childItems.length > 0) {
-        const updatedItem = { ...item, items: childItems };
-        filteredItems.push(updatedItem);
+        const updatedItem = { ...item, items: childItems }
+        filteredItems.push(updatedItem)
       }
     }
-  });
-  return filteredItems;
+  })
+  return filteredItems
 }

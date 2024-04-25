@@ -1,124 +1,121 @@
 .flex-center-col {
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    flex-direction: column; 
-    padding: 1.5rem 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 1.5rem 0 1.5rem 0;
 }
 
 .flex-center-col-wg {
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    flex-direction: column; 
-    gap: .7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 .file-input_component {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #424B57 !important;
-    border-radius: 1rem;
-    min-width: 35rem;
-    max-width: 100%;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #424b57 !important;
+  border-radius: 1rem;
+  min-width: 35rem;
+  max-width: 100%;
+  width: 100%;
 
-    background-color: #1F2937;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    margin: 0 auto;
-    overflow: hidden;
+  background-color: #1f2937;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .s-file-input-icon {
-    height: 3rem;
-    width: 3rem;
-    border-radius: 50%;
-    background-color: transparent !important;
-    margin: 0;
-    display: inline-flex;
-    user-select: none;
-    vertical-align: bottom;
-    text-align: center;
-    overflow: hidden;
-    cursor: pointer;
-    padding: 0.75rem 0;
-    outline: none !important;
-    justify-content: center;
-    color: cyan;
-    border-color: cyan;
-    margin-left: 0.75rem;
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  background-color: transparent !important;
+  margin: 0;
+  display: inline-flex;
+  user-select: none;
+  vertical-align: bottom;
+  text-align: center;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0.75rem 0;
+  outline: none !important;
+  justify-content: center;
+  color: cyan;
+  border-color: cyan;
+  margin-left: 0.75rem;
 }
 
 .file-input_component-upper {
-    padding: 1rem;
-    border-bottom: 1px solid #424B57 !important;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #424b57 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .s-image-icon {
-    text-align: center !important;
+  text-align: center !important;
 }
 
 .file-input_component-lower {
-    padding: 1rem;
-    display: flex;
-    align-items: center;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .s-file-preview {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #fff;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  width: 100%;
 }
 
 .s-doc-file {
-
 }
 
 .s-preview-image {
-    width: 50%;
-    height: 50%;
-    object-fit: cover;
-    display: block;
-  
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+  display: block;
 }
 
 .s-preview-image:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .flex-center {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .s-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-   }
-   
-   .s-modal-content {
-    padding: 1rem;
-    border-radius: 0.5rem;
-   }
-   
-   .s-close-button {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: none;
-    border: none;
-    z-index: 9999;
-   }
-   
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.s-modal-content {
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.s-close-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  z-index: 9999;
+}

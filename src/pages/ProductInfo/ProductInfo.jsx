@@ -1,60 +1,60 @@
-import React, { useContext } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import { Col, Form, Row } from "react-bootstrap";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
+import React, { useContext } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import { Col, Form, Row } from "react-bootstrap"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
 import {
   addNewProductInfo,
   deleteProductInfoByID,
   fetchAllProducts,
   fetchProductInfoByID,
-} from "../../api/ProductInfoData";
+} from "../../api/ProductInfoData"
 import {
   ROUTE_URLS,
   QUERY_KEYS,
   SELECT_QUERY_KEYS,
   MENU_KEYS,
-} from "../../utils/enums";
-import CDropdown from "../../components/Forms/CDropdown";
-import { useUserData } from "../../context/AuthContext";
+} from "../../utils/enums"
+import CDropdown from "../../components/Forms/CDropdown"
+import { useUserData } from "../../context/AuthContext"
 import {
   fetchAllBusinessUnitsForSelect,
   fetchAllProductCategoriesForSelect,
-} from "../../api/SelectData";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../api/SelectData"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.PRODUCT_INFO_QUERY_KEY;
-let IDENTITY = "ProductInfoID";
+let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.PRODUCT_INFO_QUERY_KEY
+let IDENTITY = "ProductInfoID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.UTILITIES.PRODUCT_INFO_FORM_KEY,
       MenuGroupKey: MENU_KEYS.UTILITIES.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -127,54 +127,54 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function ProductInfoDetail({ userRights }) {
-  const { pageTitles } = useContext(AppConfigurationContext);
+  const { pageTitles } = useContext(AppConfigurationContext)
 
-  document.title = `${pageTitles?.product + "s" || "Products"}`;
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = `${pageTitles?.product + "s" || "Products"}`
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
   const [filters, setFilters] = useState({
     ProductInfoTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ProductType: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllProducts(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteProductInfoByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       ProductInfoID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
   return (
     <div className="mt-4">
@@ -263,41 +263,41 @@ function ProductInfoDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 
 function ProductInfoForm({ mode, userRights }) {
-  const { pageTitles } = useContext(AppConfigurationContext);
-  document.title = `${pageTitles?.product || "Product"} Entry`;
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { ProductInfoID } = useParams();
-  const [selectedBusinessUnits, setSelectedBusinessUnits] = useState();
+  const { pageTitles } = useContext(AppConfigurationContext)
+  document.title = `${pageTitles?.product || "Product"} Entry`
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { ProductInfoID } = useParams()
+  const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       ProductInfoTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const ProductInfoData = useQuery({
     queryKey: [queryKey, ProductInfoID],
     queryFn: () => fetchProductInfoByID(ProductInfoID, user.userID),
     initialData: [],
-  });
+  })
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
-  });
+  })
   const { data: ProductCategoriesSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.PRODUCT_CATEGORIES_SELECT_QUERY_KEY],
     queryFn: fetchAllProductCategoriesForSelect,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (ProductInfoID !== undefined && ProductInfoData.data.data?.length > 0) {
@@ -305,55 +305,55 @@ function ProductInfoForm({ mode, userRights }) {
         setValue(
           "ProductCategoryID",
           ProductInfoData?.data.data[0]?.ProductCategoryID
-        );
+        )
       }
       setValue(
         "ProductInfoTitle",
         ProductInfoData?.data.data[0]?.ProductInfoTitle
-      );
-      setValue("InActive", ProductInfoData?.data.data[0]?.InActive);
-      setSelectedBusinessUnits(ProductInfoData.data.Detail);
+      )
+      setValue("InActive", ProductInfoData?.data.data[0]?.InActive)
+      setSelectedBusinessUnits(ProductInfoData.data.Detail)
     }
-  }, [ProductInfoID, ProductInfoData.data]);
+  }, [ProductInfoID, ProductInfoData.data])
 
   const mutation = useMutation({
     mutationFn: addNewProductInfo,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteProductInfoByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       ProductInfoID: ProductInfoID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + ProductInfoID);
+      navigate(viewRoute + ProductInfoID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + ProductInfoID);
+    navigate(editRoute + ProductInfoID)
   }
   function onSubmit(data) {
     mutation.mutate({
@@ -361,12 +361,12 @@ function ProductInfoForm({ mode, userRights }) {
       userID: user.userID,
       ProductInfoID: ProductInfoID,
       selectedBusinessUnits: selectedBusinessUnits,
-    });
+    })
   }
 
   const isRowSelectable = (event) => {
-    return mode !== "view" ? true : false;
-  };
+    return mode !== "view" ? true : false
+  }
 
   return (
     <>
@@ -383,10 +383,10 @@ function ProductInfoForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -476,5 +476,5 @@ function ProductInfoForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

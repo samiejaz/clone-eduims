@@ -1,5 +1,5 @@
-import { Button } from "primereact/button";
-import React from "react";
+import { Button } from "primereact/button"
+import React from "react"
 
 const ModalActionButtons = ({
   disable = false,
@@ -20,7 +20,7 @@ const ModalActionButtons = ({
         <Button
           label={cancelLabel}
           onClick={() => {
-            handleCancelClick();
+            handleCancelClick()
           }}
           severity="danger"
           type="button"
@@ -41,7 +41,7 @@ const ModalActionButtons = ({
         />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default ModalActionButtons;
+export default ModalActionButtons

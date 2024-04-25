@@ -1,15 +1,15 @@
-import { Dialog } from "primereact/dialog";
-import { useState } from "react";
-import { Button } from "primereact/button";
-import { useQueryClient } from "@tanstack/react-query";
-import { useContext } from "react";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import AllCustomersBranchEntry from "../CustomerEntryModal/AllCustomersBranchEntry";
+import { Dialog } from "primereact/dialog"
+import { useState } from "react"
+import { Button } from "primereact/button"
+import { useQueryClient } from "@tanstack/react-query"
+import { useContext } from "react"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import AllCustomersBranchEntry from "../CustomerEntryModal/AllCustomersBranchEntry"
 
 export function useAllCustomersBranchEntryModal(CustomerID) {
-  const queryClient = useQueryClient();
-  const { pageTitles } = useContext(AppConfigurationContext);
-  const [visible, setVisible] = useState(false);
+  const queryClient = useQueryClient()
+  const { pageTitles } = useContext(AppConfigurationContext)
+  const [visible, setVisible] = useState(false)
   return {
     setVisible,
     render: (
@@ -20,21 +20,21 @@ export function useAllCustomersBranchEntryModal(CustomerID) {
           maximizable
           style={{ width: "70vw", height: "60vh" }}
           onHide={() => {
-            setVisible(false);
+            setVisible(false)
             queryClient.invalidateQueries({
               queryKey: ["customersBranch"],
-            });
+            })
           }}
         >
           <AllCustomersBranchEntry CustomerID={CustomerID} />
         </Dialog>
       </>
     ),
-  };
+  }
 }
 
 export function AllCustomersBranchEntryModal({ CustomerID, pageTitles }) {
-  const { setVisible, render } = useAllCustomersBranchEntryModal(CustomerID);
+  const { setVisible, render } = useAllCustomersBranchEntryModal(CustomerID)
 
   return (
     <>
@@ -56,5 +56,5 @@ export function AllCustomersBranchEntryModal({ CustomerID, pageTitles }) {
       />
       <div>{render}</div>
     </>
-  );
+  )
 }

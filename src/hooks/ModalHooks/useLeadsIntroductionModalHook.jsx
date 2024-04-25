@@ -1,43 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
   Controller,
   FormProvider,
   useForm,
   useFormContext,
-} from "react-hook-form";
+} from "react-hook-form"
 import {
   useAllBusinessNatureSelectData,
   useAllBusinessTypesSelectData,
   useAllCountiesSelectData,
   useAllLeadsSouceSelectData,
   useAllTehsilsSelectData,
-} from "../SelectData/useSelectData";
-import CDropdown from "../../components/Forms/CDropdown";
-import CheckBox from "../../components/Forms/CheckBox";
-import TextInput from "../../components/Forms/TextInput";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { AutoComplete } from "primereact/autocomplete";
-import { classNames } from "primereact/utils";
-import { fetchDemonstrationLeadsDataByID } from "../../api/LeadIntroductionData";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "../../utils/enums";
-import { useUserData } from "../../context/AuthContext";
-import { Dropdown } from "primereact/dropdown";
-import { CMaskInputField } from "../../components/Forms/form";
+} from "../SelectData/useSelectData"
+import CDropdown from "../../components/Forms/CDropdown"
+import CheckBox from "../../components/Forms/CheckBox"
+import TextInput from "../../components/Forms/TextInput"
+import { Dialog } from "primereact/dialog"
+import { Button } from "primereact/button"
+import { AutoComplete } from "primereact/autocomplete"
+import { classNames } from "primereact/utils"
+import { fetchDemonstrationLeadsDataByID } from "../../api/LeadIntroductionData"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { QUERY_KEYS } from "../../utils/enums"
+import { useUserData } from "../../context/AuthContext"
+import { Dropdown } from "primereact/dropdown"
+import { CMaskInputField } from "../../components/Forms/form"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import { decryptID } from "../../utils/crypto";
-import { formatDateAndTime } from "../../utils/CommonFunctions";
+} from "../../components/Layout/LayoutComponents"
+import { decryptID } from "../../utils/crypto"
+import { formatDateAndTime } from "../../utils/CommonFunctions"
 
 export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
-  const queryClient = useQueryClient();
-  const user = useUserData();
+  const queryClient = useQueryClient()
+  const user = useUserData()
 
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   const LeadIntroductionData = useQuery({
     queryKey: [QUERY_KEYS.LEADS_DEMO_DATA, LeadIntroductionDetailID],
     queryFn: () =>
@@ -49,7 +49,7 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
 
     enabled: LeadIntroductionDetailID !== 0,
     initialData: [],
-  });
+  })
 
   const dialogContent = (
     <>
@@ -273,9 +273,9 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
         </FormColumn>
       </FormRow>
     </>
-  );
+  )
 
-  const footerContent = <></>;
+  const footerContent = <></>
 
   function onSubmit(data) {}
 
@@ -291,10 +291,10 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
           maximizable
           style={{ width: "80vw", height: "80vh" }}
           onHide={() => {
-            setVisible(false);
+            setVisible(false)
             queryClient.invalidateQueries([
               QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY,
-            ]);
+            ])
             //TODO: Invalidate the query
           }}
         >
@@ -302,29 +302,29 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
         </Dialog>
       </>
     ),
-  };
-};
+  }
+}
 export function LeadsIntroductionFormComponent({
   mode = "",
   hideFieldsForDemo = false,
   countryRef,
 }) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([])
 
-  const businessTypesSelectData = useAllBusinessTypesSelectData();
-  const businessNatureSelectData = useAllBusinessNatureSelectData(true);
-  const leadSourcesSelectData = useAllLeadsSouceSelectData();
+  const businessTypesSelectData = useAllBusinessTypesSelectData()
+  const businessNatureSelectData = useAllBusinessNatureSelectData(true)
+  const leadSourcesSelectData = useAllLeadsSouceSelectData()
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   const search = (event) => {
-    let _filteredItems;
-    let query = event.query;
+    let _filteredItems
+    let query = event.query
     _filteredItems = businessNatureSelectData?.data.filter((item) => {
-      return item.toLowerCase().includes(query.toLowerCase());
-    });
-    setItems(_filteredItems);
-  };
+      return item.toLowerCase().includes(query.toLowerCase())
+    })
+    setItems(_filteredItems)
+  }
 
   return (
     <>
@@ -455,7 +455,7 @@ export function LeadsIntroductionFormComponent({
                 focusOptions={() => method.setFocus("ContactPersonEmail")}
                 onChange={(e) => {
                   if (method.watch("IsWANumberSameAsMobile")) {
-                    method.setValue("ContactPersonWhatsAppNo", e.target.value);
+                    method.setValue("ContactPersonWhatsAppNo", e.target.value)
                   }
                 }}
               />
@@ -541,9 +541,9 @@ export function LeadsIntroductionFormComponent({
                         method.setValue(
                           "ContactPersonWhatsAppNo",
                           method.getValues("ContactPersonMobileNo")
-                        );
+                        )
                       } else {
-                        method.setValue("ContactPersonWhatsAppNo", "");
+                        method.setValue("ContactPersonWhatsAppNo", "")
                       }
                     }}
                   />
@@ -596,15 +596,15 @@ export function LeadsIntroductionFormComponent({
         </FormRow>
       </form>
     </>
-  );
+  )
 }
 export function LeadsIntroductionFormModalButton({
   LeadIntroductionDetailID = 0,
 }) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const { setVisible, render } = useLeadsIntroductionModalHook(
     LeadIntroductionDetailID
-  );
+  )
   return (
     <>
       <Button
@@ -617,7 +617,7 @@ export function LeadsIntroductionFormModalButton({
           position: "right",
         }}
         onClick={() => {
-          setVisible(true);
+          setVisible(true)
         }}
         style={{
           padding: "1px 0px",
@@ -629,19 +629,19 @@ export function LeadsIntroductionFormModalButton({
       />
       {render}
     </>
-  );
+  )
 }
 
 export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
-  const [CountryID, setCountryID] = useState(0);
+  const [CountryID, setCountryID] = useState(0)
 
-  const method = useFormContext();
-  const countriesSelectData = useAllCountiesSelectData();
-  const tehsilsSelectData = useAllTehsilsSelectData(CountryID);
+  const method = useFormContext()
+  const countriesSelectData = useAllCountiesSelectData()
+  const tehsilsSelectData = useAllTehsilsSelectData(CountryID)
 
   React.useImperativeHandle(ref, () => ({
     setCountryID,
-  }));
+  }))
 
   return (
     <>
@@ -662,8 +662,8 @@ export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
             disabled={mode === "view"}
             focusOptions={() => method.setFocus("TehsilID")}
             onChange={(e) => {
-              setCountryID(e.value);
-              method.resetField("TehsilID");
+              setCountryID(e.value)
+              method.resetField("TehsilID")
             }}
           />
         </div>
@@ -688,5 +688,5 @@ export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
         </div>
       </FormColumn>
     </>
-  );
-});
+  )
+})

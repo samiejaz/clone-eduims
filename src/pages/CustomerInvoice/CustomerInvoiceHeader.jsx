@@ -1,21 +1,21 @@
-import { Row, Col, Form, ButtonGroup } from "react-bootstrap";
-import { useFormContext } from "react-hook-form";
-import { useState } from "react";
-import { useEffect } from "react";
-import NumberInput from "../../components/Forms/NumberInput";
-import CDropdown from "../../components/Forms/CDropdown";
+import { Row, Col, Form, ButtonGroup } from "react-bootstrap"
+import { useFormContext } from "react-hook-form"
+import { useState } from "react"
+import { useEffect } from "react"
+import NumberInput from "../../components/Forms/NumberInput"
+import CDropdown from "../../components/Forms/CDropdown"
 import {
   useBusinessUnitsSelectData,
   useProductsInfoSelectData,
   useServicesInfoSelectData,
-} from "../../hooks/SelectData/useSelectData";
-import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons";
+} from "../../hooks/SelectData/useSelectData"
+import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
 
 function CustomerInvoiceHeader(props) {
-  const { customerBranchSelectData, typesOption, append, pageTitles } = props;
-  const [isFree, setIsFree] = useState(false);
-  const [invoiceType, setInvoiceType] = useState();
-  const [BusinessUnitID, setBusinessUnitID] = useState(0);
+  const { customerBranchSelectData, typesOption, append, pageTitles } = props
+  const [isFree, setIsFree] = useState(false)
+  const [invoiceType, setInvoiceType] = useState()
+  const [BusinessUnitID, setBusinessUnitID] = useState(0)
 
   const {
     control,
@@ -26,11 +26,11 @@ function CustomerInvoiceHeader(props) {
     setValue,
     setFocus,
     formState,
-  } = useFormContext();
+  } = useFormContext()
 
-  const businessSelectData = useBusinessUnitsSelectData();
-  const productsInfoSelectData = useProductsInfoSelectData(BusinessUnitID);
-  const servicesInfoSelectData = useServicesInfoSelectData(BusinessUnitID);
+  const businessSelectData = useBusinessUnitsSelectData()
+  const productsInfoSelectData = useProductsInfoSelectData(BusinessUnitID)
+  const servicesInfoSelectData = useServicesInfoSelectData(BusinessUnitID)
 
   function onSubmit(data) {
     append({
@@ -49,10 +49,10 @@ function CustomerInvoiceHeader(props) {
       products: JSON.stringify(productsInfoSelectData.data),
       IsFree: data.IsFree,
       services: JSON.stringify(servicesInfoSelectData.data),
-    });
-    reset();
-    setIsFree(false);
-    setFocus("InvoiceType");
+    })
+    reset()
+    setIsFree(false)
+    setFocus("InvoiceType")
   }
 
   return (
@@ -72,7 +72,7 @@ function CustomerInvoiceHeader(props) {
                 required={true}
                 focusOptions={() => setFocus("BusinessUnit")}
                 onChange={(e) => {
-                  setInvoiceType(e.value === "Product" ? true : false);
+                  setInvoiceType(e.value === "Product" ? true : false)
                 }}
               />
             </div>
@@ -93,9 +93,9 @@ function CustomerInvoiceHeader(props) {
                 options={businessSelectData.data}
                 required={true}
                 onChange={(e) => {
-                  setValue("ProductInfo", []);
-                  setValue("ServiceInfo", []);
-                  setBusinessUnitID(e.value);
+                  setValue("ProductInfo", [])
+                  setValue("ServiceInfo", [])
+                  setBusinessUnitID(e.value)
                 }}
                 filter={true}
                 focusOptions={() => setFocus("CustomerBranch")}
@@ -175,8 +175,8 @@ function CustomerInvoiceHeader(props) {
               id={"Qty"}
               control={control}
               onChange={(e) => {
-                const rate = getValues(["Rate"]);
-                setValue("Amount", e.value * rate);
+                const rate = getValues(["Rate"])
+                setValue("Amount", e.value * rate)
               }}
               inputClassName="form-control"
               useGrouping={false}
@@ -189,10 +189,10 @@ function CustomerInvoiceHeader(props) {
               id={"Rate"}
               control={control}
               onChange={(e) => {
-                const qty = getValues(["Qty"]);
-                setValue("Amount", e.value * qty);
-                const disc = getValues(["Discount"]);
-                setValue("NetAmount", e.value * qty - disc);
+                const qty = getValues(["Qty"])
+                setValue("Amount", e.value * qty)
+                const disc = getValues(["Discount"])
+                setValue("NetAmount", e.value * qty - disc)
               }}
               mode="decimal"
               maxFractionDigits={2}
@@ -233,8 +233,8 @@ function CustomerInvoiceHeader(props) {
               control={control}
               disabled={isFree}
               onChange={(e) => {
-                const amount = getValues(["Amount"]);
-                setValue("NetAmount", amount - e.value);
+                const amount = getValues(["Amount"])
+                setValue("NetAmount", amount - e.value)
               }}
               mode="decimal"
               maxFractionDigits={2}
@@ -284,14 +284,14 @@ function CustomerInvoiceHeader(props) {
               style={{ marginTop: "7px" }}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setValue("Rate", 0);
-                  setValue("CGS", 0);
-                  setValue("Amount", 0);
-                  setValue("Discount", 0);
-                  setValue("NetAmount", 0);
-                  setIsFree(true);
+                  setValue("Rate", 0)
+                  setValue("CGS", 0)
+                  setValue("Amount", 0)
+                  setValue("Discount", 0)
+                  setValue("NetAmount", 0)
+                  setIsFree(true)
                 } else {
-                  setIsFree(false);
+                  setIsFree(false)
                 }
               }}
             />
@@ -306,7 +306,7 @@ function CustomerInvoiceHeader(props) {
         </Row>
       </form>
     </>
-  );
+  )
 }
 
-export default CustomerInvoiceHeader;
+export default CustomerInvoiceHeader

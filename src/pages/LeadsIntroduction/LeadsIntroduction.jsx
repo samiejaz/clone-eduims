@@ -1,90 +1,90 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm, FormProvider, Controller } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import { Col, Form, Row } from "react-bootstrap";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode, FilterOperator } from "primereact/api"
+import React, { useContext, useEffect, useRef, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm, FormProvider, Controller } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import { Col, Form, Row } from "react-bootstrap"
 
-import { AuthContext, useUserData } from "../../context/AuthContext";
+import { AuthContext, useUserData } from "../../context/AuthContext"
 import {
   addLeadIntroductionOnAction,
   addNewLeadIntroduction,
   deleteLeadIntroductionByID,
   fetchAllLeadIntroductions,
   fetchLeadIntroductionById,
-} from "../../api/LeadIntroductionData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import { LeadsIntroductionFormComponent } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook";
-import { Dialog } from "primereact/dialog";
+} from "../../api/LeadIntroductionData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import { LeadsIntroductionFormComponent } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook"
+import { Dialog } from "primereact/dialog"
 import {
   useAllDepartmentsSelectData,
   useAllUsersSelectData,
   useProductsInfoSelectData,
-} from "../../hooks/SelectData/useSelectData";
-import CDropdown from "../../components/Forms/CDropdown";
-import NumberInput from "../../components/Forms/NumberInput";
-import { Calendar } from "primereact/calendar";
-import { classNames } from "primereact/utils";
-import { Tag } from "primereact/tag";
-import { toast } from "react-toastify";
-import { CIconButton } from "../../components/Buttons/CButtons";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
+} from "../../hooks/SelectData/useSelectData"
+import CDropdown from "../../components/Forms/CDropdown"
+import NumberInput from "../../components/Forms/NumberInput"
+import { Calendar } from "primereact/calendar"
+import { classNames } from "primereact/utils"
+import { Tag } from "primereact/tag"
+import { toast } from "react-toastify"
+import { CIconButton } from "../../components/Buttons/CButtons"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
 import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
-} from "../LeadsIntroductionViewer/LeadsIntroductionViewer";
-import LeadsComments from "./LeadsComments";
-import { encryptID } from "../../utils/crypto";
-import { SingleFileUploadField } from "../../components/Forms/form";
-import { ShowErrorToast } from "../../utils/CommonFunctions";
-import { Dropdown } from "primereact/dropdown";
+} from "../LeadsIntroductionViewer/LeadsIntroductionViewer"
+import LeadsComments from "./LeadsComments"
+import { encryptID } from "../../utils/crypto"
+import { SingleFileUploadField } from "../../components/Forms/form"
+import { ShowErrorToast } from "../../utils/CommonFunctions"
+import { Dropdown } from "primereact/dropdown"
 
-let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY;
-let IDENTITY = "LeadIntroductionID";
+let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.LEAD_INTRODUCTION_QUERY_KEY
+let IDENTITY = "LeadIntroductionID"
 
 const getSeverity = (status) => {
   switch (status?.toLowerCase().replaceAll(" ", "")) {
     case "newlead":
-      return "#34568B";
+      return "#34568B"
     case "closed":
-      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)"
     case "quoted":
-      return "#22C55E";
+      return "#22C55E"
     case "finalized":
-      return "#B35DF7";
+      return "#B35DF7"
     case "forwarded":
-      return "#9EBBF9";
+      return "#9EBBF9"
     case "acknowledged":
-      return "#FCB382";
+      return "#FCB382"
     case "meetingdone":
-      return "#FF6F61";
+      return "#FF6F61"
     case "pending":
-      return "#DFCFBE";
+      return "#DFCFBE"
   }
-};
+}
 
 export default function LeadIntroduction() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
       MenuGroupKey: MENU_KEYS.LEADS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -174,7 +174,7 @@ export default function LeadIntroduction() {
       />
       <Route path={`:LeadIntroductionID`} element={<LeadsComments />} />
     </Routes>
-  );
+  )
 }
 
 export function LeadIntroductionDetail({
@@ -182,15 +182,15 @@ export function LeadIntroductionDetail({
   Rows = 10,
   userRights,
 }) {
-  document.title = ShowMetaDeta ? "Lead Introductions" : "Leads Dashboard";
+  document.title = ShowMetaDeta ? "Lead Introductions" : "Leads Dashboard"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     Status: { value: null, matchMode: FilterMatchMode.EQUALS },
@@ -201,36 +201,36 @@ export function LeadIntroductionDetail({
     CompanyName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ContactPersonName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ContactPersonMobileNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllLeadIntroductions(user.userID),
     initialData: [],
     refetchOnWindowFocus: false,
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteLeadIntroductionByID,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
-      });
+      })
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ LeadIntroductionID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ LeadIntroductionID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   const actionBodyTemplate = (rowData) => {
@@ -251,8 +251,8 @@ export function LeadIntroductionDetail({
           />
         </div>
       </React.Fragment>
-    );
-  };
+    )
+  }
   const leftActionBodyTemplate = (rowData) => {
     return (
       <React.Fragment>
@@ -308,8 +308,8 @@ export function LeadIntroductionDetail({
           </div>
         </div>
       </React.Fragment>
-    );
-  };
+    )
+  }
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -317,12 +317,12 @@ export function LeadIntroductionDetail({
         value={rowData.Status}
         style={{ background: getSeverity(rowData.Status) }}
       />
-    );
-  };
+    )
+  }
 
   const statusItemTemplate = (option) => {
-    return <Tag value={option} style={{ background: getSeverity(option) }} />;
-  };
+    return <Tag value={option} style={{ background: getSeverity(option) }} />
+  }
 
   const [statuses] = useState([
     "New Lead",
@@ -332,7 +332,7 @@ export function LeadIntroductionDetail({
     "Meeting Done",
     "Closed",
     "Forwarded",
-  ]);
+  ])
 
   const statusRowFilterTemplate = (options) => {
     return (
@@ -346,11 +346,11 @@ export function LeadIntroductionDetail({
         showClear
         style={{ minWidth: "12rem" }}
       />
-    );
-  };
+    )
+  }
 
   const dateFilterTemplate = (options) => {
-    console.log(options);
+    console.log(options)
     return (
       <Calendar
         value={options.value}
@@ -359,21 +359,21 @@ export function LeadIntroductionDetail({
         placeholder="mm/dd/yyyy"
         mask="99/99/9999"
       />
-    );
-  };
+    )
+  }
 
   const dateBodyTemplate = (rowData) => {
-    return formatDate(rowData.VoucherDate);
-  };
+    return formatDate(rowData.VoucherDate)
+  }
 
   const formatDate = (value) => {
-    value = new Date(value);
+    value = new Date(value)
     return value.toLocaleDateString("en-US", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-    });
-  };
+    })
+  }
 
   return (
     <div className="mt-4">
@@ -479,19 +479,19 @@ export function LeadIntroductionDetail({
         </>
       )}
     </div>
-  );
+  )
 }
 
 function LeadIntroductionForm({ mode, userRights }) {
-  document.title = "Lead Introduction Entry";
+  document.title = "Lead Introduction Entry"
 
-  const queryClient = useQueryClient();
-  const { user } = useContext(AuthContext);
+  const queryClient = useQueryClient()
+  const { user } = useContext(AuthContext)
 
-  const countryRef = useRef();
+  const countryRef = useRef()
 
-  const navigate = useNavigate();
-  const { LeadIntroductionID } = useParams();
+  const navigate = useNavigate()
+  const { LeadIntroductionID } = useParams()
 
   const method = useForm({
     defaultValues: {
@@ -510,124 +510,118 @@ function LeadIntroductionForm({ mode, userRights }) {
       LeadSourceID: null,
       IsWANumberSameAsMobile: false,
     },
-  });
+  })
   const LeadIntroductionData = useQuery({
     queryKey: [queryKey, LeadIntroductionID],
     queryFn: () => fetchLeadIntroductionById(LeadIntroductionID, user.userID),
     enabled: LeadIntroductionID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (
       LeadIntroductionID !== undefined &&
       LeadIntroductionData?.data?.length > 0
     ) {
-      method.setValue("CompanyName", LeadIntroductionData.data[0].CompanyName);
-      method.setValue("CountryID", LeadIntroductionData.data[0].CountryID);
-      countryRef.current?.setCountryID(LeadIntroductionData.data[0].CountryID);
-      method.setValue("TehsilID", LeadIntroductionData.data[0].TehsilID);
+      method.setValue("CompanyName", LeadIntroductionData.data[0].CompanyName)
+      method.setValue("CountryID", LeadIntroductionData.data[0].CountryID)
+      countryRef.current?.setCountryID(LeadIntroductionData.data[0].CountryID)
+      method.setValue("TehsilID", LeadIntroductionData.data[0].TehsilID)
       method.setValue(
         "BusinessTypeID",
         LeadIntroductionData.data[0].BusinessTypeID
-      );
+      )
       method.setValue(
         "CompanyAddress",
         LeadIntroductionData.data[0].CompanyAddress
-      );
+      )
       method.setValue(
         "CompanyWebsite",
         LeadIntroductionData.data[0].CompanyWebsite
-      );
+      )
       method.setValue(
         "BusinessNatureID",
         LeadIntroductionData.data[0].BusinessNature
-      );
+      )
       method.setValue(
         "ContactPersonName",
         LeadIntroductionData.data[0].ContactPersonName
-      );
+      )
       method.setValue(
         "ContactPersonMobileNo",
         LeadIntroductionData.data[0].ContactPersonMobileNo
-      );
+      )
 
       method.setValue(
         "ContactPersonWhatsAppNo",
         LeadIntroductionData.data[0].ContactPersonWhatsAppNo
-      );
+      )
       method.setValue(
         "ContactPersonEmail",
         LeadIntroductionData.data[0].ContactPersonEmail
-      );
+      )
       method.setValue(
         "RequirementDetails",
         LeadIntroductionData.data[0].RequirementDetails
-      );
+      )
 
-      method.setValue(
-        "LeadSourceID",
-        LeadIntroductionData.data[0].LeadSourceID
-      );
+      method.setValue("LeadSourceID", LeadIntroductionData.data[0].LeadSourceID)
     }
-  }, [LeadIntroductionID, LeadIntroductionData.data]);
+  }, [LeadIntroductionID, LeadIntroductionData.data])
 
   const mutation = useMutation({
     mutationFn: addNewLeadIntroduction,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteLeadIntroductionByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       LeadIntroductionID: LeadIntroductionID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    method.reset();
-    navigate(newRoute);
+    method.reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      method.clearErrors();
-      navigate(viewRoute + LeadIntroductionID);
+      method.clearErrors()
+      navigate(viewRoute + LeadIntroductionID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + LeadIntroductionID);
+    navigate(editRoute + LeadIntroductionID)
   }
 
   function onSubmit(data) {
     data.ContactPersonWhatsAppNo = data.ContactPersonWhatsAppNo?.replaceAll(
       "-",
       ""
-    );
-    data.ContactPersonMobileNo = data.ContactPersonMobileNo?.replaceAll(
-      "-",
-      ""
-    );
+    )
+    data.ContactPersonMobileNo = data.ContactPersonMobileNo?.replaceAll("-", "")
 
     mutation.mutate({
       formData: data,
       userID: user.userID,
       LeadIntroductionID: LeadIntroductionID,
-    });
+    })
   }
 
   return (
@@ -644,10 +638,10 @@ function LeadIntroductionForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => method.handleSubmit(onSubmit)()}
@@ -669,11 +663,11 @@ function LeadIntroductionForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 const useForwardDialog = (LeadIntroductionID) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   return {
     setVisible,
     render: (
@@ -683,11 +677,11 @@ const useForwardDialog = (LeadIntroductionID) => {
         LeadIntroductionID={LeadIntroductionID}
       />
     ),
-  };
-};
+  }
+}
 
 function ForwardDialogComponent({ LeadIntroductionID }) {
-  const { setVisible, render } = useForwardDialog(LeadIntroductionID);
+  const { setVisible, render } = useForwardDialog(LeadIntroductionID)
 
   return (
     <>
@@ -712,33 +706,33 @@ function ForwardDialogComponent({ LeadIntroductionID }) {
       />
       {render}
     </>
-  );
+  )
 }
 
 function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
-  const queryClient = useQueryClient();
-  const user = useUserData();
-  const usersSelectData = useAllUsersSelectData();
-  const departmentSelectData = useAllDepartmentsSelectData();
-  const productsSelectData = useProductsInfoSelectData(0, true);
+  const queryClient = useQueryClient()
+  const user = useUserData()
+  const usersSelectData = useAllUsersSelectData()
+  const departmentSelectData = useAllDepartmentsSelectData()
+  const productsSelectData = useProductsInfoSelectData(0, true)
   const method = useForm({
     defaultValues: {
       Description: "",
     },
-  });
+  })
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Lead forwarded successfully!");
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        toast.success("Lead forwarded successfully!")
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.LEADS_CARD_DATA],
-        });
+        })
       }
     },
-  });
+  })
 
   const footerContent = (
     <>
@@ -750,7 +744,7 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
         onClick={() => method.handleSubmit(onSubmit)()}
       />
     </>
-  );
+  )
   const dialogConent = (
     <>
       <Row>
@@ -875,19 +869,19 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
         </Form.Group>
       </Row>
     </>
-  );
+  )
 
   function onSubmit(data) {
     if (data.DepartmentID === undefined && data.UserID === undefined) {
-      method.setError("DepartmentID", { type: "required" });
-      method.setError("UserID", { type: "required" });
+      method.setError("DepartmentID", { type: "required" })
+      method.setError("UserID", { type: "required" })
     } else {
       mutation.mutate({
         from: "Forward",
         formData: data,
         userID: user.userID,
         LeadIntroductionID: LeadIntroductionID,
-      });
+      })
     }
   }
 
@@ -904,11 +898,11 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
         {dialogConent}
       </Dialog>
     </>
-  );
+  )
 }
 // Quoted
 const useQuoteDialog = (LeadIntroductionID) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   return {
     setVisible,
     render: (
@@ -918,11 +912,11 @@ const useQuoteDialog = (LeadIntroductionID) => {
         LeadIntroductionID={LeadIntroductionID}
       />
     ),
-  };
-};
+  }
+}
 
 function QuoteDialogComponent({ LeadIntroductionID }) {
-  const { setVisible, render } = useQuoteDialog(LeadIntroductionID);
+  const { setVisible, render } = useQuoteDialog(LeadIntroductionID)
 
   return (
     <>
@@ -948,14 +942,14 @@ function QuoteDialogComponent({ LeadIntroductionID }) {
       />
       {render}
     </>
-  );
+  )
 }
 
 function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
-  const method = useForm();
-  const fileRef = useRef();
-  const queryClient = useQueryClient();
-  const user = useUserData();
+  const method = useForm()
+  const fileRef = useRef()
+  const queryClient = useQueryClient()
+  const user = useUserData()
   const footerContent = (
     <>
       <Button
@@ -966,8 +960,8 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
         onClick={() => method.handleSubmit(onSubmit)()}
       />
     </>
-  );
-  const headerContent = <></>;
+  )
+  const headerContent = <></>
   const dialogConent = (
     <>
       <Row>
@@ -1008,31 +1002,31 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
         </Form.Group>
       </Row>
     </>
-  );
+  )
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Lead quoted successfully!");
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        toast.success("Lead quoted successfully!")
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.LEADS_CARD_DATA],
-        });
+        })
       }
     },
-  });
+  })
   function onSubmit(data) {
-    const file = fileRef.current?.getFile();
+    const file = fileRef.current?.getFile()
     if (file === null) {
-      fileRef.current?.setError();
+      fileRef.current?.setError()
     } else {
-      data.AttachmentFile = file;
+      data.AttachmentFile = file
       mutation.mutate({
         from: "Quoted",
         formData: data,
         userID: user.userID,
         LeadIntroductionID: LeadIntroductionID,
-      });
+      })
     }
   }
 
@@ -1049,11 +1043,11 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
         {dialogConent}
       </Dialog>
     </>
-  );
+  )
 }
 // Finalized
 const useFinalizedDialog = (LeadIntroductionID) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   return {
     setVisible,
     render: (
@@ -1063,11 +1057,11 @@ const useFinalizedDialog = (LeadIntroductionID) => {
         LeadIntroductionID={LeadIntroductionID}
       />
     ),
-  };
-};
+  }
+}
 
 function FinalizedDialogComponent({ LeadIntroductionID }) {
-  const { setVisible, render } = useFinalizedDialog(LeadIntroductionID);
+  const { setVisible, render } = useFinalizedDialog(LeadIntroductionID)
 
   return (
     <>
@@ -1093,28 +1087,28 @@ function FinalizedDialogComponent({ LeadIntroductionID }) {
       />
       {render}
     </>
-  );
+  )
 }
 
 function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
-  const queryClient = useQueryClient();
-  const user = useUserData();
-  const method = useForm();
+  const queryClient = useQueryClient()
+  const user = useUserData()
+  const method = useForm()
 
-  const fileRef = useRef(null);
+  const fileRef = useRef(null)
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Lead finalized successfully!");
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        toast.success("Lead finalized successfully!")
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.LEADS_CARD_DATA],
-        });
+        })
       }
     },
-  });
+  })
 
   const footerContent = (
     <>
@@ -1126,7 +1120,7 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         onClick={() => method.handleSubmit(onSubmit)()}
       />
     </>
-  );
+  )
   const dialogConent = (
     <>
       <Row>
@@ -1167,20 +1161,20 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         </Form.Group>
       </Row>
     </>
-  );
+  )
 
   function onSubmit(data) {
-    const file = fileRef.current?.getFile();
+    const file = fileRef.current?.getFile()
     if (file === null) {
-      fileRef.current?.setError();
+      fileRef.current?.setError()
     } else {
-      data.AttachmentFile = file;
+      data.AttachmentFile = file
       mutation.mutate({
         from: "Finalized",
         formData: data,
         userID: user.userID,
         LeadIntroductionID: LeadIntroductionID,
-      });
+      })
     }
   }
 
@@ -1197,12 +1191,12 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         {dialogConent}
       </Dialog>
     </>
-  );
+  )
 }
 
 // Closed
 const useClosedDialog = (LeadIntroductionID) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   return {
     setVisible,
     render: (
@@ -1212,11 +1206,11 @@ const useClosedDialog = (LeadIntroductionID) => {
         LeadIntroductionID={LeadIntroductionID}
       />
     ),
-  };
-};
+  }
+}
 
 function ClosedDialogComponent({ LeadIntroductionID }) {
-  const { setVisible, render } = useClosedDialog(LeadIntroductionID);
+  const { setVisible, render } = useClosedDialog(LeadIntroductionID)
 
   return (
     <>
@@ -1243,13 +1237,13 @@ function ClosedDialogComponent({ LeadIntroductionID }) {
 
       {render}
     </>
-  );
+  )
 }
 
 function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
-  const method = useForm();
-  const queryClient = useQueryClient();
-  const user = useUserData();
+  const method = useForm()
+  const queryClient = useQueryClient()
+  const user = useUserData()
   const footerContent = (
     <>
       <Button
@@ -1260,26 +1254,26 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         onClick={() => method.handleSubmit(onSubmit)()}
       />
     </>
-  );
+  )
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Lead closed successfully!");
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        toast.success("Lead closed successfully!")
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.LEADS_CARD_DATA],
-        });
+        })
       }
     },
-  });
+  })
   function onSubmit(data) {
     mutation.mutate({
       from: "Closed",
       formData: data,
       userID: user.userID,
       LeadIntroductionID: LeadIntroductionID,
-    });
+    })
   }
   const dialogConent = (
     <>
@@ -1310,7 +1304,7 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         </Form.Group>
       </Row>
     </>
-  );
+  )
 
   return (
     <>
@@ -1325,5 +1319,5 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         {dialogConent}
       </Dialog>
     </>
-  );
+  )
 }

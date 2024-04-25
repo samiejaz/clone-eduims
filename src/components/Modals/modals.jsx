@@ -1,1 +1,1 @@
-export { default as CustomerInvoiceIntallmentsModal } from "./CustomerInvoiceInstallmetnsModal";
+export { default as CustomerInvoiceIntallmentsModal } from "./CustomerInvoiceInstallmetnsModal"

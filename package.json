@@ -6,6 +6,7 @@
   "homepage": "https://samiejaz.github.io/clone-eduims",
   "scripts": {
     "predeploy": "npm run build",
+    "prettier": "prettier --write '**/*.{ts,js,css,html,jsx}'",
     "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",

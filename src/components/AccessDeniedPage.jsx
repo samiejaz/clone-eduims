@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import AccessDenied from "../images/accessDenied.png";
-import { Link } from "react-router-dom";
-import { Button } from "primereact/button";
-import { CustomSpinner } from "../components/CustomSpinner";
+import React, { useEffect, useState } from "react"
+import AccessDenied from "../images/accessDenied.png"
+import { Link } from "react-router-dom"
+import { Button } from "primereact/button"
+import { CustomSpinner } from "../components/CustomSpinner"
 
 const AccessDeniedPage = () => {
-  const [showImage, setShowImage] = useState(false);
+  const [showImage, setShowImage] = useState(false)
 
   useEffect(() => {
     setTimeout(() => {
-      setShowImage(true);
-    }, 1000);
-  }, []);
+      setShowImage(true)
+    }, 1000)
+  }, [])
 
   return (
     <div
@@ -47,7 +47,7 @@ const AccessDeniedPage = () => {
         </>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AccessDeniedPage;
+export default AccessDeniedPage

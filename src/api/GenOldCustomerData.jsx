@@ -1,37 +1,37 @@
-import axios from "axios";
-import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
-import { decryptID, encryptID } from "../utils/crypto";
+import axios from "axios"
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
+import { decryptID, encryptID } from "../utils/crypto"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export async function fetchAllGenOldCustomers(LoginUserID) {
   try {
     const { data } = await axios.post(
       apiUrl + "/EduIMS/GetOldCustomersWhere?LoginUserID=" + LoginUserID
-    );
+    )
 
-    return data.data ?? [];
+    return data.data ?? []
   } catch (error) {
-    ShowErrorToast("FetchAll::" + error.message);
+    ShowErrorToast("FetchAll::" + error.message)
   }
 }
 export async function fetchGenOldCustomerById(CustomerID, LoginUserID) {
   try {
-    CustomerID = decryptID(CustomerID);
+    CustomerID = decryptID(CustomerID)
     if (CustomerID !== 0) {
       try {
         const { data } = await axios.post(
           `${apiUrl}/EduIMS/GetOldCustomersWhere?CustomerID=${CustomerID}&LoginUserID=${LoginUserID}`
-        );
-        return data;
+        )
+        return data
       } catch (error) {
-        ShowErrorToast(error.message);
+        ShowErrorToast(error.message)
       }
     } else {
-      return [];
+      return []
     }
   } catch (e) {
-    ShowErrorToast("Fetch::" + error.message);
+    ShowErrorToast("Fetch::" + error.message)
   }
 }
 
@@ -39,14 +39,14 @@ export async function deleteGenOldCustomerByID(OldCustomerID) {
   try {
     const { data } = await axios.post(
       apiUrl + "/EduIMS/CustomerDelete?CustomerID=" + OldCustomerID
-    );
+    )
     if (data.success === true) {
-      ShowSuccessToast("Customer successfully deleted!");
+      ShowSuccessToast("Customer successfully deleted!")
     } else {
-      ShowErrorToast(data.message);
+      ShowErrorToast(data.message)
     }
   } catch (e) {
-    ShowErrorToast("Delete::" + e.message);
+    ShowErrorToast("Delete::" + e.message)
   }
 }
 
@@ -61,32 +61,32 @@ export async function addNewGenOldCustomer({
       SoftwareMgtDbID: formData?.SoftwareMgtDbID,
       CustomerName: formData.CustomerName,
       EntryUserID: userID,
-    };
+    }
 
-    CustomerID = CustomerID === 0 ? 0 : decryptID(CustomerID);
+    CustomerID = CustomerID === 0 ? 0 : decryptID(CustomerID)
     if (CustomerID === 0 || CustomerID === undefined) {
-      DataToSend.CustomerID = 0;
+      DataToSend.CustomerID = 0
     } else {
-      DataToSend.CustomerID = CustomerID;
+      DataToSend.CustomerID = CustomerID
     }
 
     const { data } = await axios.post(
       apiUrl + "/EduIMS/OldCustomerInsert",
       DataToSend
-    );
+    )
 
     if (data.success === true) {
       if (CustomerID !== 0) {
-        ShowSuccessToast("Customer updated successfully!");
+        ShowSuccessToast("Customer updated successfully!")
       } else {
-        ShowSuccessToast("Customer created successfully!");
+        ShowSuccessToast("Customer created successfully!")
       }
-      return { success: true, RecordID: encryptID(data?.CustomerID) };
+      return { success: true, RecordID: encryptID(data?.CustomerID) }
     } else {
-      ShowErrorToast(data.message);
-      return { success: false, RecordID: encryptID(CustomerID) };
+      ShowErrorToast(data.message)
+      return { success: false, RecordID: encryptID(CustomerID) }
     }
   } catch (error) {
-    ShowErrorToast(error.message);
+    ShowErrorToast(error.message)
   }
 }

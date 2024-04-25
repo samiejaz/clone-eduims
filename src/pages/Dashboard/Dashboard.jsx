@@ -1,47 +1,47 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import React, { useEffect, useState } from "react";
-import { useUserData } from "../../context/AuthContext";
-import { MOVEABLE_COMPNENTS_NAMES, QUERY_KEYS } from "../../utils/enums";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Column } from "primereact/column"
+import { DataTable } from "primereact/datatable"
+import React, { useEffect, useState } from "react"
+import { useUserData } from "../../context/AuthContext"
+import { MOVEABLE_COMPNENTS_NAMES, QUERY_KEYS } from "../../utils/enums"
 import {
   addLeadIntroductionOnAction,
   fetchAllDemonstrationLeadsData,
-} from "../../api/LeadIntroductionData";
-import { Button } from "primereact/button";
-import { Tag } from "primereact/tag";
-import { FilterMatchMode } from "primereact/api";
-import { useLeadsIntroductionModalHook } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook";
-import { useMeetingDoneModalHook } from "../../components/Modals/MeetingDoneModal";
-import { CIconButton } from "../../components/Buttons/CButtons";
-import { useRevertBackModalHook } from "../../components/Modals/RevertBackModal";
-import { confirmDialog } from "primereact/confirmdialog";
-import { toast } from "react-toastify";
-import { InfoCardsContainer } from "../Leads/LeadsDashboard/LeadsDashboard";
-import { encryptID } from "../../utils/crypto";
+} from "../../api/LeadIntroductionData"
+import { Button } from "primereact/button"
+import { Tag } from "primereact/tag"
+import { FilterMatchMode } from "primereact/api"
+import { useLeadsIntroductionModalHook } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook"
+import { useMeetingDoneModalHook } from "../../components/Modals/MeetingDoneModal"
+import { CIconButton } from "../../components/Buttons/CButtons"
+import { useRevertBackModalHook } from "../../components/Modals/RevertBackModal"
+import { confirmDialog } from "primereact/confirmdialog"
+import { toast } from "react-toastify"
+import { InfoCardsContainer } from "../Leads/LeadsDashboard/LeadsDashboard"
+import { encryptID } from "../../utils/crypto"
 
 const componentMapping = {
   InfoCardsContainer,
-};
+}
 
 function DynamicComponent({ componentName }) {
-  const Component = componentMapping[componentName];
-  return <Component />;
+  const Component = componentMapping[componentName]
+  return <Component />
 }
 
 function Dashboard() {
-  document.title = "Dashboard";
-  const [dynamicComponent, setDynamicComponent] = useState("");
+  document.title = "Dashboard"
+  const [dynamicComponent, setDynamicComponent] = useState("")
 
   useEffect(() => {
     function getDynamicallyCreatedComponent() {
-      const dynamicComponent = localStorage.getItem("dynamic-component");
+      const dynamicComponent = localStorage.getItem("dynamic-component")
       if (dynamicComponent) {
-        setDynamicComponent(dynamicComponent);
+        setDynamicComponent(dynamicComponent)
       }
     }
-    getDynamicallyCreatedComponent();
-  }, [localStorage.getItem("dynamic-component")]);
+    getDynamicallyCreatedComponent()
+  }, [localStorage.getItem("dynamic-component")])
 
   return (
     <div className="flex flex-column gap-1 mt-4">
@@ -62,67 +62,67 @@ function Dashboard() {
         <LeadsIntroductionDemonstratorTable />
       </div>
     </div>
-  );
+  )
 }
 
-export default Dashboard;
+export default Dashboard
 
 const getSeverity = (status) => {
   switch (status?.toLowerCase().replaceAll(" ", "")) {
     case "newlead":
-      return "#34568B";
+      return "#34568B"
     case "closed":
-      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)"
     case "quoted":
-      return "#22C55E";
+      return "#22C55E"
     case "finalized":
-      return "#B35DF7";
+      return "#B35DF7"
     case "forwarded":
-      return "#9EBBF9";
+      return "#9EBBF9"
     case "acknowledged":
-      return "#FCB382";
+      return "#FCB382"
     case "meetingdone":
-      return "#FF6F61";
+      return "#FF6F61"
     case "pending":
-      return "#DFCFBE";
+      return "#DFCFBE"
   }
-};
+}
 
 function LeadsIntroductionDemonstratorTable() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const [LeadIntroductionData, setLeadIntroductionData] = useState({
     LeadIntroductionID: 0,
     LeadIntroductionDetailID: 0,
-  });
+  })
 
   const { render, setVisible } = useLeadsIntroductionModalHook(
     LeadIntroductionData.LeadIntroductionDetailID
-  );
+  )
   const { render: MeetingDoneModal, setVisible: setMeetingDoneModalVisible } =
     useMeetingDoneModalHook({
       LeadsIntroductionID: LeadIntroductionData.LeadIntroductionID,
       LeadIntroductionDetailID: LeadIntroductionData.LeadIntroductionDetailID,
-    });
+    })
   const { render: RevertBackModal, setVisible: setRevertBackModalVisible } =
     useRevertBackModalHook({
       LeadsIntroductionID: LeadIntroductionData.LeadIntroductionID,
       LeadIntroductionDetailID: LeadIntroductionData.LeadIntroductionDetailID,
-    });
+    })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Acknowledged successfully!");
+        toast.success("Acknowledged successfully!")
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.LEADS_DEMO_DATA],
-        });
+        })
       }
     },
-  });
+  })
 
   const confirmAcknowledge = (LeadIntroductionID) => {
     confirmDialog({
@@ -134,17 +134,17 @@ function LeadsIntroductionDemonstratorTable() {
           userID: user.userID,
           LeadIntroductionID,
           from: "Acknowledged",
-        });
+        })
       },
       reject: () => {},
-    });
-  };
+    })
+  }
 
   const [filters, setFilters] = useState({
     Status: { value: null, matchMode: FilterMatchMode.CONTAINS },
     CompanyName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     LeadSourceTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
   const { data } = useQuery({
     queryKey: [QUERY_KEYS.LEADS_DEMO_DATA],
@@ -154,7 +154,7 @@ function LeadsIntroductionDemonstratorTable() {
         DepartmentID: user.DepartmentID,
       }),
     initialData: [],
-  });
+  })
 
   const leftActionBodyTemplate = (rowData) => {
     return (
@@ -183,8 +183,8 @@ function LeadsIntroductionDemonstratorTable() {
                   LeadIntroductionDetailID: encryptID(
                     rowData.LeadIntroductionDetailID
                   ),
-                });
-                setVisible(true);
+                })
+                setVisible(true)
               }}
             />
 
@@ -193,8 +193,8 @@ function LeadsIntroductionDemonstratorTable() {
                 setLeadIntroductionData({
                   LeadIntroductionID: encryptID(rowData.LeadIntroductionID),
                   LeadIntroductionDetailID: 0,
-                });
-                setMeetingDoneModalVisible(true);
+                })
+                setMeetingDoneModalVisible(true)
               }}
               icon={"pi pi-check"}
               severity="success"
@@ -213,8 +213,8 @@ function LeadsIntroductionDemonstratorTable() {
                 setLeadIntroductionData({
                   LeadIntroductionID: encryptID(rowData.LeadIntroductionID),
                   LeadIntroductionDetailID: 0,
-                });
-                setRevertBackModalVisible(true);
+                })
+                setRevertBackModalVisible(true)
               }}
               icon={"pi pi-arrow-left"}
               severity="danger"
@@ -247,8 +247,8 @@ function LeadsIntroductionDemonstratorTable() {
           </div>
         </div>
       </React.Fragment>
-    );
-  };
+    )
+  }
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -256,8 +256,8 @@ function LeadsIntroductionDemonstratorTable() {
         value={rowData.Status}
         style={{ background: getSeverity(rowData.Status) }}
       />
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -330,5 +330,5 @@ function LeadsIntroductionDemonstratorTable() {
       {MeetingDoneModal}
       {RevertBackModal}
     </>
-  );
+  )
 }

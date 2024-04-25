@@ -1,19 +1,19 @@
-import axios from "axios";
-import { format, parseISO } from "date-fns";
-import { decryptID, encryptID } from "../utils/crypto";
-import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions";
+import axios from "axios"
+import { format, parseISO } from "date-fns"
+import { decryptID, encryptID } from "../utils/crypto"
+import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
-const CONTROLLER = "CustomerInvoice";
-const WHEREMETHOD = "GetCustomerInvoiceWhere";
-const DELETEMETHOD = "CustomerInvoiceDelete";
+const CONTROLLER = "CustomerInvoice"
+const WHEREMETHOD = "GetCustomerInvoiceWhere"
+const DELETEMETHOD = "CustomerInvoiceDelete"
 
 // URL: /CustomerInvoice/GetCustomerInvoicesData?LoginUserID=??
 export async function fetchAllCustomerInvoices(LoginUserID) {
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/GetCustomerInvoicesData?LoginUserID=${LoginUserID}`
-  );
+  )
   let newData = data.data.map((item) => {
     return {
       CustomerInvoiceID: item.CustomerInvoiceID,
@@ -24,22 +24,22 @@ export async function fetchAllCustomerInvoices(LoginUserID) {
       AccountTitle: item.AccountTitle,
       EntryDate: format(parseISO(item.EntryDate), "dd-MMM-yyyy"),
       TotalNetAmount: item.TotalNetAmount,
-    };
-  });
-  return newData ?? [];
+    }
+  })
+  return newData ?? []
 }
 
 // URL: /EduIMS/GetCustomerInvoiceWhere?CustomerInvoiceID=??&LoginUserID=??
 export async function fetchCustomerInvoiceById(CustomerInvoiceID, LoginUserID) {
   try {
-    CustomerInvoiceID = decryptID(CustomerInvoiceID);
+    CustomerInvoiceID = decryptID(CustomerInvoiceID)
 
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?CustomerInvoiceID=${CustomerInvoiceID}&LoginUserID=${LoginUserID}`
-    );
-    return data;
+    )
+    return data
   } catch (e) {
-    ShowErrorToast(e.message);
+    ShowErrorToast(e.message)
   }
 }
 
@@ -47,20 +47,20 @@ export async function fetchMaxInvoiceNo(LoginUserID) {
   try {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/GetInvoiceNo?LoginUserID=${LoginUserID}`
-    );
-    return data;
+    )
+    return data
   } catch (error) {
-    ShowErrorToast(error);
+    ShowErrorToast(error)
   }
 }
 export async function fetchMaxSessionBasedVoucherNo(LoginUserID) {
   try {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/GetSessionBasedInvoiceNo?LoginUserID=${LoginUserID}`
-    );
-    return data;
+    )
+    return data
   } catch (error) {
-    ShowErrorToast("Fetch::" + error.message);
+    ShowErrorToast("Fetch::" + error.message)
   }
 }
 // URL: /CustomerInvoice/CustomerInvoiceDelete?CustomerInvoiceID=??&LoginUserID=??
@@ -69,20 +69,20 @@ export async function deleteCustomerInvoiceByID({
   LoginUserID,
 }) {
   try {
-    CustomerInvoiceID = decryptID(CustomerInvoiceID);
+    CustomerInvoiceID = decryptID(CustomerInvoiceID)
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?CustomerInvoiceID=${CustomerInvoiceID}&LoginUserID=${LoginUserID}`
-    );
+    )
 
     if (data.success === true) {
-      ShowSuccessToast("Invoice sucessfully deleted!");
-      return true;
+      ShowSuccessToast("Invoice sucessfully deleted!")
+      return true
     } else {
-      ShowErrorToast(data.message);
-      return false;
+      ShowErrorToast(data.message)
+      return false
     }
   } catch (e) {
-    ShowErrorToast("Delete::" + e.message);
+    ShowErrorToast("Delete::" + e.message)
   }
 }
 
@@ -109,18 +109,18 @@ export async function addNewCustomerInvoice({
         NetAmount: item.NetAmount,
         DetailDescription: item.DetailDescription,
         IsFree: item.IsFree ? 1 : 0,
-      };
-    });
+      }
+    })
 
-    let InstallmentDetail = [];
+    let InstallmentDetail = []
     if (formData?.installments.length > 0) {
       InstallmentDetail = formData?.installments?.map((item, index) => {
         return {
           InstallmentRowID: index + 1,
           InstallmentDueDate: item.IDate ?? new Date(),
           InstallmentAmount: item.Amount,
-        };
-      });
+        }
+      })
     }
 
     let DataToSend = {
@@ -141,39 +141,39 @@ export async function addNewCustomerInvoice({
       DocumentNo: formData?.DocumentNo,
       EntryUserID: userID,
       InvoiceDetail: JSON.stringify(InvoiceDetail),
-    };
+    }
 
     if (InstallmentDetail.length > 0) {
-      DataToSend.InvoiceInstallmentDetail = JSON.stringify(InstallmentDetail);
+      DataToSend.InvoiceInstallmentDetail = JSON.stringify(InstallmentDetail)
     }
 
     CustomerInvoiceID =
-      CustomerInvoiceID === 0 ? 0 : decryptID(CustomerInvoiceID);
+      CustomerInvoiceID === 0 ? 0 : decryptID(CustomerInvoiceID)
 
     if (CustomerInvoiceID !== 0 || CustomerInvoiceID !== undefined) {
-      DataToSend.CustomerInvoiceID = CustomerInvoiceID;
+      DataToSend.CustomerInvoiceID = CustomerInvoiceID
     } else {
-      DataToSend.CustomerInvoiceID = 0;
+      DataToSend.CustomerInvoiceID = 0
     }
 
     const { data } = await axios.post(
       apiUrl + `/CustomerInvoice/CustomerInvoiceInsertUpdate`,
       DataToSend
-    );
+    )
 
     if (data.success === true) {
       if (CustomerInvoiceID !== 0) {
-        ShowSuccessToast("Invoice updated successfully!");
+        ShowSuccessToast("Invoice updated successfully!")
       } else {
-        ShowSuccessToast("Invoice created successfully!");
+        ShowSuccessToast("Invoice created successfully!")
       }
-      return { success: true, RecordID: encryptID(data?.CustomerInvoiceID) };
+      return { success: true, RecordID: encryptID(data?.CustomerInvoiceID) }
     } else {
-      ShowErrorToast(data.message);
-      return { success: false, RecordID: CustomerInvoiceID };
+      ShowErrorToast(data.message)
+      return { success: false, RecordID: CustomerInvoiceID }
     }
   } catch (e) {
-    ShowErrorToast("Insert::" + e.message);
+    ShowErrorToast("Insert::" + e.message)
   }
 }
 export async function fetchMonthlyMaxCustomerInvoiceNo(BusinessUnitID) {
@@ -181,12 +181,12 @@ export async function fetchMonthlyMaxCustomerInvoiceNo(BusinessUnitID) {
     try {
       const { data } = await axios.post(
         `${apiUrl}/${CONTROLLER}/GetInvoiceNo?BusinessUnitID=${BusinessUnitID}`
-      );
-      return data.data;
+      )
+      return data.data
     } catch (error) {
-      ShowErrorToast(error.message);
+      ShowErrorToast(error.message)
     }
   } else {
-    return [];
+    return []
   }
 }

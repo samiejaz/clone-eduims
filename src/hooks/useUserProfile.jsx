@@ -1,10 +1,10 @@
-import { useState } from "react";
-import UserProfile from "../components/Modals/UserProfile";
+import { useState } from "react"
+import UserProfile from "../components/Modals/UserProfile"
 
 const useUserProfile = () => {
-  const [showProfile, setShowProfile] = useState(false);
-  const handleCloseProfile = () => setShowProfile(false);
-  const handleShowProfile = () => setShowProfile(true);
+  const [showProfile, setShowProfile] = useState(false)
+  const handleCloseProfile = () => setShowProfile(false)
+  const handleShowProfile = () => setShowProfile(true)
 
   return {
     handleCloseProfile,
@@ -17,7 +17,7 @@ const useUserProfile = () => {
         />
       </>
     ),
-  };
-};
+  }
+}
 
-export default useUserProfile;
+export default useUserProfile

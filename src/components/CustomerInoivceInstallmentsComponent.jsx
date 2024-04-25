@@ -1,5 +1,5 @@
-import { Button as PrimeButton } from "primereact/button";
-import useCustomerInvoiceInstallmentHook from "../hooks/useCustomerInvoiceInstallmentHook";
+import { Button as PrimeButton } from "primereact/button"
+import useCustomerInvoiceInstallmentHook from "../hooks/useCustomerInvoiceInstallmentHook"
 
 export function CustomerInvoiceInstallmentForm({
   method,
@@ -10,7 +10,7 @@ export function CustomerInvoiceInstallmentForm({
     installmentsFieldArray,
     method,
     isEnable
-  );
+  )
 
   return (
     <>
@@ -34,5 +34,5 @@ export function CustomerInvoiceInstallmentForm({
 
       {render}
     </>
-  );
+  )
 }

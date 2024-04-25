@@ -1,7 +1,7 @@
-import { InputTextarea } from "primereact/inputtextarea";
-import { classNames } from "primereact/utils";
-import React from "react";
-import { Controller } from "react-hook-form";
+import { InputTextarea } from "primereact/inputtextarea"
+import { classNames } from "primereact/utils"
+import React from "react"
+import { Controller } from "react-hook-form"
 
 const CTextArea = ({
   name,
@@ -28,15 +28,15 @@ const CTextArea = ({
             autoResize={autoResize}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                e.preventDefault();
-                const start = e.target.selectionStart;
-                const end = e.target.selectionEnd;
+                e.preventDefault()
+                const start = e.target.selectionStart
+                const end = e.target.selectionEnd
                 const newText =
                   e.target.value.substring(0, start) +
                   "\n" +
-                  e.target.value.substring(end);
-                e.target.value = newText;
-                e.target.selectionStart = e.target.selectionEnd = start + 1;
+                  e.target.value.substring(end)
+                e.target.value = newText
+                e.target.selectionStart = e.target.selectionEnd = start + 1
               }
             }}
             {...options}
@@ -44,7 +44,7 @@ const CTextArea = ({
         </>
       )}
     />
-  );
-};
+  )
+}
 
-export default CTextArea;
+export default CTextArea

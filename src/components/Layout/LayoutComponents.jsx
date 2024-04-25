@@ -1,8 +1,8 @@
-import React from "react";
+import React from "react"
 
 export const FormRow = ({ children, className = "" }) => {
-  return <div className={`grid ${className}`}>{children}</div>;
-};
+  return <div className={`grid ${className}`}>{children}</div>
+}
 
 export const FormColumn = ({
   children,
@@ -13,11 +13,11 @@ export const FormColumn = ({
   lg = 12,
   xl = 12,
 }) => {
-  const responsiveClass = `col-${xs} sm:col-${sm} md:col-${md} lg:col-${lg} xl:col-${xl}`;
-  const combinedClass = `${responsiveClass} ${className}`.trim();
+  const responsiveClass = `col-${xs} sm:col-${sm} md:col-${md} lg:col-${lg} xl:col-${xl}`
+  const combinedClass = `${responsiveClass} ${className}`.trim()
 
-  return <div className={combinedClass}>{children}</div>;
-};
+  return <div className={combinedClass}>{children}</div>
+}
 
 export const FormLabel = ({
   children,
@@ -32,8 +32,8 @@ export const FormLabel = ({
     >
       {children}
     </label>
-  );
-};
+  )
+}
 
 export const FormField = ({
   col = "12",
@@ -55,5 +55,5 @@ export const FormField = ({
         {inputTemplate}
       </FormColumn>
     </>
-  );
-};
+  )
+}

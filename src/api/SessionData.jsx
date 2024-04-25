@@ -1,17 +1,17 @@
-import axios from "axios";
-import { format, parseISO } from "date-fns";
-import { toast } from "react-toastify";
-import { decryptID, encryptID } from "../utils/crypto";
+import axios from "axios"
+import { format, parseISO } from "date-fns"
+import { toast } from "react-toastify"
+import { decryptID, encryptID } from "../utils/crypto"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
-const CONTROLLER = "EduIMS";
-const POSTMEHTOD = "SessionInsertUpdate";
+const CONTROLLER = "EduIMS"
+const POSTMEHTOD = "SessionInsertUpdate"
 
 export async function fetchAllSessions(LoginUserID) {
   const { data } = await axios.post(
     apiUrl + "/EduIMS/GetSessionWhere?LoginUserID=" + LoginUserID
-  );
+  )
 
   let newData = data.data.map((item) => {
     return {
@@ -25,40 +25,40 @@ export async function fetchAllSessions(LoginUserID) {
         parseISO(item.SessionClosingDate),
         "dd-MMM-yyyy"
       ),
-    };
-  });
+    }
+  })
 
-  return newData;
+  return newData
 }
 
 export async function fetchSessionById(SessionID = 0, LoginUserID) {
-  SessionID = decryptID(SessionID);
+  SessionID = decryptID(SessionID)
 
   if (SessionID !== 0) {
     try {
       const { data } = await axios.post(
         apiUrl +
           `/EduIMS/GetSessionWhere?SessionID=${SessionID}&LoginUserID=${LoginUserID}`
-      );
-      return data.data;
+      )
+      return data.data
     } catch (error) {}
   } else {
-    return [];
+    return []
   }
 }
 
 export async function deleteSessionByID({ SessionID, LoginUserID }) {
-  SessionID = decryptID(SessionID);
+  SessionID = decryptID(SessionID)
   const { data } = await axios.post(
     apiUrl +
       `/EduIMS/SessionDelete?SessionID=${SessionID}&LoginUserID=${LoginUserID}`
-  );
+  )
   if (data.success === true) {
-    toast.success("Session deleted successfully!");
+    toast.success("Session deleted successfully!")
   } else {
     toast.error(data.message, {
       autoClose: false,
-    });
+    })
   }
 }
 
@@ -70,36 +70,36 @@ export async function addNewSession({ formData, userID, SessionID = 0 }) {
       SessionClosingDate: formData.SessionClosingDate,
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
-    };
+    }
 
-    SessionID = SessionID === 0 ? 0 : decryptID(SessionID);
+    SessionID = SessionID === 0 ? 0 : decryptID(SessionID)
     if (SessionID === 0 || SessionID === undefined) {
-      DataToSend.SessionID = 0;
+      DataToSend.SessionID = 0
     } else {
-      DataToSend.SessionID = SessionID;
+      DataToSend.SessionID = SessionID
     }
 
     const { data } = await axios.post(
       apiUrl + `/${CONTROLLER}/${POSTMEHTOD}`,
       DataToSend
-    );
+    )
 
     if (data.success === true) {
       if (SessionID !== 0) {
-        toast.success("Business Type updated successfully!");
+        toast.success("Business Type updated successfully!")
       } else {
-        toast.success("Business Type created successfully!");
+        toast.success("Business Type created successfully!")
       }
-      return { success: true, RecordID: encryptID(data?.SessionID) };
+      return { success: true, RecordID: encryptID(data?.SessionID) }
     } else {
       toast.error(data.message, {
         autoClose: false,
-      });
-      return { success: false, RecordID: encryptID(SessionID) };
+      })
+      return { success: false, RecordID: encryptID(SessionID) }
     }
   } catch (e) {
     toast.error(e.message, {
       autoClose: false,
-    });
+    })
   }
 }

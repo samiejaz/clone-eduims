@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import axios from "axios";
+import { useEffect } from "react"
+import axios from "axios"
 import {
   Button,
   Card,
@@ -8,66 +8,66 @@ import {
   Form,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import { useContext } from "react";
-import { useForm } from "react-hook-form";
-import Logo from "../images/logo.png";
-import { toast } from "react-toastify";
-import { CheckCircle } from "lucide-react";
+} from "react-bootstrap"
+import { useMutation } from "@tanstack/react-query"
+import { useNavigate } from "react-router-dom"
+import { AuthContext } from "../context/AuthContext"
+import { useContext } from "react"
+import { useForm } from "react-hook-form"
+import Logo from "../images/logo.png"
+import { toast } from "react-toastify"
+import { CheckCircle } from "lucide-react"
 
 const SignUp = () => {
-  const navigate = useNavigate();
-  const { user, loginUser } = useContext(AuthContext);
-  const { register, handleSubmit, formState } = useForm();
-  const { errors } = formState;
+  const navigate = useNavigate()
+  const { user, loginUser } = useContext(AuthContext)
+  const { register, handleSubmit, formState } = useForm()
+  const { errors } = formState
 
   useEffect(() => {
     if (user !== null) {
-      navigate("/", { replace: true });
+      navigate("/", { replace: true })
     }
-  }, [user, navigate]);
+  }, [user, navigate])
 
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = import.meta.env.VITE_APP_API_URL
 
   const mutation = useMutation({
     mutationFn: async (formData) => {
       const { data } = await axios.post(
         apiUrl + "/EduIMS/VerifyLogin",
         formData
-      );
+      )
       if (data.success === true) {
         const dataToSerialize = {
           username: data.data[0].FirstName + " " + data.data[0].LastName,
           userID: data.data[0].LoginUserID,
           image: data.data[0]?.ProfilePic,
           DepartmentID: data.data[0].DepartmentID,
-        };
-        loginUser(dataToSerialize);
+        }
+        loginUser(dataToSerialize)
         toast("Login sucessful", {
           autoClose: 1500,
           position: "top-right",
           icon: <CheckCircle />,
-        });
+        })
       } else {
         toast.error(data.Message, {
           autoClose: 1500,
           position: "top-right",
-        });
+        })
       }
     },
     onError: () => {
       toast.error("Something went wrong! Please try again later", {
         position: "top-left",
         autoClose: 1500,
-      });
+      })
     },
-  });
+  })
 
   function onSubmit(data) {
-    mutation.mutate(data);
+    mutation.mutate(data)
   }
 
   return (
@@ -190,7 +190,7 @@ const SignUp = () => {
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default SignUp;
+export default SignUp

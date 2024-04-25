@@ -1,7 +1,7 @@
-import { Calendar } from "primereact/calendar";
-import { classNames } from "primereact/utils";
-import React from "react";
-import { Controller } from "react-hook-form";
+import { Calendar } from "primereact/calendar"
+import { classNames } from "primereact/utils"
+import React from "react"
+import { Controller } from "react-hook-form"
 
 const CDatePicker = ({
   control,
@@ -35,7 +35,7 @@ const CDatePicker = ({
         </>
       )}
     />
-  );
-};
+  )
+}
 
-export default CDatePicker;
+export default CDatePicker

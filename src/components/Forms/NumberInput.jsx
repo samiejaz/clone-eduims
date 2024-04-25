@@ -1,7 +1,7 @@
-import React from "react";
-import { Controller } from "react-hook-form";
-import { InputNumber } from "primereact/inputnumber";
-import { classNames } from "primereact/utils";
+import React from "react"
+import { Controller } from "react-hook-form"
+import { InputNumber } from "primereact/inputnumber"
+import { classNames } from "primereact/utils"
 
 const NumberInput = ({
   label = "",
@@ -25,7 +25,7 @@ const NumberInput = ({
             value={field.value}
             onBlur={field.onBlur}
             onValueChange={(e) => {
-              field.onChange(e);
+              field.onChange(e)
             }}
             className={classNames({
               "p-invalid": fieldState.error,
@@ -50,7 +50,7 @@ const NumberInput = ({
             onKeyDown={(e) => {
               if (enterKeyOptions) {
                 if (e.key === "Enter") {
-                  enterKeyOptions();
+                  enterKeyOptions()
                 }
               }
             }}
@@ -61,7 +61,7 @@ const NumberInput = ({
         </>
       )}
     />
-  );
-};
+  )
+}
 
-export default NumberInput;
+export default NumberInput

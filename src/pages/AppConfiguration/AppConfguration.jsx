@@ -1,68 +1,68 @@
-import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
+import { toast } from "react-toastify"
+import { useForm } from "react-hook-form"
+import { useMutation } from "@tanstack/react-query"
+import { useContext, useEffect, useState } from "react"
+import { AuthContext } from "../../context/AuthContext"
+import axios from "axios"
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import TextInput from "../../components/Forms/TextInput";
-import { Button } from "primereact/button";
-import { useKeyCombinationHook } from "../../hooks/hooks";
-import { Tag } from "primereact/tag";
-import SimpleToolbar from "../../components/Toolbars/SimpleToolbar";
+} from "../../components/Layout/LayoutComponents"
+import TextInput from "../../components/Forms/TextInput"
+import { Button } from "primereact/button"
+import { useKeyCombinationHook } from "../../hooks/hooks"
+import { Tag } from "primereact/tag"
+import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 let defaultValues = {
   ProductName: "Product",
   BranchName: "Branch",
-};
+}
 
 function AppConfiguration() {
-  document.title = "App Configuration";
+  document.title = "App Configuration"
 
-  const [reload, setReload] = useState(true);
-  const [ConfigID, setConfigID] = useState(true);
-  const { setPageTitles } = useContext(AppConfigurationContext);
+  const [reload, setReload] = useState(true)
+  const [ConfigID, setConfigID] = useState(true)
+  const { setPageTitles } = useContext(AppConfigurationContext)
   const { control, setFocus, handleSubmit, setValue } = useForm({
     defaultValues,
-  });
-  const { user } = useContext(AuthContext);
+  })
+  const { user } = useContext(AuthContext)
 
   useKeyCombinationHook(
     () => {
-      handleSubmit(onSubmit)();
+      handleSubmit(onSubmit)()
     },
     "s",
     true
-  );
+  )
 
   useEffect(() => {
     async function fetchCompanyInfo() {
       const { data } = await axios.post(
         `${apiUrl}/EduIMS/GetConfigInfo?LoginUserID=${user?.userID}`
-      );
+      )
       if (data.success === true) {
-        setConfigID(data?.data[0]?.ConfigID);
-        setValue("ProductName", data?.data[0]?.ProductTitle);
-        setValue("BranchName", data?.data[0]?.CustomerBranchTitle);
+        setConfigID(data?.data[0]?.ConfigID)
+        setValue("ProductName", data?.data[0]?.ProductTitle)
+        setValue("BranchName", data?.data[0]?.CustomerBranchTitle)
         setPageTitles({
           product: data?.data[0]?.ProductTitle,
           branch: data?.data[0]?.CustomerBranchTitle,
-        });
-        setReload(false);
+        })
+        setReload(false)
       }
     }
     if (reload) {
-      fetchCompanyInfo();
+      fetchCompanyInfo()
     }
-  }, [reload]);
+  }, [reload])
 
   const configurationMutation = useMutation({
     mutationFn: async (formData) => {
@@ -72,31 +72,31 @@ function AppConfiguration() {
           ProductTitle: formData?.ProductName,
           CustomerBranchTitle: formData?.BranchName,
           EntryUserID: user?.userID,
-        };
+        }
 
         const { data } = await axios.post(
           `${apiUrl}/EduIMS/ConfigOneInsertUpdate`,
           DataToSend
-        );
+        )
 
         if (data.success === true) {
-          toast.success("App Configuration updated successfully!");
-          setReload(true);
+          toast.success("App Configuration updated successfully!")
+          setReload(true)
         } else {
           toast.error(data.message, {
             autoClose: false,
-          });
+          })
         }
       } catch (error) {
         toast.error(error.message, {
           autoClose: false,
-        });
+        })
       }
     },
-  });
+  })
 
   function onSubmit(data) {
-    configurationMutation.mutate(data);
+    configurationMutation.mutate(data)
   }
 
   return (
@@ -130,7 +130,7 @@ function AppConfiguration() {
         </form>
       </div>
     </>
-  );
+  )
 }
 
-export default AppConfiguration;
+export default AppConfiguration

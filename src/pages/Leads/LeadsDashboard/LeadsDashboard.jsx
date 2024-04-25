@@ -1,24 +1,24 @@
-import React, { useRef } from "react";
-import { LeadIntroductionDetail } from "../../LeadsIntroduction/LeadsIntroduction";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import React, { useRef } from "react"
+import { LeadIntroductionDetail } from "../../LeadsIntroduction/LeadsIntroduction"
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
 import {
   MENU_KEYS,
   MOVEABLE_COMPNENTS_NAMES,
   QUERY_KEYS,
-} from "../../../utils/enums";
-import { formatDateToMMDDYYYY } from "../../../utils/CommonFunctions";
-import { checkForUserRights } from "../../../utils/routes";
-import { ContextMenu } from "primereact/contextmenu";
+} from "../../../utils/enums"
+import { formatDateToMMDDYYYY } from "../../../utils/CommonFunctions"
+import { checkForUserRights } from "../../../utils/routes"
+import { ContextMenu } from "primereact/contextmenu"
 import {
   FormRow,
   FormColumn,
-} from "../../../components/Layout/LayoutComponents";
-import { useUserData } from "../../../context/AuthContext";
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+} from "../../../components/Layout/LayoutComponents"
+import { useUserData } from "../../../context/AuthContext"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export function LeadsDashboard() {
-  document.title = "Leads Dashboard";
+  document.title = "Leads Dashboard"
 
   return (
     <div className="flex flex-column gap-1 mt-4">
@@ -42,36 +42,36 @@ export function LeadsDashboard() {
         />
       </div>
     </div>
-  );
+  )
 }
 
-export default LeadsDashboard;
+export default LeadsDashboard
 
 export function InfoCardsContainer({
   componentLocation = "",
   selectedDate = new Date().toISOString(),
 }) {
-  const user = useUserData();
+  const user = useUserData()
 
   const { data } = useQuery({
     queryKey: [QUERY_KEYS.LEADS_CARD_DATA],
     queryFn: async () => {
       const url =
         apiUrl +
-        `/data_LeadIntroduction/GetLeadIntroductionDashboardCounter?LoginUserID=${user.userID}&DateTo=${selectedDate}`;
-      const { data } = await axios.post(url);
+        `/data_LeadIntroduction/GetLeadIntroductionDashboardCounter?LoginUserID=${user.userID}&DateTo=${selectedDate}`
+      const { data } = await axios.post(url)
 
-      return data.data || [];
+      return data.data || []
     },
     initialData: [],
-  });
+  })
 
-  const cmRef = useRef();
+  const cmRef = useRef()
   const onRightClick = (event) => {
     if (cmRef.current) {
-      cmRef.current.show(event);
+      cmRef.current.show(event)
     }
-  };
+  }
 
   const items = [
     {
@@ -82,22 +82,22 @@ export function InfoCardsContainer({
         componentLocation === "LeadsDashboard" ? "pi pi-send" : "pi pi-times"
       }`,
       command: () => {
-        setOrRemoveItemFromLocalStorage();
+        setOrRemoveItemFromLocalStorage()
       },
     },
-  ];
+  ]
 
   function setOrRemoveItemFromLocalStorage() {
     if (componentLocation === "LeadsDashboard") {
       localStorage.setItem(
         "dynamic-component",
         MOVEABLE_COMPNENTS_NAMES.LEADS_DASHBOARD_CARDS
-      );
+      )
     } else {
       localStorage.removeItem(
         "dynamic-component",
         MOVEABLE_COMPNENTS_NAMES.LEADS_DASHBOARD_CARDS
-      );
+      )
     }
   }
 
@@ -172,7 +172,7 @@ export function InfoCardsContainer({
         }}
       />
     </>
-  );
+  )
 }
 
 export function CCard({
@@ -224,5 +224,5 @@ export function CCard({
         </div>
       </div>
     </>
-  );
+  )
 }

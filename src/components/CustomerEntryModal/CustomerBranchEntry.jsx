@@ -1,53 +1,53 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { Form, Col, ButtonGroup } from "react-bootstrap";
-import { Button } from "primereact/button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Select from "react-select";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { fetchCustomerBranchesByCustomerID } from "./CustomerEntryAPI";
+import { createContext, useContext, useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
+import { Form, Col, ButtonGroup } from "react-bootstrap"
+import { Button } from "primereact/button"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import Select from "react-select"
+import axios from "axios"
+import { toast } from "react-toastify"
+import { fetchCustomerBranchesByCustomerID } from "./CustomerEntryAPI"
 import {
   fetchAllCustomerAccountsForSelect,
   fetchAllCustomersBranch,
-} from "../../api/SelectData";
-import { AuthContext } from "../../context/AuthContext";
-import { FilterMatchMode } from "primereact/api";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Dialog } from "primereact/dialog";
-import { CustomerAccountEntryModal } from "../Modals/CustomerAccountEntryModal";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import { deleteCustomerBranchByID } from "../../api/CustomerBranchData";
-import useDeleteModal from "../../hooks/useDeleteModalHook";
+} from "../../api/SelectData"
+import { AuthContext } from "../../context/AuthContext"
+import { FilterMatchMode } from "primereact/api"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { Dialog } from "primereact/dialog"
+import { CustomerAccountEntryModal } from "../Modals/CustomerAccountEntryModal"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import { deleteCustomerBranchByID } from "../../api/CustomerBranchData"
+import useDeleteModal from "../../hooks/useDeleteModalHook"
 import {
   CDropDownField,
   CMultiSelectField,
   TextInput,
   CheckBox,
-} from "../Forms/form";
-import { AllCustomersBranchEntryModal } from "../Modals/AllCustomersBranchEntryModal";
-import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents";
+} from "../Forms/form"
+import { AllCustomersBranchEntryModal } from "../Modals/AllCustomersBranchEntryModal"
+import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents"
 
-const BranchEntryContext = createContext();
+const BranchEntryContext = createContext()
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const BranchEntryProiver = ({ children }) => {
-  const [createdBranchID, setCreatedBranchID] = useState(0);
+  const [createdBranchID, setCreatedBranchID] = useState(0)
   return (
     <BranchEntryContext.Provider
       value={{ createdBranchID, setCreatedBranchID }}
     >
       {children}
     </BranchEntryContext.Provider>
-  );
-};
+  )
+}
 
 function CustomerBranchEntry(props) {
-  const { CustomerID, isEnable = true } = props;
-  const { pageTitles } = useContext(AppConfigurationContext);
+  const { CustomerID, isEnable = true } = props
+  const { pageTitles } = useContext(AppConfigurationContext)
   return (
     <>
       <BranchEntryProiver>
@@ -63,15 +63,15 @@ function CustomerBranchEntry(props) {
         />
       </BranchEntryProiver>
     </>
-  );
+  )
 }
 
-export default CustomerBranchEntry;
+export default CustomerBranchEntry
 
 function CustomerBranchEntryHeader(props) {
-  const { CustomerID, pageTitles, isEnable } = props;
-  const queryClient = useQueryClient();
-  const { user } = useContext(AuthContext);
+  const { CustomerID, pageTitles, isEnable } = props
+  const queryClient = useQueryClient()
+  const { user } = useContext(AuthContext)
   const { control, handleSubmit, reset, setValue, watch, resetField } = useForm(
     {
       defaultValues: {
@@ -86,32 +86,32 @@ function CustomerBranchEntryHeader(props) {
         CustomerAccounts: [],
       },
     }
-  );
+  )
 
   const { data: CustomersBranch } = useQuery({
     queryKey: ["customersBranch"],
     queryFn: () => fetchAllCustomersBranch(),
     initialData: [],
-  });
+  })
   const { data: CustomerAccounts } = useQuery({
     queryKey: ["customerAccounts", CustomerID],
     queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
     enabled: CustomerID !== 0,
     initialData: [],
-  });
+  })
 
   const customerBranchMutation = useMutation({
     mutationFn: async (formData) => {
-      let AccountIDs = [];
-      console.log(formData);
+      let AccountIDs = []
+      console.log(formData)
       if (formData?.CustomerAccounts?.length > 0) {
         AccountIDs = formData?.CustomerAccounts?.map((AccountID, i) => {
           return {
             RowID: i + 1,
             AccountID: AccountID,
             CreateNewAccount: 0,
-          };
-        });
+          }
+        })
       } else {
         AccountIDs = [
           {
@@ -119,9 +119,9 @@ function CustomerBranchEntryHeader(props) {
             AccountID: 0,
             CreateNewAccount: 1,
           },
-        ];
+        ]
       }
-      formData.CustomerAccounts = AccountIDs;
+      formData.CustomerAccounts = AccountIDs
       let DataToSend = {
         CustomerBranchID: 0,
         CustomerID: CustomerID,
@@ -134,42 +134,42 @@ function CustomerBranchEntryHeader(props) {
         InActive: formData?.InActive ? 1 : 0,
         AccountIDs: JSON.stringify(formData?.CustomerAccounts),
         EntryUserID: user.userID,
-      };
+      }
 
       const { data } = await axios.post(
         apiUrl + "/EduIMS/CustomerBranchInsertUpdate",
         DataToSend
-      );
+      )
 
       if (data.success === true) {
-        reset();
+        reset()
         toast.success(
           `${pageTitles?.branch || "Customer Branch"} saved successfully!`
-        );
-        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] });
+        )
+        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] })
         queryClient.invalidateQueries({
           queryKey: ["customerAccounts", CustomerID],
-        });
+        })
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   function onSubmit(data) {
     if (CustomerID === 0) {
-      toast.error("No Customer Found!!");
+      toast.error("No Customer Found!!")
     } else {
-      customerBranchMutation.mutate(data);
+      customerBranchMutation.mutate(data)
     }
   }
 
-  const createNewLedger = watch("CreateNewAccount");
+  const createNewLedger = watch("CreateNewAccount")
 
   return (
     <>
@@ -229,7 +229,7 @@ function CustomerBranchEntryHeader(props) {
                 Label={"Create New Ledger"}
                 isEnable={isEnable}
                 onChange={() => {
-                  resetField("CustomerAccounts");
+                  resetField("CustomerAccounts")
                 }}
               />
             </div>
@@ -332,7 +332,7 @@ function CustomerBranchEntryHeader(props) {
               loading={customerBranchMutation.isPending}
               loadingIcon={"pi pi-spin pi-spinner"}
               onClick={() => {
-                handleSubmit(onSubmit)();
+                handleSubmit(onSubmit)()
               }}
             />
             <Button
@@ -352,43 +352,43 @@ function CustomerBranchEntryHeader(props) {
         </FormRow>
       </form>
     </>
-  );
+  )
 }
 
 function CustomerBranchesDataTable(props) {
-  const queryClient = useQueryClient();
-  const { pageTitles, isEnable: isGloballyEnable } = props;
-  const [visible, setVisible] = useState(false);
-  const { CustomerID } = props;
+  const queryClient = useQueryClient()
+  const { pageTitles, isEnable: isGloballyEnable } = props
+  const [visible, setVisible] = useState(false)
+  const { CustomerID } = props
   const [filters, setFilters] = useState({
     CustomerBranchTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
-  const [CustomerBranchID, setCustomerBranchID] = useState(0);
-  const [isEnable, setIsEnable] = useState(false);
-  const [CustomerBranchData, setCustomerBranchData] = useState();
+  })
+  const [CustomerBranchID, setCustomerBranchID] = useState(0)
+  const [isEnable, setIsEnable] = useState(false)
+  const [CustomerBranchData, setCustomerBranchData] = useState()
 
-  const { user } = useContext(AuthContext);
-  const { register, setValue, handleSubmit, watch, control } = useForm();
+  const { user } = useContext(AuthContext)
+  const { register, setValue, handleSubmit, watch, control } = useForm()
 
   const { data: CustomerBranches } = useQuery({
     queryKey: ["customerBranchesDetail", CustomerID],
     queryFn: () => fetchCustomerBranchesByCustomerID(CustomerID, user.userID),
     enabled: CustomerID !== 0,
     initialData: [],
-  });
+  })
 
   const customerAccountEntryMutation = useMutation({
     mutationFn: async (formData) => {
-      let AccountIDs = [];
-      console.log(formData);
+      let AccountIDs = []
+      console.log(formData)
       if (formData?.CustomerAccounts?.length > 0) {
         AccountIDs = formData?.CustomerAccounts?.map((AccountID, i) => {
           return {
             RowID: i + 1,
             AccountID: AccountID,
             CreateNewAccount: 0,
-          };
-        });
+          }
+        })
       } else {
         AccountIDs = [
           {
@@ -396,9 +396,9 @@ function CustomerBranchesDataTable(props) {
             AccountID: 0,
             CreateNewAccount: 1,
           },
-        ];
+        ]
       }
-      formData.CustomerAccounts = AccountIDs;
+      formData.CustomerAccounts = AccountIDs
       let DataToSend = {
         CustomerBranchID: formData?.CustomerBranchID,
         CustomerID: CustomerID,
@@ -411,65 +411,65 @@ function CustomerBranchesDataTable(props) {
         InActive: formData?.InActive ? 1 : 0,
         AccountIDs: JSON.stringify(formData?.CustomerAccounts),
         EntryUserID: user.userID,
-      };
+      }
 
       const { data } = await axios.post(
         apiUrl + "/EduIMS/CustomerBranchInsertUpdate",
         DataToSend
-      );
+      )
 
       if (data.success === true) {
         toast.success(
           `${pageTitles?.branch || "Customer Branch"} updated! successfully!`
-        );
-        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] });
+        )
+        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] })
         queryClient.invalidateQueries({
           queryKey: ["customerAccounts", CustomerID],
-        });
-        setVisible(false);
+        })
+        setVisible(false)
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   function onSubmit(data) {
-    customerAccountEntryMutation.mutate(data);
+    customerAccountEntryMutation.mutate(data)
   }
 
   const { data: CustomersBranch } = useQuery({
     queryKey: ["customersBranch"],
     queryFn: () => fetchAllCustomersBranch(),
     initialData: [],
-  });
+  })
 
   const { data: CustomerAccounts } = useQuery({
     queryKey: ["customerAccounts", CustomerID],
     queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
     enabled: CustomerID !== 0,
     initialData: [],
-  });
+  })
 
   const {
     render: DeleteModal,
     handleShow: handleDeleteShow,
     handleClose: handleDeleteClose,
     setIdToDelete,
-  } = useDeleteModal(handleDelete);
+  } = useDeleteModal(handleDelete)
 
   const deleteMutation = useMutation({
     mutationFn: deleteCustomerBranchByID,
     onSuccess: (response) => {
       if (response === true) {
-        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] });
+        queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] })
       }
     },
-  });
+  })
 
   useEffect(() => {
     async function fetchCustomerBranch() {
@@ -480,65 +480,62 @@ function CustomerBranchesDataTable(props) {
       ) {
         const { data } = await axios.post(
           `${apiUrl}/EduIMS/ViewCustomerBranchWhere?CustomerBranchID=${CustomerBranchID}&LoginUserID=${user.userID}`
-        );
+        )
         if (!data) {
           toast.error("Network Error Occured!", {
             position: "bottom-left",
-          });
+          })
         }
 
-        setCustomerBranchData(data);
+        setCustomerBranchData(data)
       } else {
-        setCustomerBranchData(null);
+        setCustomerBranchData(null)
       }
     }
     if (CustomerBranchID !== 0) {
-      fetchCustomerBranch();
+      fetchCustomerBranch()
     }
-  }, [CustomerBranchID]);
+  }, [CustomerBranchID])
 
   useEffect(() => {
     if (CustomerBranchID !== 0 && CustomerBranchData?.BracnhInfo) {
       setValue(
         "CustomerBranchID",
         CustomerBranchData?.BracnhInfo[0].CustomerBranchID
-      );
-      setValue("CustomerBranch", CustomerBranchData?.BracnhInfo[0].BranchID);
-      setValue(
-        "BranchAddress",
-        CustomerBranchData?.BracnhInfo[0].BranchAddress
-      );
+      )
+      setValue("CustomerBranch", CustomerBranchData?.BracnhInfo[0].BranchID)
+      setValue("BranchAddress", CustomerBranchData?.BracnhInfo[0].BranchAddress)
       setValue(
         "ContactPersonName",
         CustomerBranchData?.BracnhInfo[0].ContactPersonName
-      );
+      )
       setValue(
         "ContactPersonNo",
         CustomerBranchData?.BracnhInfo[0].ContactPersonNo
-      );
+      )
       setValue(
         "ContactPersonEmail",
         CustomerBranchData?.BracnhInfo[0].ContactPersonEmail
-      );
-      setValue("Description", CustomerBranchData?.BracnhInfo[0].Description);
-      setValue("InActive", CustomerBranchData?.BracnhInfo[0].InActive);
+      )
+      setValue("Description", CustomerBranchData?.BracnhInfo[0].Description)
+      setValue("InActive", CustomerBranchData?.BracnhInfo[0].InActive)
       setValue(
         "CustomerAccounts",
         CustomerBranchData?.Accounts.map((acc) => acc.AccountID)
-      );
+      )
     }
-  }, [CustomerBranchID, CustomerBranchData]);
+  }, [CustomerBranchID, CustomerBranchData])
 
   function handleDelete(BranchID) {
     deleteMutation.mutate({
       CustomerBranchID: BranchID,
       LoginUserID: user.userID,
-    });
-    handleDeleteClose();
-    setIdToDelete(0);
+    })
+    handleDeleteClose()
+    setIdToDelete(0)
   }
 
-  const createNewLedger = watch("CreateNewAccount");
+  const createNewLedger = watch("CreateNewAccount")
 
   return (
     <>
@@ -574,9 +571,9 @@ function CustomerBranchesDataTable(props) {
                       width: "30px",
                     }}
                     onClick={() => {
-                      setVisible(true);
-                      setCustomerBranchID(rowData?.CustomerBranchID);
-                      setIsEnable(false);
+                      setVisible(true)
+                      setCustomerBranchID(rowData?.CustomerBranchID)
+                      setIsEnable(false)
                     }}
                   />
                   <Button
@@ -591,9 +588,9 @@ function CustomerBranchesDataTable(props) {
                       width: "30px",
                     }}
                     onClick={() => {
-                      setVisible(true);
-                      setCustomerBranchID(rowData?.CustomerBranchID);
-                      setIsEnable(true);
+                      setVisible(true)
+                      setCustomerBranchID(rowData?.CustomerBranchID)
+                      setIsEnable(true)
                     }}
                   />
                   <Button
@@ -607,7 +604,7 @@ function CustomerBranchesDataTable(props) {
                       width: "30px",
                     }}
                     onClick={() => {
-                      handleDeleteShow(rowData?.CustomerBranchID);
+                      handleDeleteShow(rowData?.CustomerBranchID)
                     }}
                   />
                 </ButtonGroup>
@@ -651,7 +648,7 @@ function CustomerBranchesDataTable(props) {
                         className="rounded"
                         type="button"
                         onClick={() => {
-                          setIsEnable(true);
+                          setIsEnable(true)
                         }}
                       />
                     </>
@@ -669,7 +666,7 @@ function CustomerBranchesDataTable(props) {
                         loading={customerAccountEntryMutation.isPending}
                         loadingIcon="pi pi-spin pi-spinner"
                         onClick={() => {
-                          handleSubmit(onSubmit)();
+                          handleSubmit(onSubmit)()
                         }}
                       />
                     </>
@@ -738,7 +735,7 @@ function CustomerBranchesDataTable(props) {
                         Label={"Create New Ledger"}
                         isEnable={isEnable}
                         onChange={() => {
-                          setValue("CustomerAccounts", []);
+                          setValue("CustomerAccounts", [])
                         }}
                       />
                     </div>
@@ -832,5 +829,5 @@ function CustomerBranchesDataTable(props) {
         {DeleteModal}
       </>
     </>
-  );
+  )
 }

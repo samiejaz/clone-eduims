@@ -1,7 +1,7 @@
-import React from "react";
-import { Controller } from "react-hook-form";
-import { InputMask } from "primereact/inputmask";
-import { classNames } from "primereact/utils";
+import React from "react"
+import { Controller } from "react-hook-form"
+import { InputMask } from "primereact/inputmask"
+import { classNames } from "primereact/utils"
 
 const CMaskInput = ({
   control,
@@ -28,9 +28,9 @@ const CMaskInput = ({
             ref={field.ref}
             className={classNames({ "p-invalid": fieldState.error })}
             onChange={(e) => {
-              field.onChange(e.target.value);
+              field.onChange(e.target.value)
               if (onChange) {
-                onChange(e);
+                onChange(e)
               }
             }}
             mask={mask}
@@ -47,7 +47,7 @@ const CMaskInput = ({
             onKeyDown={(e) => {
               if (focusOptions) {
                 if (e.key === "Enter") {
-                  focusOptions();
+                  focusOptions()
                 }
               }
             }}
@@ -56,7 +56,7 @@ const CMaskInput = ({
         </>
       )}
     />
-  );
-};
+  )
+}
 
-export default CMaskInput;
+export default CMaskInput

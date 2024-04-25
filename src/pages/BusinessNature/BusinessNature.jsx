@@ -1,53 +1,53 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Routes, Route, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Routes, Route, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
 
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewBusinessNature,
   deleteBusinessNatureByID,
   fetchAllBusinessNatures,
   fetchBusinessNatureById,
-} from "../../api/BusinessNatureData";
-import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+} from "../../api/BusinessNatureData"
+import { MENU_KEYS, QUERY_KEYS, ROUTE_URLS } from "../../utils/enums"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY;
-let IDENTITY = "BusinessNatureID";
+let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY
+let IDENTITY = "BusinessNatureID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.GENERAL.BUSINESS_NATURE_FORM_KEY,
       MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -120,50 +120,50 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 export function BusinessNatureDetail({ userRights }) {
-  document.title = "Business Natures";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Business Natures"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     BusinessNatureTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllBusinessNatures(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessNatureByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ BusinessNatureID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ BusinessNatureID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -236,85 +236,85 @@ export function BusinessNatureDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 function BusinessNatureForm({ mode, userRights }) {
-  document.title = "Business Nature Entry";
+  document.title = "Business Nature Entry"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { BusinessNatureID } = useParams();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { BusinessNatureID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       BusinessNatureTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const BusinessNatureData = useQuery({
     queryKey: [queryKey, BusinessNatureID],
     queryFn: () => fetchBusinessNatureById(BusinessNatureID, user?.userID),
     enabled: BusinessNatureID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (BusinessNatureID !== undefined && BusinessNatureData?.data.length > 0) {
       setValue(
         "BusinessNatureTitle",
         BusinessNatureData.data[0].BusinessNatureTitle
-      );
-      setValue("InActive", BusinessNatureData.data[0].InActive);
+      )
+      setValue("InActive", BusinessNatureData.data[0].InActive)
     }
-  }, [BusinessNatureID, BusinessNatureData]);
+  }, [BusinessNatureID, BusinessNatureData])
 
   const mutation = useMutation({
     mutationFn: addNewBusinessNature,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBusinessNatureByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       BusinessNatureID: BusinessNatureID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(parentRoute + "/" + BusinessNatureID);
+      navigate(parentRoute + "/" + BusinessNatureID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + BusinessNatureID);
+    navigate(editRoute + BusinessNatureID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       BusinessNatureID: BusinessNatureID,
-    });
+    })
   }
   return (
     <>
@@ -331,10 +331,10 @@ function BusinessNatureForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleSave={() => handleSubmit(onSubmit)()}
               handleDelete={handleDelete}
@@ -378,5 +378,5 @@ function BusinessNatureForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

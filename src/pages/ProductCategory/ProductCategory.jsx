@@ -1,51 +1,51 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import { Col, Form, Row } from "react-bootstrap";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import { Col, Form, Row } from "react-bootstrap"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
 import {
   addNewProductCategory,
   deleteProductCategoryByID,
   fetchAllProductCategories,
   fetchProductCategoryById,
-} from "../../api/ProductCategoryData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import CDropdown from "../../components/Forms/CDropdown";
-import { useUserData } from "../../context/AuthContext";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../api/ProductCategoryData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import CDropdown from "../../components/Forms/CDropdown"
+import { useUserData } from "../../context/AuthContext"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY;
-let IDENTITY = "ProductCategoryID";
+let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY
+let IDENTITY = "ProductCategoryID"
 
 export default function ProductCategory() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
       MenuGroupKey: MENU_KEYS.UTILITIES.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -118,54 +118,54 @@ export default function ProductCategory() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 export function ProductCategoryDetail({ userRights }) {
-  document.title = "Product Categories";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Product Categories"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
-  const { pageTitles } = useContext(AppConfigurationContext);
+  const { pageTitles } = useContext(AppConfigurationContext)
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     ProductCategoryTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ProductType: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllProductCategories(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteProductCategoryByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       ProductCategoryID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -256,31 +256,31 @@ export function ProductCategoryDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 
 function ProductCategoryForm({ mode, userRights }) {
-  const { pageTitles } = useContext(AppConfigurationContext);
-  document.title = `${pageTitles?.product || "Product"} Category Entry`;
+  const { pageTitles } = useContext(AppConfigurationContext)
+  document.title = `${pageTitles?.product || "Product"} Category Entry`
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { ProductCategoryID } = useParams();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { ProductCategoryID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       ProductCategoryTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const ProductCategoryData = useQuery({
     queryKey: [queryKey, ProductCategoryID],
     queryFn: () => fetchProductCategoryById(ProductCategoryID, user.userID),
     initialData: [],
     enabled: mode !== "new",
-  });
+  })
 
   useEffect(() => {
     if (
@@ -290,64 +290,64 @@ function ProductCategoryForm({ mode, userRights }) {
       setValue(
         "ProductCategoryTitle",
         ProductCategoryData?.data[0]?.ProductCategoryTitle
-      );
-      setValue("ProductType", ProductCategoryData?.data[0]?.ProductType);
+      )
+      setValue("ProductType", ProductCategoryData?.data[0]?.ProductType)
 
-      setValue("InActive", ProductCategoryData?.data[0]?.InActive);
+      setValue("InActive", ProductCategoryData?.data[0]?.InActive)
     }
-  }, [ProductCategoryID, ProductCategoryData]);
+  }, [ProductCategoryID, ProductCategoryData])
 
   const mutation = useMutation({
     mutationFn: addNewProductCategory,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteProductCategoryByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       ProductCategoryID: ProductCategoryID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + ProductCategoryID);
+      navigate(viewRoute + ProductCategoryID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + ProductCategoryID);
+    navigate(editRoute + ProductCategoryID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       ProductCategoryID: ProductCategoryID,
-    });
+    })
   }
 
   const typesOptions = [
     { label: "Product", value: "Product" },
     { label: "Service", value: "Service" },
-  ];
+  ]
 
   return (
     <>
@@ -364,10 +364,10 @@ function ProductCategoryForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -431,5 +431,5 @@ function ProductCategoryForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

@@ -1,7 +1,7 @@
-import { InputText } from "primereact/inputtext";
-import { classNames } from "primereact/utils";
-import { useEffect } from "react";
-import { Controller } from "react-hook-form";
+import { InputText } from "primereact/inputtext"
+import { classNames } from "primereact/utils"
+import { useEffect } from "react"
+import { Controller } from "react-hook-form"
 
 function CNumberInput({
   name,
@@ -26,9 +26,9 @@ function CNumberInput({
             value={field.value}
             ref={field.ref}
             onChange={(e) => {
-              field.onChange(e.target.value);
+              field.onChange(e.target.value)
               if (onChange) {
-                onChange(e);
+                onChange(e)
               }
             }}
             style={{
@@ -42,7 +42,7 @@ function CNumberInput({
             onKeyDown={(e) => {
               if (focusOptions) {
                 if (e.key === "Enter") {
-                  focusOptions();
+                  focusOptions()
                 }
               }
             }}
@@ -55,7 +55,7 @@ function CNumberInput({
         </>
       )}
     />
-  );
+  )
 }
 
-export default CNumberInput;
+export default CNumberInput

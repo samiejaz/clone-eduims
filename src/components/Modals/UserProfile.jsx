@@ -1,27 +1,27 @@
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { useForm } from "react-hook-form";
-import { SingleFileUploadField, TextInput } from "../Forms/form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import { toast } from "react-toastify";
-import { ShowErrorToast } from "../../utils/CommonFunctions";
-import { useNavigate } from "react-router-dom";
-import { FormColumn, FormRow } from "../Layout/LayoutComponents";
-import { FormLabel } from "react-bootstrap";
-import { Image } from "primereact/image";
+import { Button } from "primereact/button"
+import { Dialog } from "primereact/dialog"
+import { useForm } from "react-hook-form"
+import { SingleFileUploadField, TextInput } from "../Forms/form"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import axios from "axios"
+import { useContext, useEffect, useRef, useState } from "react"
+import { AuthContext } from "../../context/AuthContext"
+import { toast } from "react-toastify"
+import { ShowErrorToast } from "../../utils/CommonFunctions"
+import { useNavigate } from "react-router-dom"
+import { FormColumn, FormRow } from "../Layout/LayoutComponents"
+import { FormLabel } from "react-bootstrap"
+import { Image } from "primereact/image"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 function UserProfile({ showProfile, handleCloseProfile }) {
-  const [isEnable, setIsEnable] = useState(true);
+  const [isEnable, setIsEnable] = useState(true)
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
-  const fileRef = useRef();
+  const fileRef = useRef()
 
   const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
@@ -30,40 +30,40 @@ function UserProfile({ showProfile, handleCloseProfile }) {
       Email: "",
       UserName: "",
     },
-  });
+  })
 
-  const { user, loginUser, setUser } = useContext(AuthContext);
+  const { user, loginUser, setUser } = useContext(AuthContext)
   const { data: UserData } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       const { data } = await axios.post(
         `${apiUrl}/EduIMS/GetUserInfo?LoginUserID=${user.userID}`
-      );
-      let localStorageUser = JSON.parse(localStorage.getItem("user"));
+      )
+      let localStorageUser = JSON.parse(localStorage.getItem("user"))
       if (localStorageUser === null) {
-        navigate("/auth");
-        setUser(null);
+        navigate("/auth")
+        setUser(null)
       }
       if (data) {
-        return data;
+        return data
       } else {
-        return [];
+        return []
       }
     },
     refetchOnWindowFocus: false,
     staleTime: 100 * 60 * 60 * 60 * 24,
-  });
+  })
 
   const userProfileMutation = useMutation({
     mutationFn: async (formData) => {
       try {
-        let newFormData = new FormData();
-        newFormData.append("FirstName", formData.FirstName);
-        newFormData.append("LastName", formData.LastName);
-        newFormData.append("Email", formData.Email);
-        newFormData.append("Username", formData.Username);
-        newFormData.append("LoginUserID", user.userID);
-        newFormData.append("image", formData.UserImage);
+        let newFormData = new FormData()
+        newFormData.append("FirstName", formData.FirstName)
+        newFormData.append("LastName", formData.LastName)
+        newFormData.append("Email", formData.Email)
+        newFormData.append("Username", formData.Username)
+        newFormData.append("LoginUserID", user.userID)
+        newFormData.append("image", formData.UserImage)
         const { data } = await axios.post(
           apiUrl + "/EduIMS/UsersInfoUpdate",
           newFormData,
@@ -72,14 +72,14 @@ function UserProfile({ showProfile, handleCloseProfile }) {
               "Content-Type": "multipart/form-data",
             },
           }
-        );
+        )
 
         if (data.success === false) {
-          ShowErrorToast(data.message);
+          ShowErrorToast(data.message)
         } else {
           toast.success("Profile updated successfully!", {
             autoClose: 1000,
-          });
+          })
 
           loginUser(
             {
@@ -89,36 +89,36 @@ function UserProfile({ showProfile, handleCloseProfile }) {
               DepartmetnID: user.DepartmentID,
             },
             false
-          );
-          queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-          handleCloseProfile();
-          setIsEnable(true);
+          )
+          queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+          handleCloseProfile()
+          setIsEnable(true)
         }
       } catch (err) {
-        ShowErrorToast(err.message);
+        ShowErrorToast(err.message)
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (user?.userID !== 0 && UserData?.data) {
-      setValue("FirstName", UserData?.data[0]?.FirstName);
-      setValue("LastName", UserData?.data[0]?.LastName);
-      setValue("Email", UserData?.data[0]?.Email);
-      setValue("Username", UserData?.data[0]?.UserName);
+      setValue("FirstName", UserData?.data[0]?.FirstName)
+      setValue("LastName", UserData?.data[0]?.LastName)
+      setValue("Email", UserData?.data[0]?.Email)
+      setValue("Username", UserData?.data[0]?.UserName)
       fileRef.current?.setBase64File(
         "data:image/png;base64," + UserData?.data[0].ProfilePic
-      );
+      )
     }
-  }, [user, UserData]);
+  }, [user, UserData])
 
   function onSubmit(data) {
-    const file = fileRef.current?.getFile();
+    const file = fileRef.current?.getFile()
     if (file === null) {
-      fileRef.current?.setError();
+      fileRef.current?.setError()
     } else {
-      data.UserImage = file;
-      userProfileMutation.mutate(data);
+      data.UserImage = file
+      userProfileMutation.mutate(data)
     }
   }
 
@@ -162,7 +162,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
                     severity="warning"
                     onClick={() => {
                       //  handleCloseProfile();
-                      setIsEnable(true);
+                      setIsEnable(true)
                     }}
                     className="p-button-success rounded"
                     pt={{
@@ -205,8 +205,8 @@ function UserProfile({ showProfile, handleCloseProfile }) {
         position="right"
         style={{ width: "40vw", height: "100vh" }}
         onHide={() => {
-          handleCloseProfile();
-          setIsEnable(true);
+          handleCloseProfile()
+          setIsEnable(true)
         }}
       >
         <div>
@@ -284,7 +284,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
         </div>
       </Dialog>
     </>
-  );
+  )
 }
 
-export default UserProfile;
+export default UserProfile

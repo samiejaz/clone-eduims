@@ -1,76 +1,76 @@
-import { Row, Form, Col, Spinner } from "react-bootstrap";
-import { DataTable } from "primereact/datatable";
-import { Button } from "primereact/button";
-import { Column } from "primereact/column";
+import { Row, Form, Col, Spinner } from "react-bootstrap"
+import { DataTable } from "primereact/datatable"
+import { Button } from "primereact/button"
+import { Column } from "primereact/column"
 import {
   useForm,
   useFieldArray,
   useFormContext,
   FormProvider,
   useWatch,
-} from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import ActionButtons from "../../components/ActionButtons";
-import { FilterMatchMode } from "primereact/api";
-import React, { useContext, useEffect, useRef, useState } from "react";
+} from "react-hook-form"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import ActionButtons from "../../components/ActionButtons"
+import { FilterMatchMode } from "primereact/api"
+import React, { useContext, useEffect, useRef, useState } from "react"
 
-import { AuthContext } from "../../context/AuthContext";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 
-import TextInput from "../../components/Forms/TextInput";
-import NumberInput from "../../components/Forms/NumberInput";
+import TextInput from "../../components/Forms/TextInput"
+import NumberInput from "../../components/Forms/NumberInput"
 
-import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons";
-import CDropdown from "../../components/Forms/CDropdown";
-import { DevTool } from "@hookform/devtools";
+import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
+import CDropdown from "../../components/Forms/CDropdown"
+import { DevTool } from "@hookform/devtools"
 import {
   addNewDebitNote,
   fetchAllDebitNotees,
   fetchMonthlyMaxDebitNoteNo,
   fetchDebitNoteById,
   deleteDebitNoteByID,
-} from "../../api/DebitNoteData";
-import ButtonToolBar from "../../components/ActionsToolbar";
+} from "../../api/DebitNoteData"
+import ButtonToolBar from "../../components/ActionsToolbar"
 import {
   MENU_KEYS,
   QUERY_KEYS,
   ROUTE_URLS,
   SELECT_QUERY_KEYS,
-} from "../../utils/enums";
+} from "../../utils/enums"
 import {
   fetchAllBankAccountsForSelect,
   fetchAllBusinessUnitsForSelect,
   fetchAllCustomerAccountsForSelect,
   fetchAllOldCustomersForSelect,
   fetchAllSessionsForSelect,
-} from "../../api/SelectData";
-import CDatePicker from "../../components/Forms/CDatePicker";
-import CNumberInput from "../../components/Forms/CNumberInput";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../api/SelectData"
+import CDatePicker from "../../components/Forms/CDatePicker"
+import CNumberInput from "../../components/Forms/CNumberInput"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let cashDetailColor = "#22C55E";
-let queryKey = QUERY_KEYS.DEBIT_NODE_QUERY_KEY;
-let viewRoute = `${parentRoute}/`;
-let IDENTITY = "DebitNoteID";
+let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let cashDetailColor = "#22C55E"
+let queryKey = QUERY_KEYS.DEBIT_NODE_QUERY_KEY
+let viewRoute = `${parentRoute}/`
+let IDENTITY = "DebitNoteID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.ACCOUNTS.DEBIT_NOTE_FORM_KEY,
       MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -143,16 +143,16 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 function DebitNoteEntrySearch({ userRights }) {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     VoucherNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -160,39 +160,39 @@ function DebitNoteEntrySearch({ userRights }) {
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     DebitNoteMode: { value: null, matchMode: FilterMatchMode.CONTAINS },
     TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext)
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllDebitNotees(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteDebitNoteByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
 
   if (isLoading) {
-    return <h1>Loading...</h1>;
+    return <h1>Loading...</h1>
   }
 
   function handleDelete(id) {
-    deleteMutation.mutate({ DebitNoteID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ DebitNoteID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -287,93 +287,93 @@ function DebitNoteEntrySearch({ userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 const defaultValues = {
   VoucherDate: new Date(),
   Description: "",
   DebitNoteDetail: [],
-};
+}
 
 function DebitNoteEntryForm({ mode, userRights }) {
-  document.title = "Debit Note Entry";
-  const queryClient = useQueryClient();
-  const { DebitNoteID } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  document.title = "Debit Note Entry"
+  const queryClient = useQueryClient()
+  const { DebitNoteID } = useParams()
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+  const { user } = useContext(AuthContext)
   // Ref
-  const detailTableRef = useRef();
-  const customerCompRef = useRef();
+  const detailTableRef = useRef()
+  const customerCompRef = useRef()
   // Form
   const method = useForm({
     defaultValues,
-  });
+  })
 
   const { data: DebitNoteData } = useQuery({
     queryKey: [QUERY_KEYS.DEBIT_NODE_QUERY_KEY, +DebitNoteID],
     queryFn: () => fetchDebitNoteById(DebitNoteID, user.userID),
     enabled: DebitNoteID !== undefined,
     initialData: [],
-  });
+  })
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
     enabled: mode !== "",
-  });
+  })
 
   const DebitNoteMutation = useMutation({
     mutationFn: addNewDebitNote,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteDebitNoteByID,
     onSuccess: (success) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
       }
     },
-  });
+  })
   useEffect(() => {
     if (DebitNoteID !== undefined && DebitNoteData?.Master?.length > 0) {
       // Setting Values
-      method.setValue("SessionID", DebitNoteData?.Master[0]?.SessionID);
+      method.setValue("SessionID", DebitNoteData?.Master[0]?.SessionID)
       method.setValue(
         "BusinessUnitID",
         DebitNoteData?.Master[0]?.BusinessUnitID
-      );
-      method.setValue("Customer", DebitNoteData?.Master[0]?.CustomerID);
+      )
+      method.setValue("Customer", DebitNoteData?.Master[0]?.CustomerID)
 
       customerCompRef.current.setCustomerID(
         DebitNoteData?.Master[0]?.CustomerID
-      );
+      )
 
-      method.setValue("CustomerLedgers", DebitNoteData?.Master[0]?.AccountID);
-      method.setValue("DocumentNo", DebitNoteData?.Master[0]?.DocumentNo);
-      method.setValue("VoucherNo", DebitNoteData?.Master[0]?.VoucherNo);
+      method.setValue("CustomerLedgers", DebitNoteData?.Master[0]?.AccountID)
+      method.setValue("DocumentNo", DebitNoteData?.Master[0]?.DocumentNo)
+      method.setValue("VoucherNo", DebitNoteData?.Master[0]?.VoucherNo)
       method.setValue(
         "SessionBasedVoucherNo",
         DebitNoteData?.Master[0]?.SessionBasedVoucherNo
-      );
+      )
       method.setValue(
         "SessionBasedVoucherNo",
         DebitNoteData?.Master[0]?.SessionBasedVoucherNo
-      );
-      method.setValue("DebitNoteMode", DebitNoteData?.Master[0]?.DebitNoteMode);
-      method.setValue("Description", DebitNoteData?.Master[0]?.Description);
+      )
+      method.setValue("DebitNoteMode", DebitNoteData?.Master[0]?.DebitNoteMode)
+      method.setValue("Description", DebitNoteData?.Master[0]?.Description)
       method.setValue(
         "VoucherDate",
         new Date(DebitNoteData?.Master[0]?.VoucherDate)
-      );
+      )
       method.setValue(
         "DebitNoteDetail",
         DebitNoteData.Detail?.map((item) => {
@@ -382,26 +382,26 @@ function DebitNoteEntryForm({ mode, userRights }) {
             Amount: item.Amount,
             Description: item.DetailDescription,
             Balance: item.Balance,
-          };
+          }
         })
-      );
+      )
     }
-  }, [DebitNoteID, DebitNoteData]);
+  }, [DebitNoteID, DebitNoteData])
 
   function handleEdit() {
-    navigate(`${editRoute}${DebitNoteID}`);
+    navigate(`${editRoute}${DebitNoteID}`)
   }
 
   function handleAddNew() {
-    method.reset();
-    navigate(newRoute);
+    method.reset()
+    navigate(newRoute)
   }
 
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(`${parentRoute}/${DebitNoteID}`);
+      navigate(`${parentRoute}/${DebitNoteID}`)
     }
   }
 
@@ -409,8 +409,8 @@ function DebitNoteEntryForm({ mode, userRights }) {
     deleteMutation.mutate({
       DebitNoteID: DebitNoteID,
       LoginUserID: user.userID,
-    });
-    navigate(parentRoute);
+    })
+    navigate(parentRoute)
   }
 
   function onSubmit(data) {
@@ -418,7 +418,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
       formData: data,
       userID: user.userID,
       DebitNoteID: DebitNoteID,
-    });
+    })
   }
 
   return (
@@ -442,10 +442,10 @@ function DebitNoteEntryForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleSave={() => method.handleSubmit(onSubmit)()}
               GoBackLabel="DebitNotes"
@@ -536,7 +536,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }
 
 // New Master Fields
@@ -545,15 +545,15 @@ function SessionSelect({ mode }) {
     queryKey: [SELECT_QUERY_KEYS.SESSION_SELECT_QUERY_KEY],
     queryFn: fetchAllSessionsForSelect,
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   useEffect(() => {
     if (data.length > 0 && mode === "new") {
-      method.setValue("SessionID", data[0]?.SessionID);
+      method.setValue("SessionID", data[0]?.SessionID)
     }
-  }, [data, mode]);
+  }, [data, mode])
 
   return (
     <>
@@ -578,30 +578,30 @@ function SessionSelect({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const CustomerDependentFields = React.forwardRef(
   ({ mode, removeAllRows }, ref) => {
-    const [CustomerID, setCustomerID] = useState(0);
+    const [CustomerID, setCustomerID] = useState(0)
 
     React.useImperativeHandle(ref, () => ({
       setCustomerID,
-    }));
+    }))
 
     const { data: customerSelectData } = useQuery({
       queryKey: [QUERY_KEYS.ALL_CUSTOMER_QUERY_KEY],
       queryFn: fetchAllOldCustomersForSelect,
       initialData: [],
-    });
+    })
 
     const { data: CustomerAccounts } = useQuery({
       queryKey: [QUERY_KEYS.CUSTOMER_ACCOUNTS_QUERY_KEY, CustomerID],
       queryFn: () => fetchAllCustomerAccountsForSelect(CustomerID),
       initialData: [],
-    });
+    })
 
-    const method = useFormContext();
+    const method = useFormContext()
 
     return (
       <>
@@ -623,8 +623,8 @@ const CustomerDependentFields = React.forwardRef(
               required={true}
               filter={true}
               onChange={(e) => {
-                setCustomerID(e.value);
-                removeAllRows();
+                setCustomerID(e.value)
+                removeAllRows()
               }}
               focusOptions={() => method.setFocus("CustomerLedgers")}
             />
@@ -648,53 +648,53 @@ const CustomerDependentFields = React.forwardRef(
               required={true}
               filter={true}
               onChange={() => {
-                removeAllRows();
+                removeAllRows()
               }}
               focusOptions={() => method.setFocus("Description")}
             />
           </div>
         </Form.Group>
       </>
-    );
+    )
   }
-);
+)
 
 function BusinessUnitDependantFields({ mode }) {
-  const [BusinesssUnitID, setBusinessUnitID] = useState(0);
+  const [BusinesssUnitID, setBusinessUnitID] = useState(0)
 
   const { data: BusinessUnitSelectData } = useQuery({
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
     enabled: mode !== "",
-  });
+  })
   useEffect(() => {
     if (BusinessUnitSelectData.length > 0) {
       method.setValue(
         "BusinessUnitID",
         BusinessUnitSelectData[0].BusinessUnitID
-      );
-      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID);
+      )
+      setBusinessUnitID(BusinessUnitSelectData[0].BusinessUnitID)
     }
-  }, [BusinessUnitSelectData]);
+  }, [BusinessUnitSelectData])
 
   useEffect(() => {
     async function fetchDebitNoteNo() {
-      const data = await fetchMonthlyMaxDebitNoteNo(BusinesssUnitID);
-      method.setValue("BusinessUnitID", BusinesssUnitID);
-      method.setValue("VoucherNo", data.data[0]?.VoucherNo);
+      const data = await fetchMonthlyMaxDebitNoteNo(BusinesssUnitID)
+      method.setValue("BusinessUnitID", BusinesssUnitID)
+      method.setValue("VoucherNo", data.data[0]?.VoucherNo)
       method.setValue(
         "SessionBasedVoucherNo",
         data.data[0]?.SessionBasedVoucherNo
-      );
+      )
     }
 
     if (BusinesssUnitID !== 0 && mode === "new") {
-      fetchDebitNoteNo();
+      fetchDebitNoteNo()
     }
-  }, [BusinesssUnitID, mode]);
+  }, [BusinesssUnitID, mode])
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -716,7 +716,7 @@ function BusinessUnitDependantFields({ mode }) {
             required={true}
             focusOptions={() => method.setFocus("DocumentNo")}
             onChange={(e) => {
-              setBusinessUnitID(e.value);
+              setBusinessUnitID(e.value)
             }}
           />
         </div>
@@ -755,7 +755,7 @@ function BusinessUnitDependantFields({ mode }) {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const MasterBankFields = ({
@@ -768,9 +768,9 @@ const MasterBankFields = ({
     queryKey: [SELECT_QUERY_KEYS.BANKS_SELECT_QUERY_KEY],
     queryFn: fetchAllBankAccountsForSelect,
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -815,8 +815,8 @@ const MasterBankFields = ({
         </div>
       </Form.Group>
     </>
-  );
-};
+  )
+}
 
 // New Detail Header Form
 function DebitNoteDetailHeaderForm({ appendSingleRow }) {
@@ -826,11 +826,11 @@ function DebitNoteDetailHeaderForm({ appendSingleRow }) {
       Amount: 0,
       Description: "",
     },
-  });
+  })
 
   function onSubmit(data) {
-    appendSingleRow(data);
-    method.reset();
+    appendSingleRow(data)
+    method.reset()
   }
 
   return (
@@ -866,7 +866,7 @@ function DebitNoteDetailHeaderForm({ appendSingleRow }) {
         <DevTool control={method.control} />
       </form>
     </>
-  );
+  )
 }
 
 function DetailHeaderBusinessUnitDependents() {
@@ -874,9 +874,9 @@ function DetailHeaderBusinessUnitDependents() {
     queryKey: [QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY],
     queryFn: fetchAllBusinessUnitsForSelect,
     initialData: [],
-  });
+  })
 
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -924,12 +924,12 @@ function DetailHeaderBusinessUnitDependents() {
         </div>
       </Form.Group>
     </>
-  );
+  )
 }
 
 const DebitNoteDetailTable = React.forwardRef(
   ({ mode, BusinessUnitSelectData }, ref) => {
-    const method = useFormContext();
+    const method = useFormContext()
 
     const { fields, append, remove } = useFieldArray({
       control: method.control,
@@ -937,16 +937,16 @@ const DebitNoteDetailTable = React.forwardRef(
       rules: {
         required: true,
       },
-    });
+    })
 
     React.useImperativeHandle(ref, () => ({
       appendSingleRow(data) {
-        append(data);
+        append(data)
       },
       removeAllRows() {
-        remove();
+        remove()
       },
-    }));
+    }))
 
     return (
       <>
@@ -1006,15 +1006,15 @@ const DebitNoteDetailTable = React.forwardRef(
                     BusinessUnitSelectData={BusinessUnitSelectData}
                     remove={remove}
                   />
-                );
+                )
               })}
             </FormProvider>
           </tbody>
         </table>
       </>
-    );
+    )
   }
-);
+)
 
 function DebitNoteDetailTableRow({
   item,
@@ -1023,7 +1023,7 @@ function DebitNoteDetailTableRow({
   remove,
   disable = false,
 }) {
-  const method = useFormContext();
+  const method = useFormContext()
 
   return (
     <>
@@ -1102,28 +1102,28 @@ function DebitNoteDetailTableRow({
         </td>
       </tr>
     </>
-  );
+  )
 }
 
 // Total
 function DebitNoteDetailTotal() {
-  const method = useFormContext();
+  const method = useFormContext()
 
   const details = useWatch({
     control: method.control,
     name: "DebitNoteDetail",
-  });
+  })
 
   useEffect(() => {
-    calculateTotal(details);
-  }, [details]);
+    calculateTotal(details)
+  }, [details])
 
   function calculateTotal(details) {
     let total = details?.reduce((accumulator, item) => {
-      return accumulator + parseFloat(item.Amount);
-    }, 0);
-    method.setValue("TotalNetAmount", total);
+      return accumulator + parseFloat(item.Amount)
+    }, 0)
+    method.setValue("TotalNetAmount", total)
   }
 
-  return null;
+  return null
 }

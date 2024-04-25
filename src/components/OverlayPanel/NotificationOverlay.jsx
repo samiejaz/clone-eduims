@@ -1,11 +1,11 @@
-import { Button } from "primereact/button";
-import { OverlayPanel } from "primereact/overlaypanel";
-import React, { useRef } from "react";
-import { CCard } from "../../pages/Leads/LeadsDashboard/LeadsDashboard";
-import { Badge } from "primereact/badge";
-import { useClickOutside } from "primereact/hooks";
+import { Button } from "primereact/button"
+import { OverlayPanel } from "primereact/overlaypanel"
+import React, { useRef } from "react"
+import { CCard } from "../../pages/Leads/LeadsDashboard/LeadsDashboard"
+import { Badge } from "primereact/badge"
+import { useClickOutside } from "primereact/hooks"
 const NotificationOverlay = () => {
-  const op = useRef(null);
+  const op = useRef(null)
 
   return (
     <>
@@ -146,7 +146,7 @@ const NotificationOverlay = () => {
         </div>
       </OverlayPanel>
     </>
-  );
-};
+  )
+}
 
-export default NotificationOverlay;
+export default NotificationOverlay

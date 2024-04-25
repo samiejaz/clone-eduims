@@ -1,7 +1,7 @@
-import { Dropdown } from "primereact/dropdown";
-import { classNames } from "primereact/utils";
-import React from "react";
-import { Controller } from "react-hook-form";
+import { Dropdown } from "primereact/dropdown"
+import { classNames } from "primereact/utils"
+import React from "react"
+import { Controller } from "react-hook-form"
 
 const CDropdown = ({
   control,
@@ -38,20 +38,20 @@ const CDropdown = ({
               focusInputRef={field.ref}
               ref={field.ref}
               onChange={(e) => {
-                field.onChange(e.value);
+                field.onChange(e.value)
                 if (focusOptions) {
                   if (
                     e.originalEvent.key === "ArrowDown" ||
                     e.originalEvent.key === "ArrowUp"
                   ) {
                   } else {
-                    focusOptions(e);
+                    focusOptions(e)
                     let obj = {
                       value: e.value,
                       ref: field.ref,
-                    };
+                    }
                     if (onChange) {
-                      onChange(obj);
+                      onChange(obj)
                     }
                   }
                 }
@@ -60,12 +60,12 @@ const CDropdown = ({
               onKeyDown={(e) => {
                 if (focusOptions) {
                   if (e.key === "Enter") {
-                    focusOptions(e);
+                    focusOptions(e)
                     let obj = {
                       value: field.value,
-                    };
+                    }
                     if (onChange) {
-                      onChange(obj);
+                      onChange(obj)
                     }
                   }
                 }
@@ -105,8 +105,8 @@ const CDropdown = ({
         )}
       />
     </>
-  );
-};
+  )
+}
 
 export const CDropdownWithOutControl = ({
   name,
@@ -148,7 +148,7 @@ export const CDropdownWithOutControl = ({
       resetFilterOnHide
       {...moreOptions}
     />
-  );
-};
+  )
+}
 
-export default CDropdown;
+export default CDropdown

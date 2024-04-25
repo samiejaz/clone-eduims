@@ -4,31 +4,31 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from "react";
-import { Link, useParams } from "react-router-dom";
-import { useUserData } from "../../context/AuthContext";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+} from "react"
+import { Link, useParams } from "react-router-dom"
+import { useUserData } from "../../context/AuthContext"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   addNewComment,
   deleteCommentByID,
   fetchAllLeadComments,
-} from "../../api/LeadsIntroductionCommentsData";
-import { Controller, useForm } from "react-hook-form";
-import { classNames } from "primereact/utils";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { ContextMenu } from "primereact/contextmenu";
-import { confirmDialog } from "primereact/confirmdialog";
-import { Avatar } from "primereact/avatar";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { ROUTE_URLS } from "../../utils/enums";
-import { CIconButton } from "../../components/Buttons/CButtons";
-import { decryptID } from "../../utils/crypto";
-import { Dialog } from "primereact/dialog";
+} from "../../api/LeadsIntroductionCommentsData"
+import { Controller, useForm } from "react-hook-form"
+import { classNames } from "primereact/utils"
+import { Button } from "primereact/button"
+import { InputText } from "primereact/inputtext"
+import { ContextMenu } from "primereact/contextmenu"
+import { confirmDialog } from "primereact/confirmdialog"
+import { Avatar } from "primereact/avatar"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { ROUTE_URLS } from "../../utils/enums"
+import { CIconButton } from "../../components/Buttons/CButtons"
+import { decryptID } from "../../utils/crypto"
+import { Dialog } from "primereact/dialog"
 
 const LeadsComments = () => {
-  const { LeadIntroductionID } = useParams();
-  const user = useUserData();
+  const { LeadIntroductionID } = useParams()
+  const user = useUserData()
 
   return (
     <LeadCommentProivder>
@@ -52,18 +52,18 @@ const LeadsComments = () => {
         </div>
       </div>
     </LeadCommentProivder>
-  );
-};
+  )
+}
 
 const CONTEXT_ACTIONS = {
   EDIT_ACTION: "Edit",
   DELETE_ACTION: "Delete",
-};
+}
 
 const CommentsContainer = ({ LeadIntroductionID, user }) => {
-  const queryClient = useQueryClient();
-  const [commentID, setCommentID] = useState(null);
-  const [commentText, setCommentText] = useState(null);
+  const queryClient = useQueryClient()
+  const [commentID, setCommentID] = useState(null)
+  const [commentText, setCommentText] = useState(null)
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["leadComments"],
     queryFn: () =>
@@ -71,11 +71,11 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
         LeadIntroductionID: LeadIntroductionID,
         LoginUserID: user.userID,
       }),
-  });
+  })
 
-  const { setComment } = useContext(LeadCommentContext);
+  const { setComment } = useContext(LeadCommentContext)
 
-  const cm = useRef(null);
+  const cm = useRef(null)
 
   const items = [
     // {
@@ -89,24 +89,24 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
       label: "Delete",
       icon: "pi pi-trash",
       command: () => {
-        handleClick(commentID, CONTEXT_ACTIONS.DELETE_ACTION);
+        handleClick(commentID, CONTEXT_ACTIONS.DELETE_ACTION)
       },
     },
-  ];
+  ]
 
   const onRightClick = (event, commentId, commentText = "") => {
     if (cm.current) {
-      setCommentID(commentId);
+      setCommentID(commentId)
       if (commentText !== "") {
-        setCommentText(commentText);
+        setCommentText(commentText)
       }
-      cm.current.show(event);
+      cm.current.show(event)
     }
-  };
+  }
 
   function handleClick(id, action, comment = "") {
     if (action === CONTEXT_ACTIONS.EDIT_ACTION) {
-      handleEdit(id, comment);
+      handleEdit(id, comment)
     } else if (action === CONTEXT_ACTIONS.DELETE_ACTION) {
       confirmDialog({
         message: "Are you sure you want to delete this comment?",
@@ -117,7 +117,7 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
         position: "top",
         accept: () => handleDelete(id),
         reject: () => {},
-      });
+      })
     } else {
     }
   }
@@ -125,22 +125,22 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
   const deleteMutation = useMutation({
     mutationFn: deleteCommentByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leadComments"] });
+      queryClient.invalidateQueries({ queryKey: ["leadComments"] })
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       CommentID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id, comment) {
     setComment({
       CommentID: id,
       Comment: comment,
-    });
+    })
   }
 
   return (
@@ -199,8 +199,8 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
               ref={cm}
               model={items}
               onHide={() => {
-                setCommentID(null);
-                setCommentText(null);
+                setCommentID(null)
+                setCommentText(null)
               }}
               pt={{
                 menu: {
@@ -212,8 +212,8 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
         </>
       )}
     </>
-  );
-};
+  )
+}
 
 const SingleComment = ({ comment, user, handleRightClick }) => {
   return (
@@ -225,7 +225,7 @@ const SingleComment = ({ comment, user, handleRightClick }) => {
         style={{ maxWidth: "fit-content" }}
         onContextMenu={(event) => {
           if (comment.EntryUserID === user.userID) {
-            handleRightClick(event, comment.CommentID, comment.Comment);
+            handleRightClick(event, comment.CommentID, comment.Comment)
           }
         }}
       >
@@ -251,36 +251,36 @@ const SingleComment = ({ comment, user, handleRightClick }) => {
         </div>
       </li>
     </>
-  );
-};
+  )
+}
 
 const CreateCommentInput = ({ LeadIntroductionID, user }) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const method = useForm({
     defaultValues: {
       Comment: "",
       EditComment: "",
     },
-  });
-  const { comment, setComment } = useContext(LeadCommentContext);
+  })
+  const { comment, setComment } = useContext(LeadCommentContext)
 
   useEffect(() => {
     if (comment?.Comment !== null) {
-      method.setValue("EditComment", comment.Comment);
-      method.setFocus("EditComment");
+      method.setValue("EditComment", comment.Comment)
+      method.setFocus("EditComment")
     }
-  }, [comment]);
+  }, [comment])
 
   const mutation = useMutation({
     mutationFn: addNewComment,
     onSuccess: ({ success }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: ["leadComments"] });
-        setComment({ CommentID: null, Comment: null });
-        method.reset();
+        queryClient.invalidateQueries({ queryKey: ["leadComments"] })
+        setComment({ CommentID: null, Comment: null })
+        method.reset()
       }
     },
-  });
+  })
 
   function onSubmit(data) {
     try {
@@ -289,11 +289,11 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
         LeadIntroductionID: LeadIntroductionID,
         userID: user.userID,
         CommentID: comment.CommentID ?? 0,
-      });
+      })
     } catch (e) {
       toast.error(e.message, {
         autoClose: false,
-      });
+      })
     }
   }
 
@@ -315,7 +315,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                     value={field.value}
                     ref={field.ref}
                     onChange={(e) => {
-                      field.onChange(e.target.value);
+                      field.onChange(e.target.value)
                     }}
                     rows={1}
                     placeholder="Type your comment..."
@@ -327,20 +327,20 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                     )}
                     onKeyDown={(e) => {
                       if (e.shiftKey && e.key === "Enter") {
-                        e.preventDefault(); // Prevent the default behavior of the Enter key
-                        const start = e.target.selectionStart;
-                        const end = e.target.selectionEnd;
+                        e.preventDefault() // Prevent the default behavior of the Enter key
+                        const start = e.target.selectionStart
+                        const end = e.target.selectionEnd
                         const newText =
                           e.target.value.substring(0, start) +
                           "\n" +
-                          e.target.value.substring(end);
-                        e.target.value = newText; // Update the textarea's value
+                          e.target.value.substring(end)
+                        e.target.value = newText // Update the textarea's value
                         e.target.selectionStart = e.target.selectionEnd =
-                          start + 1;
+                          start + 1
                       }
 
                       if (e.key === "Enter" && e.target.value !== "") {
-                        method.handleSubmit(onSubmit)();
+                        method.handleSubmit(onSubmit)()
                       }
                     }}
                   ></textarea>
@@ -376,7 +376,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
           setComment({
             Comment: null,
             CommentID: null,
-          });
+          })
         }}
         style={{ width: "80vw", height: "30vh" }}
       >
@@ -393,7 +393,7 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                 value={field.value}
                 ref={field.ref}
                 onChange={(e) => {
-                  field.onChange(e.target.value);
+                  field.onChange(e.target.value)
                 }}
                 placeholder="Type your comment..."
                 className={classNames("p-inputtext w-100 p-3", {
@@ -401,15 +401,15 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                 })}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && e.shiftKey) {
-                    e.preventDefault();
-                    const start = e.target.selectionStart;
-                    const end = e.target.selectionEnd;
+                    e.preventDefault()
+                    const start = e.target.selectionStart
+                    const end = e.target.selectionEnd
                     const newText =
                       e.target.value.substring(0, start) +
                       "\n" +
-                      e.target.value.substring(end);
-                    e.target.value = newText;
-                    e.target.selectionStart = e.target.selectionEnd = start + 1;
+                      e.target.value.substring(end)
+                    e.target.value = newText
+                    e.target.selectionStart = e.target.selectionEnd = start + 1
                   }
 
                   // if (e.key === "Enter" && e.target.value !== "") {
@@ -422,22 +422,22 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
         />
       </Dialog>
     </>
-  );
-};
+  )
+}
 
-export default LeadsComments;
+export default LeadsComments
 
-const LeadCommentContext = createContext();
+const LeadCommentContext = createContext()
 
 const LeadCommentProivder = ({ children }) => {
   const [comment, setComment] = useState({
     CommentID: null,
     Comment: null,
-  });
+  })
 
   return (
     <LeadCommentContext.Provider value={{ comment, setComment }}>
       {children}
     </LeadCommentContext.Provider>
-  );
-};
+  )
+}

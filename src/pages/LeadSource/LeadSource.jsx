@@ -1,53 +1,53 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewLeadSource,
   deleteLeadSourceByID,
   fetchAllLeadSources,
   fetchLeadSourceById,
-} from "../../api/LeadSourceData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
+} from "../../api/LeadSourceData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
+} from "../../components/Layout/LayoutComponents"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
 
-let parentRoute = ROUTE_URLS.LEED_SOURCE_ROUTE;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.LEED_SOURCE_QUERY_KEY;
+let parentRoute = ROUTE_URLS.LEED_SOURCE_ROUTE
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.LEED_SOURCE_QUERY_KEY
 
-let IDENTITY = "LeadSourceID";
+let IDENTITY = "LeadSourceID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.LEADS.LEAD_SOURCE_FORM_KEY,
       MenuGroupKey: MENU_KEYS.LEADS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -117,51 +117,51 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function LeadSourceDetail({ userRights }) {
-  document.title = "Lead Sources";
+  document.title = "Lead Sources"
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     LeadSourceTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllLeadSources(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteLeadSourceByID,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
-      });
+      })
     },
-  });
+  })
 
   function handleDelete(id) {
-    deleteMutation.mutate({ LeadSourceID: id, LoginUserID: user.userID });
+    deleteMutation.mutate({ LeadSourceID: id, LoginUserID: user.userID })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -236,74 +236,74 @@ function LeadSourceDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 function LeadSourceForm({ mode, userRights }) {
-  document.title = "Lead Source Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { LeadSourceID } = useParams();
+  document.title = "Lead Source Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { LeadSourceID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       LeadSourceTitle: "",
       InActive: false,
     },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const LeadSourceData = useQuery({
     queryKey: [queryKey, LeadSourceID],
     queryFn: () => fetchLeadSourceById(LeadSourceID, user.userID),
     enabled: LeadSourceID !== undefined,
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (LeadSourceID !== undefined && LeadSourceData?.data?.length > 0) {
-      setValue("LeadSourceTitle", LeadSourceData.data[0].LeadSourceTitle);
-      setValue("InActive", LeadSourceData.data[0].InActive);
+      setValue("LeadSourceTitle", LeadSourceData.data[0].LeadSourceTitle)
+      setValue("InActive", LeadSourceData.data[0].InActive)
     }
-  }, [LeadSourceID, LeadSourceData]);
+  }, [LeadSourceID, LeadSourceData])
 
   const mutation = useMutation({
     mutationFn: addNewLeadSource,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteLeadSourceByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       LeadSourceID: LeadSourceID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + LeadSourceID);
+      navigate(viewRoute + LeadSourceID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + LeadSourceID);
+    navigate(editRoute + LeadSourceID)
   }
 
   function onSubmit(data) {
@@ -311,7 +311,7 @@ function LeadSourceForm({ mode, userRights }) {
       formData: data,
       userID: user.userID,
       LeadSourceID: LeadSourceID,
-    });
+    })
   }
 
   return (
@@ -329,10 +329,10 @@ function LeadSourceForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -377,5 +377,5 @@ function LeadSourceForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

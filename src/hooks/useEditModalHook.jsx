@@ -1,4 +1,4 @@
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog"
 
 const useEditModal = (handleEdit) => {
   // const [show, setShowModal] = useState(false);
@@ -36,8 +36,8 @@ const useEditModal = (handleEdit) => {
   //     </Modal>
   //   ),
   // };
-  const reject = () => {};
-  const setIdToDelete = () => {};
+  const reject = () => {}
+  const setIdToDelete = () => {}
   const confirm = (id) => {
     confirmDialog({
       message: "Do you want to edit this record?",
@@ -48,8 +48,8 @@ const useEditModal = (handleEdit) => {
       position: "top",
       accept: () => handleEdit(id),
       reject,
-    });
-  };
+    })
+  }
 
   return {
     handleShow: confirm,
@@ -75,7 +75,7 @@ const useEditModal = (handleEdit) => {
       //   }}
       // />
     ),
-  };
-};
+  }
+}
 
-export default useEditModal;
+export default useEditModal

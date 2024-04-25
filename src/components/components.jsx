@@ -1,1 +1,1 @@
-export { default as KSearchBar } from "./ksearchbar/KesearchBar";
+export { default as KSearchBar } from "./ksearchbar/KesearchBar"

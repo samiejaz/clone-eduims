@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { InputSwitch } from "primereact/inputswitch";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { FilterMatchMode } from "primereact/api";
+import React, { useState, useEffect, useRef, useContext } from "react"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { InputSwitch } from "primereact/inputswitch"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { FilterMatchMode } from "primereact/api"
 
 let filters = {
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-};
+}
 
 export default function UserRightsGroupedTable() {
-  const [expandedRows, setExpandedRows] = useState([]);
+  const [expandedRows, setExpandedRows] = useState([])
 
   const { setRoutesWithUserRights, routesWithUserRights } =
-    useContext(UserRightsContext);
+    useContext(UserRightsContext)
 
   function updateAllRolesOfGroup(groupKey, currentState) {
-    let _routesWithUserRights = [...routesWithUserRights];
+    let _routesWithUserRights = [...routesWithUserRights]
     for (let i = 0; i < _routesWithUserRights.length; i++) {
       if (_routesWithUserRights[i].menuGroupKey === groupKey) {
-        _routesWithUserRights[i].AllowAllRoles = !currentState;
+        _routesWithUserRights[i].AllowAllRoles = !currentState
         _routesWithUserRights[i].subItems = _routesWithUserRights[
           i
         ].subItems?.map((item) => {
@@ -30,12 +30,12 @@ export default function UserRightsGroupedTable() {
             RoleNew: !currentState,
             RolePrint: !currentState,
             ShowForm: !currentState,
-          };
-        });
+          }
+        })
       }
     }
-    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights));
-    setRoutesWithUserRights(_routesWithUserRights);
+    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights))
+    setRoutesWithUserRights(_routesWithUserRights)
   }
 
   const headerTemplate = (data) => {
@@ -59,48 +59,48 @@ export default function UserRightsGroupedTable() {
           </div>
         </div>
       </React.Fragment>
-    );
-  };
+    )
+  }
   const RoleEditor = (options) => {
     return (
       <InputSwitch
         checked={options.value}
         onChange={(e) => options.editorCallback(e.value)}
       />
-    );
-  };
+    )
+  }
   const ShowFormTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.ShowForm} />;
-  };
+    return <InputSwitch checked={rowData.ShowForm} />
+  }
   const RoleEditTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleEdit} />;
-  };
+    return <InputSwitch checked={rowData.RoleEdit} />
+  }
   const RoleDeleteTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleDelete} />;
-  };
+    return <InputSwitch checked={rowData.RoleDelete} />
+  }
   const RoleNewTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleNew} />;
-  };
+    return <InputSwitch checked={rowData.RoleNew} />
+  }
   const RolePrintTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RolePrint} />;
-  };
+    return <InputSwitch checked={rowData.RolePrint} />
+  }
 
   const onRowEditComplete = (e) => {
-    let _routesWithUserRights = [...routesWithUserRights];
+    let _routesWithUserRights = [...routesWithUserRights]
 
-    let { newData } = e;
+    let { newData } = e
     for (let i = 0; i < _routesWithUserRights.length; i++) {
       for (let j = 0; j < _routesWithUserRights[i].subItems.length; j++) {
         if (
           _routesWithUserRights[i]?.subItems[j]?.menuKey === newData.menuKey
         ) {
-          _routesWithUserRights[i].subItems[j] = { ...newData };
+          _routesWithUserRights[i].subItems[j] = { ...newData }
         }
       }
     }
-    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights));
-    setRoutesWithUserRights(_routesWithUserRights);
-  };
+    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights))
+    setRoutesWithUserRights(_routesWithUserRights)
+  }
 
   const bodyTemplate = (rowData) => {
     return (
@@ -168,8 +168,8 @@ export default function UserRightsGroupedTable() {
           ></Column>
         </DataTable>
       </>
-    );
-  };
+    )
+  }
 
   return (
     <div className="card">
@@ -192,5 +192,5 @@ export default function UserRightsGroupedTable() {
         ></Column>
       </DataTable>
     </div>
-  );
+  )
 }

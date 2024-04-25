@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import CustomerInvoiceIntallmentsModal from "../components/Modals/CustomerInvoiceInstallmetnsModal";
+import React, { useState } from "react"
+import CustomerInvoiceIntallmentsModal from "../components/Modals/CustomerInvoiceInstallmetnsModal"
 
 const useCustomerInvoiceInstallmentHook = (
   installmentsFieldArray,
   method,
   isEnable
 ) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   const handleClose = () => {
-    setVisible(false);
-    method.setValue("installments", []);
-  };
-  const handleOpen = () => setVisible(true);
+    setVisible(false)
+    method.setValue("installments", [])
+  }
+  const handleOpen = () => setVisible(true)
   return {
     handleClose,
     handleOpen,
@@ -27,7 +27,7 @@ const useCustomerInvoiceInstallmentHook = (
         />
       </>
     ),
-  };
-};
+  }
+}
 
-export default useCustomerInvoiceInstallmentHook;
+export default useCustomerInvoiceInstallmentHook

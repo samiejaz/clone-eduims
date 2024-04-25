@@ -1,4 +1,4 @@
-import { MENU_KEYS, ROUTE_URLS } from "./enums";
+import { MENU_KEYS, ROUTE_URLS } from "./enums"
 
 export const routes = [
   {
@@ -157,10 +157,10 @@ export const routes = [
       },
     ],
   },
-];
+]
 
 export const routesWithUserRights = routes.map((route) => {
-  const updatedRoute = { ...route };
+  const updatedRoute = { ...route }
 
   updatedRoute.subItems = route.subItems.map((subItem) => ({
     ...subItem,
@@ -169,31 +169,31 @@ export const routesWithUserRights = routes.map((route) => {
     RoleDelete: true,
     RolePrint: true,
     ShowForm: true,
-  }));
+  }))
 
-  return updatedRoute;
-});
+  return updatedRoute
+})
 
 // Authorized Routes
-export let authorizedRoutes = ["allowAll"];
+export let authorizedRoutes = ["allowAll"]
 
 // Filtering Routes
 const filteredRoutes = routes.map((route) => {
   if (authorizedRoutes[0] === "allowAll") {
-    return { ...route };
+    return { ...route }
   } else {
     const filteredSubItems = route.subItems.filter((subItem) => {
-      return authorizedRoutes.includes(subItem.menuKey);
-    });
+      return authorizedRoutes.includes(subItem.menuKey)
+    })
     if (filteredSubItems.length > 0) {
-      return { ...route, subItems: filteredSubItems };
+      return { ...route, subItems: filteredSubItems }
     }
   }
-});
+})
 
 export const finalFilteredRoutes = filteredRoutes.filter(
   (route) => route !== undefined
-);
+)
 
 // Check For User Rights
 export function checkForUserRights({
@@ -206,7 +206,7 @@ export function checkForUserRights({
   const ShowForm =
     MenuName && authorizedRoutes[0] === "allowAll"
       ? true
-      : authorizedRoutes.includes(MenuName);
+      : authorizedRoutes.includes(MenuName)
 
   return [
     {
@@ -216,17 +216,17 @@ export function checkForUserRights({
       RolePrint,
       ShowForm,
     },
-  ];
+  ]
 }
 
 export const initRoutesWithUserRights = (routes) => {
-  const userRights = [];
+  const userRights = []
 
   if (userRights?.length > 0) {
-    return userRights;
+    return userRights
   } else {
     const updatedRoutes = finalFilteredRoutes.map((route) => {
-      const updatedRoute = { ...route, AllowAllRoles: true };
+      const updatedRoute = { ...route, AllowAllRoles: true }
 
       updatedRoute.subItems = route.subItems.map((subItem) => ({
         ...subItem,
@@ -235,13 +235,13 @@ export const initRoutesWithUserRights = (routes) => {
         RoleDelete: true,
         RolePrint: true,
         ShowForm: true,
-      }));
+      }))
 
-      return updatedRoute;
-    });
-    return updatedRoutes;
+      return updatedRoute
+    })
+    return updatedRoutes
   }
-};
+}
 
 // New Routes
 export const initAuthorizedMenus = (allForms) => {
@@ -290,15 +290,15 @@ export const initAuthorizedMenus = (allForms) => {
     General: "pi pi-home",
     Utilities: "pi pi-cog",
     Leads: "pi pi-phone",
-  };
+  }
 
   const groupedForms = allForms.reduce((acc, form) => {
     if (!acc[form.menuGroupname]) {
-      acc[form.menuGroupname] = [];
+      acc[form.menuGroupname] = []
     }
-    acc[form.menuGroupname].push(form);
-    return acc;
-  }, {});
+    acc[form.menuGroupname].push(form)
+    return acc
+  }, {})
 
   // const transformedRoutes = Object.entries(groupedForms).map(
   //   ([menuGroupName, forms]) => ({
@@ -315,7 +315,7 @@ export const initAuthorizedMenus = (allForms) => {
 
   const transformedRoutes = Object.entries(groupedForms).map(
     ([menuGroupName, forms]) => {
-      const hideMenuGroup = forms.every((form) => !form.ShowForm);
+      const hideMenuGroup = forms.every((form) => !form.ShowForm)
       return {
         menuGroupName,
         icon: menuGroupIcons[menuGroupName] || "pi pi-question",
@@ -332,16 +332,16 @@ export const initAuthorizedMenus = (allForms) => {
         })),
         hideMenuGroup,
         AllowAllRoles: forms.some((form) => form.ShowForm === true),
-      };
+      }
     }
-  );
+  )
   // const userRightsRoutes =
   //   initAuthorizedRoutesWithUserRights(transformedRoutes);
-  return transformedRoutes;
-};
+  return transformedRoutes
+}
 
 export function convertBackToOriginal() {
-  let originalForms = [];
+  let originalForms = []
   // let transformedRoutes = initAuthorizedMenus(routes);
   // console.log(transformedRoutes);
   routes.forEach((group) => {
@@ -357,14 +357,14 @@ export function convertBackToOriginal() {
         RoleDelete: subItem.RoleDelete,
         ShowForm: subItem.ShowForm,
         RolePrint: subItem.RolePrint,
-      });
-    });
-  });
-  return originalForms;
+      })
+    })
+  })
+  return originalForms
 }
 export const initAuthorizedRoutesWithUserRights = (routes) => {
   const updatedRoutes = routes.map((route) => {
-    const updatedRoute = { ...route, AllowAllRoles: true };
+    const updatedRoute = { ...route, AllowAllRoles: true }
 
     updatedRoute.subItems = route.subItems.map((subItem) => ({
       ...subItem,
@@ -373,9 +373,9 @@ export const initAuthorizedRoutesWithUserRights = (routes) => {
       RoleDelete: true,
       RolePrint: true,
       ShowForm: true,
-    }));
+    }))
 
-    return updatedRoute;
-  });
-  return updatedRoutes;
-};
+    return updatedRoute
+  })
+  return updatedRoutes
+}

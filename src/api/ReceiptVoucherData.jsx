@@ -1,38 +1,38 @@
-import axios from "axios";
-import { toast } from "react-toastify";
-import { decryptID, verifyAndReturnEncryptedIDForForms } from "../utils/crypto";
-import { ShowErrorToast } from "../utils/CommonFunctions";
+import axios from "axios"
+import { toast } from "react-toastify"
+import { decryptID, verifyAndReturnEncryptedIDForForms } from "../utils/crypto"
+import { ShowErrorToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
-const CONTROLLER = "data_ReceiptVoucher";
-const WHEREMETHOD = "GetReceiptVoucherData";
-const DELETEMETHOD = "ReceiptVoucherDelete";
+const CONTROLLER = "data_ReceiptVoucher"
+const WHEREMETHOD = "GetReceiptVoucherData"
+const DELETEMETHOD = "ReceiptVoucherDelete"
 
 // URL: /data_ReceiptVoucher/GetReceiptVoucherWhere?LoginUserID=??
 export async function fetchAllReceiptVoucheres(LoginUserID) {
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LoginUserID=${LoginUserID}`
-  );
+  )
 
-  return data.data ?? [];
+  return data.data ?? []
 }
 
 // URL: /data_ReceiptVoucher/GetReceiptVoucherWhere?ReceiptVoucherID=??&LoginUserID=??
 export async function fetchReceiptVoucherById(ReceiptVoucherID, LoginUserID) {
-  ReceiptVoucherID = verifyAndReturnEncryptedIDForForms(ReceiptVoucherID);
+  ReceiptVoucherID = verifyAndReturnEncryptedIDForForms(ReceiptVoucherID)
   if (ReceiptVoucherID === undefined || ReceiptVoucherID === 0) {
-    return [];
+    return []
   } else {
     try {
       const { data } = await axios.post(
         `${apiUrl}/${CONTROLLER}/GetReceiptVoucherWhere?ReceiptVoucherID=${ReceiptVoucherID}&LoginUserID=${LoginUserID}`
-      );
-      return data ?? [];
+      )
+      return data ?? []
     } catch (error) {
       toast.error(error.message, {
         autoClose: false,
-      });
+      })
     }
   }
 }
@@ -40,16 +40,16 @@ export async function fetchReceiptVoucherById(ReceiptVoucherID, LoginUserID) {
 export async function deleteReceiptVoucherByID(serviceInfo) {
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?ReceiptVoucherID=${serviceInfo.ReceiptVoucherID}&LoginUserID=${serviceInfo.LoginUserID}`
-  );
+  )
 
   if (data.success === true) {
-    toast.success("Receipt sucessfully deleted!");
-    return true;
+    toast.success("Receipt sucessfully deleted!")
+    return true
   } else {
     toast.error(data.message, {
       autoClose: false,
-    });
-    return false;
+    })
+    return false
   }
 }
 //
@@ -57,10 +57,10 @@ export async function fetchMonthlyMaxReceiptNo(BusinesssUnitID) {
   try {
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/GetReceiptNo?BusinesssUnitID=${BusinesssUnitID}`
-    );
-    return data;
+    )
+    return data
   } catch (error) {
-    toast.error(error);
+    toast.error(error)
   }
 }
 
@@ -78,8 +78,8 @@ export async function addNewReceiptVoucher({
           DetailBusinessUnitID: item.BusinessUnitID,
           Amount: parseFloat(0 + item.Amount),
           DetailDescription: item.Description,
-        };
-      });
+        }
+      })
 
       let DataToSend = {
         SessionID: formData.SessionID,
@@ -99,47 +99,47 @@ export async function addNewReceiptVoucher({
         FromBank: formData.FromBank,
         EntryUserID: userID,
         ReceiptVoucherDetail: JSON.stringify(ReceiptVoucherDetail),
-      };
-
-      if (DataToSend.ReceiptMode === "Online") {
-        DataToSend.TransactionID = formData.TransactionID;
-      } else if (DataToSend.ReceiptMode === "Instrument") {
-        DataToSend.InstrumentNo = formData.TransactionID;
       }
 
-      ReceiptVoucherID = decryptID(ReceiptVoucherID);
+      if (DataToSend.ReceiptMode === "Online") {
+        DataToSend.TransactionID = formData.TransactionID
+      } else if (DataToSend.ReceiptMode === "Instrument") {
+        DataToSend.InstrumentNo = formData.TransactionID
+      }
+
+      ReceiptVoucherID = decryptID(ReceiptVoucherID)
       if (ReceiptVoucherID === 0 || ReceiptVoucherID === undefined) {
-        DataToSend.ReceiptVoucherID = 0;
+        DataToSend.ReceiptVoucherID = 0
       } else {
-        DataToSend.ReceiptVoucherID = ReceiptVoucherID;
+        DataToSend.ReceiptVoucherID = ReceiptVoucherID
       }
 
       const { data } = await axios.post(
         apiUrl + `/${CONTROLLER}/ReceiptVoucherInsertUpdate`,
         DataToSend
-      );
+      )
 
       if (data.success === true) {
         if (ReceiptVoucherID !== 0) {
-          toast.success("ReceiptVoucher updated successfully!");
+          toast.success("ReceiptVoucher updated successfully!")
         } else {
-          toast.success("ReceiptVoucher created successfully!");
+          toast.success("ReceiptVoucher created successfully!")
         }
-        return { success: true, RecordID: data?.ReceiptVoucherID };
+        return { success: true, RecordID: data?.ReceiptVoucherID }
       } else {
         toast.error(data.message, {
           autoClose: false,
-        });
-        return { success: false, RecordID: ReceiptVoucherID };
+        })
+        return { success: false, RecordID: ReceiptVoucherID }
       }
     } catch (error) {
       toast.error(error.message, {
         autoClose: false,
-      });
+      })
     }
   } else {
     toast.error("Please add atleast 1 row!", {
       autoClose: false,
-    });
+    })
   }
 }

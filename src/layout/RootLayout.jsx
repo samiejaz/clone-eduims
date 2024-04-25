@@ -1,42 +1,42 @@
-import { Outlet } from "react-router-dom";
-import { Navbar } from "react-bootstrap";
-import Logo from "../images/logo.png";
-import User from "../images/profilelogo.png";
-import CSidebar from "./Sidebar/CSidebar";
-import { useRef } from "react";
-import NotificationOverlay from "../components/OverlayPanel/NotificationOverlay";
-import useKeyCombination from "../hooks/useKeyCombinationHook";
-import useUserProfile from "../hooks/useUserProfile";
+import { Outlet } from "react-router-dom"
+import { Navbar } from "react-bootstrap"
+import Logo from "../images/logo.png"
+import User from "../images/profilelogo.png"
+import CSidebar from "./Sidebar/CSidebar"
+import { useRef } from "react"
+import NotificationOverlay from "../components/OverlayPanel/NotificationOverlay"
+import useKeyCombination from "../hooks/useKeyCombinationHook"
+import useUserProfile from "../hooks/useUserProfile"
 
 function RootLayout() {
-  const sidebarRef = useRef();
-  const searchInputRef = useRef();
+  const sidebarRef = useRef()
+  const searchInputRef = useRef()
 
   useKeyCombination(
     () => {
-      toggleSideBar(true);
+      toggleSideBar(true)
     },
     "k",
     true
-  );
+  )
 
   function toggleSideBar(openSideBarOnly = false) {
     if (!openSideBarOnly) {
       if (sidebarRef.current.className.includes("c-close")) {
-        sidebarRef.current.className = "c-sidebar";
-        searchInputRef.current?.focus();
-        localStorage.setItem("isSidebarOpen", true);
+        sidebarRef.current.className = "c-sidebar"
+        searchInputRef.current?.focus()
+        localStorage.setItem("isSidebarOpen", true)
       } else {
-        sidebarRef.current.className = "c-sidebar c-close";
-        localStorage.removeItem("isSidebarOpen");
+        sidebarRef.current.className = "c-sidebar c-close"
+        localStorage.removeItem("isSidebarOpen")
       }
     } else {
       if (sidebarRef.current.className.includes("c-close")) {
-        sidebarRef.current.className = "c-sidebar";
-        searchInputRef.current?.focus();
-        localStorage.setItem("isSidebarOpen", true);
+        sidebarRef.current.className = "c-sidebar"
+        searchInputRef.current?.focus()
+        localStorage.setItem("isSidebarOpen", true)
       } else {
-        searchInputRef.current?.focus();
+        searchInputRef.current?.focus()
       }
     }
   }
@@ -59,11 +59,11 @@ function RootLayout() {
         </section>
       </div>
     </>
-  );
+  )
 }
 
 function Header({ toggleSidebar }) {
-  const { handleCloseProfile, handleShowProfile, render } = useUserProfile();
+  const { handleCloseProfile, handleShowProfile, render } = useUserProfile()
 
   return (
     <>
@@ -79,20 +79,20 @@ function Header({ toggleSidebar }) {
         <i
           className="pi pi-bars hoverIcon"
           onClick={() => {
-            toggleSidebar();
+            toggleSidebar()
           }}
         ></i>
         <i
           className="pi pi-user hoverIcon"
           onClick={() => {
-            handleShowProfile();
+            handleShowProfile()
           }}
         ></i>
         {/* <NotificationOverlay /> */}
       </div>
       {render}
     </>
-  );
+  )
 }
 
 function LogoImage() {
@@ -108,11 +108,11 @@ function LogoImage() {
         />
       </Navbar.Brand>
     </>
-  );
+  )
 }
 
 function UserImage() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user"))
 
   return (
     <>
@@ -143,7 +143,7 @@ function UserImage() {
         </>
       )}
     </>
-  );
+  )
 }
 
-export default RootLayout;
+export default RootLayout

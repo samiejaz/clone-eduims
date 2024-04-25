@@ -1,10 +1,10 @@
-import { Navigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import RootLayout from "../layout/RootLayout";
-import { useContext } from "react";
+import { Navigate } from "react-router-dom"
+import { AuthContext } from "../context/AuthContext"
+import RootLayout from "../layout/RootLayout"
+import { useContext } from "react"
 
 function ProtectedRoutes() {
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext)
   return (
     <>
       {user !== null ? (
@@ -17,7 +17,7 @@ function ProtectedRoutes() {
         </>
       )}
     </>
-  );
+  )
 }
 
-export default ProtectedRoutes;
+export default ProtectedRoutes

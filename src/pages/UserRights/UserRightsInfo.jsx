@@ -1,12 +1,12 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form"
 
-import React from "react";
+import React from "react"
 
-import UserRightsGroupedTable from "./UserRightsGroupedDatatable";
-import UserRightsGroupedTableCellWise from "./UserRightsGroupedDataTableCellWise";
+import UserRightsGroupedTable from "./UserRightsGroupedDatatable"
+import UserRightsGroupedTableCellWise from "./UserRightsGroupedDataTableCellWise"
 
 const UserRightsInfo = () => {
-  const method = useForm();
+  const method = useForm()
 
   return (
     <>
@@ -15,7 +15,7 @@ const UserRightsInfo = () => {
         {/* <UserRightsGroupedTableCellWise /> */}
       </FormProvider>
     </>
-  );
-};
+  )
+}
 
-export default UserRightsInfo;
+export default UserRightsInfo

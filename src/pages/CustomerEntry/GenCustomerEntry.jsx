@@ -1,40 +1,40 @@
-import { useEffect, useState } from "react";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { FilterMatchMode } from "primereact/api";
+import { useEffect, useState } from "react"
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query"
+import { useContext } from "react"
+import { AuthContext } from "../../context/AuthContext"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { FilterMatchMode } from "primereact/api"
 import {
   deleteNewCustomerByID,
   fetchAllNewCustomers,
-} from "../../api/NewCustomerData";
-import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent";
-import { useNavigate } from "react-router";
-import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import GenNewCustomerView from "./CustomerEntryView";
-import { Route, Routes } from "react-router-dom";
+} from "../../api/NewCustomerData"
+import { CustomerEntryForm } from "../../components/CustomerEntryFormComponent"
+import { useNavigate } from "react-router"
+import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import GenNewCustomerView from "./CustomerEntryView"
+import { Route, Routes } from "react-router-dom"
 
-const parentRoute = ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY;
-const viewRoute = `${parentRoute}/`;
-const IDENTITY = "CustomerID";
+const parentRoute = ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY
+const viewRoute = `${parentRoute}/`
+const IDENTITY = "CustomerID"
 
 export default function Customers() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.USERS.CUSTOMERS_FORM_KEY,
       MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -63,14 +63,14 @@ export default function Customers() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 export function GenCustomerEntry({ userRights }) {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
   // Hooks
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext)
 
   const [filters, setFilters] = useState({
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -80,12 +80,12 @@ export function GenCustomerEntry({ userRights }) {
     },
     CustomerBusinessName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ContactPerson1Name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   // Queries
   const {
@@ -97,26 +97,26 @@ export function GenCustomerEntry({ userRights }) {
     queryFn: () => fetchAllNewCustomers(user.userID),
     initialData: [],
     refetchOnWindowFocus: false,
-  });
+  })
 
   // Mutations
   const deleteMutation = useMutation({
     mutationFn: deleteNewCustomerByID,
     onSuccess: (response) => {
       if (response) {
-        queryClient.invalidateQueries({ queryKey: ["Customers"] });
+        queryClient.invalidateQueries({ queryKey: ["Customers"] })
       }
     },
-  });
+  })
 
   function handleEdit(CustomerID) {
-    navigate(viewRoute + CustomerID + "?viewMode=edit");
+    navigate(viewRoute + CustomerID + "?viewMode=edit")
   }
   function handleDelete(CustomerID) {
-    deleteMutation.mutate({ CustomerID, LoginUserID: user.userID });
+    deleteMutation.mutate({ CustomerID, LoginUserID: user.userID })
   }
   function handleView(CustomerID) {
-    navigate(viewRoute + CustomerID + "?viewMode=view");
+    navigate(viewRoute + CustomerID + "?viewMode=view")
   }
 
   return (
@@ -202,5 +202,5 @@ export function GenCustomerEntry({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }

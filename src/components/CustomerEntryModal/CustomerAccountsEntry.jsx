@@ -1,34 +1,34 @@
-import { createContext, useState, useContext } from "react";
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions";
-import { Form, Row, Col } from "react-bootstrap";
-import { Button } from "primereact/button";
-import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AuthContext } from "../../context/AuthContext";
-import { toast } from "react-toastify";
-import axios from "axios";
-import { fetchCustomerAccountByID } from "./CustomerEntryAPI";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { FilterMatchMode } from "primereact/api";
-import { Dialog } from "primereact/dialog";
+import { createContext, useState, useContext } from "react"
+import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
+import { Form, Row, Col } from "react-bootstrap"
+import { Button } from "primereact/button"
+import { useForm } from "react-hook-form"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { AuthContext } from "../../context/AuthContext"
+import { toast } from "react-toastify"
+import axios from "axios"
+import { fetchCustomerAccountByID } from "./CustomerEntryAPI"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { FilterMatchMode } from "primereact/api"
+import { Dialog } from "primereact/dialog"
 
-let pageTitles = {};
-const apiUrl = import.meta.env.VITE_APP_API_URL;
-const AccountEntryContext = createContext();
+let pageTitles = {}
+const apiUrl = import.meta.env.VITE_APP_API_URL
+const AccountEntryContext = createContext()
 const AccountEntryProvider = ({ children }) => {
-  const [createdAccountID, setCreatedAccountID] = useState(0);
+  const [createdAccountID, setCreatedAccountID] = useState(0)
   return (
     <AccountEntryContext.Provider
       value={{ createdAccountID, setCreatedAccountID }}
     >
       {children}
     </AccountEntryContext.Provider>
-  );
-};
+  )
+}
 
 function CustomerAccountEntry(props) {
-  const { CustomerID, isEnable = true } = props;
+  const { CustomerID, isEnable = true } = props
   return (
     <>
       <AccountEntryProvider>
@@ -44,23 +44,23 @@ function CustomerAccountEntry(props) {
         </div>
       </AccountEntryProvider>
     </>
-  );
+  )
 }
 
-export default CustomerAccountEntry;
+export default CustomerAccountEntry
 
 function CustomerAccountDataTableHeader(props) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  const { CustomerID, isEnable } = props;
-  const { user } = useContext(AuthContext);
-  const { setCreatedAccountID } = useContext(AccountEntryContext);
+  const { CustomerID, isEnable } = props
+  const { user } = useContext(AuthContext)
+  const { setCreatedAccountID } = useContext(AccountEntryContext)
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       AccountTitle: "",
     },
-  });
+  })
 
   const customerAccountEntryMutation = useMutation({
     mutationFn: async (formData) => {
@@ -69,31 +69,31 @@ function CustomerAccountDataTableHeader(props) {
         AccountTitle: formData?.AccountTitle,
         CustomerID: CustomerID,
         EntryUserID: user.userID,
-      };
+      }
       const { data } = await axios.post(
         apiUrl + "/EduIMS/CustomerAccountsInsertUpdate",
         DataToSend
-      );
+      )
       if (data.success === true) {
-        reset();
-        toast.success("Ledger saved successfully!");
-        queryClient.invalidateQueries({ queryKey: ["customerAccountsDetail"] });
+        reset()
+        toast.success("Ledger saved successfully!")
+        queryClient.invalidateQueries({ queryKey: ["customerAccountsDetail"] })
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   function onSubmit(data) {
     if (CustomerID === 0) {
-      toast.error("No Customer Found!!");
+      toast.error("No Customer Found!!")
     } else {
-      customerAccountEntryMutation.mutate(data);
+      customerAccountEntryMutation.mutate(data)
     }
   }
 
@@ -119,7 +119,7 @@ function CustomerAccountDataTableHeader(props) {
                 severity="info"
                 className="px-4 py-2 rounded-1 "
                 onClick={() => {
-                  handleSubmit(onSubmit)();
+                  handleSubmit(onSubmit)()
                 }}
                 type="button"
                 disabled={!isEnable}
@@ -131,26 +131,26 @@ function CustomerAccountDataTableHeader(props) {
         </Row>
       </form>
     </>
-  );
+  )
 }
 
 function CustomerAccountDetailTable(props) {
-  const queryClient = useQueryClient();
-  const [visible, setVisible] = useState(false);
-  const { CustomerID, isEnable } = props;
+  const queryClient = useQueryClient()
+  const [visible, setVisible] = useState(false)
+  const { CustomerID, isEnable } = props
   const [filters, setFilters] = useState({
     AccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const { user } = useContext(AuthContext);
-  const { register, setValue, handleSubmit } = useForm();
+  const { user } = useContext(AuthContext)
+  const { register, setValue, handleSubmit } = useForm()
 
   const { data: CustomerAccounts } = useQuery({
     queryKey: ["customerAccountsDetail", CustomerID],
     queryFn: () => fetchCustomerAccountByID(CustomerID, user.userID),
     enabled: CustomerID !== 0,
     initialData: [],
-  });
+  })
 
   const customerAccountEntryMutation = useMutation({
     mutationFn: async (formData) => {
@@ -159,29 +159,29 @@ function CustomerAccountDetailTable(props) {
         AccountTitle: formData?.AccountTitle,
         CustomerID: CustomerID,
         EntryUserID: user.userID,
-      };
+      }
       const { data } = await axios.post(
         apiUrl + "/EduIMS/CustomerAccountsInsertUpdate",
         DataToSend
-      );
+      )
 
       if (data.success === true) {
-        toast.success("Ledger updated successfully!");
-        queryClient.invalidateQueries({ queryKey: ["customerAccountsDetail"] });
-        setVisible(false);
+        toast.success("Ledger updated successfully!")
+        queryClient.invalidateQueries({ queryKey: ["customerAccountsDetail"] })
+        setVisible(false)
       } else {
         toast.error(data.message, {
           autoClose: 1500,
-        });
+        })
       }
     },
     onError: () => {
-      toast.error("Error while saving data!");
+      toast.error("Error while saving data!")
     },
-  });
+  })
 
   function onSubmit(data) {
-    customerAccountEntryMutation.mutate(data);
+    customerAccountEntryMutation.mutate(data)
   }
 
   return (
@@ -214,9 +214,9 @@ function CustomerAccountDetailTable(props) {
               disabled={!isEnable}
               type="button"
               onClick={() => {
-                setVisible(true);
-                setValue("AccountTitle", rowData?.AccountTitle);
-                setValue("AccountID", rowData?.AccountID);
+                setVisible(true)
+                setValue("AccountTitle", rowData?.AccountTitle)
+                setValue("AccountID", rowData?.AccountID)
               }}
             />
           )}
@@ -245,7 +245,7 @@ function CustomerAccountDetailTable(props) {
             header={"Edit Ledger Name"}
             visible={visible}
             onHide={() => {
-              setVisible(false);
+              setVisible(false)
             }}
             style={{ width: "40vw" }}
             footer={
@@ -260,7 +260,7 @@ function CustomerAccountDetailTable(props) {
                 loading={customerAccountEntryMutation.isPending}
                 loadingIcon="pi pi-spin pi-spinner"
                 onClick={() => {
-                  handleSubmit(onSubmit)();
+                  handleSubmit(onSubmit)()
                 }}
               />
             }
@@ -289,7 +289,7 @@ function CustomerAccountDetailTable(props) {
         </div>
       </form>
     </>
-  );
+  )
 }
 
 // function CustomerAccountDataTableDetail() {

@@ -1,51 +1,51 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { FilterMatchMode } from "primereact/api";
-import { useContext, useEffect, useState } from "react";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import ActionButtons from "../../components/ActionButtons";
-import { useForm } from "react-hook-form";
-import ButtonToolBar from "../../components/ActionsToolbar";
-import TextInput from "../../components/Forms/TextInput";
-import CheckBox from "../../components/Forms/CheckBox";
-import { useUserData } from "../../context/AuthContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { FilterMatchMode } from "primereact/api"
+import { useContext, useEffect, useState } from "react"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import ActionButtons from "../../components/ActionButtons"
+import { useForm } from "react-hook-form"
+import ButtonToolBar from "../../components/ActionsToolbar"
+import TextInput from "../../components/Forms/TextInput"
+import CheckBox from "../../components/Forms/CheckBox"
+import { useUserData } from "../../context/AuthContext"
 import {
   addNewBankAccount,
   deleteBankAccountByID,
   fetchAllBankAccounts,
   fetchBankAccountById,
-} from "../../api/BankAccountData";
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums";
+} from "../../api/BankAccountData"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
 import {
   FormRow,
   FormColumn,
   FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import useConfirmationModal from "../../hooks/useConfirmationModalHook";
-import AccessDeniedPage from "../../components/AccessDeniedPage";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { encryptID } from "../../utils/crypto";
-let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING;
-let editRoute = `${parentRoute}/edit/`;
-let newRoute = `${parentRoute}/new`;
-let viewRoute = `${parentRoute}/`;
-let queryKey = QUERY_KEYS.BANK_ACCOUNTS_QUERY_KEY;
-let IDENTITY = "BankAccountID";
+} from "../../components/Layout/LayoutComponents"
+import useConfirmationModal from "../../hooks/useConfirmationModalHook"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { encryptID } from "../../utils/crypto"
+let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING
+let editRoute = `${parentRoute}/edit/`
+let newRoute = `${parentRoute}/new`
+let viewRoute = `${parentRoute}/`
+let queryKey = QUERY_KEYS.BANK_ACCOUNTS_QUERY_KEY
+let IDENTITY = "BankAccountID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext);
-  const [userRights, setUserRights] = useState([]);
+  const { checkForUserRights } = useContext(UserRightsContext)
+  const [userRights, setUserRights] = useState([])
 
   useEffect(() => {
     const rights = checkForUserRights({
       MenuKey: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
       MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    });
-    setUserRights([rights]);
-  }, []);
+    })
+    setUserRights([rights])
+  }, [])
 
   return (
     <Routes>
@@ -118,54 +118,54 @@ export default function BanckAccountOpening() {
         />
       )}
     </Routes>
-  );
+  )
 }
 
 function BankAccountDetail({ userRights }) {
-  document.title = "Bank Accounts";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  document.title = "Bank Accounts"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
-  });
+  })
 
   const [filters, setFilters] = useState({
     BankAccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     AccountNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     IbanNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
+  })
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
     queryFn: () => fetchAllBankAccounts(user.userID),
     initialData: [],
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBankAccountByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete(id) {
     deleteMutation.mutate({
       BankAccountID: id,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleEdit(id) {
-    navigate(editRoute + id);
+    navigate(editRoute + id)
   }
 
   function handleView(id) {
-    navigate(parentRoute + "/" + id);
+    navigate(parentRoute + "/" + id)
   }
 
   return (
@@ -255,14 +255,14 @@ function BankAccountDetail({ userRights }) {
         </>
       )}
     </div>
-  );
+  )
 }
 function BankAccountForm({ mode, userRights }) {
-  document.title = "Bank Account Entry";
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const user = useUserData();
-  const { BankAccountID } = useParams();
+  document.title = "Bank Account Entry"
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const user = useUserData()
+  const { BankAccountID } = useParams()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       BankAccountTitle: "",
@@ -274,72 +274,72 @@ function BankAccountForm({ mode, userRights }) {
       IbanNo: "",
       InActive: false,
     },
-  });
+  })
 
   const BankAccountData = useQuery({
     queryKey: [queryKey, +BankAccountID],
     queryFn: () => fetchBankAccountById(BankAccountID, user.userID),
     enabled: mode !== "new",
     initialData: [],
-  });
+  })
 
   useEffect(() => {
     if (BankAccountID !== undefined && BankAccountData.data.length > 0) {
-      setValue("BankAccountTitle", BankAccountData?.data[0]?.BankAccountTitle);
-      setValue("BranchName", BankAccountData?.data[0]?.BranchName);
-      setValue("BranchCode", BankAccountData?.data[0]?.BranchCode);
-      setValue("AccountNo", BankAccountData?.data[0]?.AccountNo);
-      setValue("IbanNo", BankAccountData?.data[0]?.IbanNo);
-      setValue("BankTitle", BankAccountData?.data[0]?.BankTitle);
-      setValue("InActive", BankAccountData?.data[0]?.InActive);
+      setValue("BankAccountTitle", BankAccountData?.data[0]?.BankAccountTitle)
+      setValue("BranchName", BankAccountData?.data[0]?.BranchName)
+      setValue("BranchCode", BankAccountData?.data[0]?.BranchCode)
+      setValue("AccountNo", BankAccountData?.data[0]?.AccountNo)
+      setValue("IbanNo", BankAccountData?.data[0]?.IbanNo)
+      setValue("BankTitle", BankAccountData?.data[0]?.BankTitle)
+      setValue("InActive", BankAccountData?.data[0]?.InActive)
     }
-  }, [BankAccountID, BankAccountData.data]);
+  }, [BankAccountID, BankAccountData.data])
 
   const mutation = useMutation({
     mutationFn: addNewBankAccount,
     onSuccess: ({ success, RecordID }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-        navigate(`${parentRoute}/${RecordID}`);
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+        navigate(`${parentRoute}/${RecordID}`)
       }
     },
-  });
+  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteBankAccountByID,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      navigate(parentRoute);
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      navigate(parentRoute)
     },
-  });
+  })
 
   function handleDelete() {
     deleteMutation.mutate({
       BankAccountID: BankAccountID,
       LoginUserID: user.userID,
-    });
+    })
   }
 
   function handleAddNew() {
-    reset();
-    navigate(newRoute);
+    reset()
+    navigate(newRoute)
   }
   function handleCancel() {
     if (mode === "new") {
-      navigate(parentRoute);
+      navigate(parentRoute)
     } else if (mode === "edit") {
-      navigate(viewRoute + BankAccountID);
+      navigate(viewRoute + BankAccountID)
     }
   }
   function handleEdit() {
-    navigate(editRoute + BankAccountID);
+    navigate(editRoute + BankAccountID)
   }
   function onSubmit(data) {
     mutation.mutate({
       formData: data,
       userID: user.userID,
       BankAccountID: BankAccountID,
-    });
+    })
   }
 
   return (
@@ -357,10 +357,10 @@ function BankAccountForm({ mode, userRights }) {
               handleGoBack={() => navigate(parentRoute)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
-                handleCancel();
+                handleCancel()
               }}
               handleAddNew={() => {
-                handleAddNew();
+                handleAddNew()
               }}
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
@@ -471,5 +471,5 @@ function BankAccountForm({ mode, userRights }) {
         </>
       )}
     </>
-  );
+  )
 }

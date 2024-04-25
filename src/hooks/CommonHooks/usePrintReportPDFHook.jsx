@@ -1,19 +1,19 @@
-import { useMutation } from "@tanstack/react-query";
-import React from "react";
-import { PrintReportInNewTabWithLoadingToast } from "../../utils/CommonFunctions";
-import { Button } from "primereact/button";
-import { CustomSpinner } from "../../components/CustomSpinner";
-import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query"
+import React from "react"
+import { PrintReportInNewTabWithLoadingToast } from "../../utils/CommonFunctions"
+import { Button } from "primereact/button"
+import { CustomSpinner } from "../../components/CustomSpinner"
+import { toast } from "react-toastify"
 
 const usePrintReportPDFHook = () => {
   const mutation = useMutation({
     mutationFn: PrintReportInNewTabWithLoadingToast,
-  });
+  })
 
   function handlePrintReport({ getPrintFromUrl, fullUrl }) {
     mutation.mutateAsync({
       controllerName: getPrintFromUrl || fullUrl,
-    });
+    })
   }
 
   return {
@@ -46,7 +46,7 @@ const usePrintReportPDFHook = () => {
         />
       </>
     ),
-  };
-};
+  }
+}
 
-export default usePrintReportPDFHook;
+export default usePrintReportPDFHook

@@ -1,59 +1,56 @@
-import React, { useEffect, useState, useRef } from "react";
-import { ROUTE_URLS } from "../../utils/enums";
-import { Timeline } from "primereact/timeline";
-import { Card } from "primereact/card";
-import { Button } from "primereact/button";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Col, Form, Row } from "react-bootstrap";
-import { Controller, useForm } from "react-hook-form";
-import NumberInput from "../../components/Forms/NumberInput";
-import CDropdown from "../../components/Forms/CDropdown";
+import React, { useEffect, useState, useRef } from "react"
+import { ROUTE_URLS } from "../../utils/enums"
+import { Timeline } from "primereact/timeline"
+import { Card } from "primereact/card"
+import { Button } from "primereact/button"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import axios from "axios"
+import { Col, Form, Row } from "react-bootstrap"
+import { Controller, useForm } from "react-hook-form"
+import NumberInput from "../../components/Forms/NumberInput"
+import CDropdown from "../../components/Forms/CDropdown"
 import {
   useAllDepartmentsSelectData,
   useAllUsersSelectData,
   useProductsInfoSelectData,
-} from "../../hooks/SelectData/useSelectData";
-import { Calendar } from "primereact/calendar";
-import { classNames } from "primereact/utils";
-import { parseISO } from "date-fns";
+} from "../../hooks/SelectData/useSelectData"
+import { Calendar } from "primereact/calendar"
+import { classNames } from "primereact/utils"
+import { parseISO } from "date-fns"
 import {
   addLeadIntroductionOnAction,
   getLeadsFile,
-} from "../../api/LeadIntroductionData";
-import { toast } from "react-toastify";
-import { MeetingDoneFields } from "../../components/Modals/MeetingDoneModal";
-import { RevertBackFields } from "../../components/Modals/RevertBackModal";
-import { decryptID, encryptID } from "../../utils/crypto";
-import { ShowErrorToast } from "../../utils/CommonFunctions";
-import { useUserData } from "../../context/AuthContext";
-import {
-  FormColumn,
-  FormLabel,
-} from "../../components/Layout/LayoutComponents";
-import { SingleFileUploadField } from "../../components/Forms/form";
-import useLeadsFileViewerHook from "./useLeadsFileViewerHook";
+} from "../../api/LeadIntroductionData"
+import { toast } from "react-toastify"
+import { MeetingDoneFields } from "../../components/Modals/MeetingDoneModal"
+import { RevertBackFields } from "../../components/Modals/RevertBackModal"
+import { decryptID, encryptID } from "../../utils/crypto"
+import { ShowErrorToast } from "../../utils/CommonFunctions"
+import { useUserData } from "../../context/AuthContext"
+import { FormColumn, FormLabel } from "../../components/Layout/LayoutComponents"
+import { SingleFileUploadField } from "../../components/Forms/form"
+import useLeadsFileViewerHook from "./useLeadsFileViewerHook"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
-let queryKey = "key";
+let queryKey = "key"
 
 async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
   try {
     if (LeadIntroductionID !== undefined) {
-      LeadIntroductionID = decryptID(LeadIntroductionID);
+      LeadIntroductionID = decryptID(LeadIntroductionID)
       const { data } = await axios.post(
         apiUrl +
           `/data_LeadIntroduction/GetLeadIntroductionDetailData?LoginUserID=${LoginUserID}&LeadIntroductionID=${LeadIntroductionID}`
-      );
-      return data.data;
+      )
+      return data.data
     } else {
-      return [];
+      return []
     }
   } catch (e) {
-    ShowErrorToast(e.message);
-    return [];
+    ShowErrorToast(e.message)
+    return []
   }
 }
 async function getLeadsTimelineDetail({
@@ -62,18 +59,18 @@ async function getLeadsTimelineDetail({
 }) {
   try {
     if (LeadIntroductionDetailID !== undefined) {
-      LeadIntroductionDetailID = decryptID(LeadIntroductionDetailID);
+      LeadIntroductionDetailID = decryptID(LeadIntroductionDetailID)
       const { data } = await axios.post(
         apiUrl +
           `/data_LeadIntroduction/GetLeadIntroductionDetailDataWhere?LoginUserID=${LoginUserID}&LeadIntroductionDetailID=${LeadIntroductionDetailID}`
-      );
-      return data.data;
+      )
+      return data.data
     } else {
-      return [];
+      return []
     }
   } catch (e) {
-    ShowErrorToast(e.message);
-    return [];
+    ShowErrorToast(e.message)
+    return []
   }
 }
 
@@ -81,44 +78,44 @@ async function getLeadsTimelineDetail({
 function getStatusIcon(status) {
   switch (status) {
     case "Forwarded":
-      return "pi pi-send";
+      return "pi pi-send"
     case "Quoted":
-      return "pi pi-dollar";
+      return "pi pi-dollar"
     case "Finalized":
-      return "pi pi-check";
+      return "pi pi-check"
     case "Closed":
-      return "pi pi-times";
+      return "pi pi-times"
     case "Acknowledge":
-      return "pi pi-star";
+      return "pi pi-star"
     case "Acknowledged":
-      return "pi pi-star";
+      return "pi pi-star"
     case "Meeting Done":
-      return "pi pi-check-circle";
+      return "pi pi-check-circle"
     case "Pending":
-      return "pi pi-spinner";
+      return "pi pi-spinner"
   }
 }
 
 function getIconColor(status) {
   switch (status?.toLowerCase().replaceAll(" ", "")) {
     case "newlead":
-      return "#34568B";
+      return "#34568B"
     case "closed":
-      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)";
+      return "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)"
     case "quoted":
-      return "#22C55E";
+      return "#22C55E"
     case "finalized":
-      return "#B35DF7";
+      return "#B35DF7"
     case "forwarded":
-      return "#9EBBF9";
+      return "#9EBBF9"
     case "acknowledge":
-      return "#FCB382";
+      return "#FCB382"
     case "acknowledged":
-      return "#FCB382";
+      return "#FCB382"
     case "meetingdone":
-      return "#FF6F61";
+      return "#FF6F61"
     case "pending":
-      return "#DFCFBE";
+      return "#DFCFBE"
   }
 }
 
@@ -137,13 +134,13 @@ const customizedMarker = (item) => {
         <i className={item.icon}></i>
       </span>
     </>
-  );
-};
+  )
+}
 
 const LeadsIntroductionViewer = () => {
-  const { LeadIntroductionID } = useParams();
-  const navigate = useNavigate();
-  const user = useUserData();
+  const { LeadIntroductionID } = useParams()
+  const navigate = useNavigate()
+  const user = useUserData()
 
   const { data } = useQuery({
     queryKey: [queryKey, LeadIntroductionID],
@@ -151,7 +148,7 @@ const LeadsIntroductionViewer = () => {
       getLeadsTimeline({ LeadIntroductionID, LoginUserID: user.userID }),
     initialData: [],
     enabled: LeadIntroductionID !== undefined,
-  });
+  })
 
   let newEvents = data.map((item) => {
     return {
@@ -161,8 +158,8 @@ const LeadsIntroductionViewer = () => {
       color: getIconColor(item.Status),
       Detail: item.Detail,
       LeadIntroductionDetailID: item.LeadIntroductionDetailID,
-    };
-  });
+    }
+  })
 
   const customizedContent = (item) => {
     return (
@@ -185,8 +182,8 @@ const LeadsIntroductionViewer = () => {
           </>
         )}
       </Card>
-    );
-  };
+    )
+  }
 
   return (
     <div className="mt-5">
@@ -228,21 +225,21 @@ const LeadsIntroductionViewer = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LeadsIntroductionViewer;
+export default LeadsIntroductionViewer
 
 function formatDate(data) {
-  let date = new Date(data);
-  let hours = date.getHours();
-  let minutes = ("0" + date.getMinutes()).slice(-2);
-  let seconds = ("0" + date.getSeconds()).slice(-2);
-  let ampm = hours >= 12 ? "PM" : "AM";
+  let date = new Date(data)
+  let hours = date.getHours()
+  let minutes = ("0" + date.getMinutes()).slice(-2)
+  let seconds = ("0" + date.getSeconds()).slice(-2)
+  let ampm = hours >= 12 ? "PM" : "AM"
 
   // Convert to 12-hour format
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
+  hours = hours % 12
+  hours = hours ? hours : 12 // the hour '0' should be '12'
 
   let formattedDate =
     ("0" + date.getDate()).slice(-2) +
@@ -270,13 +267,13 @@ function formatDate(data) {
     ":" +
     seconds +
     " " +
-    ampm;
-  return formattedDate;
+    ampm
+  return formattedDate
 }
-let queryKey2 = "key2";
+let queryKey2 = "key2"
 export const LeadsIntroductionViewerDetail = () => {
-  const { LeadIntroductionID, LeadIntroductionDetailID, Type } = useParams();
-  const TimelineType = decryptID(Type);
+  const { LeadIntroductionID, LeadIntroductionDetailID, Type } = useParams()
+  const TimelineType = decryptID(Type)
   return (
     <div className="mt-5">
       {TimelineType === "Forwarded" ? (
@@ -337,21 +334,21 @@ export const LeadsIntroductionViewerDetail = () => {
         ""
       )}
     </div>
-  );
-};
+  )
+}
 
 function ForwardedFieldsContainer({
   LeadIntroductionDetailID,
   LeadIntroductionID,
 }) {
-  const [isEnable, setIsEnable] = useState(false);
+  const [isEnable, setIsEnable] = useState(false)
 
-  const method = useForm();
+  const method = useForm()
 
-  const departmentSelectData = useAllDepartmentsSelectData();
-  const usersSelectData = useAllUsersSelectData();
-  const productsSelectData = useProductsInfoSelectData(0, true);
-  const user = useUserData();
+  const departmentSelectData = useAllDepartmentsSelectData()
+  const usersSelectData = useAllUsersSelectData()
+  const productsSelectData = useProductsInfoSelectData(0, true)
+  const user = useUserData()
 
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
@@ -361,42 +358,42 @@ function ForwardedFieldsContainer({
         LoginUserID: user.userID,
       }),
     initialData: [],
-  });
+  })
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        setIsEnable(false);
-        toast.success("Updated successfully");
-        method.clearErrors();
+        setIsEnable(false)
+        toast.success("Updated successfully")
+        method.clearErrors()
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (data.length > 0 && !method.formState.isDirty) {
-      method.setValue("DepartmentID", data[0].DepartmentID);
-      method.setValue("UserID", data[0].UserID);
-      method.setValue("MeetingPlace", data[0].MeetingPlace);
-      method.setValue("MeetingTime", parseISO(data[0].MeetingTime));
-      method.setValue("DepartmentID", data[0].DepartmentID);
-      method.setValue("ProductInfoID", data[0].RecommendedProductID);
-      method.setValue("Description", data[0].Description);
+      method.setValue("DepartmentID", data[0].DepartmentID)
+      method.setValue("UserID", data[0].UserID)
+      method.setValue("MeetingPlace", data[0].MeetingPlace)
+      method.setValue("MeetingTime", parseISO(data[0].MeetingTime))
+      method.setValue("DepartmentID", data[0].DepartmentID)
+      method.setValue("ProductInfoID", data[0].RecommendedProductID)
+      method.setValue("Description", data[0].Description)
     }
-  }, [data]);
+  }, [data])
 
   let filePath =
     data[0]?.FileName === null
       ? null
       : "http://192.168.9.110:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
-        data[0]?.FileName;
-  let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1);
+        data[0]?.FileName
+  let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
 
   const { fileData } = useQuery({
     queryKey: ["leadsFile"],
     queryFn: () => getLeadsFile(data[0].FileName),
-  });
+  })
 
   // Forward Fields
   const ForwardFields = (
@@ -529,15 +526,15 @@ function ForwardedFieldsContainer({
         </Form.Group>
       </Row>
     </>
-  );
+  )
 
   function onSubmit(data) {
     if (
       (data.DepartmentID === undefined || data.DepartmentID === null) &&
       (data.UserID === undefined || data.DepartmentID === null)
     ) {
-      method.setError("DepartmentID", { type: "required" });
-      method.setError("UserID", { type: "required" });
+      method.setError("DepartmentID", { type: "required" })
+      method.setError("UserID", { type: "required" })
     } else {
       mutation.mutate({
         from: "Forward",
@@ -545,11 +542,11 @@ function ForwardedFieldsContainer({
         userID: user.userID,
         LeadIntroductionID: LeadIntroductionID,
         LeadIntroductionDetailID: LeadIntroductionDetailID,
-      });
+      })
     }
   }
 
-  const fileRef = useRef();
+  const fileRef = useRef()
 
   return (
     <>
@@ -583,7 +580,7 @@ function ForwardedFieldsContainer({
         <></>
       )}
     </>
-  );
+  )
 }
 
 function QuotedFieldsContainer({
@@ -591,11 +588,11 @@ function QuotedFieldsContainer({
   LeadIntroductionID,
   Type,
 }) {
-  const method = useForm();
-  const fileInputRef = useRef();
-  const [isEnable, setIsEnable] = useState(false);
+  const method = useForm()
+  const fileInputRef = useRef()
+  const [isEnable, setIsEnable] = useState(false)
 
-  const user = useUserData();
+  const user = useUserData()
 
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
@@ -606,31 +603,31 @@ function QuotedFieldsContainer({
       }),
     enabled: isEnable === false,
     initialData: [],
-  });
+  })
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Updated successfully");
-        setIsEnable(false);
+        toast.success("Updated successfully")
+        setIsEnable(false)
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (data.length > 0) {
-      method.setValue("Amount", data[0].Amount);
-      method.setValue("Description", data[0].Description);
+      method.setValue("Amount", data[0].Amount)
+      method.setValue("Description", data[0].Description)
       //   data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
       // );
     }
-  }, [data]);
+  }, [data])
 
   const { render, getFileData, setFileError } = useLeadsFileViewerHook({
     fileName: data[0]?.FileName,
     mode: isEnable ? "edit" : "view",
-  });
+  })
 
   const QuotedFields = (
     <>
@@ -663,10 +660,10 @@ function QuotedFieldsContainer({
         {render}
       </Row>
     </>
-  );
+  )
 
   function onSubmit(data) {
-    data.AttachmentFile = getFileData();
+    data.AttachmentFile = getFileData()
     if (data.AttachmentFile !== null) {
       mutation.mutate({
         from: Type,
@@ -674,9 +671,9 @@ function QuotedFieldsContainer({
         userID: user.userID,
         LeadIntroductionID: LeadIntroductionID,
         LeadIntroductionDetailID: LeadIntroductionDetailID,
-      });
+      })
     } else {
-      setFileError();
+      setFileError()
     }
   }
 
@@ -692,17 +689,17 @@ function QuotedFieldsContainer({
       />
       {QuotedFields}
     </>
-  );
+  )
 }
 
 function ClosedFieldContainer({
   LeadIntroductionDetailID,
   LeadIntroductionID,
 }) {
-  const [isEnable, setIsEnable] = useState(false);
-  const user = useUserData();
+  const [isEnable, setIsEnable] = useState(false)
+  const user = useUserData()
 
-  const method = useForm();
+  const method = useForm()
   const { data } = useQuery({
     queryKey: [queryKey2, LeadIntroductionDetailID],
     queryFn: () =>
@@ -711,24 +708,24 @@ function ClosedFieldContainer({
         LoginUserID: user.userID,
       }),
     initialData: [],
-  });
+  })
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Updated successfully");
-        setIsEnable(false);
+        toast.success("Updated successfully")
+        setIsEnable(false)
       }
     },
-  });
+  })
 
   useEffect(() => {
     if (data.length > 0 && !method.formState.isDirty) {
-      method.setValue("Amount", data[0].Amount);
-      method.setValue("Description", data[0].Description);
+      method.setValue("Amount", data[0].Amount)
+      method.setValue("Description", data[0].Description)
     }
-  }, [data]);
+  }, [data])
 
   const ClosedFields = (
     <>
@@ -760,7 +757,7 @@ function ClosedFieldContainer({
         </Form.Group>
       </Row>
     </>
-  );
+  )
 
   function onSubmit(data) {
     mutation.mutate({
@@ -769,7 +766,7 @@ function ClosedFieldContainer({
       userID: user.userID,
       LeadIntroductionID: LeadIntroductionID,
       LeadIntroductionDetailID: LeadIntroductionDetailID,
-    });
+    })
   }
 
   return (
@@ -784,7 +781,7 @@ function ClosedFieldContainer({
       />
       {ClosedFields}
     </>
-  );
+  )
 }
 
 export function LeadsViewerButtonToolBar({
@@ -853,16 +850,16 @@ export function LeadsViewerButtonToolBar({
         />
       </div>
     </div>
-  );
+  )
 }
 
 function getFileType(fileType) {
   switch (fileType) {
     case "xlsx":
-      return "microsoftxlsx";
+      return "microsoftxlsx"
     case "docx":
-      return "microsoftdoc";
+      return "microsoftdoc"
     default:
-      return fileType;
+      return fileType
   }
 }

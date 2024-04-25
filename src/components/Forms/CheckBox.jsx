@@ -1,6 +1,6 @@
-import { Checkbox } from "primereact/checkbox";
-import React from "react";
-import { Controller } from "react-hook-form";
+import { Checkbox } from "primereact/checkbox"
+import React from "react"
+import { Controller } from "react-hook-form"
 
 const CheckBox = ({ ID, Label, isEnable, control, onChange }) => {
   return (
@@ -16,9 +16,9 @@ const CheckBox = ({ ID, Label, isEnable, control, onChange }) => {
               checked={field.value}
               inputRef={field.ref}
               onChange={(e) => {
-                field.onChange(e.checked);
+                field.onChange(e.checked)
                 if (onChange) {
-                  onChange(e);
+                  onChange(e)
                 }
               }}
             />
@@ -29,7 +29,7 @@ const CheckBox = ({ ID, Label, isEnable, control, onChange }) => {
         </>
       )}
     />
-  );
-};
+  )
+}
 
-export default CheckBox;
+export default CheckBox

@@ -1,7 +1,7 @@
-import { MultiSelect } from "primereact/multiselect";
-import { classNames } from "primereact/utils";
-import React from "react";
-import { Controller } from "react-hook-form";
+import { MultiSelect } from "primereact/multiselect"
+import { classNames } from "primereact/utils"
+import React from "react"
+import { Controller } from "react-hook-form"
 
 const CMultiSelect = ({
   control,
@@ -28,7 +28,7 @@ const CMultiSelect = ({
             value={field.value}
             options={options}
             onChange={(e) => {
-              field.onChange(e.value);
+              field.onChange(e.value)
             }}
             optionLabel={optionLabel}
             optionValue={optionValue}
@@ -61,7 +61,7 @@ const CMultiSelect = ({
         </>
       )}
     />
-  );
-};
+  )
+}
 
-export default CMultiSelect;
+export default CMultiSelect

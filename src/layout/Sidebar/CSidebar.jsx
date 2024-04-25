@@ -1,33 +1,33 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import "./sidebar.css";
-import { ROUTE_URLS } from "../../utils/enums";
-import signalRConnectionManager from "../../services/SignalRService";
-import { Toast } from "primereact/toast";
-import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-import { AuthContext } from "../../context/AuthContext";
-import { confirmDialog } from "primereact/confirmdialog";
-import { InputText } from "primereact/inputtext";
-import { UserRightsContext } from "../../context/UserRightContext";
-import { finalFilteredRoutes } from "../../utils/routes";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react"
+import { Link } from "react-router-dom"
+import "./sidebar.css"
+import { ROUTE_URLS } from "../../utils/enums"
+import signalRConnectionManager from "../../services/SignalRService"
+import { Toast } from "primereact/toast"
+import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import { AuthContext } from "../../context/AuthContext"
+import { confirmDialog } from "primereact/confirmdialog"
+import { InputText } from "primereact/inputtext"
+import { UserRightsContext } from "../../context/UserRightContext"
+import { finalFilteredRoutes } from "../../utils/routes"
 
 const CSidebar = ({ sideBarRef, searchInputRef }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const toastRef = useRef(null);
+  const user = JSON.parse(localStorage.getItem("user"))
+  const toastRef = useRef(null)
 
   useEffect(() => {
     async function configurationSetup() {
-      let isSidebarOpen = localStorage.getItem("isSidebarOpen");
+      let isSidebarOpen = localStorage.getItem("isSidebarOpen")
       if (isSidebarOpen) {
-        sideBarRef.current.className = "c-sidebar";
+        sideBarRef.current.className = "c-sidebar"
       }
     }
-    configurationSetup();
+    configurationSetup()
 
     return () => {
-      localStorage.removeItem("isSidebarOpen");
-    };
-  }, []);
+      localStorage.removeItem("isSidebarOpen")
+    }
+  }, [])
 
   return (
     <>
@@ -77,13 +77,13 @@ const CSidebar = ({ sideBarRef, searchInputRef }) => {
       <NotificationHandler toast={toastRef} />
       <Toast ref={toastRef} position="top-right" />
     </>
-  );
-};
+  )
+}
 
-export default CSidebar;
+export default CSidebar
 
 const NotificationHandler = ({ toast }) => {
-  const connection = signalRConnectionManager.getConnection();
+  const connection = signalRConnectionManager.getConnection()
 
   useEffect(() => {
     connection.on("ReceiveNotification", (message, route) => {
@@ -110,23 +110,23 @@ const NotificationHandler = ({ toast }) => {
             </Link>
           </div>
         ),
-      });
-    });
+      })
+    })
     connection.on("ReceiveAllNotification", (message) => {
-      toast.current.show(message);
-    });
+      toast.current.show(message)
+    })
 
     return () => {
-      connection?.off("ReceiveNotification");
-      connection?.off("ReceiveAllNotification");
-    };
-  }, [connection]);
+      connection?.off("ReceiveNotification")
+      connection?.off("ReceiveAllNotification")
+    }
+  }, [connection])
 
-  return null;
-};
+  return null
+}
 
 export const SignOut = () => {
-  const { logoutUser } = useContext(AuthContext);
+  const { logoutUser } = useContext(AuthContext)
 
   const confirmLogout = () => {
     confirmDialog({
@@ -138,8 +138,8 @@ export const SignOut = () => {
       position: "top",
       accept: () => logoutUser(),
       reject: () => {},
-    });
-  };
+    })
+  }
 
   return (
     <>
@@ -149,12 +149,12 @@ export const SignOut = () => {
         style={{ width: "50px", minWidth: "50px" }}
       ></i>
     </>
-  );
-};
+  )
+}
 
 const SubSidebar = () => {
-  const { filteredRoutes } = useContext(UserRightsContext);
-  console.log(filteredRoutes);
+  const { filteredRoutes } = useContext(UserRightsContext)
+  console.log(filteredRoutes)
   return (
     <>
       {filteredRoutes?.map((route) => (
@@ -167,8 +167,8 @@ const SubSidebar = () => {
         />
       ))}
     </>
-  );
-};
+  )
+}
 
 const MenuGroup = ({
   menuGroupName,
@@ -177,8 +177,8 @@ const MenuGroup = ({
   hideMenuGroup = false,
 }) => {
   function toggleSubmenu(e) {
-    let parent = e.target.parentNode.parentNode;
-    parent.classList.toggle("c-showMenu");
+    let parent = e.target.parentNode.parentNode
+    parent.classList.toggle("c-showMenu")
   }
   return (
     <>
@@ -218,8 +218,8 @@ const MenuGroup = ({
         </li>
       )}
     </>
-  );
-};
+  )
+}
 
 const MenuItem = ({
   route,
@@ -249,16 +249,16 @@ const MenuItem = ({
         </>
       )}
     </>
-  );
-};
+  )
+}
 
 const SearchBar = ({ searchInputRef }) => {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("")
 
   const { routesWithUserRights, setFilteredRoutes } =
-    useContext(UserRightsContext);
+    useContext(UserRightsContext)
   const filterRoutes = () => {
-    if (!searchText) return routesWithUserRights;
+    if (!searchText) return routesWithUserRights
 
     return routesWithUserRights
       .map((group) => ({
@@ -270,12 +270,12 @@ const SearchBar = ({ searchInputRef }) => {
             .includes(searchText.toLowerCase().replaceAll(" ", ""))
         ),
       }))
-      .filter((group) => group.subItems.length > 0);
-  };
+      .filter((group) => group.subItems.length > 0)
+  }
 
   useEffect(() => {
-    setFilteredRoutes(filterRoutes());
-  }, [searchText]);
+    setFilteredRoutes(filterRoutes())
+  }, [searchText])
 
   return (
     <>
@@ -289,5 +289,5 @@ const SearchBar = ({ searchInputRef }) => {
         />
       </div>
     </>
-  );
-};
+  )
+}
