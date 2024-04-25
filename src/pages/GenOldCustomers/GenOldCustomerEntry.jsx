@@ -115,19 +115,20 @@ export function GenOldCustomerDetail() {
             filterDisplay="row"
             resizableColumns
             size="small"
-            style={{ backgroundColor: "red" }}
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
           >
             <Column
               body={(rowData) =>
-                ActionButtons(
-                  encryptID(rowData.CustomerID),
-                  () => showDeleteDialog(encryptID(rowData.CustomerID)),
-                  () => showEditDialog(encryptID(rowData.CustomerID)),
-                  handleView,
-                  true
-                )
+                ActionButtons({
+                  ID: rowData.CustomerID,
+                  handleDelete: () => showDeleteDialog(rowData.CustomerID),
+                  handleEdit: () => showEditDialog(rowData.CustomerID),
+                  handleView: handleView,
+                  showEditButton: userRights[0]?.RoleEdit,
+                  showDeleteButton: userRights[0]?.RoleDelete,
+                  viewBtnRoute: viewRoute + rowData.CustomerID,
+                })
               }
               header="Actions"
               resizeable={false}

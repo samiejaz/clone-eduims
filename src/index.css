@@ -738,3 +738,10 @@ a {
 .p-dropdown-label.p-inputtext {
   margin: auto;
 }
+
+.place-items-center {
+  place-items: center;
+}
+.place-items-end {
+  place-items: end;
+}

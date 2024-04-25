@@ -45,7 +45,7 @@ const CMultiSelect = ({
               },
             },
           }}
-          emptyMessage="No data found!"
+          //  emptyMessage="No data found!"
         />
       )}
     />

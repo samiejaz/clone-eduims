@@ -1,7 +1,7 @@
 import React from "react";
 
-export const FormRow = ({ children }) => {
-  return <div className="grid">{children}</div>;
+export const FormRow = ({ children, className = "" }) => {
+  return <div className={`grid ${className}`}>{children}</div>;
 };
 
 export const FormColumn = ({
