@@ -1,10 +1,10 @@
-import { Route, Routes } from "react-router-dom";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-import { useEffect } from "react";
-import { ToastContainer } from "react-toastify";
-import SignUp from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import GenNewCustomerView from "./pages/CustomerEntry/CustomerEntryView";
+import { Route, Routes } from "react-router-dom"
+import ProtectedRoutes from "./components/ProtectedRoutes"
+import { useEffect } from "react"
+import { ToastContainer } from "react-toastify"
+import SignUp from "./pages/LoginPage"
+import Dashboard from "./pages/Dashboard/Dashboard"
+import GenNewCustomerView from "./pages/CustomerEntry/CustomerEntryView"
 import {
   AppConfiguration,
   CompanyInfo,
@@ -28,30 +28,30 @@ import {
   LeadSource,
   UserRights,
   Customers,
-} from "./pages";
+} from "./pages"
 
-import { ROUTE_URLS } from "./utils/enums";
-import { BusinessType } from "./pages/BusinessType/BusinessType";
+import { ROUTE_URLS } from "./utils/enums"
+import { BusinessType } from "./pages/BusinessType/BusinessType"
 
-import signalRConnectionManager from "./services/SignalRService";
+import signalRConnectionManager from "./services/SignalRService"
 import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
-} from "./pages/LeadsIntroductionViewer/LeadsIntroductionViewer";
-import LeadsDashboard from "./pages/Leads/LeadsDashboard/LeadsDashboard";
+} from "./pages/LeadsIntroductionViewer/LeadsIntroductionViewer"
+import LeadsDashboard from "./pages/Leads/LeadsDashboard/LeadsDashboard"
 
 import {
   GenOldCustomerDetail,
   GenOldCustomerForm,
-} from "./pages/GenOldCustomers/GenOldCustomerEntry";
+} from "./pages/GenOldCustomers/GenOldCustomerEntry"
 
-import LeadsComments from "./pages/LeadsIntroduction/LeadsComments";
-import { ConfirmDialog } from "primereact/confirmdialog";
-import { KSearchBar } from "./components/components";
-import { convertBackToOriginal, routes } from "./utils/routes";
+import LeadsComments from "./pages/LeadsIntroduction/LeadsComments"
+import { ConfirmDialog } from "primereact/confirmdialog"
+import { KSearchBar } from "./components/components"
+import { convertBackToOriginal, routes } from "./utils/routes"
 const App = () => {
   useEffect(() => {
-    signalRConnectionManager.startConnection();
-  }, []);
+    signalRConnectionManager.startConnection()
+  }, [])
 
   return (
     <>
@@ -229,7 +229,7 @@ const App = () => {
         containerId={"autoClose"}
       />
     </>
-  );
-};
+  )
+}
 
-export default App;
+export default App
