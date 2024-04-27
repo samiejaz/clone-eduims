@@ -51,11 +51,10 @@ import CNumberInput from "../../components/Forms/CNumberInput"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { decryptID, encryptID } from "../../utils/crypto"
 import { Dropdown } from "primereact/dropdown"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
-import { ShowErrorToast } from "../../utils/CommonFunctions"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -81,16 +80,24 @@ let queryKey = QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY
 let IDENTITY = "ReceiptVoucherID"
 
 export default function ReceiptVoucher() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
 
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>
@@ -524,7 +531,9 @@ export function ReceiptEntryForm({ mode, userRights }) {
         })
       )
     } else {
-      navigate(parentRoute)
+      if (mode !== "new") {
+        navigate(parentRoute)
+      }
     }
   }, [ReceiptVoucherID, ReceiptVoucherData])
 

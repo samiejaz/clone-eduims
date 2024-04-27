@@ -19,7 +19,10 @@ import {
   fetchUserById,
 } from "../../api/UserData"
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
-import { useAllDepartmentsSelectData } from "../../hooks/SelectData/useSelectData"
+import {
+  useAllDepartmentsSelectData,
+  useAllUserRolesSelectData,
+} from "../../hooks/SelectData/useSelectData"
 import CDropdown from "../../components/Forms/CDropdown"
 import ImageContainer from "../../components/ImageContainer"
 import {
@@ -34,6 +37,7 @@ import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
 import { SingleFileUploadField } from "../../components/Forms/form"
 import { Avatar } from "primereact/avatar"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.USER_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -42,16 +46,24 @@ let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.USER_QUERY_KEY
 let IDENTITY = "UserID"
 export default function Users() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.USERS.USERS_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
 
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.USERS.USERS_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>
@@ -312,11 +324,13 @@ function UserForm({ mode, userRights }) {
       Password: "",
       UserName: "",
       InActive: "",
-      DepartmentID: [],
+      DepartmentID: null,
+      RoleID: null,
     },
   })
 
   const departmentSelectData = useAllDepartmentsSelectData()
+  const userRolesSelectData = useAllUserRolesSelectData()
 
   const UserData = useQuery({
     queryKey: [queryKey, UserID],
@@ -336,6 +350,7 @@ function UserForm({ mode, userRights }) {
           setValue("Password", UserData?.data[0]?.Password)
           setValue("InActive", UserData?.data[0]?.InActive)
           setValue("DepartmentID", UserData?.data[0]?.DepartmentID)
+          setValue("RoleID", UserData?.data[0]?.RoleID)
           if (UserData?.data[0]?.ProfilePic) {
             fileRef.current?.setBase64File(
               "data:image/png;base64," + UserData?.data[0]?.ProfilePic
@@ -525,25 +540,43 @@ function UserForm({ mode, userRights }) {
                     control={control}
                     ID={"Password"}
                     required={true}
-                    focusOptions={() => setFocus("InActive")}
+                    focusOptions={() => setFocus("RoleID")}
                     isEnable={mode !== "view"}
                   />
                 </div>
               </FormColumn>
             </FormRow>
             <FormRow>
-              <FormField
-                inputTemplate={
-                  <>
-                    <CheckBox
-                      control={control}
-                      ID={"InActive"}
-                      Label={"InActive"}
-                      isEnable={mode !== "view"}
-                    />
-                  </>
-                }
-              />
+              <FormColumn lg={4} xl={4} md={12}>
+                <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
+                  Role
+                  <span className="text-danger fw-bold ">*</span>
+                </FormLabel>
+                <div>
+                  <CDropdown
+                    control={control}
+                    name={`RoleID`}
+                    optionLabel="RoleTitle"
+                    optionValue="RoleID"
+                    placeholder="Select a role"
+                    options={userRolesSelectData.data}
+                    required={true}
+                    disabled={mode === "view"}
+                    focusOptions={() => setFocus("InActive")}
+                  />
+                </div>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel></FormLabel>
+                <div className="mt-1">
+                  <CheckBox
+                    control={control}
+                    ID={"InActive"}
+                    Label={"InActive"}
+                    isEnable={mode !== "view"}
+                  />
+                </div>
+              </FormColumn>
             </FormRow>
 
             <FormRow>

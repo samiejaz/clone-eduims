@@ -17,6 +17,7 @@ import { BrowserRouter } from "react-router-dom"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { AppConfigurationProivder } from "./context/AppConfigurationContext.jsx"
 import { UserRightsProivder } from "./context/UserRightContext.jsx"
+import { RoutesProivder } from "./context/RoutesContext.jsx"
 
 const queryClient = new QueryClient()
 
@@ -25,11 +26,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvier>
-          <UserRightsProivder>
-            <AppConfigurationProivder>
-              <App />
-            </AppConfigurationProivder>
-          </UserRightsProivder>
+          <RoutesProivder>
+            <UserRightsProivder>
+              <AppConfigurationProivder>
+                <App />
+              </AppConfigurationProivder>
+            </UserRightsProivder>
+          </RoutesProivder>
         </AuthProvier>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />

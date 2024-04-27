@@ -27,8 +27,8 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.BUSINESS_NATURE_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -38,16 +38,24 @@ let queryKey = QUERY_KEYS.BUSINESS_NATURE_QUERY_KEY
 let IDENTITY = "BusinessNatureID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.GENERAL.BUSINESS_NATURE_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
 
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.GENERAL.BUSINESS_NATURE_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>

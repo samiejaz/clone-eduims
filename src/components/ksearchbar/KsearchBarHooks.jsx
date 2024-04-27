@@ -11,7 +11,6 @@ export const useListNavigation = (initialIndex, itemsLength) => {
     }
   }
 
-  console.log(index)
   useEffect(() => {
     const listElement = listRef.current
     if (listElement) {
@@ -69,7 +68,6 @@ export function FocusableDiv({ children, onKeyDown, className }) {
 export const useLocalStorageListener = (key, callback) => {
   useEffect(() => {
     const handleStorageChange = (e) => {
-      console.log(e)
       if (e.key === key) {
         callback(e.newValue)
       }

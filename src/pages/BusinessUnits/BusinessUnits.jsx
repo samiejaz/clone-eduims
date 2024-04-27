@@ -31,9 +31,9 @@ import { classNames } from "primereact/utils"
 import { Tooltip } from "primereact/tooltip"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
 import { SingleFileUploadField } from "../../components/Forms/form"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS
 let editRoute = `${parentRoute}/edit/`
@@ -43,16 +43,25 @@ let queryKey = QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY
 let IDENTITY = "BusinessUnitID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.GENERAL.BUSINESS_UNIT_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.GENERAL.BUSINESS_UNIT_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>

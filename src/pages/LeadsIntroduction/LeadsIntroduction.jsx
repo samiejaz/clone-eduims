@@ -36,7 +36,6 @@ import { toast } from "react-toastify"
 import { CIconButton } from "../../components/Buttons/CButtons"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer"
@@ -45,6 +44,7 @@ import { encryptID } from "../../utils/crypto"
 import { SingleFileUploadField } from "../../components/Forms/form"
 import { ShowErrorToast } from "../../utils/CommonFunctions"
 import { Dropdown } from "primereact/dropdown"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -75,16 +75,25 @@ const getSeverity = (status) => {
 }
 
 export default function LeadIntroduction() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.LEADS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>
@@ -350,7 +359,6 @@ export function LeadIntroductionDetail({
   }
 
   const dateFilterTemplate = (options) => {
-    console.log(options)
     return (
       <Calendar
         value={options.value}
