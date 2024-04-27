@@ -1,19 +1,38 @@
-import React, { useState, useEffect, useRef, useContext } from "react"
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { InputSwitch } from "primereact/inputswitch"
 import { UserRightsContext } from "../../context/UserRightContext"
 import { FilterMatchMode } from "primereact/api"
+import { useRoutesData } from "../../context/RoutesContext"
+import { initRoutesWithUserRights } from "../../utils/routes"
 
 let filters = {
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
 }
 
-export default function UserRightsGroupedTable() {
+const UserRightsGroupedTable = React.forwardRef(({ mode }, ref) => {
   const [expandedRows, setExpandedRows] = useState([])
+  const { authorizedRoutes } = useRoutesData()
+  const [routesWithUserRights, setRoutesWithUserRights] = useState(
+    initRoutesWithUserRights(authorizedRoutes)
+  )
 
-  const { setRoutesWithUserRights, routesWithUserRights } =
-    useContext(UserRightsContext)
+  React.useImperativeHandle(ref, () => ({
+    getUserRoutesDetail() {
+      return routesWithUserRights
+    },
+    setUserRoutesDetail(data) {
+      setRoutesWithUserRights(data)
+    },
+  }))
 
   function updateAllRolesOfGroup(groupKey, currentState) {
     let _routesWithUserRights = [...routesWithUserRights]
@@ -34,7 +53,6 @@ export default function UserRightsGroupedTable() {
         })
       }
     }
-    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights))
     setRoutesWithUserRights(_routesWithUserRights)
   }
 
@@ -49,9 +67,9 @@ export default function UserRightsGroupedTable() {
             <span className="vertical-align-middle ml-2 font-bold line-height-3">
               Allow All
             </span>
-
             <InputSwitch
               checked={data.AllowAllRoles}
+              disabled={mode === "view"}
               onChange={() =>
                 updateAllRolesOfGroup(data.menuGroupKey, data.AllowAllRoles)
               }
@@ -65,24 +83,29 @@ export default function UserRightsGroupedTable() {
     return (
       <InputSwitch
         checked={options.value}
+        disabled={mode === "view"}
         onChange={(e) => options.editorCallback(e.value)}
       />
     )
   }
   const ShowFormTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.ShowForm} />
+    return <InputSwitch disabled={mode === "view"} checked={rowData.ShowForm} />
   }
   const RoleEditTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleEdit} />
+    return <InputSwitch disabled={mode === "view"} checked={rowData.RoleEdit} />
   }
   const RoleDeleteTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleDelete} />
+    return (
+      <InputSwitch disabled={mode === "view"} checked={rowData.RoleDelete} />
+    )
   }
   const RoleNewTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RoleNew} />
+    return <InputSwitch disabled={mode === "view"} checked={rowData.RoleNew} />
   }
   const RolePrintTemplate = (rowData) => {
-    return <InputSwitch checked={rowData.RolePrint} />
+    return (
+      <InputSwitch disabled={mode === "view"} checked={rowData.RolePrint} />
+    )
   }
 
   const onRowEditComplete = (e) => {
@@ -98,7 +121,6 @@ export default function UserRightsGroupedTable() {
         }
       }
     }
-    localStorage.setItem("userRights", JSON.stringify(_routesWithUserRights))
     setRoutesWithUserRights(_routesWithUserRights)
   }
 
@@ -161,8 +183,9 @@ export default function UserRightsGroupedTable() {
             body={RolePrintTemplate}
             editor={(options) => RoleEditor(options)}
           ></Column>
+
           <Column
-            rowEditor={true}
+            rowEditor={mode !== "view"}
             headerStyle={{ width: "10%", minWidth: "8rem" }}
             bodyStyle={{ textAlign: "center" }}
           ></Column>
@@ -193,4 +216,6 @@ export default function UserRightsGroupedTable() {
       </DataTable>
     </div>
   )
-}
+})
+
+export default UserRightsGroupedTable

@@ -19,6 +19,7 @@ import {
   fetchAllSessionsForSelect,
   fetchAllSoftwareCustomersForSelect,
   fetchAllTehsilsForSelect,
+  fetchAllUserRolesForSelect,
   fetchAllUsersForSelect,
 } from "../../api/SelectData"
 import { SELECT_QUERY_KEYS } from "../../utils/enums"
@@ -235,6 +236,17 @@ export function useAllUsersSelectData() {
   const data = useQuery({
     queryKey: [SELECT_QUERY_KEYS.USERS_SELECT_QUERY_KEY],
     queryFn: () => fetchAllUsersForSelect(),
+    refetchOnWindowFocus: false,
+    staleTime: 600000,
+    refetchInterval: 600000,
+  })
+  return data
+}
+
+export function useAllUserRolesSelectData() {
+  const data = useQuery({
+    queryKey: [SELECT_QUERY_KEYS.USER_ROLES_SELECT_QUERY_KEY],
+    queryFn: () => fetchAllUserRolesForSelect(),
     refetchOnWindowFocus: false,
     staleTime: 600000,
     refetchInterval: 600000,

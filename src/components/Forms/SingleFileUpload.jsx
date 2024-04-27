@@ -35,10 +35,10 @@ const SingleFileUpload = React.forwardRef(
 
     React.useImperativeHandle(ref, () => ({
       getFile() {
-        if (currentFile) {
+        if (inputRef.current?.files[0]) {
           return inputRef.current?.files[0]
         } else {
-          return inputRef.current?.files[0]
+          return currentFile
         }
       },
       setFile(file) {

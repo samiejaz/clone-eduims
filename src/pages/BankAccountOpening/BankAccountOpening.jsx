@@ -26,8 +26,8 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -36,17 +36,24 @@ let queryKey = QUERY_KEYS.BANK_ACCOUNTS_QUERY_KEY
 let IDENTITY = "BankAccountID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
 
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
-
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
   return (
     <Routes>
       {userRights && userRights[0]?.ShowForm ? (

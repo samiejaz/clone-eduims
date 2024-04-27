@@ -25,8 +25,8 @@ import { useUserData } from "../../context/AuthContext"
 import { AppConfigurationContext } from "../../context/AppConfigurationContext"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -36,16 +36,24 @@ let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY
 let IDENTITY = "ProductCategoryID"
 
 export default function ProductCategory() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
 
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.UTILITIES.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>

@@ -65,6 +65,7 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
     newFormData.append("FirstName", formData.FirstName)
     newFormData.append("LastName", formData.LastName)
     newFormData.append("DepartmentID", formData.DepartmentID)
+    newFormData.append("RoleID", formData.RoleID)
     newFormData.append("Email", formData.Email)
     newFormData.append("Username", formData.UserName)
     newFormData.append("Password", formData.Password)

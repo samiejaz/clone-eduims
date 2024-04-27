@@ -103,7 +103,7 @@ function CustomerBranchEntryHeader(props) {
   const customerBranchMutation = useMutation({
     mutationFn: async (formData) => {
       let AccountIDs = []
-      console.log(formData)
+
       if (formData?.CustomerAccounts?.length > 0) {
         AccountIDs = formData?.CustomerAccounts?.map((AccountID, i) => {
           return {
@@ -380,7 +380,7 @@ function CustomerBranchesDataTable(props) {
   const customerAccountEntryMutation = useMutation({
     mutationFn: async (formData) => {
       let AccountIDs = []
-      console.log(formData)
+
       if (formData?.CustomerAccounts?.length > 0) {
         AccountIDs = formData?.CustomerAccounts?.map((AccountID, i) => {
           return {

@@ -70,6 +70,7 @@ export const QUERY_KEYS = {
   OLD_CUSTOMERS_QUERY_KEY: "oldcustomers",
   PRODUCT_CATEGORIES_QUERY_KEY: "productCategories",
   PRODUCT_INFO_QUERY_KEY: "productsInfo",
+  USER_ROLES_QUERY_KEY: "userRoles",
   // Select
   ALL_CUSTOMER_QUERY_KEY: "oldcustomers",
   CUSTOMER_ACCOUNTS_QUERY_KEY: "customerAccounts",
@@ -93,6 +94,7 @@ export const SELECT_QUERY_KEYS = {
   ACTIVATION_CLIENTS_SELECT_QUERY_KEY: "activationClientsSelect",
   SOFTWARE_CLIENTS_SELECT_QUERY_KEY: "softwareClientsSelect",
   PRODUCT_CATEGORIES_SELECT_QUERY_KEY: "productCategoriesSelect",
+  USER_ROLES_SELECT_QUERY_KEY: "userRolesSelect",
 }
 
 export const TOAST_CONTAINER_IDS = {

@@ -23,7 +23,6 @@ const KesearchBar = () => {
   const listContainerRef = useRef()
   const divRef = useRef()
 
-  console.log(visible)
   useCtrlKeyDown(() => setVisible(true), "k")
   useKeydown(() => setVisible(false), "Escape")
   useClickOutside(() => {

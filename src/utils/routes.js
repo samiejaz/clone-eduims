@@ -225,7 +225,138 @@ export const initRoutesWithUserRights = (routes) => {
   if (userRights?.length > 0) {
     return userRights
   } else {
-    const updatedRoutes = finalFilteredRoutes.map((route) => {
+    const updatedRoutes = routes?.map((route) => {
+      const updatedRoute = { ...route, AllowAllRoles: true }
+
+      updatedRoute.subItems = route?.subItems.map((subItem) => ({
+        ...subItem,
+        RoleNew: true,
+        RoleEdit: true,
+        RoleDelete: true,
+        RolePrint: true,
+        ShowForm: true,
+      }))
+
+      return updatedRoute
+    })
+    return updatedRoutes
+  }
+}
+
+export const initAuthorizedMenus = (allForms, areRoleAvailables = false) => {
+  const menuGroupIcons = {
+    Users: "pi pi-users",
+    Accounts: "pi pi-dollar",
+    General: "pi pi-home",
+    Utilities: "pi pi-cog",
+    Leads: "pi pi-phone",
+  }
+
+  const groupedForms = allForms.reduce((acc, form) => {
+    if (!acc[form.menuGroupName]) {
+      acc[form.menuGroupName] = []
+    }
+    acc[form.menuGroupName].push(form)
+    return acc
+  }, {})
+
+  let transformedRoutes
+  if (areRoleAvailables) {
+    transformedRoutes = Object.entries(groupedForms).map(
+      ([menuGroupName, forms]) => {
+        const hideMenuGroup = forms.every((form) => form.ShowForm === "False")
+        return {
+          menuGroupName,
+          icon: menuGroupIcons[menuGroupName] || "pi pi-question",
+          menuGroupKey: forms[0].menuGroupKey,
+          subItems: forms.map((form) => ({
+            name: form.menuName,
+            menuKey: form.menuKey,
+            RoleNew: form.RoleNew === "True",
+            RoleEdit: form.RoleEdit === "True",
+            RoleDelete: form.RoleDelete === "True",
+            RolePrint: form.RolePrint === "True",
+            ShowForm: form.ShowForm === "True",
+          })),
+          hideMenuGroup,
+          AllowAllRoles: forms.some((form) => form.ShowForm === "True"),
+        }
+      }
+    )
+  } else {
+    transformedRoutes = Object.entries(groupedForms).map(
+      ([menuGroupName, forms]) => {
+        const hideMenuGroup = forms.every((form) => !form.ShowForm)
+        return {
+          menuGroupName,
+          icon: menuGroupIcons[menuGroupName] || "pi pi-question",
+          menuGroupKey: forms[0].menuGroupKey,
+          subItems: forms.map((form) => ({
+            name: form.menuName,
+            menuKey: form.menuKey,
+            route: form.routeUrl,
+          })),
+          hideMenuGroup,
+          AllowAllRoles: forms.some((form) => form.ShowForm === true),
+        }
+      }
+    )
+  }
+  return transformedRoutes
+}
+// Unused
+export function convertToSingleRoutesWithUserRights(routes) {
+  let originalForms = []
+  routes.forEach((group) => {
+    group.subItems.forEach((subItem) => {
+      originalForms.push({
+        MenuKey: subItem.menuKey,
+        RoleEdit: subItem.RoleEdit,
+        RoleNew: subItem.RoleNew,
+        RoleDelete: subItem.RoleDelete,
+        ShowForm: subItem.ShowForm,
+        RolePrint: subItem.RolePrint,
+      })
+    })
+  })
+  return originalForms
+}
+
+export function convertRouteGroupsToSingleRoutes(routes) {
+  let originalForms = []
+  let i = 0
+  routes.forEach((group) => {
+    group.subItems.forEach((subItem, index) => {
+      originalForms.push({
+        MenuOrderID: i++,
+        MenuName: subItem.name,
+        MenuKey: subItem.menuKey,
+        MenuRoute: subItem.route,
+        ParentMenuKey: group.menuGroupKey,
+        ParentMenuName: group.menuGroupName,
+      })
+    })
+  })
+  return originalForms
+}
+
+export const initAuthorizedRoutesWithUserRights = (
+  routes,
+  areRolesAvailable
+) => {
+  if (areRolesAvailable) {
+    const updatedRoutes = routes.map((route) => {
+      const updatedRoute = { ...route, AllowAllRoles: true }
+
+      updatedRoute.subItems = route.subItems.map((subItem) => ({
+        ...subItem,
+      }))
+
+      return updatedRoute
+    })
+    return updatedRoutes
+  } else {
+    const updatedRoutes = routes.map((route) => {
       const updatedRoute = { ...route, AllowAllRoles: true }
 
       updatedRoute.subItems = route.subItems.map((subItem) => ({
@@ -243,139 +374,4 @@ export const initRoutesWithUserRights = (routes) => {
   }
 }
 
-// New Routes
-export const initAuthorizedMenus = (allForms) => {
-  // const allForms = [
-  //   {
-  //     menuName: "Users",
-  //     menuKey: "mnuUsers",
-  //     routeUrl: "/general/users",
-  //     menuGroupKey: "grpUsers",
-  //     menuGroupname: "Users",
-  //     RoleEdit: true,
-  //     RoleNew: true,
-  //     RoleDelete: true,
-  //     ShowForm: false,
-  //     RolePrint: true,
-  //   },
-  //   {
-  //     menuName: "Customers",
-  //     menuKey: "mnuCustomers",
-  //     routeUrl: "/general/customers",
-  //     menuGroupKey: "grpUsers",
-  //     menuGroupname: "Users",
-  //     RoleEdit: true,
-  //     RoleNew: true,
-  //     RoleDelete: true,
-  //     ShowForm: true,
-  //     RolePrint: true,
-  //   },
-  //   {
-  //     menuName: "Invoice",
-  //     menuKey: "mnuInvoices",
-  //     routeUrl: "/accounts/customerinvoice",
-  //     menuGroupKey: "grpAccounts",
-  //     menuGroupname: "Accounts",
-  //     RoleEdit: true,
-  //     RoleNew: true,
-  //     RoleDelete: true,
-  //     ShowForm: false,
-  //     RolePrint: true,
-  //   },
-  // ];
-
-  const menuGroupIcons = {
-    Users: "pi pi-users",
-    Accounts: "pi pi-dollar",
-    General: "pi pi-home",
-    Utilities: "pi pi-cog",
-    Leads: "pi pi-phone",
-  }
-
-  const groupedForms = allForms.reduce((acc, form) => {
-    if (!acc[form.menuGroupname]) {
-      acc[form.menuGroupname] = []
-    }
-    acc[form.menuGroupname].push(form)
-    return acc
-  }, {})
-
-  // const transformedRoutes = Object.entries(groupedForms).map(
-  //   ([menuGroupName, forms]) => ({
-  //     menuGroupName,
-  //     icon: menuGroupIcons[menuGroupName] || "pi pi-question",
-  //     menuGroupKey: forms[0].menuGroupKey,
-  //     subItems: forms.map((form) => ({
-  //       name: form.menuName,
-  //       menuKey: form.menuKey,
-  //       route: form.routeUrl,
-  //     })),
-  //   })
-  // );
-
-  const transformedRoutes = Object.entries(groupedForms).map(
-    ([menuGroupName, forms]) => {
-      const hideMenuGroup = forms.every((form) => !form.ShowForm)
-      return {
-        menuGroupName,
-        icon: menuGroupIcons[menuGroupName] || "pi pi-question",
-        menuGroupKey: forms[0].menuGroupKey,
-        subItems: forms.map((form) => ({
-          name: form.menuName,
-          menuKey: form.menuKey,
-          route: form.routeUrl,
-          RoleNew: form.RoleNew,
-          RoleEdit: form.RoleEdit,
-          RoleDelete: form.RoleDelete,
-          RolePrint: form.RolePrint,
-          ShowForm: form.ShowForm,
-        })),
-        hideMenuGroup,
-        AllowAllRoles: forms.some((form) => form.ShowForm === true),
-      }
-    }
-  )
-  // const userRightsRoutes =
-  //   initAuthorizedRoutesWithUserRights(transformedRoutes);
-  return transformedRoutes
-}
-
-export function convertBackToOriginal() {
-  let originalForms = []
-  // let transformedRoutes = initAuthorizedMenus(routes);
-  // console.log(transformedRoutes);
-  routes.forEach((group) => {
-    group.subItems.forEach((subItem) => {
-      originalForms.push({
-        menuName: subItem.name,
-        menuKey: subItem.menuKey,
-        routeUrl: subItem.route,
-        menuGroupKey: group.menuGroupKey,
-        menuGroupname: group.menuGroupName,
-        RoleEdit: subItem.RoleEdit,
-        RoleNew: subItem.RoleNew,
-        RoleDelete: subItem.RoleDelete,
-        ShowForm: subItem.ShowForm,
-        RolePrint: subItem.RolePrint,
-      })
-    })
-  })
-  return originalForms
-}
-export const initAuthorizedRoutesWithUserRights = (routes) => {
-  const updatedRoutes = routes.map((route) => {
-    const updatedRoute = { ...route, AllowAllRoles: true }
-
-    updatedRoute.subItems = route.subItems.map((subItem) => ({
-      ...subItem,
-      RoleNew: true,
-      RoleEdit: true,
-      RoleDelete: true,
-      RolePrint: true,
-      ShowForm: true,
-    }))
-
-    return updatedRoute
-  })
-  return updatedRoutes
-}
+// Function

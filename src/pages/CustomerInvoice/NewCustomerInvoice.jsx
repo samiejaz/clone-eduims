@@ -70,6 +70,7 @@ import { decryptID, encryptID } from "../../utils/crypto"
 import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields"
 import { TextAreaField } from "../../components/Forms/form"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
 let editRoute = `${parentRoute}/edit/`
@@ -83,13 +84,23 @@ export default function CustomerInvoice() {
   const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.ACCOUNTS.CUSTOMER_INVOICE_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.ACCOUNTS.CUSTOMER_INVOICE_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>

@@ -33,8 +33,8 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO
 let editRoute = `${parentRoute}/edit/`
@@ -44,16 +44,25 @@ let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY
 let IDENTITY = "SessionID"
 
 export default function SessionInfoOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>

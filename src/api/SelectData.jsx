@@ -1,4 +1,5 @@
 import axios from "axios"
+import { ShowErrorToast } from "../utils/CommonFunctions"
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
@@ -199,4 +200,13 @@ export async function fetchAllDepartmentsForSelect() {
 export async function fetchAllUsersForSelect() {
   const { data } = await axios.post(apiUrl + "/Select/SelectUsers")
   return data.data || []
+}
+
+export async function fetchAllUserRolesForSelect() {
+  try {
+    const { data } = await axios.post(apiUrl + "/Select/SelectUserRoles")
+    return data.data || []
+  } catch (err) {
+    ShowErrorToast(err.message)
+  }
 }

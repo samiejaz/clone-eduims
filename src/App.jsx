@@ -46,8 +46,11 @@ import {
 
 import LeadsComments from "./pages/LeadsIntroduction/LeadsComments"
 import { ConfirmDialog } from "primereact/confirmdialog"
-import { KSearchBar } from "./components/components"
-import { convertBackToOriginal, routes } from "./utils/routes"
+// import { KSearchBar } from "./components/components"
+import { useUserData } from "./context/AuthContext"
+import { useQuery } from "@tanstack/react-query"
+import { GetAllMenus } from "./api/MenusData"
+import { useRoutesData } from "./context/RoutesContext"
 const App = () => {
   useEffect(() => {
     signalRConnectionManager.startConnection()
@@ -55,7 +58,8 @@ const App = () => {
 
   return (
     <>
-      <KSearchBar />
+      {/* <KSearchBar /> */}
+      <InitMenuNames />
       <Routes>
         <Route path="auth" element={<SignUp />} />
         <Route path="/" element={<ProtectedRoutes />}>
@@ -151,7 +155,7 @@ const App = () => {
 
           {/* Configuration Routes*/}
           <Route
-            path={`${ROUTE_URLS.CONFIGURATION.USER_RIGHTS_ROUTE}`}
+            path={`${ROUTE_URLS.CONFIGURATION.USER_RIGHTS_ROUTE}/*`}
             element={<UserRights />}
           />
           {/* Configuration Routes END */}
@@ -233,3 +237,24 @@ const App = () => {
 }
 
 export default App
+
+export function InitMenuNames() {
+  const user = useUserData()
+  const { setAuthorizedRoutes } = useRoutesData()
+
+  const { data: AllowedMenus } = useQuery({
+    queryKey: ["allowRoutes", user?.userID],
+    queryFn: () => GetAllMenus({ LoginUserID: user?.userID }),
+    enabled: user != null,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+  })
+
+  useEffect(() => {
+    if (AllowedMenus) {
+      setAuthorizedRoutes(AllowedMenus)
+    }
+  }, [AllowedMenus])
+
+  return null
+}

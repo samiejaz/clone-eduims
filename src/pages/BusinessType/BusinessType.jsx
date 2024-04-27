@@ -26,8 +26,8 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.BUSINESS_TYPE
 let editRoute = `${parentRoute}/edit/`
@@ -36,17 +36,25 @@ let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY
 
 export function BusinessType() {
-  const { checkForUserRights } = useContext(UserRightsContext)
-
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    let data = checkForUserRights({
-      MenuKey: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    })
-    setUserRights([data])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
   return (
     <>
       <Routes>

@@ -4,12 +4,11 @@ import "./sidebar.css"
 import { ROUTE_URLS } from "../../utils/enums"
 import signalRConnectionManager from "../../services/SignalRService"
 import { Toast } from "primereact/toast"
-import { AppConfigurationContext } from "../../context/AppConfigurationContext"
 import { AuthContext } from "../../context/AuthContext"
 import { confirmDialog } from "primereact/confirmdialog"
 import { InputText } from "primereact/inputtext"
-import { UserRightsContext } from "../../context/UserRightContext"
-import { finalFilteredRoutes } from "../../utils/routes"
+
+import { useRoutesData } from "../../context/RoutesContext"
 
 const CSidebar = ({ sideBarRef, searchInputRef }) => {
   const user = JSON.parse(localStorage.getItem("user"))
@@ -153,19 +152,19 @@ export const SignOut = () => {
 }
 
 const SubSidebar = () => {
-  const { filteredRoutes } = useContext(UserRightsContext)
-  console.log(filteredRoutes)
+  const { filteredRoutes } = useRoutesData()
   return (
     <>
-      {filteredRoutes?.map((route) => (
-        <MenuGroup
-          key={route.menuGroupKey}
-          menuGroupName={route.menuGroupName}
-          subItems={route.subItems}
-          icon={route.icon}
-          hideMenuGroup={!route?.AllowAllRoles}
-        />
-      ))}
+      {filteredRoutes &&
+        filteredRoutes.map((route) => (
+          <MenuGroup
+            key={route.menuGroupKey}
+            menuGroupName={route.menuGroupName}
+            subItems={route.subItems}
+            icon={route.icon}
+            hideMenuGroup={!route?.hideMenuGroup}
+          />
+        ))}
     </>
   )
 }
@@ -255,12 +254,11 @@ const MenuItem = ({
 const SearchBar = ({ searchInputRef }) => {
   const [searchText, setSearchText] = useState("")
 
-  const { routesWithUserRights, setFilteredRoutes } =
-    useContext(UserRightsContext)
+  const { authorizedRoutes, setFilteredRoutes } = useRoutesData()
   const filterRoutes = () => {
-    if (!searchText) return routesWithUserRights
+    if (!searchText) return authorizedRoutes
 
-    return routesWithUserRights
+    return authorizedRoutes
       .map((group) => ({
         ...group,
         subItems: group.subItems.filter((subItem) =>

@@ -14,7 +14,7 @@ import ActionButtons from "../../components/ActionButtons"
 import { FilterMatchMode } from "primereact/api"
 import React, { useContext, useEffect, useRef, useState } from "react"
 
-import { AuthContext } from "../../context/AuthContext"
+import { AuthContext, useUserData } from "../../context/AuthContext"
 import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 
 import TextInput from "../../components/Forms/TextInput"
@@ -49,8 +49,8 @@ import CNumberInput from "../../components/Forms/CNumberInput"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -61,16 +61,25 @@ let viewRoute = `${parentRoute}/`
 let IDENTITY = "DebitNoteID"
 
 export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.ACCOUNTS.DEBIT_NOTE_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.ACCOUNTS.DEBIT_NOTE_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>
@@ -162,7 +171,7 @@ function DebitNoteEntrySearch({ userRights }) {
     TotalNetAmount: { value: null, matchMode: FilterMatchMode.CONTAINS },
   })
 
-  const { user } = useContext(AuthContext)
+  const user = useUserData()
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [queryKey],
@@ -302,7 +311,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
   const { DebitNoteID } = useParams()
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const { user } = useContext(AuthContext)
+  const user = useUserData()
   // Ref
   const detailTableRef = useRef()
   const customerCompRef = useRef()

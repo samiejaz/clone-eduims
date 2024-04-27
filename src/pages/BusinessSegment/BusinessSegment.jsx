@@ -26,8 +26,8 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
+import { checkForUserRightsAsync } from "../../api/MenusData"
 
 let parentRoute = ROUTE_URLS.BUSINESS_SEGMENT_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -37,17 +37,25 @@ let queryKey = QUERY_KEYS.BUSINESS_SEGMENT_QUERY_KEY
 let IDENTITY = "BusinessSegmentID"
 
 export default function BusinessSegmentOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
-  useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.GENERAL.BUSINESS_SEGMENT_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.GENERAL.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+  const user = useUserData()
 
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.GENERAL.BUSINESS_SEGMENT_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
+  useEffect(() => {
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
   return (
     <Routes>
       {userRights && userRights[0]?.ShowForm ? (
