@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query"
-import { useContext } from "react"
-import { AuthContext } from "../../context/AuthContext"
+import { useUserData } from "../../context/AuthContext"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
@@ -16,25 +15,36 @@ import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import GenNewCustomerView from "./CustomerEntryView"
 import { Route, Routes } from "react-router-dom"
+import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 const parentRoute = ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY
 const viewRoute = `${parentRoute}/`
 const IDENTITY = "CustomerID"
+let MENU_KEY = MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY
 
 export default function Customers() {
-  const { checkForUserRights } = useContext(UserRightsContext)
   const [userRights, setUserRights] = useState([])
 
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.USERS.CUSTOMERS_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
   useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.USERS.CUSTOMERS_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
 
   return (
     <Routes>
@@ -70,7 +80,7 @@ export function GenCustomerEntry({ userRights }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   // Hooks
-  const { user } = useContext(AuthContext)
+  const user = useUserData()
 
   const [filters, setFilters] = useState({
     CustomerName: { value: null, matchMode: FilterMatchMode.CONTAINS },

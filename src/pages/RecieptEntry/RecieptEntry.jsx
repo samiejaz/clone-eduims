@@ -15,7 +15,7 @@ import { FilterMatchMode } from "primereact/api"
 import React, { useContext, useEffect, useRef, useState } from "react"
 
 import { AuthContext } from "../../context/AuthContext"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import TextInput from "../../components/Forms/TextInput"
 import NumberInput from "../../components/Forms/NumberInput"
@@ -50,11 +50,12 @@ import CDatePicker from "../../components/Forms/CDatePicker"
 import CNumberInput from "../../components/Forms/CNumberInput"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
+
 import { decryptID, encryptID } from "../../utils/crypto"
 import { Dropdown } from "primereact/dropdown"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -78,102 +79,20 @@ let ddDetailColor = "#8f48d2"
 let queryKey = QUERY_KEYS.RECEIPT_VOUCHER_INFO_QUERY_KEY
 
 let IDENTITY = "ReceiptVoucherID"
+let MENU_KEY = MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY
 
-export default function ReceiptVoucher() {
-  const [userRights, setUserRights] = useState([])
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.ACCOUNTS.RECIEPT_VOUCHER_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
-
+export default function RecieptVouchers() {
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<ReceiptEntrySearch userRights={userRights} />}
-          />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <ReceiptEntryForm
-                key={"ReceiptEntryFormViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <ReceiptEntryForm
-                      key={"ReceiptEntryFormEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <ReceiptEntryForm
-                        key={"ReceiptEntryFormNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-function ReceiptEntrySearch({ userRights }) {
+function DetailComponent({ userRights }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -409,7 +328,7 @@ const defaultValues = {
   receiptDetail: [],
 }
 
-export function ReceiptEntryForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   document.title = "Receipt Voucher Entry"
   const queryClient = useQueryClient()
   const { ReceiptVoucherID } = useParams()

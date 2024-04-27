@@ -30,13 +30,14 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { encryptID } from "../../utils/crypto"
 import { checkForUserRightsAsync } from "../../api/MenusData"
-
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 let parentRoute = ROUTE_URLS.TEHSIL_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.TEHSIL_QUERY_KEY
 let IDENTITY = "TehsilID"
+let MENU_KEY = MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY
 
 export default function BanckAccountOpening() {
   const [userRights, setUserRights] = useState([])

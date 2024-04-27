@@ -1,6 +1,5 @@
 export { default as AppConfiguration } from "./AppConfiguration/AppConfguration"
 export { default as CompanyInfo } from "./CompanyInfo/CompanyInfo"
-export { default as GenCustomerEntry } from "./CustomerEntry/GenCustomerEntry"
 
 // Configuration
 export { default as UserRights } from "./UserRights/UserRightsInfo"
@@ -12,12 +11,14 @@ export { default as Tehsil } from "./Tehsil/Tehsil"
 export { default as Businessunit } from "./BusinessUnits/BusinessUnits"
 export { default as BusinessNature } from "./BusinessNature/BusinessNature"
 export { default as BusinessSegment } from "./BusinessSegment/BusinessSegment"
+export { default as BusinessType } from "./BusinessType/BusinessType"
 export { default as Session } from "./SessionInfo/SessionInfo"
 
 // User Routes
 export { default as Users } from "./GenUsers/Users"
 export { default as Departments } from "./Departments/Department"
 export { default as Customers } from "./CustomerEntry/GenCustomerEntry"
+export { default as OldCustomers } from "./GenOldCustomers/GenOldCustomerEntry"
 
 // Account Routes
 export { default as CustomerInvoice } from "./CustomerInvoice/NewCustomerInvoice"

@@ -30,6 +30,7 @@ import { TextInput } from "../../components/Forms/form"
 import {
   addNewUserRole,
   checkForUserRightsAsync,
+  deleteUserRoleByID,
   fetchAllUserRoless,
   fetchUserRolesById,
 } from "../../api/MenusData"
@@ -179,7 +180,7 @@ const UserRightsInfo = ({ mode, userRights }) => {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: () => {},
+    mutationFn: deleteUserRoleByID,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] })
       navigate(parentRoute)
@@ -194,6 +195,7 @@ const UserRightsInfo = ({ mode, userRights }) => {
       let DetailData = RoleData.data.Detail
       if (DetailData.length > 0) {
         let updatedDetailData = initAuthorizedMenus(DetailData, true)
+
         userRightsRef.current?.setUserRoutesDetail(updatedDetailData)
       }
     }
@@ -222,6 +224,7 @@ const UserRightsInfo = ({ mode, userRights }) => {
   }
   function onSubmit(data) {
     const userRightsDetail = userRightsRef.current?.getUserRoutesDetail()
+
     data.UserRightsDetail = userRightsDetail
     mutation.mutate({
       formData: data,
@@ -300,7 +303,7 @@ function UserRightsDetail({ userRights }) {
     initialData: [],
   })
   const deleteMutation = useMutation({
-    mutationFn: addNewUserRole,
+    mutationFn: deleteUserRoleByID,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] })
       navigate(parentRoute)

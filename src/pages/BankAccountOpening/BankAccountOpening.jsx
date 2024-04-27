@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
@@ -25,9 +25,10 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
+
 import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -36,95 +37,13 @@ let queryKey = QUERY_KEYS.BANK_ACCOUNTS_QUERY_KEY
 let IDENTITY = "BankAccountID"
 
 export default function BanckAccountOpening() {
-  const [userRights, setUserRights] = useState([])
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<BankAccountDetail userRights={userRights} />}
-          />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <BankAccountForm
-                key={"BankAccountViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <BankAccountForm
-                      key={"BankAccountEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <BankAccountForm
-                        key={"BankAccountNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={BankAccountForm}
+      DetailComponent={BankAccountDetail}
+      menuKey={MENU_KEYS.ACCOUNTS.BANK_ACCOUNTS_FORM_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 

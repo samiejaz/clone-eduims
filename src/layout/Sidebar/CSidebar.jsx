@@ -273,7 +273,7 @@ const SearchBar = ({ searchInputRef }) => {
 
   useEffect(() => {
     setFilteredRoutes(filterRoutes())
-  }, [searchText])
+  }, [searchText, authorizedRoutes])
 
   return (
     <>

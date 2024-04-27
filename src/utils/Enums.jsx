@@ -21,9 +21,10 @@ export const ROUTE_URLS = {
     PRODUCT_CATEGORY_ROUTE: "/general/productcategory",
     PRODUCT_INFO_ROUTE: "/general/productinfo",
     COMPANY_INFO_ROUTE: "/general/companyinfo",
-    LEADS_INTROUDCTION_VIEWER_ROUTE: "/general/leadsview",
-    LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE: "/general/leadsview/detail",
-    LEADS_INTROUDCTION_COMMENT_ROUTE: "/general/leadcomments",
+    LEADS_INTROUDCTION_VIEWER_ROUTE: "/general/leadintroduction/leadsview",
+    LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE:
+      "/general/leadintroduction/leadsview/detail",
+    LEADS_INTROUDCTION_COMMENT_ROUTE: "/general/leadintroduction/leadcomments",
     APP_CONFIGURATION_ROUTE: "/utilities/appconfiguration",
   },
   UTILITIES: {
@@ -46,6 +47,9 @@ export const ROUTE_URLS = {
   },
   CONFIGURATION: {
     USER_RIGHTS_ROUTE: "/configuration/userrights",
+  },
+  REPORTS: {
+    ACCOUNT_LEDGER_REPORT_ROUTE: "/reports/accountledger",
   },
 }
 
@@ -95,6 +99,10 @@ export const SELECT_QUERY_KEYS = {
   SOFTWARE_CLIENTS_SELECT_QUERY_KEY: "softwareClientsSelect",
   PRODUCT_CATEGORIES_SELECT_QUERY_KEY: "productCategoriesSelect",
   USER_ROLES_SELECT_QUERY_KEY: "userRolesSelect",
+}
+
+export const REPORTS_QUERY_KEYS = {
+  ACCOUNT_LEDGER_QUERY_KEY: "accountLedgerReport",
 }
 
 export const TOAST_CONTAINER_IDS = {
@@ -151,6 +159,11 @@ export const MENU_KEYS = {
     GROUP_NAME: "Configuration",
     GROUP_KEY: "mnuConfiguration",
     USER_RIGHTS_ROUTE: "mnuUserRights",
+  },
+  REPORTS: {
+    GROUP_NAME: "Reports",
+    GROUP_KEY: "mnuReports",
+    ACCOUNT_LEDGER_REPORT_FORM_KEY: "mnuAccountLedgerReport",
   },
 }
 

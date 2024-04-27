@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useNavigate, useParams } from "react-router-dom"
+import { Route, Routes, useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
@@ -18,7 +18,7 @@ import {
   fetchAllGenOldCustomers,
   fetchGenOldCustomerById,
 } from "../../api/GenOldCustomerData"
-import { ROUTE_URLS, QUERY_KEYS } from "../../utils/enums"
+import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
 import {
   useActivationClientsSelectData,
   useSoftwareClientsSelectData,
@@ -30,6 +30,8 @@ import {
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
+import { checkForUserRightsAsync } from "../../api/MenusData"
+import AccessDeniedPage from "../../components/AccessDeniedPage"
 
 let parentRoute = ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY
 let editRoute = `${parentRoute}/edit/`
@@ -37,7 +39,103 @@ let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.OLD_CUSTOMERS_QUERY_KEY
 
-export function GenOldCustomerDetail() {
+export default function OldCustomers() {
+  const [userRights, setUserRights] = useState([])
+
+  const user = useUserData()
+
+  const { data: rights } = useQuery({
+    queryKey: ["formRights"],
+    queryFn: () =>
+      checkForUserRightsAsync({
+        MenuKey: MENU_KEYS.USERS.OLD_CUSTOMERS_FORM_KEY,
+        LoginUserID: user?.userID,
+      }),
+    initialData: [],
+  })
+
+  useEffect(() => {
+    if (rights) {
+      setUserRights(rights)
+    }
+  }, [rights])
+  return (
+    <>
+      <Routes>
+        {userRights.length > 0 && userRights[0].ShowForm ? (
+          <>
+            <Route
+              index
+              element={<GenOldCustomerDetail userRights={userRights} />}
+            />
+            <Route
+              path={`:CustomerID`}
+              element={
+                <GenOldCustomerForm
+                  key={"GenOldCustomerViewRoute"}
+                  mode={"view"}
+                  userRights={userRights}
+                />
+              }
+            />
+            <Route
+              path={`edit/:CustomerID`}
+              element={
+                <>
+                  {userRights[0].RoleEdit ? (
+                    <>
+                      <GenOldCustomerForm
+                        key={"GenOldCustomerEditRoute"}
+                        mode={"edit"}
+                        userRights={userRights}
+                      />
+                    </>
+                  ) : (
+                    <AccessDeniedPage />
+                  )}
+                </>
+              }
+            />
+
+            <>
+              <Route
+                path={`new`}
+                element={
+                  <>
+                    {userRights[0].RoleNew ? (
+                      <>
+                        <GenOldCustomerForm
+                          key={"GenOldCustomerNewRoute"}
+                          mode={"new"}
+                          userRights={userRights}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <AccessDeniedPage />
+                      </>
+                    )}
+                  </>
+                }
+              />
+            </>
+          </>
+        ) : (
+          <Route
+            path="*"
+            element={
+              <>
+                <AccessDeniedPage />
+              </>
+            }
+          />
+        )}
+      </Routes>
+    </>
+  )
+}
+
+export function GenOldCustomerDetail({ userRights }) {
   document.title = "Old Customers"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -121,13 +219,15 @@ export function GenOldCustomerDetail() {
             <Column
               body={(rowData) =>
                 ActionButtons({
-                  ID: rowData.CustomerID,
-                  handleDelete: () => showDeleteDialog(rowData.CustomerID),
-                  handleEdit: () => showEditDialog(rowData.CustomerID),
+                  ID: encryptID(rowData.CustomerID),
+                  handleDelete: () =>
+                    showDeleteDialog(encryptID(rowData.CustomerID)),
+                  handleEdit: () =>
+                    showEditDialog(encryptID(rowData.CustomerID)),
                   handleView: handleView,
                   showEditButton: userRights[0]?.RoleEdit,
                   showDeleteButton: userRights[0]?.RoleDelete,
-                  viewBtnRoute: viewRoute + rowData.CustomerID,
+                  viewBtnRoute: viewRoute + encryptID(rowData.CustomerID),
                 })
               }
               header="Actions"
@@ -147,7 +247,7 @@ export function GenOldCustomerDetail() {
     </div>
   )
 }
-export function GenOldCustomerForm({ mode }) {
+export function GenOldCustomerForm({ mode, userRights }) {
   document.title = "Old Customer Entry"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -263,7 +363,9 @@ export function GenOldCustomerForm({ mode }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Old Customers"
-              showDelete={false}
+              showDelete={false || userRights[0]?.RoleDelete}
+              showAddNewButton={userRights[0]?.RoleNew}
+              showEditButton={userRights[0]?.RoleEdit}
             />
           </div>
           <form className="mt-4">

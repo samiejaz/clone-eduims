@@ -71,6 +71,7 @@ import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailT
 import { TextAreaField } from "../../components/Forms/form"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
 import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
 let editRoute = `${parentRoute}/edit/`
@@ -79,104 +80,20 @@ let viewRoute = `${parentRoute}/`
 let onlineDetailColor = "#365abd"
 let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY
 let IDENTITY = "CustomerInvoiceID"
+let MENU_KEY = MENU_KEYS.ACCOUNTS.CUSTOMER_INVOICE_FORM_KEY
 
-export default function CustomerInvoice() {
-  const { checkForUserRights } = useContext(UserRightsContext)
-  const [userRights, setUserRights] = useState([])
-
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.ACCOUNTS.CUSTOMER_INVOICE_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
-
+export default function CreditNotes() {
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<NewCustomerInvoiceEntrySearch userRights={userRights} />}
-          />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <NewCustomerInvoiceEntryForm
-                key={"CustomerInvoiceViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <NewCustomerInvoiceEntryForm
-                      key={"CustomerInvoiceEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <NewCustomerInvoiceEntryForm
-                        key={"CustomerInvoiceNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-function NewCustomerInvoiceEntrySearch({ userRights }) {
+function DetailComponent({ userRights }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -351,7 +268,7 @@ const defaultValues = {
   installments: [],
 }
 
-function NewCustomerInvoiceEntryForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   document.title = "Customer Invoice"
   const queryClient = useQueryClient()
   const { CustomerInvoiceID } = useParams()

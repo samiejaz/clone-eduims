@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import { FilterMatchMode } from "primereact/api"
-import { useEffect, useState, useRef, useContext } from "react"
+import { useEffect, useState, useRef } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
@@ -25,15 +25,12 @@ import {
   fetchBusinessUnitById,
 } from "../../api/BusinessUnitData"
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
-import ImageContainer from "../../components/ImageContainer"
 import { ColorPicker } from "primereact/colorpicker"
 import { classNames } from "primereact/utils"
-import { Tooltip } from "primereact/tooltip"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { encryptID } from "../../utils/crypto"
 import { SingleFileUploadField } from "../../components/Forms/form"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS
 let editRoute = `${parentRoute}/edit/`
@@ -41,103 +38,20 @@ let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.BUSINESS_UNIT_QUERY_KEY
 let IDENTITY = "BusinessUnitID"
+let MENU_KEY = MENU_KEYS.GENERAL.BUSINESS_UNIT_FORM_KEY
 
-export default function BanckAccountOpening() {
-  const [userRights, setUserRights] = useState([])
-
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.GENERAL.BUSINESS_UNIT_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
-
+export default function BusinessUnits() {
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<BusinessUnitDetail userRights={userRights} />}
-          />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <BusinessUnitForm
-                key={"BusinessUnitViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <BusinessUnitForm
-                      key={"BusinessUnitEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <BusinessUnitForm
-                        key={"BusinessUnitNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-function BusinessUnitDetail({ userRights }) {
+function DetailComponent({ userRights }) {
   document.title = "Business Units"
 
   const queryClient = useQueryClient()
@@ -290,7 +204,7 @@ function BusinessUnitDetail({ userRights }) {
   )
 }
 
-function BusinessUnitForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   document.title = "Business Unit Entry"
 
   const queryClient = useQueryClient()

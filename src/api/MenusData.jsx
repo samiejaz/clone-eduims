@@ -107,16 +107,18 @@ export async function checkForUserRightsAsync({ MenuKey, LoginUserID }) {
       const { data } = await axios.post(
         `${apiUrl}/gen_UserRole/GetUserRightsForForm?MenuKey=${MenuKey}&LoginUserID=${LoginUserID}`
       )
-      let UpdatedData = data.data.map((role) => {
-        return {
-          RoleDelete: role.RoleDelete === "True",
-          RolePrint: role.RolePrint === "True",
-          RoleNew: role.RoleNew === "True",
-          RoleEdit: role.RoleEdit === "True",
-          ShowForm: role.ShowForm === "True",
-        }
-      })
-      return UpdatedData
+      if (data.success) {
+        let UpdatedData = data.data.map((role) => {
+          return {
+            RoleDelete: role.RoleDelete === "True",
+            RolePrint: role.RolePrint === "True",
+            RoleNew: role.RoleNew === "True",
+            RoleEdit: role.RoleEdit === "True",
+            ShowForm: role.ShowForm === "True",
+          }
+        })
+        return UpdatedData
+      }
     } else {
       return [
         {
@@ -139,5 +141,25 @@ export async function checkForUserRightsAsync({ MenuKey, LoginUserID }) {
         ShowForm: false,
       },
     ]
+  }
+}
+
+export async function deleteUserRoleByID({ RoleID, LoginUserID }) {
+  try {
+    RoleID = decryptID(RoleID)
+
+    const { data } = await axios.post(
+      `${apiUrl}/gen_UserRole/UserRoleDelete?RoleID=${RoleID}&LoginUserID=${LoginUserID}`
+    )
+
+    if (data.success === true) {
+      ShowSuccessToast("Role sucessfully deleted!")
+      return true
+    } else {
+      ShowErrorToast(data.message)
+      return false
+    }
+  } catch (e) {
+    ShowErrorToast(e.message)
   }
 }

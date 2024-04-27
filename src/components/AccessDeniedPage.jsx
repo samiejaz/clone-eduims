@@ -30,6 +30,7 @@ const AccessDeniedPage = () => {
               objectFit: "contain",
               margin: "auto",
             }}
+            draggable={false}
           />
           <Link to="/">
             <Button

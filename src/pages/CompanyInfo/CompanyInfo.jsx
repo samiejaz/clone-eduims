@@ -15,6 +15,11 @@ import { Tooltip } from "react-bootstrap"
 import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
 import { useKeyCombinationHook } from "../../hooks/hooks"
 import SingleFileUpload from "../../components/Forms/SingleFileUpload"
+import {
+  FormRightsWrapper,
+  SingleFormRightsWrapper,
+} from "../../components/Wrappers/wrappers"
+import { MENU_KEYS } from "../../utils/enums"
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
@@ -30,8 +35,16 @@ const defaultValues = {
   AuthorityPersonEmail: "",
   Description: "",
 }
-
 function CompanyInfo() {
+  return (
+    <SingleFormRightsWrapper
+      menuKey={MENU_KEYS.GENERAL.COMPANY_INFO_FORM_KEY}
+      FormComponent={CompanyInfoForm}
+    />
+  )
+}
+
+function CompanyInfoForm({ mode, userRights }) {
   document.title = "Company Info"
   const [CompanyInfo, setCompanyInfo] = useState([])
   const [reload, setReload] = useState(true)
