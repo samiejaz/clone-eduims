@@ -42,7 +42,7 @@ export async function deleteDebitNoteByID({ DebitNoteID, LoginUserID }) {
     )
 
     if (data.success === true) {
-      ShowSuccessToast("Branch sucessfully deleted!")
+      ShowSuccessToast("Debit note sucessfully deleted!")
       return true
     } else {
       ShowErrorToast(data.message)

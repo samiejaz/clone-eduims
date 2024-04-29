@@ -66,12 +66,11 @@ export async function addNewSession({ formData, userID, SessionID = 0 }) {
   try {
     let DataToSend = {
       SessionTitle: formData.SessionTitle,
-      SessionOpeningDate: formData.SessionOpeningDate,
-      SessionClosingDate: formData.SessionClosingDate,
+      SessionOpeningDate: formData.SessionOpeningDate.toLocaleDateString(),
+      SessionClosingDate: formData.SessionClosingDate.toLocaleDateString(),
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
     }
-
     SessionID = SessionID === 0 ? 0 : decryptID(SessionID)
     if (SessionID === 0 || SessionID === undefined) {
       DataToSend.SessionID = 0

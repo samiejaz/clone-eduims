@@ -8,8 +8,22 @@ export const CIconButton = ({
   disabled = false,
   tooltip = "",
   toolTipPostion = "right",
+  style = {},
   ...options
 }) => {
+  let defaultStyles = {
+    padding: "1px 0px",
+    fontSize: "small",
+    width: "30px",
+    height: "2rem",
+    border: "none",
+  }
+
+  let newStyles = {
+    ...defaultStyles,
+    ...style,
+  }
+
   return (
     <>
       <Button
@@ -17,13 +31,7 @@ export const CIconButton = ({
         rounded
         outlined
         severity={severity}
-        style={{
-          padding: "1px 0px",
-          fontSize: "small",
-          width: "30px",
-          height: "2rem",
-          border: "none",
-        }}
+        style={newStyles}
         onClick={onClick}
         disabled={disabled}
         tooltip={tooltip}

@@ -60,6 +60,7 @@ function DetailComponent({ userRights }) {
 
   const [filters, setFilters] = useState({
     TehsilTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    CountryTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
   })
 
   const user = useUserData()
@@ -88,7 +89,7 @@ function DetailComponent({ userRights }) {
   function handleView(id) {
     navigate(parentRoute + "/" + id)
   }
-
+  console.log(data)
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -158,6 +159,13 @@ function DetailComponent({ userRights }) {
               filterPlaceholder="Search by Tehsil"
               sortable
               header="Tehsil"
+            ></Column>
+            <Column
+              field="CountryTitle"
+              filter
+              filterPlaceholder="Search by Country"
+              sortable
+              header="Coutnry"
             ></Column>
           </DataTable>
         </>

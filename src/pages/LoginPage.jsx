@@ -40,7 +40,7 @@ const SignUp = () => {
       )
       if (data.success === true) {
         const dataToSerialize = {
-          username: data.data[0].FirstName + " " + data.data[0].LastName,
+          username: data.data[0].FirstName + " " + data.data[0].LastName ?? "",
           userID: data.data[0].LoginUserID,
           image: data.data[0]?.ProfilePic,
           DepartmentID: data.data[0].DepartmentID,

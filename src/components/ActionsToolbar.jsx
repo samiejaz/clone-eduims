@@ -91,20 +91,25 @@ export default function ButtonToolBar({
   const centerContent = (
     <React.Fragment>
       <div className="w-full flex gap-1 flex-wrap">
-        <Button
-          label={cancelLabel}
-          icon="pi pi-times"
-          className="rounded"
-          type="button"
-          severity="secondary"
-          disabled={cancelDisable ? true : mode === "view"}
-          onClick={() => handleCancel()}
-          pt={{
-            label: {
-              className: "hidden md:block lg:block",
-            },
-          }}
-        />
+        {showCancelButton && (
+          <>
+            <Button
+              label={cancelLabel}
+              icon="pi pi-times"
+              className="rounded"
+              type="button"
+              severity="secondary"
+              disabled={cancelDisable ? true : mode === "view"}
+              onClick={() => handleCancel()}
+              pt={{
+                label: {
+                  className: "hidden md:block lg:block",
+                },
+              }}
+            />
+          </>
+        )}
+
         {showAddNewButton ? (
           <>
             <Button

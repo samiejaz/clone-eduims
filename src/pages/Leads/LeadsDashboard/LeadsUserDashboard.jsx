@@ -3,7 +3,11 @@ import { Column } from "primereact/column"
 import { DataTable } from "primereact/datatable"
 import React, { useEffect, useState } from "react"
 
-import { MOVEABLE_COMPNENTS_NAMES, QUERY_KEYS } from "../../../utils/enums"
+import {
+  MOVEABLE_COMPNENTS_NAMES,
+  QUERY_KEYS,
+  ROUTE_URLS,
+} from "../../../utils/enums"
 import {
   addLeadIntroductionOnAction,
   fetchAllDemonstrationLeadsData,
@@ -20,6 +24,7 @@ import { toast } from "react-toastify"
 import { InfoCardsContainer } from "../../Leads/LeadsDashboard/LeadsDashboard"
 import { encryptID } from "../../../utils/crypto"
 import { useUserData } from "../../../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 const componentMapping = {
   InfoCardsContainer,
@@ -112,6 +117,7 @@ function LeadsIntroductionDemonstratorTable() {
     })
 
   const user = useUserData()
+  const navigate = useNavigate()
 
   const mutation = useMutation({
     mutationFn: addLeadIntroductionOnAction,
@@ -244,6 +250,18 @@ function LeadsIntroductionDemonstratorTable() {
                 rowData.Status === "Meeting Done" ||
                 rowData.Status === "Pending"
               }
+            />
+            <CIconButton
+              icon="pi pi-comments"
+              severity="info"
+              onClick={() =>
+                navigate(
+                  ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_COMMENT_ROUTE +
+                    "/" +
+                    encryptID(rowData.LeadIntroductionID)
+                )
+              }
+              tooltip="Comments"
             />
           </div>
         </div>

@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { useUserData } from "../../context/AuthContext"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
@@ -62,6 +62,7 @@ const CONTEXT_ACTIONS = {
 
 const CommentsContainer = ({ LeadIntroductionID, user }) => {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [commentID, setCommentID] = useState(null)
   const [commentText, setCommentText] = useState(null)
   const { data, isLoading, isFetching } = useQuery({
@@ -152,18 +153,15 @@ const CommentsContainer = ({ LeadIntroductionID, user }) => {
       ) : (
         <>
           <div className="relative">
-            <Link
-              to={ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}
+            <CIconButton
+              icon="pi pi-arrow-left"
+              onClick={() => navigate(-1)}
+              severity="secondary"
+              tooltip="Go Back..."
               className="fixed"
               style={{ top: "3rem", left: "6.3rem" }}
-            >
-              <CIconButton
-                icon="pi pi-arrow-left"
-                onClick={() => null}
-                severity="secondary"
-                tooltip="Go Back..."
-              />
-            </Link>
+            />
+
             <hr
               className="mt-2"
               aria-hidden="true"
@@ -247,7 +245,9 @@ const SingleComment = ({ comment, user, handleRightClick }) => {
           style={{ background: "#202C33", color: "white" }}
         >
           <p className="p-0 m-0 text-sm font-semibold">~{comment.FullName}</p>
-          <p className="p-0 m-0">{comment.Comment}</p>
+          <p className="p-0 m-0" style={{ whiteSpace: "pre-line" }}>
+            {comment.Comment}
+          </p>
         </div>
       </li>
     </>
@@ -327,19 +327,17 @@ const CreateCommentInput = ({ LeadIntroductionID, user }) => {
                     )}
                     onKeyDown={(e) => {
                       if (e.shiftKey && e.key === "Enter") {
-                        e.preventDefault() // Prevent the default behavior of the Enter key
+                        e.preventDefault()
                         const start = e.target.selectionStart
                         const end = e.target.selectionEnd
                         const newText =
                           e.target.value.substring(0, start) +
                           "\n" +
                           e.target.value.substring(end)
-                        e.target.value = newText // Update the textarea's value
+                        e.target.value = newText
                         e.target.selectionStart = e.target.selectionEnd =
                           start + 1
-                      }
-
-                      if (e.key === "Enter" && e.target.value !== "") {
+                      } else if (e.key === "Enter" && e.target.value !== "") {
                         method.handleSubmit(onSubmit)()
                       }
                     }}

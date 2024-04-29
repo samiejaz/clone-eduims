@@ -163,8 +163,14 @@ function DetailComponent({ userRights }) {
                   handleEdit: () =>
                     showEditDialog(encryptID(rowData.LoginUserID)),
                   handleView: handleView,
-                  showEditButton: userRights[0]?.RoleEdit,
-                  showDeleteButton: userRights[0]?.RoleDelete,
+                  showEditButton:
+                    rowData.FirstName === "ADMINISTRATOR"
+                      ? false
+                      : userRights[0]?.RoleEdit,
+                  showDeleteButton:
+                    rowData.FirstName === "ADMINISTRATOR"
+                      ? false
+                      : userRights[0]?.RoleDelete,
                   viewBtnRoute: viewRoute + encryptID(rowData.LoginUserID),
                 })
               }
@@ -355,8 +361,30 @@ function FormComponent({ mode, userRights }) {
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Users"
               showAddNewButton={userRights[0]?.RoleNew}
-              showEditButton={userRights[0]?.RoleEdit}
-              showDelete={userRights[0]?.RoleDelete}
+              showEditButton={
+                mode === "view" &&
+                UserData?.data[0]?.FirstName === "ADMINISTRATOR"
+                  ? false
+                  : userRights[0]?.RoleEdit
+              }
+              showDelete={
+                mode === "view" &&
+                UserData?.data[0]?.FirstName === "ADMINISTRATOR"
+                  ? false
+                  : userRights[0]?.RoleDelete
+              }
+              showCancelButton={
+                mode === "view" &&
+                UserData?.data[0]?.FirstName === "ADMINISTRATOR"
+                  ? false
+                  : true
+              }
+              showSaveButton={
+                mode === "view" &&
+                UserData?.data[0]?.FirstName === "ADMINISTRATOR"
+                  ? false
+                  : true
+              }
             />
           </div>
           <form className="mt-4">
