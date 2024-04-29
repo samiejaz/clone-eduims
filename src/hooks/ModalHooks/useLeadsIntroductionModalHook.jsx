@@ -426,14 +426,16 @@ export function LeadsIntroductionFormComponent({
               <TextInput
                 control={method.control}
                 ID={"CompanyWebsite"}
-                required={true}
                 focusOptions={() => method.setFocus("ContactPersonName")}
                 isEnable={mode !== "view"}
               />
             </div>
           </FormColumn>
           <FormColumn lg={3} xl={3} md={6}>
-            <FormLabel>Contact Person Name</FormLabel>
+            <FormLabel>
+              Contact Person Name
+              <span className="text-danger fw-bold ">*</span>
+            </FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -445,7 +447,10 @@ export function LeadsIntroductionFormComponent({
             </div>
           </FormColumn>
           <FormColumn lg={3} xl={3} md={6}>
-            <FormLabel>Contact Person Mobile No</FormLabel>
+            <FormLabel>
+              Contact Person Mobile No
+              <span className="text-danger fw-bold ">*</span>
+            </FormLabel>
             <div>
               <TextInput
                 control={method.control}
@@ -482,7 +487,6 @@ export function LeadsIntroductionFormComponent({
               <TextInput
                 control={method.control}
                 ID={"ContactPersonEmail"}
-                required={true}
                 focusOptions={() => method.setFocus("CompanyAddress")}
                 isEnable={mode !== "view"}
               />

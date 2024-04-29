@@ -12,6 +12,7 @@ function TextInput({
   floatLabel = false,
   onChange,
   type = "text",
+
   errorMessage = "This field is required!",
   ...options
 }) {

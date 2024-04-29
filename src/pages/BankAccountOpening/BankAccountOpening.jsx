@@ -58,6 +58,7 @@ function BankAccountDetail({ userRights }) {
   })
 
   const [filters, setFilters] = useState({
+    BankTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     BankAccountTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
     AccountNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     IbanNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -154,11 +155,19 @@ function BankAccountDetail({ userRights }) {
               style={{ minWidth: "7rem", maxWidth: "10rem", width: "7rem" }}
             ></Column>
             <Column
+              field="BankTitle"
+              filter
+              filterPlaceholder="Search by bank"
+              sortable
+              header="Bank"
+              style={{ minWidth: "20rem" }}
+            ></Column>
+            <Column
               field="BankAccountTitle"
               filter
-              filterPlaceholder="Search by BankAccount"
+              filterPlaceholder="Search by Bank Account"
               sortable
-              header="BankAccount"
+              header="Bank Account"
               style={{ minWidth: "20rem" }}
             ></Column>
             <Column

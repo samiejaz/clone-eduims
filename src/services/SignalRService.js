@@ -24,7 +24,7 @@ class SignalRConnectionManager {
         const user = JSON.parse(localStorage.getItem("user"))
         await this.connection.start()
         await this.connection.invoke("JoinGroup", {
-          GroupName: "",
+          GroupName: user.DepartmentID.toString(),
           UserName: user.userID.toString(),
         })
       } catch (err) {

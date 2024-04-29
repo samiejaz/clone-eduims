@@ -277,9 +277,9 @@ function FormComponent({ mode, userRights }) {
         setValue("InActive", BusinessUnitData?.data[0]?.InActive)
 
         setValue("PrimaryColor", {
-          r: BusinessUnitData?.data[0]?.RedColor,
-          g: BusinessUnitData?.data[0]?.GreenColor,
-          b: BusinessUnitData?.data[0]?.BlueColor,
+          r: BusinessUnitData?.data[0]?.RedColor ?? 0,
+          g: BusinessUnitData?.data[0]?.GreenColor ?? 0,
+          b: BusinessUnitData?.data[0]?.BlueColor ?? 0,
         })
         fileRef.current?.setBase64File(
           "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo
@@ -332,16 +332,13 @@ function FormComponent({ mode, userRights }) {
 
   function onSubmit(data) {
     const file = fileRef.current?.getFile()
-    if (file === null) {
-      fileRef.current?.setError()
-    } else {
-      data.Logo = file
-      mutation.mutate({
-        formData: data,
-        userID: user?.userID,
-        BusinessUnitID: BusinessUnitID,
-      })
-    }
+
+    data.Logo = file
+    mutation.mutate({
+      formData: data,
+      userID: user?.userID,
+      BusinessUnitID: BusinessUnitID,
+    })
   }
 
   return (
@@ -441,10 +438,7 @@ function FormComponent({ mode, userRights }) {
                 </div>
               </FormColumn>
               <FormColumn lg={3} xl={3} md={6}>
-                <FormLabel>
-                  Authority Person / CEO Name
-                  <span className="text-danger fw-bold ">*</span>
-                </FormLabel>
+                <FormLabel>Authority Person / CEO Name</FormLabel>
 
                 <div>
                   <TextInput
@@ -456,10 +450,7 @@ function FormComponent({ mode, userRights }) {
                 </div>
               </FormColumn>
               <FormColumn lg={3} xl={3} md={6}>
-                <FormLabel>
-                  CEO Mobile No
-                  <span className="text-danger fw-bold ">*</span>
-                </FormLabel>
+                <FormLabel>CEO Mobile No</FormLabel>
 
                 <div>
                   <TextInput
@@ -471,10 +462,7 @@ function FormComponent({ mode, userRights }) {
                 </div>
               </FormColumn>
               <FormColumn lg={3} xl={3} md={6}>
-                <FormLabel>
-                  CEO Email
-                  <span className="text-danger fw-bold ">*</span>
-                </FormLabel>
+                <FormLabel>CEO Email</FormLabel>
 
                 <div>
                   <TextInput

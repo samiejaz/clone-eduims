@@ -153,17 +153,12 @@ export async function addLeadIntroductionOnAction({
           formData?.AttachmentFile !== undefined ? formData?.AttachmentFile : ""
         )
       }
-      newFormData.append("Amount", formData.Amount ?? 1900)
+      newFormData.append("Amount", parseFloat(0 + formData.Amount))
       newFormData.append("Description", formData.Description ?? "")
-      // if (fileData) {
-      //   newFormData.append("FileType", formData.FileType);
-      //   newFormData.append("FileName", formData.FileName);
-      //   newFormData.append("FilePath", formData.FilePath);
-      //   newFormData.append("FullFilePath", formData.FullFilePath);
-      // }
+
       Status = from === "Quoted" ? "Quoted" : "Finalized"
     } else if (from === "Closed") {
-      newFormData.append("Amount", formData.Amount ?? 100)
+      newFormData.append("Amount", parseFloat(0 + formData.Amount))
       newFormData.append("Description", formData.Description ?? "")
       Status = "Closed"
     } else if (from === "MeetingDone") {

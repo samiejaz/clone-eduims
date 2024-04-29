@@ -1,6 +1,6 @@
 import { createContext, useState, useContext } from "react"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
-import { Form, Row, Col } from "react-bootstrap"
+import { Form, Row, Col, FormLabel } from "react-bootstrap"
 import { Button } from "primereact/button"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -12,6 +12,8 @@ import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { FilterMatchMode } from "primereact/api"
 import { Dialog } from "primereact/dialog"
+import { FormColumn, FormRow } from "../Layout/LayoutComponents"
+import TextInput from "../Forms/TextInput"
 
 let pageTitles = {}
 const apiUrl = import.meta.env.VITE_APP_API_URL
@@ -56,7 +58,7 @@ function CustomerAccountDataTableHeader(props) {
   const { user } = useContext(AuthContext)
   const { setCreatedAccountID } = useContext(AccountEntryContext)
 
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit, reset, control } = useForm({
     defaultValues: {
       AccountTitle: "",
     },
@@ -103,32 +105,35 @@ function CustomerAccountDataTableHeader(props) {
         // onSubmit={handleSubmit(onSubmit)}
         onKeyDown={preventFormByEnterKeySubmission}
       >
-        <Row>
-          <Form.Group as={Col} controlId="AccountTitle">
-            <Form.Label>Customer Ledger Title</Form.Label>
-            <div className="d-flex gap-2">
-              <Form.Control
-                type="text"
-                placeholder=""
-                required
-                disabled={!isEnable}
-                className="form-control"
-                {...register("AccountTitle")}
+        <FormRow className="place-items-end">
+          <FormColumn lg={11} xl={11} sm={11}>
+            <FormLabel>Customer Ledger Title</FormLabel>
+            <div>
+              <TextInput
+                control={control}
+                ID={"AccountTitle"}
+                isEnable={isEnable}
+                required={true}
               />
-              <Button
-                severity="info"
-                className="px-4 py-2 rounded-1 "
-                onClick={() => {
-                  handleSubmit(onSubmit)()
-                }}
-                type="button"
-                disabled={!isEnable}
-              >
-                Add
-              </Button>
             </div>
-          </Form.Group>
-        </Row>
+          </FormColumn>
+          <FormColumn lg={1} xl={1} sm={1}>
+            <Button
+              severity="info"
+              className="px-4 py-2 rounded-1 "
+              onClick={() => {
+                handleSubmit(onSubmit)()
+              }}
+              type="button"
+              disabled={!isEnable || customerAccountEntryMutation.isPending}
+              label={
+                customerAccountEntryMutation?.isPending ? `Adding...` : "Add"
+              }
+              loadingIcon={"pi pi-spin pi-spinner"}
+              loading={customerAccountEntryMutation.isPending}
+            ></Button>
+          </FormColumn>
+        </FormRow>
       </form>
     </>
   )
@@ -143,7 +148,7 @@ function CustomerAccountDetailTable(props) {
   })
 
   const { user } = useContext(AuthContext)
-  const { register, setValue, handleSubmit } = useForm()
+  const { register, setValue, handleSubmit, control } = useForm()
 
   const { data: CustomerAccounts } = useQuery({
     queryKey: ["customerAccountsDetail", CustomerID],
@@ -273,18 +278,19 @@ function CustomerAccountDetailTable(props) {
               className="visually-hidden "
               style={{ display: "none" }}
             />
-            <Row>
-              <Form.Group as={Col} controlId="AccountTitle">
-                <Form.Label>Customer Ledger Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder=""
-                  required
-                  className="form-control"
-                  {...register("AccountTitle")}
-                />
-              </Form.Group>
-            </Row>
+            <FormRow className="place-items-end">
+              <FormColumn lg={11} xl={11} sm={11}>
+                <FormLabel>Customer Ledger Title</FormLabel>
+                <div>
+                  <TextInput
+                    control={control}
+                    ID={"AccountTitle"}
+                    isEnable={isEnable}
+                    required={true}
+                  />
+                </div>
+              </FormColumn>
+            </FormRow>
           </Dialog>
         </div>
       </form>

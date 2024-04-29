@@ -63,9 +63,6 @@ const CSidebar = ({ sideBarRef, searchInputRef }) => {
                   <div className="c-profile_name" style={{ marginLeft: "5px" }}>
                     {user?.username}
                   </div>
-                  <div className="c-job" style={{ marginLeft: "5px" }}>
-                    Development
-                  </div>
                 </div>
                 <SignOut />
               </div>
@@ -184,7 +181,7 @@ const MenuGroup = ({
       {!hideMenuGroup && (
         <li>
           <div className="c-iocn-link">
-            <Link to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}>
+            <Link to={"#"}>
               <i className={`pi ${icon}`}></i>
               <span className="c-link_name">{menuGroupName}</span>
             </Link>
@@ -195,10 +192,7 @@ const MenuGroup = ({
           </div>
           <ul className="c-sub-menu" key={menuGroupName}>
             <li>
-              <Link
-                className="c-link_name"
-                to={ROUTE_URLS.LEADS.LEADS_DASHBOARD}
-              >
+              <Link className="c-link_name" to={"#"}>
                 {menuGroupName}
               </Link>
             </li>

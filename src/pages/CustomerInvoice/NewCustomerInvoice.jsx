@@ -1187,6 +1187,7 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             options={ServicesInfoSelectData}
             filter={true}
             disabled={InvoiceType === "Product"}
+            required={InvoiceType !== "Product"}
             focusOptions={() => method.setFocus("Qty")}
           />
         </div>

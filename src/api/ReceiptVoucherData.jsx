@@ -1,6 +1,10 @@
 import axios from "axios"
 import { toast } from "react-toastify"
-import { decryptID, verifyAndReturnEncryptedIDForForms } from "../utils/crypto"
+import {
+  decryptID,
+  encryptID,
+  verifyAndReturnEncryptedIDForForms,
+} from "../utils/crypto"
 import { ShowErrorToast } from "../utils/CommonFunctions"
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
@@ -37,9 +41,14 @@ export async function fetchReceiptVoucherById(ReceiptVoucherID, LoginUserID) {
   }
 }
 // URL: /data_ReceiptVoucher/ReceiptVoucherDelete?ReceiptVoucherID=??&LoginUserID=??
-export async function deleteReceiptVoucherByID(serviceInfo) {
+export async function deleteReceiptVoucherByID({
+  ReceiptVoucherID,
+  LoginUserID,
+}) {
+  ReceiptVoucherID = verifyAndReturnEncryptedIDForForms(ReceiptVoucherID)
+
   const { data } = await axios.post(
-    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?ReceiptVoucherID=${serviceInfo.ReceiptVoucherID}&LoginUserID=${serviceInfo.LoginUserID}`
+    `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?ReceiptVoucherID=${ReceiptVoucherID}&LoginUserID=${LoginUserID}`
   )
 
   if (data.success === true) {
@@ -92,7 +101,8 @@ export async function addNewReceiptVoucher({
           formData.InstrumentType?.length > 0 ? formData.InstrumentType : null,
         CustomerID: formData.Customer,
         AccountID: formData.CustomerLedgers,
-        ReceivedInBankID: formData.ReceivedInBankID,
+        ReceivedInBankID:
+          formData.ReceivedInBankID === "" ? null : formData.ReceivedInBankID,
         InstrumentDate: formData.InstrumentDate,
         TotalNetAmount: formData.TotalNetAmount,
         Description: formData.Description,
@@ -125,7 +135,7 @@ export async function addNewReceiptVoucher({
         } else {
           toast.success("ReceiptVoucher created successfully!")
         }
-        return { success: true, RecordID: data?.ReceiptVoucherID }
+        return { success: true, RecordID: encryptID(data?.ReceiptVoucherID) }
       } else {
         toast.error(data.message, {
           autoClose: false,

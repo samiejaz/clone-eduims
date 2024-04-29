@@ -41,7 +41,7 @@ import LeadsIntroductionViewer, {
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer"
 import LeadsComments from "./LeadsComments"
 import { encryptID } from "../../utils/crypto"
-import { SingleFileUploadField } from "../../components/Forms/form"
+import { SingleFileUploadField, TextInput } from "../../components/Forms/form"
 
 import { Dropdown } from "primereact/dropdown"
 import { checkForUserRightsAsync } from "../../api/MenusData"
@@ -98,6 +98,10 @@ export default function LeadIntroduction() {
 
   return (
     <Routes>
+      <Route
+        path={`/leadcomments/:LeadIntroductionID`}
+        element={<LeadsComments />}
+      />
       {userRights && userRights[0]?.ShowForm ? (
         <>
           <Route
@@ -109,10 +113,7 @@ export default function LeadIntroduction() {
             path={`/leadsview/:LeadIntroductionID`}
             element={<LeadsIntroductionViewer />}
           />
-          <Route
-            path={`/leadcomments/:LeadIntroductionID`}
-            element={<LeadsComments />}
-          />
+
           <Route
             path={`/leadsview/detail/:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
             element={<LeadsIntroductionViewerDetail />}
@@ -981,13 +982,12 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
         </Form.Group>
       </Row>
       <Row>
-        <Form.Group className="col-xl-3" as={Col} controlId="Amount">
+        <Form.Group className="col-xl-3">
           <Form.Label>Amount</Form.Label>
           <div>
             <NumberInput
               control={method.control}
               id={`Amount`}
-              //required={true}
               enterKeyOptions={() => method.setFocus("Description")}
             />
           </div>
@@ -1140,14 +1140,13 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
         </Form.Group>
       </Row>
       <Row>
-        <Form.Group className="col-xl-3" as={Col} controlId="Amount">
+        <Form.Group className="col-xl-3">
           <Form.Label>Amount</Form.Label>
           <div>
             <NumberInput
               control={method.control}
               id={`Amount`}
-              //required={true}
-              enterKeyOptions={() => method.setFocus("FromBank")}
+              enterKeyOptions={() => method.setFocus("Description")}
             />
           </div>
         </Form.Group>
@@ -1246,7 +1245,12 @@ function ClosedDialogComponent({ LeadIntroductionID }) {
 }
 
 function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
-  const method = useForm()
+  const method = useForm({
+    defaultValues: {
+      Description: "",
+      Amount: 0,
+    },
+  })
   const queryClient = useQueryClient()
   const user = useUserData()
   const footerContent = (
@@ -1296,14 +1300,13 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
             {...method.register("Description")}
           />
         </Form.Group>
-        <Form.Group className="col-xl-3" as={Col} controlId="Amount">
+        <Form.Group className="col-xl-3">
           <Form.Label>Expected Amount</Form.Label>
           <div>
             <NumberInput
               control={method.control}
               id={`Amount`}
-              //       required={true}
-              enterKeyOptions={() => method.setFocus("FromBank")}
+              enterKeyOptions={() => method.setFocus("Description")}
             />
           </div>
         </Form.Group>

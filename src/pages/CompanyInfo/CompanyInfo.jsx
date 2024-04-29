@@ -96,7 +96,7 @@ function CompanyInfoForm({ mode, userRights }) {
     mutationFn: async (formData) => {
       try {
         let newFormData = new FormData()
-        newFormData.append("CompanyID", CompanyInfo[0]?.CompanyID)
+        newFormData.append("CompanyID", CompanyInfo[0]?.CompanyID ?? 0)
         newFormData.append("CompanyName", formData.CompanyName)
         newFormData.append("Address", formData?.Address || "")
         newFormData.append("LandlineNo", formData?.LandlineNo || "")

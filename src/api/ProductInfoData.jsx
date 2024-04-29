@@ -1,5 +1,4 @@
 import axios from "axios"
-import { toast } from "react-toastify"
 import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 import { decryptID, encryptID } from "../utils/crypto"
 
@@ -57,7 +56,7 @@ export async function addNewProductInfo({
   try {
     let selectedBusinessUnitIDs
     if (selectedBusinessUnits?.length === 0) {
-      selectedBusinessUnitIDs = { RowID: 0, BusinessUnitID: null }
+      selectedBusinessUnitIDs = null
     } else {
       selectedBusinessUnitIDs = selectedBusinessUnits?.map((b, i) => {
         return { RowID: i + 1, BusinessUnitID: b.BusinessUnitID }

@@ -11,7 +11,7 @@ const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const CONTROLLER = "EduIMS"
 const WHEREMETHOD = "GetAllUsers"
-const DELETEMETHOD = "UserDelete"
+const DELETEMETHOD = "UsersDelete"
 const POSTMEHTOD = "UsersInsertUpdate"
 
 // URL: /gen_User/GetUserWhere?LoginUserID=??
@@ -38,10 +38,7 @@ export async function fetchUserById(UserID = 0, LoginUserID) {
 export async function deleteUserByID({ UserID, LoginUserID }) {
   try {
     UserID = decryptID(UserID)
-    ShowErrorToast(UserID + "-" + LoginUserID)
-    ShowErrorToast(
-      `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?UserID=${UserID}&LoginUserID=${LoginUserID}`
-    )
+
     const { data } = await axios.post(
       `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?UserID=${UserID}&LoginUserID=${LoginUserID}`
     )
@@ -69,7 +66,7 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
     newFormData.append("Email", formData.Email)
     newFormData.append("Username", formData.UserName)
     newFormData.append("Password", formData.Password)
-    newFormData.append("Inactive", formData.InActive === false ? 0 : 1)
+    newFormData.append("Inactive", (formData.InActive === false ? 0 : 1) ?? 0)
     newFormData.append("EntryUserID", userID)
     // if (UserImage !== "") {
     //   let userImageFile = convertBase64StringToFile(UserImage, true);
