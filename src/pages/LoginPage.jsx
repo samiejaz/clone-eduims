@@ -111,7 +111,6 @@ const SignUp = () => {
                   className="fas fa-crow fa-3x me-3"
                   style={{ color: "#709085" }}
                 />
-                <img src={Logo} alt="Logo" />
               </div>
               <Row>
                 <h1 className="text-center mb-5">Login</h1>
