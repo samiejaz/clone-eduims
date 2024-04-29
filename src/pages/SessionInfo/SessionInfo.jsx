@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
@@ -32,9 +32,8 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO
 let editRoute = `${parentRoute}/edit/`
@@ -42,100 +41,19 @@ let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.SESSION_INFO_QUERY_KEY
 let IDENTITY = "SessionID"
+let MENU_KEY = MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY
 
-export default function SessionInfoOpening() {
-  const [userRights, setUserRights] = useState([])
-
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.GENERAL.SESSION_INFO_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
-
+export default function SessionInfo() {
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route index element={<SessionDetail userRights={userRights} />} />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <SessionForm
-                key={"SessionInfoViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <SessionForm
-                      key={"SessionInfoEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <SessionForm
-                        key={"SessionInfoNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
-
-export function SessionDetail({ userRights }) {
+function DetailComponent({ userRights }) {
   document.title = "Session Info"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -264,7 +182,7 @@ export function SessionDetail({ userRights }) {
     </div>
   )
 }
-export function SessionForm({ mode, userRights }) {
+export function FormComponent({ mode, userRights }) {
   document.title = "Session Info Entry"
   const queryClient = useQueryClient()
   const navigate = useNavigate()

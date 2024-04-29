@@ -15,7 +15,7 @@ import { FilterMatchMode } from "primereact/api"
 import React, { useContext, useEffect, useRef, useState } from "react"
 
 import { AuthContext } from "../../context/AuthContext"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import TextInput from "../../components/Forms/TextInput"
 import NumberInput from "../../components/Forms/NumberInput"
@@ -46,13 +46,11 @@ import {
 } from "../../api/SelectData"
 import CDatePicker from "../../components/Forms/CDatePicker"
 import CNumberInput from "../../components/Forms/CNumberInput"
-import { useSessionSelectData } from "../../hooks/SelectData/useSelectData"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
 import { encryptID } from "../../utils/crypto"
 
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -60,94 +58,20 @@ let viewRoute = `${parentRoute}/`
 let ddDetailColor = "#8f48d2"
 let queryKey = QUERY_KEYS.CREDIT_NODE_QUERY_KEY
 let IDENTITY = "CreditNoteID"
+let MENU_KEY = MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY
 
-export default function BanckAccountOpening() {
-  const { checkForUserRights } = useContext(UserRightsContext)
-  const [userRights, setUserRights] = useState([])
-
-  useEffect(() => {
-    const rights = checkForUserRights({
-      MenuKey: MENU_KEYS.ACCOUNTS.CREDIT_NOTE_FORM_KEY,
-      MenuGroupKey: MENU_KEYS.ACCOUNTS.GROUP_KEY,
-    })
-    setUserRights([rights])
-  }, [])
-
+export default function CreditNotes() {
   return (
-    <Routes>
-      {userRights.length > 0 && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<CreditNoteEntrySearch userRights={userRights} />}
-          />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <CreditNoteEntryForm
-                key={"CreditNoteViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <CreditNoteEntryForm
-                      key={"CreditNoteEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <CreditNoteEntryForm
-                        key={"CreditNoteNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-function CreditNoteEntrySearch({ userRights }) {
+function DetailComponent({ userRights }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -298,7 +222,7 @@ const defaultValues = {
   CreditNoteDetail: [],
 }
 
-function CreditNoteEntryForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   document.title = "Credit Note Entry"
   const queryClient = useQueryClient()
   const { CreditNoteID } = useParams()

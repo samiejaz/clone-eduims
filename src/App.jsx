@@ -4,11 +4,9 @@ import { useEffect } from "react"
 import { ToastContainer } from "react-toastify"
 import SignUp from "./pages/LoginPage"
 import Dashboard from "./pages/Dashboard/Dashboard"
-import GenNewCustomerView from "./pages/CustomerEntry/CustomerEntryView"
 import {
   AppConfiguration,
   CompanyInfo,
-  GenCustomerEntry,
   BankAccountOpening,
   Country,
   Tehsil,
@@ -28,21 +26,17 @@ import {
   LeadSource,
   UserRights,
   Customers,
+  OldCustomers,
+  BusinessType,
 } from "./pages"
 
 import { ROUTE_URLS } from "./utils/enums"
-import { BusinessType } from "./pages/BusinessType/BusinessType"
 
 import signalRConnectionManager from "./services/SignalRService"
 import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
 } from "./pages/LeadsIntroductionViewer/LeadsIntroductionViewer"
 import LeadsDashboard from "./pages/Leads/LeadsDashboard/LeadsDashboard"
-
-import {
-  GenOldCustomerDetail,
-  GenOldCustomerForm,
-} from "./pages/GenOldCustomers/GenOldCustomerEntry"
 
 import LeadsComments from "./pages/LeadsIntroduction/LeadsComments"
 import { ConfirmDialog } from "primereact/confirmdialog"
@@ -51,6 +45,7 @@ import { useUserData } from "./context/AuthContext"
 import { useQuery } from "@tanstack/react-query"
 import { GetAllMenus } from "./api/MenusData"
 import { useRoutesData } from "./context/RoutesContext"
+import Reports from "./pages/Reports/reports"
 const App = () => {
   useEffect(() => {
     signalRConnectionManager.startConnection()
@@ -103,6 +98,10 @@ const App = () => {
           <Route
             path={`${ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY}/*`}
             element={<Customers />}
+          />
+          <Route
+            path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/*`}
+            element={<OldCustomers />}
           />
 
           {/* Users Routes END*/}
@@ -161,50 +160,30 @@ const App = () => {
           {/* Configuration Routes END */}
 
           <Route
-            path={`${ROUTE_URLS.GENERAL.COMPANY_INFO_ROUTE}`}
+            path={`${ROUTE_URLS.GENERAL.COMPANY_INFO_ROUTE}/*`}
             element={<CompanyInfo />}
           />
           <Route
-            path={`${ROUTE_URLS.UTILITIES.APP_CONFIGURATION_ROUTE}`}
+            path={`${ROUTE_URLS.UTILITIES.APP_CONFIGURATION_ROUTE}/*`}
             element={<AppConfiguration />}
           />
 
           {/* TODO  */}
-          <Route
-            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID`}
-            element={<LeadsIntroductionViewer />}
-          />
-          <Route
-            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE}/:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
-            element={<LeadsIntroductionViewerDetail />}
-          />
-          <Route
-            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_COMMENT_ROUTE}/:LeadIntroductionID`}
-            element={<LeadsComments />}
-          />
-
-          <Route
-            path={ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}
-            element={<GenOldCustomerDetail />}
-          />
-          <Route
-            path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/:CustomerID`}
-            element={<GenOldCustomerForm mode={"view"} />}
-          />
-          <Route
-            path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/edit/:CustomerID`}
-            element={<GenOldCustomerForm mode={"edit"} />}
-          />
-          <Route
-            path={`${ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY}/new`}
-            element={<GenOldCustomerForm mode={"new"} />}
-          />
+          {/* <Route
+            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID/*`}
+            element={<LeadsViewerRoutes />}
+          /> */}
 
           <Route
             path={`${ROUTE_URLS.LEADS.LEADS_DASHBOARD}`}
             element={<LeadsDashboard />}
           />
           {/* Leads End */}
+
+          {/* Reports */}
+          <Route path={`/reports/*`} element={<Reports />} />
+
+          {/* Reports End */}
         </Route>
       </Routes>
       <ConfirmDialog
@@ -235,6 +214,31 @@ const App = () => {
     </>
   )
 }
+
+// function LeadsViewerRoutes() {
+//   return (
+//     <Routes>
+//       <Route index element={<LeadsIntroductionViewer />} />
+//       <Route
+//         path={`:Type/:LeadIntroductionDetailID`}
+//         element={<LeadsIntroductionViewerDetail />}
+//       />
+//       <Route path={`:LeadIntroductionID`} element={<LeadsComments />} />
+//       <Route
+//             path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID`}
+//             element={<LeadsIntroductionViewer />}
+//           />
+//           <Route
+//             path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE}/:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
+//             element={<LeadsIntroductionViewerDetail />}
+//           />
+//           <Route
+//             path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_COMMENT_ROUTE}/:LeadIntroductionID`}
+//             element={<LeadsComments />}
+//           />
+//     </Routes>
+//   )
+// }
 
 export default App
 

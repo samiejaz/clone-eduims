@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useContext, useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
@@ -24,113 +24,31 @@ import {
   FormColumn,
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
+
 import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
 import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.BUSINESS_TYPE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.BUSINESS_TYPE_QUERY_KEY
+let MENU_KEY = MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY
+let IDENTITY = "BusinessTypeID"
 
-export function BusinessType() {
-  const [userRights, setUserRights] = useState([])
-
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.GENERAL.BUSINESS_TYPE_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
+export default function BusinessType() {
   return (
-    <>
-      <Routes>
-        {userRights.length > 0 && userRights[0].ShowForm ? (
-          <>
-            <Route
-              index
-              element={<BusinessTypeDetail userRights={userRights} />}
-            />
-            <Route
-              path={`:BusinessTypeID`}
-              element={
-                <BusinessTypeForm
-                  key={"BusinessTypeViewRoute"}
-                  mode={"view"}
-                  userRights={userRights}
-                />
-              }
-            />
-            <Route
-              path={`edit/:BusinessTypeID`}
-              element={
-                <>
-                  {userRights[0].RoleEdit ? (
-                    <>
-                      <BusinessTypeForm
-                        key={"BusinessTypeEditRoute"}
-                        mode={"edit"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <AccessDeniedPage />
-                  )}
-                </>
-              }
-            />
-
-            <>
-              <Route
-                path={`new`}
-                element={
-                  <>
-                    {userRights[0].RoleNew ? (
-                      <>
-                        <BusinessTypeForm
-                          key={"BusinessTypeNewRoute"}
-                          mode={"new"}
-                          userRights={userRights}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <AccessDeniedPage />
-                      </>
-                    )}
-                  </>
-                }
-              />
-            </>
-          </>
-        ) : (
-          <Route
-            path="*"
-            element={
-              <>
-                <AccessDeniedPage />
-              </>
-            }
-          />
-        )}
-      </Routes>
-    </>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
-export function BusinessTypeDetail({ userRights }) {
+
+function DetailComponent({ userRights }) {
   document.title = "Business Types"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -247,7 +165,7 @@ export function BusinessTypeDetail({ userRights }) {
     </div>
   )
 }
-export function BusinessTypeForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   document.title = "Business Type Entry"
   const queryClient = useQueryClient()
   const navigate = useNavigate()

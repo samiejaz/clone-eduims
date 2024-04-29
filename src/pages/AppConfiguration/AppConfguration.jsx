@@ -16,6 +16,8 @@ import { Button } from "primereact/button"
 import { useKeyCombinationHook } from "../../hooks/hooks"
 import { Tag } from "primereact/tag"
 import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
+import { SingleFormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { MENU_KEYS } from "../../utils/enums"
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
@@ -25,6 +27,15 @@ let defaultValues = {
 }
 
 function AppConfiguration() {
+  return (
+    <SingleFormRightsWrapper
+      menuKey={MENU_KEYS.UTILITIES.APP_CONFIGURATION_FORM_KEY}
+      FormComponent={AppConfigurationForm}
+    />
+  )
+}
+
+function AppConfigurationForm() {
   document.title = "App Configuration"
 
   const [reload, setReload] = useState(true)

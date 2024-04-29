@@ -157,6 +157,18 @@ export const routes = [
       },
     ],
   },
+  {
+    menuGroupName: "Reports",
+    icon: "pi pi-report",
+    menuGroupKey: MENU_KEYS.REPORTS.GROUP_KEY,
+    subItems: [
+      {
+        name: "Customer Ledger",
+        menuKey: MENU_KEYS.REPORTS.ACCOUNT_LEDGER_REPORT_FORM_KEY,
+        route: ROUTE_URLS.REPORTS.ACCOUNT_LEDGER_REPORT_ROUTE,
+      },
+    ],
+  },
 ]
 
 export const routesWithUserRights = routes.map((route) => {
@@ -250,6 +262,7 @@ export const initAuthorizedMenus = (allForms, areRoleAvailables = false) => {
     General: "pi pi-home",
     Utilities: "pi pi-cog",
     Leads: "pi pi-phone",
+    Reports: "pi pi-file-pdf",
   }
 
   const groupedForms = allForms.reduce((acc, form) => {
@@ -271,7 +284,7 @@ export const initAuthorizedMenus = (allForms, areRoleAvailables = false) => {
           menuGroupKey: forms[0].menuGroupKey,
           subItems: forms.map((form) => ({
             name: form.menuName,
-            menuKey: form.menuKey,
+            menuKey: form?.MenuKey ?? form?.menuKey,
             RoleNew: form.RoleNew === "True",
             RoleEdit: form.RoleEdit === "True",
             RoleDelete: form.RoleDelete === "True",
@@ -304,8 +317,9 @@ export const initAuthorizedMenus = (allForms, areRoleAvailables = false) => {
   }
   return transformedRoutes
 }
-// Unused
+
 export function convertToSingleRoutesWithUserRights(routes) {
+  debugger
   let originalForms = []
   routes.forEach((group) => {
     group.subItems.forEach((subItem) => {
@@ -373,5 +387,3 @@ export const initAuthorizedRoutesWithUserRights = (
     return updatedRoutes
   }
 }
-
-// Function

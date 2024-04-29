@@ -27,8 +27,8 @@ import { SELECT_QUERY_KEYS } from "../../utils/enums"
 // Activation Customers
 export function useActivationClientsSelectData(OldCustomerID = 0) {
   const activationClients = useQuery({
-    queryKey: ["activationClients", OldCustomerID],
-    queryFn: () => fetchAllActivationCustomersForSelect(OldCustomerID),
+    queryKey: ["activationClients", +OldCustomerID],
+    queryFn: () => fetchAllActivationCustomersForSelect(+OldCustomerID),
     initialData: [],
   })
   return activationClients
@@ -37,8 +37,8 @@ export function useActivationClientsSelectData(OldCustomerID = 0) {
 // Software Mgt. Customers
 export function useSoftwareClientsSelectData(OldCustomerID = 0) {
   const softwareClients = useQuery({
-    queryKey: ["softwareClients", OldCustomerID],
-    queryFn: () => fetchAllSoftwareCustomersForSelect(OldCustomerID),
+    queryKey: ["softwareClients", +OldCustomerID],
+    queryFn: () => fetchAllSoftwareCustomersForSelect(+OldCustomerID),
     initialData: [],
   })
   return softwareClients

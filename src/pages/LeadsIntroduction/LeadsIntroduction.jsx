@@ -42,7 +42,7 @@ import LeadsIntroductionViewer, {
 import LeadsComments from "./LeadsComments"
 import { encryptID } from "../../utils/crypto"
 import { SingleFileUploadField } from "../../components/Forms/form"
-import { ShowErrorToast } from "../../utils/CommonFunctions"
+
 import { Dropdown } from "primereact/dropdown"
 import { checkForUserRightsAsync } from "../../api/MenusData"
 
@@ -104,11 +104,15 @@ export default function LeadIntroduction() {
             element={<LeadIntroductionDetail userRights={userRights} />}
           />
           <Route
-            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID`}
+            path={`/leadsview/:LeadIntroductionID`}
             element={<LeadsIntroductionViewer />}
           />
           <Route
-            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE}/:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
+            path={`/leadcomments/:LeadIntroductionID`}
+            element={<LeadsComments />}
+          />
+          <Route
+            path={`/leadsview/detail/:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
             element={<LeadsIntroductionViewerDetail />}
           />
           <Route
@@ -173,15 +177,6 @@ export default function LeadIntroduction() {
           }
         />
       )}
-      <Route
-        path={`:LeadIntroductionID`}
-        element={<LeadsIntroductionViewer />}
-      />
-      <Route
-        path={`:LeadIntroductionID/:Type/:LeadIntroductionDetailID`}
-        element={<LeadsIntroductionViewerDetail />}
-      />
-      <Route path={`:LeadIntroductionID`} element={<LeadsComments />} />
     </Routes>
   )
 }

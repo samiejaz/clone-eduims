@@ -24,112 +24,30 @@ import CDropdown from "../../components/Forms/CDropdown"
 import { useUserData } from "../../context/AuthContext"
 import { AppConfigurationContext } from "../../context/AppConfigurationContext"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
 
+import { encryptID } from "../../utils/crypto"
+
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.PRODUCT_CATEGORIES_QUERY_KEY
 let IDENTITY = "ProductCategoryID"
+let MENU_KEY = MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY
 
 export default function ProductCategory() {
-  const [userRights, setUserRights] = useState([])
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
-
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route
-            index
-            element={<ProductCategoryDetail userRights={userRights} />}
-          />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <ProductCategoryForm
-                key={"ProductCategoryViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <ProductCategoryForm
-                      key={"ProductCategoryEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <ProductCategoryForm
-                        key={"ProductCategoryNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-export function ProductCategoryDetail({ userRights }) {
+export function DetailComponent({ userRights }) {
   document.title = "Product Categories"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -267,7 +185,7 @@ export function ProductCategoryDetail({ userRights }) {
   )
 }
 
-function ProductCategoryForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   const { pageTitles } = useContext(AppConfigurationContext)
   document.title = `${pageTitles?.product || "Product"} Category Entry`
 

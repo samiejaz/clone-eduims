@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useContext, useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
@@ -25,9 +25,8 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.COUNTRY_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -35,100 +34,20 @@ let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.COUNTRIES_QUERY_KEY
 let IDENTITY = "CountryID"
+let MENU_KEY = MENU_KEYS.GENERAL.COUNTRY_FORM_KEY
 
-export default function BanckAccountOpening() {
-  const [userRights, setUserRights] = useState([])
-
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.GENERAL.COUNTRY_FORM_KEY,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
-
+export default function Country() {
   return (
-    <Routes>
-      {userRights && userRights[0]?.ShowForm ? (
-        <>
-          <Route index element={<CountryDetail userRights={userRights} />} />
-          <Route
-            path={`:${IDENTITY}`}
-            element={
-              <CountryForm
-                key={"CountryViewRoute"}
-                mode={"view"}
-                userRights={userRights}
-              />
-            }
-          />
-          <Route
-            path={`edit/:${IDENTITY}`}
-            element={
-              <>
-                {userRights[0].RoleEdit ? (
-                  <>
-                    <CountryForm
-                      key={"CountryEditRoute"}
-                      mode={"edit"}
-                      userRights={userRights}
-                    />
-                  </>
-                ) : (
-                  <AccessDeniedPage />
-                )}
-              </>
-            }
-          />
-
-          <>
-            <Route
-              path={`new`}
-              element={
-                <>
-                  {userRights[0].RoleNew ? (
-                    <>
-                      <CountryForm
-                        key={"BankAccountNewRoute"}
-                        mode={"new"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AccessDeniedPage />
-                    </>
-                  )}
-                </>
-              }
-            />
-          </>
-        </>
-      ) : (
-        <Route
-          path="*"
-          element={
-            <>
-              <AccessDeniedPage />
-            </>
-          }
-        />
-      )}
-    </Routes>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-function CountryDetail({ userRights }) {
+function DetailComponent({ userRights }) {
   document.title = "Countries"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -241,7 +160,7 @@ function CountryDetail({ userRights }) {
     </div>
   )
 }
-function CountryForm({ mode, userRights }) {
+function FormComponent({ mode, userRights }) {
   document.title = "Country Entry"
 
   const queryClient = useQueryClient()
