@@ -761,3 +761,11 @@ a {
 .place-items-end {
   place-items: end;
 }
+
+#login-container {
+  background: url(/src/images/login-background.png) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
