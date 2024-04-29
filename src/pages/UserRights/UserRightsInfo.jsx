@@ -1,5 +1,5 @@
 import { FormProvider, useForm } from "react-hook-form"
-import React, { useContext, useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import UserRightsGroupedTable from "./UserRightsGroupedDatatable"
 import UserRightsGroupedTableCellWise from "./UserRightsGroupedDataTableCellWise"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -16,8 +16,7 @@ import {
   ROUTE_URLS,
   SELECT_QUERY_KEYS,
 } from "../../utils/enums"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { useNavigate, useParams } from "react-router-dom"
 import { Button } from "primereact/button"
 import ButtonToolBar from "../../components/ActionsToolbar"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
@@ -35,117 +34,29 @@ import {
   fetchUserRolesById,
 } from "../../api/MenusData"
 import ActionButtons from "../../components/ActionButtons"
-import {
-  initAuthorizedMenus,
-  initAuthorizedRoutesWithUserRights,
-  initRoutesWithUserRights,
-} from "../../utils/routes"
+import { initAuthorizedMenus } from "../../utils/routes"
+import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.CONFIGURATION.USER_RIGHTS_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
 let viewRoute = `${parentRoute}/`
 let queryKey = QUERY_KEYS.USER_ROLES_QUERY_KEY
+let MENU_KEY = MENU_KEYS.CONFIGURATION.USER_RIGHTS_ROUTE
+let IDENTITY = "RoleID"
 
-function UserRoles() {
-  const [userRights, setUserRights] = useState([])
-
-  const user = useUserData()
-
-  const { data: rights } = useQuery({
-    queryKey: ["formRights"],
-    queryFn: () =>
-      checkForUserRightsAsync({
-        MenuKey: MENU_KEYS.CONFIGURATION.USER_RIGHTS_ROUTE,
-        LoginUserID: user?.userID,
-      }),
-    initialData: [],
-  })
-
-  useEffect(() => {
-    if (rights) {
-      setUserRights(rights)
-    }
-  }, [rights])
+export default function UserRoles() {
   return (
-    <>
-      <Routes>
-        {userRights.length > 0 &&
-        userRights[0] !== null &&
-        userRights[0].ShowForm ? (
-          <>
-            <Route
-              index
-              element={<UserRightsDetail userRights={userRights} />}
-            />
-            <Route
-              path={`:RoleID`}
-              element={
-                <UserRightsInfo
-                  key={"RoleViewRoute"}
-                  mode={"view"}
-                  userRights={userRights}
-                />
-              }
-            />
-            <Route
-              path={`edit/:RoleID`}
-              element={
-                <>
-                  {userRights[0].RoleEdit ? (
-                    <>
-                      <UserRightsInfo
-                        key={"RoleEditRoute"}
-                        mode={"edit"}
-                        userRights={userRights}
-                      />
-                    </>
-                  ) : (
-                    <AccessDeniedPage />
-                  )}
-                </>
-              }
-            />
-
-            <>
-              <Route
-                path={`new`}
-                element={
-                  <>
-                    {userRights[0].RoleNew ? (
-                      <>
-                        <UserRightsInfo
-                          key={"RoleNewRoute"}
-                          mode={"new"}
-                          userRights={userRights}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <AccessDeniedPage />
-                      </>
-                    )}
-                  </>
-                }
-              />
-            </>
-          </>
-        ) : (
-          <Route
-            path="*"
-            element={
-              <>
-                <AccessDeniedPage />
-              </>
-            }
-          />
-        )}
-      </Routes>
-    </>
+    <FormRightsWrapper
+      FormComponent={FormComponent}
+      DetailComponent={DetailComponent}
+      menuKey={MENU_KEY}
+      identity={IDENTITY}
+    />
   )
 }
 
-const UserRightsInfo = ({ mode, userRights }) => {
+const FormComponent = ({ mode, userRights }) => {
   document.title = "Business Type Entry"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -163,6 +74,7 @@ const UserRightsInfo = ({ mode, userRights }) => {
     queryFn: () => fetchUserRolesById({ LoginUserID: user?.userID, RoleID }),
     enabled: RoleID !== undefined,
     initialData: [],
+    refetchOnWindowFocus: false,
   })
 
   const mutation = useMutation({
@@ -223,9 +135,9 @@ const UserRightsInfo = ({ mode, userRights }) => {
     navigate(editRoute + RoleID)
   }
   function onSubmit(data) {
-    const userRightsDetail = userRightsRef.current?.getUserRoutesDetail()
+    const UserRightsDetail = userRightsRef.current?.getUserRoutesDetail()
 
-    data.UserRightsDetail = userRightsDetail
+    data.UserRightsDetail = UserRightsDetail
     mutation.mutate({
       formData: data,
       userID: user.userID,
@@ -281,7 +193,7 @@ const UserRightsInfo = ({ mode, userRights }) => {
   )
 }
 
-function UserRightsDetail({ userRights }) {
+function DetailComponent({ userRights }) {
   document.title = "User Rights"
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -403,5 +315,3 @@ function UserRightsDetail({ userRights }) {
     </div>
   )
 }
-
-export default UserRoles

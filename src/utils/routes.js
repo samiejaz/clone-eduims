@@ -317,8 +317,9 @@ export const initAuthorizedMenus = (allForms, areRoleAvailables = false) => {
   }
   return transformedRoutes
 }
-// Unused
+
 export function convertToSingleRoutesWithUserRights(routes) {
+  debugger
   let originalForms = []
   routes.forEach((group) => {
     group.subItems.forEach((subItem) => {
