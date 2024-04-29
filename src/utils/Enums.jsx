@@ -44,6 +44,7 @@ export const ROUTE_URLS = {
     LEADS_DASHBOARD: "/leads/dashboard",
     LEED_SOURCE_ROUTE: "/leads/leadsource",
     LEAD_INTRODUCTION_ROUTE: "/leads/leadintroduction",
+    LEADS_USER_DASHBOARD: "/leads/userdashboard",
   },
   CONFIGURATION: {
     USER_RIGHTS_ROUTE: "/configuration/userrights",
@@ -146,6 +147,8 @@ export const MENU_KEYS = {
     LEADS_FORM_KEY: "mnuLeads",
     LEAD_SOURCE_FORM_KEY: "mnuLeadSource",
     LEAD_INTRODUCTION_FORM_KEY: "mnuLeadIntroduction",
+    LEADS_DASHBOARD_KEY: "mnuLeadsDashboard",
+    LEADS_USER_DASHBOARD_KEY: "mnuLeadsUserDashboard",
   },
   UTILITIES: {
     GROUP_NAME: "Utilities",

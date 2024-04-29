@@ -45,6 +45,7 @@ import { SingleFileUploadField } from "../../components/Forms/form"
 
 import { Dropdown } from "primereact/dropdown"
 import { checkForUserRightsAsync } from "../../api/MenusData"
+import LeadUserDashboard from "../Leads/LeadsDashboard/LeadsUserDashboard"
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -103,6 +104,7 @@ export default function LeadIntroduction() {
             index
             element={<LeadIntroductionDetail userRights={userRights} />}
           />
+
           <Route
             path={`/leadsview/:LeadIntroductionID`}
             element={<LeadsIntroductionViewer />}

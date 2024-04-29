@@ -459,6 +459,7 @@ function FormComponent({ mode, userRights }) {
                     required={true}
                     focusOptions={() => setFocus("RoleID")}
                     isEnable={mode !== "view"}
+                    type="password"
                   />
                 </div>
               </FormColumn>

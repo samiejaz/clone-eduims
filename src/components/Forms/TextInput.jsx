@@ -11,6 +11,7 @@ function TextInput({
   isEnable = true,
   floatLabel = false,
   onChange,
+  type = "text",
   errorMessage = "This field is required!",
   ...options
 }) {
@@ -53,6 +54,7 @@ function TextInput({
                 "p-invalid": fieldState.error,
               })}
               autoComplete="off"
+              type={type}
               {...options}
             />
             <span className="text-danger text-sm">

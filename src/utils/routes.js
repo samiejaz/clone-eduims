@@ -146,6 +146,16 @@ export const routes = [
     menuGroupKey: MENU_KEYS.LEADS.GROUP_KEY,
     subItems: [
       {
+        name: "Leads Dashboard",
+        menuKey: MENU_KEYS.LEADS.LEADS_DASHBOARD_KEY,
+        route: ROUTE_URLS.LEADS.LEADS_DASHBOARD,
+      },
+      {
+        name: "User Dashboard",
+        menuKey: MENU_KEYS.LEADS.LEADS_USER_DASHBOARD_KEY,
+        route: ROUTE_URLS.LEADS.LEADS_USER_DASHBOARD,
+      },
+      {
         name: "Leads Introduction",
         menuKey: MENU_KEYS.LEADS.LEAD_INTRODUCTION_FORM_KEY,
         route: ROUTE_URLS.LEAD_INTRODUCTION_ROUTE,
@@ -387,3 +397,5 @@ export const initAuthorizedRoutesWithUserRights = (
     return updatedRoutes
   }
 }
+
+console.log(convertRouteGroupsToSingleRoutes(routes))

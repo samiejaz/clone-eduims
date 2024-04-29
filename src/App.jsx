@@ -33,12 +33,7 @@ import {
 import { ROUTE_URLS } from "./utils/enums"
 
 import signalRConnectionManager from "./services/SignalRService"
-import LeadsIntroductionViewer, {
-  LeadsIntroductionViewerDetail,
-} from "./pages/LeadsIntroductionViewer/LeadsIntroductionViewer"
-import LeadsDashboard from "./pages/Leads/LeadsDashboard/LeadsDashboard"
 
-import LeadsComments from "./pages/LeadsIntroduction/LeadsComments"
 import { ConfirmDialog } from "primereact/confirmdialog"
 // import { KSearchBar } from "./components/components"
 import { useUserData } from "./context/AuthContext"
@@ -46,6 +41,7 @@ import { useQuery } from "@tanstack/react-query"
 import { GetAllMenus } from "./api/MenusData"
 import { useRoutesData } from "./context/RoutesContext"
 import Reports from "./pages/Reports/reports"
+import LeadsDashboardWrapper from "./pages/Leads/LeadsDashboard/LeadsDashboardWrapper"
 const App = () => {
   useEffect(() => {
     signalRConnectionManager.startConnection()
@@ -168,16 +164,7 @@ const App = () => {
             element={<AppConfiguration />}
           />
 
-          {/* TODO  */}
-          {/* <Route
-            path={`${ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_VIEWER_ROUTE}/:LeadIntroductionID/*`}
-            element={<LeadsViewerRoutes />}
-          /> */}
-
-          <Route
-            path={`${ROUTE_URLS.LEADS.LEADS_DASHBOARD}`}
-            element={<LeadsDashboard />}
-          />
+          <Route path="/*" element={<LeadsDashboardWrapper />} />
           {/* Leads End */}
 
           {/* Reports */}
