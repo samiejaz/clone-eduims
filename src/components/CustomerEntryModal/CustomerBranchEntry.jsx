@@ -1,10 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
-import { Form, Col, ButtonGroup } from "react-bootstrap"
+import { useForm } from "react-hook-form"
+import {
+  ShowErrorToast,
+  ShowSuccessToast,
+  preventFormByEnterKeySubmission,
+} from "../../utils/CommonFunctions"
+import { ButtonGroup } from "react-bootstrap"
 import { Button } from "primereact/button"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import Select from "react-select"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { fetchCustomerBranchesByCustomerID } from "./CustomerEntryAPI"
@@ -143,7 +146,7 @@ function CustomerBranchEntryHeader(props) {
 
       if (data.success === true) {
         reset()
-        toast.success(
+        ShowSuccessToast(
           `${pageTitles?.branch || "Customer Branch"} saved successfully!`
         )
         queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] })
@@ -151,19 +154,17 @@ function CustomerBranchEntryHeader(props) {
           queryKey: ["customerAccounts", CustomerID],
         })
       } else {
-        toast.error(data.message, {
-          autoClose: 1500,
-        })
+        ShowErrorToast(data.message)
       }
     },
     onError: () => {
-      toast.error("Error while saving data!")
+      ShowErrorToast("Error while saving data!")
     },
   })
 
   function onSubmit(data) {
     if (CustomerID === 0) {
-      toast.error("No Customer Found!!")
+      ShowErrorToast("No Customer Found!!")
     } else {
       customerBranchMutation.mutate(data)
     }
@@ -419,7 +420,7 @@ function CustomerBranchesDataTable(props) {
       )
 
       if (data.success === true) {
-        toast.success(
+        ShowSuccessToast(
           `${pageTitles?.branch || "Customer Branch"} updated! successfully!`
         )
         queryClient.invalidateQueries({ queryKey: ["customerBranchesDetail"] })
@@ -428,13 +429,11 @@ function CustomerBranchesDataTable(props) {
         })
         setVisible(false)
       } else {
-        toast.error(data.message, {
-          autoClose: 1500,
-        })
+        ShowErrorToast(data.message)
       }
     },
     onError: () => {
-      toast.error("Error while saving data!")
+      ShowErrorToast("Error while saving data!")
     },
   })
 
@@ -482,9 +481,7 @@ function CustomerBranchesDataTable(props) {
           `${apiUrl}/EduIMS/ViewCustomerBranchWhere?CustomerBranchID=${CustomerBranchID}&LoginUserID=${user.userID}`
         )
         if (!data) {
-          toast.error("Network Error Occured!", {
-            position: "bottom-left",
-          })
+          ShowErrorToast("Network Error Occured!")
         }
 
         setCustomerBranchData(data)
