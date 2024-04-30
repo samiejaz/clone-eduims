@@ -15,6 +15,7 @@ import { BreadCrumb } from "primereact/breadcrumb"
 import Select from "react-select"
 import { fetchAllOldCustomersForSelect } from "../../api/SelectData"
 import { ROUTE_URLS } from "../../utils/enums"
+import { Dropdown } from "primereact/dropdown"
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const items = [{ label: "Customer Detail" }]
@@ -120,8 +121,8 @@ export default function GenNewCustomerView() {
             <Form.Group as={Col}>
               <h2 className="text-start my-auto">Customer Detail</h2>
             </Form.Group>
-            <Form.Group as={Col} controlId="Customers">
-              <Controller
+            <Form.Group as={Col}>
+              {/* <Controller
                 control={control}
                 name="Customers"
                 render={({ field: { onChange, value } }) => (
@@ -139,6 +140,32 @@ export default function GenNewCustomerView() {
                     placeholder="Select a customer"
                     noOptionsMessage={() => "No customers found!"}
                     isClearable
+                  />
+                )}
+              /> */}
+              <Controller
+                name="Customers"
+                control={control}
+                render={({ field }) => (
+                  <Dropdown
+                    id={field.name}
+                    value={field.value}
+                    optionValue="CustomerID"
+                    optionLabel="CustomerName"
+                    placeholder="Select a customer"
+                    options={data}
+                    focusInputRef={field.ref}
+                    onChange={(e) => {
+                      field.onChange(e.value)
+                      if (e.value === undefined) {
+                        setCustomerID(params?.CustomerID)
+                      } else {
+                        setCustomerID(e.value)
+                      }
+                    }}
+                    style={{ width: "100%" }}
+                    filter
+                    showClear
                   />
                 )}
               />
