@@ -1,5 +1,6 @@
 import axios from "axios"
 import { toast } from "react-toastify"
+import { ShowErrorToast } from "../utils/CommonFunctions"
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
@@ -29,18 +30,22 @@ export async function fetchNewCustomerById(CustomerID, LoginUserID) {
 }
 
 export async function deleteNewCustomerByID(newCustomer) {
-  const { data } = await axios.post(
-    `${apiUrl}/EduIMS/NewCustomerDelete?CustomerID=${newCustomer.CustomerID}&LoginUserID=${newCustomer.LoginUserID}`
-  )
-  if (data.success === true) {
-    toast.success("Customer sucessfully deleted!", {
-      autoClose: 1500,
-    })
-    return true
-  } else {
-    toast.error(data.message, {
-      autoClose: false,
-    })
-    return false
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/EduIMS/NewCustomerDelete?CustomerID=${newCustomer.CustomerID}&LoginUserID=${newCustomer.LoginUserID}`
+    )
+    if (data.success === true) {
+      toast.success("Customer sucessfully deleted!", {
+        autoClose: 1500,
+      })
+      return true
+    } else {
+      toast.error(data.message, {
+        autoClose: false,
+      })
+      return false
+    }
+  } catch (err) {
+    ShowErrorToast(err.message)
   }
 }

@@ -226,7 +226,7 @@ export function GenOldCustomerDetail({ userRights }) {
                     showEditDialog(encryptID(rowData.CustomerID)),
                   handleView: handleView,
                   showEditButton: userRights[0]?.RoleEdit,
-                  showDeleteButton: userRights[0]?.RoleDelete,
+                  showDeleteButton: false,
                   viewBtnRoute: viewRoute + encryptID(rowData.CustomerID),
                 })
               }
@@ -363,7 +363,7 @@ export function GenOldCustomerForm({ mode, userRights }) {
               handleDelete={handleDelete}
               handleSave={() => handleSubmit(onSubmit)()}
               GoBackLabel="Old Customers"
-              showDelete={false || userRights[0]?.RoleDelete}
+              showDelete={false}
               showAddNewButton={userRights[0]?.RoleNew}
               showEditButton={userRights[0]?.RoleEdit}
             />

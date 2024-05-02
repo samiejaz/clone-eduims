@@ -1,33 +1,31 @@
-import { InputText } from "primereact/inputtext"
 import { classNames } from "primereact/utils"
+import { Password } from "primereact/password"
 import { Controller } from "react-hook-form"
 
-function TextInput({
-  Label = "",
-  ID,
+function CPassword({
+  label = "",
+  name,
   control,
   required,
   focusOptions,
-  isEnable = true,
+  disabled = false,
   floatLabel = false,
   onChange,
-  type = "text",
-
+  toggleMask = true,
   errorMessage = "This field is required!",
-  showErrorMessage = true,
   ...options
 }) {
   return (
     <Controller
-      name={ID}
+      name={name}
       control={control}
       rules={{ required }}
       render={({ field, fieldState }) => (
         <>
-          <label htmlFor={field.name}>{Label}</label>
+          <label htmlFor={field.name}>{label}</label>
           <span className={floatLabel ? "p-float-label" : ""}>
-            <InputText
-              disabled={!isEnable}
+            <Password
+              disabled={disabled}
               id={field.name}
               value={field.value}
               ref={field.ref}
@@ -39,11 +37,22 @@ function TextInput({
               }}
               style={{
                 width: "100%",
-                backgroundColor: isEnable === false ? "#dee2e6" : "white",
+                backgroundColor: disabled ? "#dee2e6" : "white",
                 color: "black",
               }}
               pt={{
-                root: { style: { padding: "0.3rem 0.4rem", fontSize: ".9em" } },
+                root: {
+                  style: {
+                    width: "100%",
+                    padding: "0",
+                    fontSize: ".9em",
+                  },
+                },
+                input: {
+                  style: {
+                    width: "100%",
+                  },
+                },
               }}
               onKeyDown={(e) => {
                 if (focusOptions) {
@@ -56,16 +65,12 @@ function TextInput({
                 "p-invalid": fieldState.error,
               })}
               autoComplete="off"
-              type={type}
               {...options}
+              toggleMask={toggleMask}
             />
-            {showErrorMessage && (
-              <>
-                <span className="text-danger text-sm">
-                  {fieldState.error ? errorMessage : ""}
-                </span>
-              </>
-            )}
+            <span className="text-danger text-sm">
+              {fieldState.error ? errorMessage : ""}
+            </span>
           </span>
         </>
       )}
@@ -73,4 +78,4 @@ function TextInput({
   )
 }
 
-export default TextInput
+export default CPassword

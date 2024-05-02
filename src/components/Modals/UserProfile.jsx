@@ -1,13 +1,16 @@
 import { Button } from "primereact/button"
 import { Dialog } from "primereact/dialog"
 import { useForm } from "react-hook-form"
-import { SingleFileUploadField, TextInput } from "../Forms/form"
+import { PasswordField, SingleFileUploadField, TextInput } from "../Forms/form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
-import { useContext, useEffect, useRef, useState } from "react"
-import { AuthContext } from "../../context/AuthContext"
+import { useEffect, useRef, useState } from "react"
+import { useAuthProvider } from "../../context/AuthContext"
 import { toast } from "react-toastify"
-import { ShowErrorToast } from "../../utils/CommonFunctions"
+import {
+  ShowErrorToast,
+  convertBase64StringToFile,
+} from "../../utils/CommonFunctions"
 import { useNavigate } from "react-router-dom"
 import { FormColumn, FormRow } from "../Layout/LayoutComponents"
 import { FormLabel } from "react-bootstrap"
@@ -29,10 +32,11 @@ function UserProfile({ showProfile, handleCloseProfile }) {
       LastName: "",
       Email: "",
       UserName: "",
+      Password: "",
     },
   })
 
-  const { user, loginUser, setUser } = useContext(AuthContext)
+  const { user, setUser, updateUserName } = useAuthProvider()
   const { data: UserData } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
@@ -63,6 +67,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
         newFormData.append("Email", formData.Email)
         newFormData.append("Username", formData.Username)
         newFormData.append("LoginUserID", user.userID)
+        newFormData.append("Password", formData.Password)
         newFormData.append("image", formData.UserImage)
         const { data } = await axios.post(
           apiUrl + "/EduIMS/UsersInfoUpdate",
@@ -80,16 +85,8 @@ function UserProfile({ showProfile, handleCloseProfile }) {
           toast.success("Profile updated successfully!", {
             autoClose: 1000,
           })
+          updateUserName(`${formData.FirstName}  ${formData.LastName}`)
 
-          loginUser(
-            {
-              userID: user.userID,
-              username: `${formData.FirstName}  ${formData.LastName}`,
-              image: formData.UserImage,
-              DepartmetnID: user.DepartmentID,
-            },
-            false
-          )
           queryClient.invalidateQueries({ queryKey: ["currentUser"] })
           handleCloseProfile()
           setIsEnable(true)
@@ -106,16 +103,21 @@ function UserProfile({ showProfile, handleCloseProfile }) {
       setValue("LastName", UserData?.data[0]?.LastName)
       setValue("Email", UserData?.data[0]?.Email)
       setValue("Username", UserData?.data[0]?.UserName)
-      fileRef.current?.setBase64File(
-        "data:image/png;base64," + UserData?.data[0].ProfilePic
-      )
+      setValue("Password", UserData?.data[0]?.Password)
     }
   }, [user, UserData])
 
   function onSubmit(data) {
-    const file = fileRef.current?.getFile()
+    const file = fileRef.current?.getFile(false)
     if (file === null) {
-      fileRef.current?.setError()
+      let convertedFile = convertBase64StringToFile(
+        "data:image/png;base64," + UserData?.data[0].ProfilePic,
+        true
+      )
+      if (convertedFile) {
+        data.UserImage = convertedFile
+        userProfileMutation.mutate(data)
+      }
     } else {
       data.UserImage = file
       userProfileMutation.mutate(data)
@@ -135,7 +137,9 @@ function UserProfile({ showProfile, handleCloseProfile }) {
                       label="Edit"
                       severity="success"
                       type="button"
-                      onClick={() => setIsEnable(false)}
+                      onClick={() => {
+                        setIsEnable(false)
+                      }}
                       className="p-button-success rounded"
                       pt={{
                         label: {
@@ -182,6 +186,8 @@ function UserProfile({ showProfile, handleCloseProfile }) {
                     type="button"
                     severity="success"
                     onClick={() => handleSubmit(onSubmit)()}
+                    loading={userProfileMutation.isPending}
+                    loadingIcon={"pi pi-spin pi-cog"}
                     className="p-button-success rounded"
                     pt={{
                       label: {
@@ -258,6 +264,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
               Label={"First Name"}
               ID={"FirstName"}
               isEnable={!isEnable}
+              showErrorMessage={false}
             />
             <TextInput
               control={control}
@@ -265,6 +272,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
               Label={"Last Name"}
               ID={"LastName"}
               isEnable={!isEnable}
+              showErrorMessage={false}
             />
             <TextInput
               control={control}
@@ -272,6 +280,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
               Label={"Email"}
               ID={"Email"}
               isEnable={!isEnable}
+              showErrorMessage={false}
             />
             <TextInput
               control={control}
@@ -279,6 +288,14 @@ function UserProfile({ showProfile, handleCloseProfile }) {
               Label={"Username"}
               ID={"Username"}
               isEnable={!isEnable}
+              showErrorMessage={false}
+            />
+
+            <PasswordField
+              control={control}
+              name={"Password"}
+              disabled={isEnable}
+              label="Password"
             />
           </form>
         </div>

@@ -56,7 +56,7 @@ const App = () => {
         <Route path="/" element={<ProtectedRoutes />}>
           <Route index element={<Dashboard />} />
           <Route
-            path={ROUTE_URLS.GENERAL.APP_CONFIGURATION_ROUTE}
+            path={ROUTE_URLS.GENERAL.APP_CONFIGURATION_ROUTE + "/*"}
             element={<AppConfiguration />}
           />
 
@@ -158,10 +158,6 @@ const App = () => {
           <Route
             path={`${ROUTE_URLS.GENERAL.COMPANY_INFO_ROUTE}/*`}
             element={<CompanyInfo />}
-          />
-          <Route
-            path={`${ROUTE_URLS.UTILITIES.APP_CONFIGURATION_ROUTE}/*`}
-            element={<AppConfiguration />}
           />
 
           <Route path="/*" element={<LeadsDashboardWrapper />} />

@@ -34,8 +34,8 @@ const SingleFileUpload = React.forwardRef(
     const overLayRef = useRef()
 
     React.useImperativeHandle(ref, () => ({
-      getFile() {
-        if (inputRef.current?.files[0]) {
+      getFile(getFromInputField = true) {
+        if (getFromInputField && inputRef.current?.files[0]) {
           return inputRef.current?.files[0]
         } else {
           return currentFile
@@ -50,6 +50,7 @@ const SingleFileUpload = React.forwardRef(
       setBase64File(base64String) {
         try {
           const file = convertBase64StringToFile(base64String, true)
+
           setCurrentFile(file)
         } catch (e) {
           ShowErrorToast(e.message)
@@ -124,6 +125,11 @@ const SingleFileUpload = React.forwardRef(
                   type="button"
                   className="rounded w-full"
                   disabled={mode === "view"}
+                  pt={{
+                    label: {
+                      className: "hidden md:block lg:block",
+                    },
+                  }}
                 />
                 {currentFile?.type.includes("pdf") && (
                   <>
@@ -135,6 +141,11 @@ const SingleFileUpload = React.forwardRef(
                       type="button"
                       className="rounded w-full"
                       disabled={currentFile === null}
+                      pt={{
+                        label: {
+                          className: "hidden md:block lg:block",
+                        },
+                      }}
                     />
                   </>
                 )}
@@ -150,6 +161,11 @@ const SingleFileUpload = React.forwardRef(
                   type="button"
                   className="rounded w-full p-button-text"
                   disabled={currentFile === null || mode === "view"}
+                  pt={{
+                    label: {
+                      className: "hidden md:block lg:block",
+                    },
+                  }}
                 />
 
                 {mode === "view" && (
@@ -164,6 +180,11 @@ const SingleFileUpload = React.forwardRef(
                       type="button"
                       className="rounded w-full"
                       disabled={currentFile === null}
+                      pt={{
+                        label: {
+                          className: "hidden md:block lg:block",
+                        },
+                      }}
                     />
                   </>
                 )}

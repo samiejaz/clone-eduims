@@ -31,7 +31,10 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
-import { SingleFileUploadField } from "../../components/Forms/form"
+import {
+  PasswordField,
+  SingleFileUploadField,
+} from "../../components/Forms/form"
 import { Avatar } from "primereact/avatar"
 
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
@@ -246,7 +249,7 @@ function FormComponent({ mode, userRights }) {
       Email: "",
       Password: "",
       UserName: "",
-      InActive: "",
+      InActive: false,
       DepartmentID: null,
       RoleID: null,
     },
@@ -325,16 +328,13 @@ function FormComponent({ mode, userRights }) {
   }
   function onSubmit(data) {
     const file = fileRef.current?.getFile()
-    if (file === null) {
-      fileRef.current?.setError()
-    } else {
-      data.UserImage = file
-      mutation.mutate({
-        formData: data,
-        userID: user?.userID,
-        UserID: UserID,
-      })
-    }
+
+    data.UserImage = file
+    mutation.mutate({
+      formData: data,
+      userID: user?.userID,
+      UserID: UserID,
+    })
   }
 
   return (
@@ -436,7 +436,7 @@ function FormComponent({ mode, userRights }) {
                     options={departmentSelectData.data}
                     required={true}
                     disabled={mode === "view"}
-                    focusOptions={() => setFocus("InActive")}
+                    focusOptions={() => setFocus("Email")}
                   />
                 </div>
               </FormColumn>
@@ -481,13 +481,11 @@ function FormComponent({ mode, userRights }) {
                 </FormLabel>
 
                 <div>
-                  <TextInput
+                  <PasswordField
                     control={control}
-                    ID={"Password"}
-                    required={true}
+                    name={"Password"}
+                    disabled={mode === "view"}
                     focusOptions={() => setFocus("RoleID")}
-                    isEnable={mode !== "view"}
-                    type="password"
                   />
                 </div>
               </FormColumn>

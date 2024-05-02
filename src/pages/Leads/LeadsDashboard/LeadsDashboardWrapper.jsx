@@ -8,7 +8,7 @@ export default function LeadsDashboardWrapper() {
   return (
     <Routes>
       <Route
-        path={ROUTE_URLS.LEADS.LEADS_DASHBOARD}
+        path={ROUTE_URLS.LEADS.LEADS_DASHBOARD + "/*"}
         element={
           <SingleFormRightsWrapper
             FormComponent={LeadsDashboard}
@@ -17,7 +17,7 @@ export default function LeadsDashboardWrapper() {
         }
       />
       <Route
-        path={ROUTE_URLS.LEADS.LEADS_USER_DASHBOARD}
+        path={ROUTE_URLS.LEADS.LEADS_USER_DASHBOARD + "/*"}
         element={
           <SingleFormRightsWrapper
             FormComponent={LeadUserDashboard}

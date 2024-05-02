@@ -380,7 +380,7 @@ const CustomerBranchDetailField = ({ pageTitles, index, disable }) => {
           optionLabel="BranchTitle"
           optionValue="BranchID"
           placeholder={`Select a ${
-            pageTitles?.branch?.toLowerCase() || "branch"
+            pageTitles?.branch?.toLowerCase() ?? "branch"
           }`}
           options={data}
           required={true}

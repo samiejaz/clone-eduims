@@ -238,7 +238,7 @@ function AllCustomersBranchDetailTable(props) {
         dataKey="BranchID"
         removableSort
         emptyMessage={`No ${
-          pageTitles?.branch?.toLowerCase() || "customer branch"
+          pageTitles?.branch?.toLowerCase() ?? "customer branch"
         } found!`}
         filters={filters}
         filterDisplay="row"

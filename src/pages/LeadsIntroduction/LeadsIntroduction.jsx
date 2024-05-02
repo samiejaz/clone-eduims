@@ -41,11 +41,20 @@ import LeadsIntroductionViewer, {
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer"
 import LeadsComments from "./LeadsComments"
 import { encryptID } from "../../utils/crypto"
-import { SingleFileUploadField, TextInput } from "../../components/Forms/form"
+import {
+  SingleFileUploadField,
+  TextAreaField,
+  TextInput,
+} from "../../components/Forms/form"
 
 import { Dropdown } from "primereact/dropdown"
 import { checkForUserRightsAsync } from "../../api/MenusData"
 import LeadUserDashboard from "../Leads/LeadsDashboard/LeadsUserDashboard"
+import {
+  FormColumn,
+  FormLabel,
+  FormRow,
+} from "../../components/Layout/LayoutComponents"
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -754,11 +763,11 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const dialogConent = (
     <>
       <Row>
-        <Form.Group as={Col} controlId="DepartmentID">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        <FormColumn lg={6} xl={6} md={6}>
+          <FormLabel>
             Department
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -771,12 +780,12 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
               showClear={true}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="UserID">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+        <FormColumn lg={6} xl={6} md={6}>
+          <FormLabel>
             User
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -789,14 +798,14 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
               showClear={true}
             />
           </div>
-        </Form.Group>
+        </FormColumn>
       </Row>
       <Row>
-        <Form.Group as={Col} controlId="MeetingPlace">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
             Meeting Medium
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -811,12 +820,12 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
               focusOptions={() => method.setFocus("MeetingTime")}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="MeetingTime">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
             Meeting Date & Time
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <Controller
               name="MeetingTime"
@@ -839,12 +848,12 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
               )}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="DepartmentID">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
             Recomended Product
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -857,22 +866,17 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
               focusOptions={() => method.setFocus("Description")}
             />
           </div>
-        </Form.Group>
+        </FormColumn>
       </Row>
       <Row>
-        <Form.Group as={Col} className="col-12">
-          <Form.Label>Instructions</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
-            {...method.register("Description")}
+        <FormColumn lg={12} xl={12} md={12} className="col-12">
+          <FormLabel>Instructions</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
           />
-        </Form.Group>
+        </FormColumn>
       </Row>
     </>
   )
@@ -952,7 +956,12 @@ function QuoteDialogComponent({ LeadIntroductionID }) {
 }
 
 function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
-  const method = useForm()
+  const method = useForm({
+    defaultValues: {
+      Description: "",
+      Amount: 0,
+    },
+  })
   const fileRef = useRef()
   const queryClient = useQueryClient()
   const user = useUserData()
@@ -971,40 +980,35 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const dialogConent = (
     <>
       <Row>
-        <Form.Group as={Col} controlId="AttachmentFile">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        <FormColumn lg={12} xl={12} md={6}>
+          <FormLabel>
             File
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
-            <SingleFileUploadField ref={fileRef} />
+            <SingleFileUploadField ref={fileRef} background="bg-primary" />
           </div>
-        </Form.Group>
+        </FormColumn>
       </Row>
       <Row>
-        <Form.Group className="col-xl-3">
-          <Form.Label>Amount</Form.Label>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Amount</FormLabel>
           <div>
             <NumberInput
               control={method.control}
-              id={`Amount`}
+              id={"Amount"}
               enterKeyOptions={() => method.setFocus("Description")}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="Description" className="col-9">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
-            {...method.register("Description")}
+        </FormColumn>
+        <FormColumn lg={9} xl={9} md={6}>
+          <FormLabel>Description</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
           />
-        </Form.Group>
+        </FormColumn>
       </Row>
     </>
   )
@@ -1098,7 +1102,12 @@ function FinalizedDialogComponent({ LeadIntroductionID }) {
 function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const queryClient = useQueryClient()
   const user = useUserData()
-  const method = useForm()
+  const method = useForm({
+    defaultValues: {
+      Description: "",
+      Amount: 0,
+    },
+  })
 
   const fileRef = useRef(null)
 
@@ -1129,19 +1138,19 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const dialogConent = (
     <>
       <Row>
-        <Form.Group as={Col} controlId="AttachmentFile">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        <FormColumn lg={12} xl={12} md={6}>
+          <FormLabel>
             File
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <SingleFileUploadField ref={fileRef} background="bg-primary" />
           </div>
-        </Form.Group>
+        </FormColumn>
       </Row>
       <Row>
-        <Form.Group className="col-xl-3">
-          <Form.Label>Amount</Form.Label>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Amount</FormLabel>
           <div>
             <NumberInput
               control={method.control}
@@ -1149,20 +1158,15 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
               enterKeyOptions={() => method.setFocus("Description")}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="Description" className="col-9">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
-            {...method.register("Description")}
+        </FormColumn>
+        <FormColumn lg={9} xl={9} md={6}>
+          <FormLabel>Description</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
           />
-        </Form.Group>
+        </FormColumn>
       </Row>
     </>
   )
@@ -1286,22 +1290,17 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   }
   const dialogConent = (
     <>
-      <Row>
-        <Form.Group as={Col} controlId="Description" className="col-9">
-          <Form.Label>Reason</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
-            {...method.register("Description")}
+      <FormRow>
+        <FormColumn lg={9} xl={9} md={6}>
+          <FormLabel>Reason</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
           />
-        </Form.Group>
-        <Form.Group className="col-xl-3">
-          <Form.Label>Expected Amount</Form.Label>
+        </FormColumn>
+        <FormColumn lg={3} xl={3} md={6}>
+          <FormLabel>Expected Amount</FormLabel>
           <div>
             <NumberInput
               control={method.control}
@@ -1309,8 +1308,8 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
               enterKeyOptions={() => method.setFocus("Description")}
             />
           </div>
-        </Form.Group>
-      </Row>
+        </FormColumn>
+      </FormRow>
     </>
   )
 

@@ -169,7 +169,7 @@ function DetailComponent({ userRights }) {
               field="ProductInfoTitle"
               filter
               filterPlaceholder={`Search by ${
-                pageTitles?.product.toLowerCase() || "product"
+                pageTitles?.product?.toLowerCase() ?? "product"
               }`}
               sortable
               header={`${pageTitles?.product || "Product"} Info`}
@@ -179,7 +179,7 @@ function DetailComponent({ userRights }) {
               field="ProductCategoryTitle"
               filter
               filterPlaceholder={`Search by ${
-                pageTitles?.product.toLowerCase() || "product"
+                pageTitles?.product?.toLowerCase() ?? "product"
               } type`}
               sortable
               header={`${pageTitles?.product || "Product"} Type`}

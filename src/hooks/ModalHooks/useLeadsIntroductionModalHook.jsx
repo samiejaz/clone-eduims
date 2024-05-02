@@ -32,6 +32,7 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import { decryptID } from "../../utils/crypto"
 import { formatDateAndTime } from "../../utils/CommonFunctions"
+import { InputTextarea } from "primereact/inputtextarea"
 
 export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
   const queryClient = useQueryClient()
@@ -259,17 +260,15 @@ export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
       <FormRow>
         <FormColumn lg={12} xl={12} md={6}>
           <FormLabel>Description</FormLabel>
-          <input
-            as={"textarea"}
-            rows={1}
-            disabled
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
-            value={LeadIntroductionData.data[0]?.Description || ""}
-          />
+          <div>
+            <InputTextarea
+              autoResize={true}
+              name="Description"
+              value={LeadIntroductionData.data[0]?.Description || ""}
+              disabled
+              style={{ width: "100%" }}
+            />
+          </div>
         </FormColumn>
       </FormRow>
     </>

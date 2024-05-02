@@ -12,11 +12,17 @@ export const AuthProvier = ({ children }) => {
 
   function loginUser(data, navigateToDashBoard = true) {
     localStorage.setItem("user", JSON.stringify(data))
-
     setUser(data)
     if (navigateToDashBoard) {
       navigate("/", { replace: true })
     }
+  }
+
+  function updateUserName(username) {
+    let existingUserObj = JSON.parse(localStorage.getItem("user"))
+    existingUserObj.username = username
+    localStorage.setItem("user", JSON.stringify(existingUserObj))
+    setUser(existingUserObj)
   }
 
   function logoutUser() {
@@ -42,7 +48,9 @@ export const AuthProvier = ({ children }) => {
   }, [user, navigate])
 
   return (
-    <AuthContext.Provider value={{ user, loginUser, logoutUser, setUser }}>
+    <AuthContext.Provider
+      value={{ user, loginUser, logoutUser, setUser, updateUserName }}
+    >
       {children}
     </AuthContext.Provider>
   )
@@ -51,4 +59,16 @@ export const AuthProvier = ({ children }) => {
 export function useUserData() {
   const { user } = useContext(AuthContext)
   return user
+}
+
+export function useAuthProvider() {
+  const { user, loginUser, logoutUser, setUser, updateUserName } =
+    useContext(AuthContext)
+  return {
+    user,
+    loginUser,
+    logoutUser,
+    setUser,
+    updateUserName,
+  }
 }

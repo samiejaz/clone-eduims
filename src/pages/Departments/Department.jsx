@@ -18,7 +18,12 @@ import {
   fetchAllDepartments,
   fetchDepartmentById,
 } from "../../api/DepartmentData"
-import { ROUTE_URLS, QUERY_KEYS, MENU_KEYS } from "../../utils/enums"
+import {
+  ROUTE_URLS,
+  QUERY_KEYS,
+  MENU_KEYS,
+  SELECT_QUERY_KEYS,
+} from "../../utils/enums"
 import {
   FormRow,
   FormColumn,
@@ -196,6 +201,9 @@ function FormComponent({ mode, userRights }) {
     onSuccess: ({ success, RecordID }) => {
       if (success) {
         queryClient.invalidateQueries({ queryKey: [queryKey] })
+        queryClient.invalidateQueries({
+          queryKey: [SELECT_QUERY_KEYS.DEPARTMENT_SELECT_QUERY_KEY],
+        })
         navigate(`${parentRoute}/${RecordID}`)
       }
     },

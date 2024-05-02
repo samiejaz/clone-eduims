@@ -1161,7 +1161,7 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             optionLabel="ProductInfoTitle"
             optionValue="ProductInfoID"
             placeholder={`Select a ${
-              pageTitles?.product?.toLowerCase() || "product"
+              pageTitles?.product?.toLowerCase() ?? "product"
             }`}
             options={ProductsInfoSelectData}
             required={true}
@@ -1353,7 +1353,7 @@ const BranchSelectField = () => {
             optionLabel="BranchTitle"
             optionValue="BranchID"
             placeholder={`Select a  ${
-              pageTitles?.branch?.toLowerCase() || "branch"
+              pageTitles?.branch?.toLowerCase() ?? "branch"
             }`}
             options={data}
             required={true}
