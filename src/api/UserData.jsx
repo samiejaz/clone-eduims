@@ -66,6 +66,7 @@ export async function addNewUser({ formData, userID, UserID = 0, UserImage }) {
     newFormData.append("Email", formData.Email)
     newFormData.append("Username", formData.UserName)
     newFormData.append("Password", formData.Password)
+
     newFormData.append("Inactive", (formData.InActive === false ? 0 : 1) ?? 0)
     newFormData.append("EntryUserID", userID)
     // if (UserImage !== "") {

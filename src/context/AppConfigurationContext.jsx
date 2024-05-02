@@ -7,8 +7,8 @@ export const AppConfigurationContext = createContext()
 
 export const AppConfigurationProivder = ({ children }) => {
   const [pageTitles, setPageTitles] = useState({
-    product: null,
-    branch: null,
+    product: "Product",
+    branch: "Branch",
   })
   const user = JSON.parse(localStorage.getItem("user"))
 

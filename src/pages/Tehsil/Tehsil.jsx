@@ -89,7 +89,7 @@ function DetailComponent({ userRights }) {
   function handleView(id) {
     navigate(parentRoute + "/" + id)
   }
-  console.log(data)
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (

@@ -301,7 +301,7 @@ function DetailRow({
             optionLabel="ProductInfoTitle"
             optionValue="ProductInfoID"
             placeholder={`Select a ${
-              pageTitles?.product.toLowerCase() || "product"
+              pageTitles?.product?.toLowerCase() || "product"
             }`}
             options={JSON.parse(
               watch(`detail.${index}.products`)?.toString() || "[]"
@@ -319,7 +319,7 @@ function DetailRow({
             optionLabel="ProductInfoTitle"
             optionValue="ProductInfoID"
             placeholder={`Select a ${
-              pageTitles?.product.toLowerCase() || "product"
+              pageTitles?.product?.toLowerCase() || "product"
             }`}
             options={JSON.parse(
               watch(`detail.${index}.services`)?.toString() || "[]"

@@ -140,7 +140,7 @@ function CustomerInvoiceHeader(props) {
                 optionLabel="ProductInfoTitle"
                 optionValue="ProductInfoID"
                 placeholder={`Select a ${
-                  pageTitles?.product.toLowerCase() || "product"
+                  pageTitles?.product?.toLowerCase() ?? "product"
                 }`}
                 options={productsInfoSelectData.data}
                 required={true}

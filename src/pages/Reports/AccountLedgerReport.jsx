@@ -23,6 +23,7 @@ import { CustomSpinner } from "../../components/CustomSpinner"
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export default function AccountLedgerReport() {
+  document.title = "Account Ledger"
   const method = useForm()
   const { generateReport, render } = useReportViewer()
 

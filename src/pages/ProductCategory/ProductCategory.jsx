@@ -48,11 +48,11 @@ export default function ProductCategory() {
 }
 
 export function DetailComponent({ userRights }) {
-  document.title = "Product Categories"
+  const { pageTitles } = useContext(AppConfigurationContext)
+  document.title = `${pageTitles?.product ?? "Product"} Categories`
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { pageTitles } = useContext(AppConfigurationContext)
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
     handleEdit,
@@ -172,7 +172,7 @@ export function DetailComponent({ userRights }) {
               field="ProductType"
               filter
               filterPlaceholder={`Search by ${
-                pageTitles?.product.toLowerCase() || "product"
+                pageTitles?.product?.toLowerCase() ?? "product"
               } type`}
               sortable
               header={`${pageTitles?.product || "Product"} Type`}
@@ -271,7 +271,7 @@ function FormComponent({ mode, userRights }) {
   }
 
   const typesOptions = [
-    { label: "Product", value: "Product" },
+    { label: `${pageTitles?.product || "Product"}`, value: "Product" },
     { label: "Service", value: "Service" },
   ]
 

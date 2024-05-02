@@ -544,7 +544,7 @@ function CustomerBranchesDataTable(props) {
           dataKey="CustomerBranchID"
           removableSort
           emptyMessage={`No ${
-            pageTitles?.branch?.toLowerCase() || "customer branch"
+            pageTitles?.branch?.toLowerCase() ?? "customer branch"
           }`}
           filters={filters}
           filterDisplay="row"

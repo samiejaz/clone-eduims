@@ -396,5 +396,3 @@ export const initAuthorizedRoutesWithUserRights = (
     return updatedRoutes
   }
 }
-
-console.log(convertRouteGroupsToSingleRoutes(routes))

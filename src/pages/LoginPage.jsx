@@ -48,6 +48,7 @@ const SignUp = () => {
           image: data.data[0]?.ProfilePic,
           DepartmentID: data.data[0].DepartmentID,
         }
+        console.log(data)
         loginUser(dataToSerialize)
         toast("Login sucessful", {
           autoClose: 1500,
