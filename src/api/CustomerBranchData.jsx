@@ -1,7 +1,7 @@
 import axios from "axios"
 import { toast } from "react-toastify"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 const CONTROLLER = "EduIMS"
 const WHEREMETHOD = "GetCustomerBranchWhere"

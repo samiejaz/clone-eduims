@@ -12,14 +12,13 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import TextInput from "../../components/Forms/TextInput"
-import { Button } from "primereact/button"
+
 import { useKeyCombinationHook } from "../../hooks/hooks"
-import { Tag } from "primereact/tag"
+
 import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
 import { SingleFormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { MENU_KEYS } from "../../utils/enums"
-
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../../public/COSTANTS"
 
 let defaultValues = {
   ProductName: "Product",

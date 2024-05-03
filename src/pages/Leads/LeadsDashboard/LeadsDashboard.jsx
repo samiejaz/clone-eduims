@@ -18,7 +18,7 @@ import {
 import { useUserData } from "../../../context/AuthContext"
 import { Button } from "primereact/button"
 import { useNavigate } from "react-router-dom"
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../../../public/COSTANTS"
 
 export function LeadsDashboard() {
   document.title = "Leads Dashboard"

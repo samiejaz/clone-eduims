@@ -26,15 +26,12 @@
 //   fetchInvoiceDeafultDescriptionById,
 // } from "../../api/InvoiceDefaultDescriptions";
 // import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-
-// const apiUrl = import.meta.env.VITE_APP_API_URL;
-
+// import { apiUrl } from "../../public/COSTANTS"
 // const defaultValues = {
 //   InvoiceType: [],
 //   Description: "",
 //   InActive: false,
 // };
-
 // function InvoiceDefaultDescriptions() {
 //   const { pageTitles } = useContext(AppConfigurationContext);
 //   document.title = `Invoice Descriptions`;
@@ -49,13 +46,10 @@
 //     </InvoiceDefaultDescriptionsDataProivder>
 //   );
 // }
-
 // function InvoiceDefaultDescriptionsSearch({ pageTitles }) {
 //   const queryClient = useQueryClient();
-
 //   const { user } = useContext(AuthContext);
 //   const { setKey } = useContext(ActiveKeyContext);
-
 //   const [filters, setFilters] = useState({
 //     Description: {
 //       value: null,
@@ -66,25 +60,21 @@
 //       matchMode: FilterMatchMode.CONTAINS,
 //     },
 //   });
-
 //   const {
 //     render: EditModal,
 //     handleShow: handleEditShow,
 //     handleClose: handleEditClose,
 //     setIdToEdit,
 //   } = useEditModal(handleEdit);
-
 //   const {
 //     render: DeleteModal,
 //     handleShow: handleDeleteShow,
 //     handleClose: handleDeleteClose,
 //     setIdToDelete,
 //   } = useDeleteModal(handleDelete);
-
 //   const { setIsEnable, setDescriptionID } = useContext(
 //     InvoiceDefaultDescriptionsDataContext
 //   );
-
 //   const {
 //     data: InvoiceDefaultDescriptions,
 //     isLoading,
@@ -94,7 +84,6 @@
 //     queryFn: () => fetchAllInvoiceDeafultDescriptions(user.userID),
 //     initialData: [],
 //   });
-
 //   const deleteMutation = useMutation({
 //     mutationFn: deleteInvoiceDeafultDescriptionsByID,
 //     onSuccess: (data) => {
@@ -105,7 +94,6 @@
 //       }
 //     },
 //   });
-
 //   function handleEdit(DescriptionID) {
 //     setDescriptionID(DescriptionID);
 //     setIsEnable(true);
@@ -127,7 +115,6 @@
 //     setDescriptionID(DescriptionID);
 //     setIsEnable(false);
 //   }
-
 //   return (
 //     <>
 //       {isFetching || isLoading ? (
@@ -196,7 +183,6 @@
 //     </>
 //   );
 // }
-
 // function InvoiceDefaultDescriptionsEntry({ pageTitles }) {
 //   const queryClient = useQueryClient();
 //   const [InvoiceDefaultDescription, setInvoiceDefaultDescription] = useState();
@@ -209,13 +195,11 @@
 //     setValue,
 //     formState: { isDirty, isValid },
 //   } = useForm();
-
 //   const { user } = useContext(AuthContext);
 //   const { setKey } = useContext(ActiveKeyContext);
 //   const { isEnable, DescriptionID, setDescriptionID, setIsEnable } = useContext(
 //     InvoiceDefaultDescriptionsDataContext
 //   );
-
 //   useEffect(() => {
 //     async function fetchInvoiceDefaultDescription() {
 //       if (
@@ -246,7 +230,6 @@
 //       fetchInvoiceDefaultDescription();
 //     }
 //   }, [DescriptionID]);
-
 //   const invoiceDefaultDescriptionsMutation = useMutation({
 //     mutationFn: async (formData) => {
 //       const dataToSend = {
@@ -256,19 +239,16 @@
 //         InActive: formData.InActive ? 1 : 0,
 //         EntryUserID: user.userID,
 //       };
-
 //       if (InvoiceDefaultDescription?.data && DescriptionID !== 0) {
 //         dataToSend.DescriptionID =
 //           InvoiceDefaultDescription?.data[0]?.DescriptionID;
 //       } else {
 //         dataToSend.DescriptionID = 0;
 //       }
-
 //       const { data } = await axios.post(
 //         apiUrl + `/EduIMS/InvoiceDescriptionInsertUpdate`,
 //         dataToSend
 //       );
-
 //       if (data.success === true) {
 //         if (DescriptionID !== 0) {
 //           toast.success("Inovice Description updated successfully!");
@@ -305,7 +285,6 @@
 //       }
 //     },
 //   });
-
 //   useEffect(() => {
 //     if (DescriptionID !== 0 && InvoiceDefaultDescription?.data) {
 //       setValue("Description", InvoiceDefaultDescription?.data[0]?.Description);
@@ -316,40 +295,34 @@
 //       setValue("InActive", InvoiceDefaultDescription?.data[0]?.InActive);
 //     }
 //   }, [DescriptionID, InvoiceDefaultDescription]);
-
 //   function onSubmit(data) {
 //     invoiceDefaultDescriptionsMutation.mutate(data);
 //   }
 //   function handleEdit() {
 //     setIsEnable(true);
 //   }
-
 //   function handleAddNew() {
 //     setInvoiceDefaultDescription([]);
 //     setDescriptionID(0);
 //     reset(defaultValues);
 //     setIsEnable(true);
 //   }
-
 //   function handleCancel() {
 //     setInvoiceDefaultDescription([]);
 //     setDescriptionID(0);
 //     reset(defaultValues);
 //     setIsEnable(true);
 //   }
-
 //   function handleDelete() {
 //     deleteMutation.mutate({
 //       DescriptionID,
 //       LoginUserID: user.userID,
 //     });
 //   }
-
 //   const typesOptions = [
 //     { label: pageTitles?.product || "Product", value: "Product" },
 //     { label: "Service", value: "Service" },
 //   ];
-
 //   return (
 //     <>
 //       {isLoading ? (
@@ -420,7 +393,6 @@
 //                 />
 //               </Form.Group>
 //             </Row>
-
 //             <ButtonRow
 //               isDirty={isDirty}
 //               isValid={isValid}
@@ -440,5 +412,4 @@
 //     </>
 //   );
 // }
-
 // export default InvoiceDefaultDescriptions;

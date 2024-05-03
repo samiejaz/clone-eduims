@@ -32,8 +32,6 @@ import { FormColumn, FormLabel } from "../../components/Layout/LayoutComponents"
 import { SingleFileUploadField } from "../../components/Forms/form"
 import useLeadsFileViewerHook from "./useLeadsFileViewerHook"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
-
 let queryKey = "key"
 
 async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
