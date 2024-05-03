@@ -1,5 +1,5 @@
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { createContext } from "react"
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
@@ -33,4 +33,13 @@ export const AppConfigurationProivder = ({ children }) => {
       {children}
     </AppConfigurationContext.Provider>
   )
+}
+
+export const useAppConfigurataionProvider = () => {
+  const { pageTitles, setPageTitles } = useContext(AppConfigurationContext)
+
+  return {
+    pageTitles,
+    setPageTitles,
+  }
 }

@@ -1,6 +1,6 @@
 import React, { useContext } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
@@ -8,9 +8,13 @@ import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
-import { useForm } from "react-hook-form"
+import { useForm, useFormContext } from "react-hook-form"
 import ButtonToolBar from "../../components/ActionsToolbar"
-import { Col, Form, Row } from "react-bootstrap"
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents"
 import TextInput from "../../components/Forms/TextInput"
 import CheckBox from "../../components/Forms/CheckBox"
 import {
@@ -31,11 +35,12 @@ import {
   fetchAllBusinessUnitsForSelect,
   fetchAllProductCategoriesForSelect,
 } from "../../api/SelectData"
-import { AppConfigurationContext } from "../../context/AppConfigurationContext"
+import {
+  AppConfigurationContext,
+  useAppConfigurataionProvider,
+} from "../../context/AppConfigurationContext"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -323,12 +328,12 @@ function FormComponent({ mode, userRights }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
                   {pageTitles?.product || "Product"} Title
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -339,12 +344,12 @@ function FormComponent({ mode, userRights }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>
                   {pageTitles?.product || "Product"} Category
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <CDropdown
@@ -360,10 +365,10 @@ function FormComponent({ mode, userRights }) {
                     filter={false}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={3} xl={3} md={6}>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -372,10 +377,10 @@ function FormComponent({ mode, userRights }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={3} xl={3} md={6}>
                 <DataTable
                   id="businessUnitTable"
                   value={BusinessUnitSelectData}
@@ -396,11 +401,110 @@ function FormComponent({ mode, userRights }) {
                     header="Business Unit"
                   ></Column>
                 </DataTable>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}
+    </>
+  )
+}
+
+export const ProductInfoFormFields = ({ mode }) => {
+  const { control, setFocus } = useFormContext()
+  const { pageTitles } = useAppConfigurataionProvider()
+  const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
+
+  const { data: BusinessUnitSelectData } = useQuery({
+    queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
+    queryFn: fetchAllBusinessUnitsForSelect,
+    initialData: [],
+  })
+  const { data: ProductCategoriesSelectData } = useQuery({
+    queryKey: [SELECT_QUERY_KEYS.PRODUCT_CATEGORIES_SELECT_QUERY_KEY],
+    queryFn: fetchAllProductCategoriesForSelect,
+    initialData: [],
+  })
+
+  const isRowSelectable = () => {
+    return mode !== "view" ? true : false
+  }
+  return (
+    <>
+      <form className="mt-4">
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>
+              {pageTitles?.product || "Product"} Title
+              <span className="text-danger fw-bold ">*</span>
+            </FormLabel>
+
+            <div>
+              <TextInput
+                control={control}
+                ID={"ProductInfoTitle"}
+                required={true}
+                focusOptions={() => setFocus("ProductType")}
+                isEnable={mode !== "view"}
+              />
+            </div>
+          </FormColumn>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>
+              {pageTitles?.product || "Product"} Category
+              <span className="text-danger fw-bold ">*</span>
+            </FormLabel>
+
+            <div>
+              <CDropdown
+                control={control}
+                name="ProductCategoryID"
+                options={ProductCategoriesSelectData}
+                optionLabel="ProductCategoryTitle"
+                optionValue="ProductCategoryID"
+                required={true}
+                focusOptions={() => setFocus("InActive")}
+                disabled={mode === "view"}
+                showOnFocus={true}
+                filter={false}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <div className="mt-2">
+              <CheckBox
+                control={control}
+                ID={"InActive"}
+                Label={"InActive"}
+                isEnable={mode !== "view"}
+              />
+            </div>
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <DataTable
+              id="businessUnitTable"
+              value={BusinessUnitSelectData}
+              selectionMode={"checkbox"}
+              selection={selectedBusinessUnits}
+              onSelectionChange={(e) => setSelectedBusinessUnits(e.value)}
+              dataKey="BusinessUnitID"
+              tableStyle={{ minWidth: "50rem" }}
+              size="sm"
+              isDataSelectable={isRowSelectable}
+            >
+              <Column
+                selectionMode="multiple"
+                headerStyle={{ width: "3rem" }}
+              ></Column>
+              <Column field="BusinessUnitName" header="Business Unit"></Column>
+            </DataTable>
+          </FormColumn>
+        </FormRow>
+      </form>
     </>
   )
 }
