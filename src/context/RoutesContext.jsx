@@ -5,6 +5,7 @@ export const RoutesContext = createContext()
 export const RoutesProivder = ({ children }) => {
   const [authorizedRoutes, setAuthorizedRoutes] = useState([])
   const [filteredRoutes, setFilteredRoutes] = useState([])
+  const [originalRoutes, setOriginalRoutes] = useState([])
 
   return (
     <RoutesContext.Provider
@@ -13,6 +14,8 @@ export const RoutesProivder = ({ children }) => {
         setFilteredRoutes,
         authorizedRoutes,
         setAuthorizedRoutes,
+        originalRoutes,
+        setOriginalRoutes,
       }}
     >
       {children}
@@ -26,6 +29,8 @@ export function useRoutesData() {
     setFilteredRoutes,
     authorizedRoutes,
     setAuthorizedRoutes,
+    originalRoutes,
+    setOriginalRoutes,
   } = useContext(RoutesContext)
 
   return {
@@ -33,5 +38,7 @@ export function useRoutesData() {
     setFilteredRoutes,
     authorizedRoutes,
     setAuthorizedRoutes,
+    originalRoutes,
+    setOriginalRoutes,
   }
 }

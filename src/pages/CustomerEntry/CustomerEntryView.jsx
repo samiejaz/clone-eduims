@@ -46,7 +46,7 @@ export default function GenNewCustomerView() {
   let customerMutation = useMutation({
     mutationFn: async (formData) => {
       let DataToSend = {
-        CustomerID: +params.CustomerID,
+        CustomerID: CustomerID !== 0 ? CustomerID : params.CustomerID,
         ContactPerson1Email: formData?.ContactPerson1Email,
         ContactPerson1Name: formData?.ContactPerson1Name,
         ContactPerson1No: formData?.ContactPerson1No,
@@ -56,6 +56,10 @@ export default function GenNewCustomerView() {
         Description: formData?.Description,
         InActive: formData?.InActive === false ? 0 : 1,
         EntryUserID: user.userID,
+        CountryID: formData.CountryID,
+        TehsilID: formData.TehsilID,
+        BusinessTypeID: formData.BusinessTypeID,
+        BusinessNature: formData.BusinessNatureID,
       }
 
       const { data } = await axios.post(

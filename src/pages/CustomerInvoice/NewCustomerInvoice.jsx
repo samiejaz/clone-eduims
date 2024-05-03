@@ -64,14 +64,14 @@ import NewCustomerInvoiceIntallmentsModal from "../../components/Modals/NewCusto
 import { CustomSpinner } from "../../components/CustomSpinner"
 import { AppConfigurationContext } from "../../context/AppConfigurationContext"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
-import { UserRightsContext } from "../../context/UserRightContext"
+
 import { decryptID, encryptID } from "../../utils/crypto"
 import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields"
 import { TextAreaField } from "../../components/Forms/form"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
-import { checkForUserRightsAsync } from "../../api/MenusData"
+
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { Button as BootStrapButton } from "react-bootstrap"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
 let editRoute = `${parentRoute}/edit/`
@@ -96,6 +96,7 @@ export default function CreditNotes() {
 function DetailComponent({ userRights }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const menuRef = useRef()
 
   const { showDeleteDialog, showEditDialog } = useConfirmationModal({
     handleDelete,
@@ -140,7 +141,30 @@ function DetailComponent({ userRights }) {
   function handleView(id) {
     navigate(parentRoute + "/" + id)
   }
-  console.log(data)
+
+  function handlePrint({ id, report = "simple" }) {
+    if (report !== "simple") {
+      handlePrintReport({
+        getPrintFromUrl:
+          "InvoicePrint?CustomerInvoiceID=" + id + `&ReportType=${report}`,
+      })
+    } else {
+      handlePrintReport({
+        getPrintFromUrl: "InvoicePrint?CustomerInvoiceID=" + id,
+      })
+    }
+  }
+
+  const items = [
+    {
+      label: "Previous Balance Report",
+      icon: "pi pi-step-backward",
+      command: (id) => {
+        handlePrint({ id: id, report: "PreviousBalance" })
+      },
+    },
+  ]
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -197,11 +221,23 @@ function DetailComponent({ userRights }) {
                     viewRoute + encryptID(rowData.CustomerInvoiceID),
                   showPrintBtn: true,
                   handlePrint: () =>
-                    handlePrintReport({
-                      getPrintFromUrl:
-                        "InvoicePrint?CustomerInvoiceID=" +
-                        rowData.CustomerInvoiceID,
-                    }),
+                    handlePrint({ id: rowData.CustomerInvoiceID }),
+                  children: (
+                    <>
+                      <BootStrapButton
+                        size="sm"
+                        variant="outline-warning"
+                        onClick={() =>
+                          handlePrint({
+                            id: rowData.CustomerInvoiceID,
+                            report: "PreviousBalance",
+                          })
+                        }
+                      >
+                        <i className="pi pi-print"></i>
+                      </BootStrapButton>
+                    </>
+                  ),
                 })
               }
               header="Actions"
@@ -224,11 +260,10 @@ function DetailComponent({ userRights }) {
             <Column
               field="DocumentNo"
               filter
-              filterPlaceholder="Search by ref no"
+              filterPlaceholder="Search by document no"
               sortable
               header="Document No"
             ></Column>
-
             <Column
               field="CustomerName"
               filter
@@ -496,6 +531,13 @@ function FormComponent({ mode, userRights }) {
                     CustomerInvoiceID
                   )}`
                 }
+                splitButtonItems={[
+                  {
+                    label: "Previous Balance Report",
+                    icon: "pi pi-step-backward",
+                    reportType: "PreviousBalance",
+                  },
+                ]}
               />
             </div>
             <form id="CustomerInvoice" className="mt-4">
@@ -912,14 +954,22 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
       CGS: 0,
       Discount: 0,
       NetAmount: 0,
-      Description: "",
+      DetailDescription: "",
       CustomerBranch: "",
     },
   })
 
   function onSubmit(data) {
     appendSingleRow(data)
-    method.reset()
+    method.resetField("ProductInfoID")
+    method.resetField("ServiceInfoID")
+    method.resetField("Qty")
+    method.resetField("Rate")
+    method.resetField("CGS")
+    method.resetField("Amount")
+    method.resetField("Discount")
+    method.resetField("NetAmount")
+    method.resetField("DetailDescription")
   }
 
   const typesOptions = [
@@ -1060,7 +1110,10 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               }}
               {...method.register("DetailDescription")}
             /> */}
-            <TextAreaField control={method.control} name={"Description"} />
+            <TextAreaField
+              control={method.control}
+              name={"DetailDescription"}
+            />
           </Form.Group>
           <Form.Group as={Col} className="col-1">
             <Form.Label>Is Free</Form.Label>
@@ -1088,7 +1141,6 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
             />
           </Form.Group>
         </Row>
-        <DevTool control={method.control} />
       </form>
     </>
   )
@@ -1158,8 +1210,12 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
         </div>
       </Form.Group>
       <Form.Group as={Col} className="col-3">
-        <Form.Label>{pageTitles?.product || "Product"}</Form.Label>
-        <span className="text-danger fw-bold ">*</span>
+        <Form.Label>
+          {pageTitles?.product || "Product"}
+          <span className="text-danger fw-bold ">*</span>
+
+          {/* <ProductInfoDialog /> */}
+        </Form.Label>
         <div>
           <CDropdown
             control={method.control}

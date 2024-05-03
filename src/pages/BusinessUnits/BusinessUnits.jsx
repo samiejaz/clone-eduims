@@ -29,7 +29,10 @@ import { ColorPicker } from "primereact/colorpicker"
 import { classNames } from "primereact/utils"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
-import { SingleFileUploadField } from "../../components/Forms/form"
+import {
+  SingleFileUploadField,
+  TextAreaField,
+} from "../../components/Forms/form"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 
 let parentRoute = ROUTE_URLS.GENERAL.BUSINESS_UNITS
@@ -208,8 +211,8 @@ function FormComponent({ mode, userRights }) {
   document.title = "Business Unit Entry"
 
   const queryClient = useQueryClient()
-  const imageRef = useRef()
   const fileRef = useRef()
+  const secondLogoRef = useRef()
 
   const navigate = useNavigate()
   const { BusinessUnitID } = useParams()
@@ -284,8 +287,9 @@ function FormComponent({ mode, userRights }) {
         fileRef.current?.setBase64File(
           "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo
         )
-        // imageRef.current.src =
-        //   "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo;
+        secondLogoRef.current?.setBase64File(
+          "data:image/png;base64," + BusinessUnitData?.data[0]?.Logo2
+        )
       } catch (error) {}
     }
   }, [BusinessUnitID, BusinessUnitData.data])
@@ -332,8 +336,10 @@ function FormComponent({ mode, userRights }) {
 
   function onSubmit(data) {
     const file = fileRef.current?.getFile()
+    const secondLogo = secondLogoRef.current?.getFile()
 
     data.Logo = file
+    data.secondLogo = secondLogo
     mutation.mutate({
       formData: data,
       userID: user?.userID,
@@ -418,10 +424,22 @@ function FormComponent({ mode, userRights }) {
                   <TextInput
                     control={control}
                     ID={"Email"}
-                    focusOptions={() => setFocus("Website")}
+                    focusOptions={() => setFocus("Address")}
                     isEnable={mode !== "view"}
                   />
                 </div>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={12} xl={12}>
+                <FormLabel>Address</FormLabel>
+                <TextAreaField
+                  control={control}
+                  name={"Address"}
+                  autoResize={true}
+                  disabled={mode === "view"}
+                  focusOptions={() => setFocus("Website")}
+                />
               </FormColumn>
             </FormRow>
             <FormRow>
@@ -503,19 +521,12 @@ function FormComponent({ mode, userRights }) {
             <FormRow>
               <FormColumn lg={12} xl={12}>
                 <FormLabel>Description</FormLabel>
-                <div>
-                  <textarea
-                    rows={"1"}
-                    disabled={mode === "view"}
-                    className="p-inputtext"
-                    style={{
-                      padding: "0.3rem 0.4rem",
-                      fontSize: "0.8em",
-                      width: "100%",
-                    }}
-                    {...register("Description")}
-                  />
-                </div>
+                <TextAreaField
+                  control={control}
+                  name={"Description"}
+                  autoResize={true}
+                  disabled={mode === "view"}
+                />
               </FormColumn>
             </FormRow>
             <FormRow>
@@ -526,22 +537,6 @@ function FormComponent({ mode, userRights }) {
                     ID={"InActive"}
                     Label={"InActive"}
                     isEnable={mode !== "view"}
-                  />
-                </div>
-              </FormColumn>
-            </FormRow>
-
-            <FormRow>
-              <FormColumn lg={6} xl={6} md={6}>
-                <FormLabel>Profie Pic</FormLabel>
-                <div>
-                  <SingleFileUploadField
-                    ref={fileRef}
-                    accept="image/*"
-                    chooseBtnLabel="Select Image"
-                    changeBtnLabel="Change Image"
-                    mode={mode}
-                    errorMessage="Upload your logo"
                   />
                 </div>
               </FormColumn>
@@ -566,6 +561,35 @@ function FormComponent({ mode, userRights }) {
                         onChange={(e) => field.onChange(e.value)}
                       />
                     )}
+                  />
+                </div>
+              </FormColumn>
+            </FormRow>
+
+            <FormRow>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>Logo</FormLabel>
+                <div>
+                  <SingleFileUploadField
+                    ref={fileRef}
+                    accept="image/*"
+                    chooseBtnLabel="Select Image"
+                    changeBtnLabel="Change Image"
+                    mode={mode}
+                    errorMessage="Upload your logo"
+                  />
+                </div>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <FormLabel>Second Logo</FormLabel>
+                <div>
+                  <SingleFileUploadField
+                    ref={secondLogoRef}
+                    accept="image/*"
+                    chooseBtnLabel="Select Image"
+                    changeBtnLabel="Change Image"
+                    mode={mode}
+                    errorMessage="Upload your logo"
                   />
                 </div>
               </FormColumn>

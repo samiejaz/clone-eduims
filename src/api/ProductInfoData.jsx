@@ -67,7 +67,10 @@ export async function addNewProductInfo({
       ProductInfoID: 0,
       ProductInfoTitle: formData.ProductInfoTitle,
       ProductCategoryID: formData.ProductCategoryID,
-      BusinessUnitIDs: JSON.stringify(selectedBusinessUnitIDs),
+      BusinessUnitIDs:
+        selectedBusinessUnitIDs === null
+          ? null
+          : JSON.stringify(selectedBusinessUnitIDs),
       InActive: formData.InActive ? 1 : 0,
       EntryUserID: userID,
     }

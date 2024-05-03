@@ -10,6 +10,7 @@ const CTextArea = ({
   rows = 1,
   cols = 1,
   autoResize = false,
+  disabled = false,
   ...options
 }) => {
   return (
@@ -23,9 +24,14 @@ const CTextArea = ({
             id={field.name}
             {...field}
             rows={rows}
-            style={{ width: "100%" }}
+            style={{
+              width: "100%",
+              backgroundColor: disabled ? "#dee2e6" : "white",
+              color: "black",
+            }}
             className={classNames({ "p-invalid": fieldState.error })}
             autoResize={autoResize}
+            disabled={disabled}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault()

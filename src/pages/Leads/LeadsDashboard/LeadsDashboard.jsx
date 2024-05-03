@@ -6,6 +6,7 @@ import {
   MENU_KEYS,
   MOVEABLE_COMPNENTS_NAMES,
   QUERY_KEYS,
+  ROUTE_URLS,
 } from "../../../utils/enums"
 import { formatDateToMMDDYYYY } from "../../../utils/CommonFunctions"
 import { checkForUserRights } from "../../../utils/routes"
@@ -15,16 +16,27 @@ import {
   FormColumn,
 } from "../../../components/Layout/LayoutComponents"
 import { useUserData } from "../../../context/AuthContext"
+import { Button } from "primereact/button"
+import { useNavigate } from "react-router-dom"
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export function LeadsDashboard() {
   document.title = "Leads Dashboard"
-
+  const navigate = useNavigate()
   return (
     <div className="flex flex-column gap-1 mt-4">
       <div className="w-full">
-        <div className="flex align-items-center justify-content-between">
+        <div className="flex align-items-center justify-content-start gap-2">
           <h1 className="text-2xl">Leads Dashboard</h1>
+          <Button
+            label="Add New Lead Introduction"
+            icon="pi pi-plus"
+            type="button"
+            className="rounded"
+            onClick={() =>
+              navigate(ROUTE_URLS.LEAD_INTRODUCTION_ROUTE + "/new")
+            }
+          />
         </div>
         <hr />
         <InfoCardsContainer

@@ -5,6 +5,7 @@ import useKeyCombination from "../hooks/useKeyCombinationHook"
 import { confirmDialog } from "primereact/confirmdialog"
 import { useMutation } from "@tanstack/react-query"
 import { PrintReportInNewTab } from "../utils/CommonFunctions"
+import { SplitButton } from "primereact/splitbutton"
 
 export default function ButtonToolBar({
   printLoading = false,
@@ -38,6 +39,7 @@ export default function ButtonToolBar({
   showEditButton = true,
   mode = "new",
   getPrintFromUrl = "",
+  splitButtonItems = [],
 }) {
   useKeyCombination(() => {
     if (mode === "edit" || mode === "new") {
@@ -213,10 +215,10 @@ export default function ButtonToolBar({
         {showPrint ? (
           <>
             <i className="pi pi-bars p-toolbar-separator mr-2" />
-
             <PrintRecordButton
               getPrintFromUrl={getPrintFromUrl}
               printDisable={printDisable}
+              items={splitButtonItems}
             />
           </>
         ) : (
@@ -246,32 +248,78 @@ export default function ButtonToolBar({
   )
 }
 
-const PrintRecordButton = ({ getPrintFromUrl, printDisable, fullUrl }) => {
+const PrintRecordButton = ({
+  getPrintFromUrl,
+  printDisable,
+  fullUrl,
+  items = [],
+}) => {
   const mutation = useMutation({
-    mutationFn: () =>
-      PrintReportInNewTab({
-        controllerName: getPrintFromUrl || fullUrl,
-      }),
+    mutationFn: PrintReportInNewTab,
   })
+
+  let updatedItems =
+    items.length > 0
+      ? items.map((item) => {
+          return {
+            label: item.label,
+            icon: item.icon,
+            command: () => {
+              mutation.mutateAsync({
+                controllerName: `${getPrintFromUrl}&ReportType=${item.reportType}`,
+              })
+            },
+          }
+        })
+      : []
 
   return (
     <>
-      <Button
-        label={mutation.isPending ? "Generating..." : "Print"}
-        icon="pi pi-print"
-        className="rounded"
-        type="button"
-        severity="help"
-        disabled={printDisable}
-        loading={mutation.isPending}
-        loadingIcon="pi pi-spin pi-print"
-        onClick={() => mutation.mutateAsync()}
-        pt={{
-          label: {
-            className: "hidden md:block lg:block",
-          },
-        }}
-      />
+      {items.length === 0 ? (
+        <>
+          <Button
+            label={mutation.isPending ? "Generating..." : "Print"}
+            icon="pi pi-print"
+            className="rounded"
+            type="button"
+            severity="help"
+            disabled={printDisable}
+            loading={mutation.isPending}
+            loadingIcon="pi pi-spin pi-print"
+            onClick={() => mutation.mutateAsync()}
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <SplitButton
+            label={mutation.isPending ? "Generating..." : "Print"}
+            icon="pi pi-print"
+            className="rounded"
+            type="button"
+            severity="help"
+            disabled={printDisable}
+            dis
+            loading={mutation.isPending}
+            loadingIcon="pi pi-spin pi-print"
+            onClick={() =>
+              mutation.mutateAsync({
+                controllerName: getPrintFromUrl || fullUrl,
+              })
+            }
+            model={updatedItems}
+            pt={{
+              label: {
+                className: "hidden md:block lg:block",
+              },
+            }}
+          />
+        </>
+      )}
     </>
   )
 }

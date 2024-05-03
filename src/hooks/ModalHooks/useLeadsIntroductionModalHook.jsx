@@ -33,6 +33,7 @@ import {
 import { decryptID } from "../../utils/crypto"
 import { formatDateAndTime } from "../../utils/CommonFunctions"
 import { InputTextarea } from "primereact/inputtextarea"
+import CountryDependentFields from "../../components/CommonFormFields/CountryDependantFields"
 
 export const useLeadsIntroductionModalHook = (LeadIntroductionDetailID = 0) => {
   const queryClient = useQueryClient()
@@ -631,61 +632,115 @@ export function LeadsIntroductionFormModalButton({
   )
 }
 
-export const CountryDependentFields = React.forwardRef(({ mode }, ref) => {
-  const [CountryID, setCountryID] = useState(0)
+export const CustomerAndLeadsInfo = ({
+  mode,
+  col = 3,
+  required = true,
+  countryRef,
+  focusOn = "",
+  disabled,
+}) => {
+  const [items, setItems] = useState([])
 
   const method = useFormContext()
-  const countriesSelectData = useAllCountiesSelectData()
-  const tehsilsSelectData = useAllTehsilsSelectData(CountryID)
 
-  React.useImperativeHandle(ref, () => ({
-    setCountryID,
-  }))
+  const businessTypesSelectData = useAllBusinessTypesSelectData()
+  const businessNatureSelectData = useAllBusinessNatureSelectData(true)
+  const search = (event) => {
+    let _filteredItems
+    let query = event.query
+    _filteredItems = businessNatureSelectData?.data.filter((item) => {
+      return item.toLowerCase().includes(query.toLowerCase())
+    })
+    setItems(_filteredItems)
+  }
 
   return (
     <>
-      <FormColumn lg={3} xl={3} md={6}>
+      <FormProvider {...method}>
+        <CountryDependentFields
+          mode={mode}
+          col={col}
+          required={required}
+          ref={countryRef}
+        />
+      </FormProvider>
+
+      <FormColumn lg={col} xl={col} md={6}>
         <FormLabel>
-          Country
-          <span className="text-danger fw-bold ">*</span>
+          Business Type
+          {required && (
+            <>
+              <span className="text-danger fw-bold ">*</span>
+            </>
+          )}
         </FormLabel>
         <div>
           <CDropdown
             control={method.control}
-            name={`CountryID`}
-            optionLabel="CountryTitle"
-            optionValue="CountryID"
-            placeholder="Select a country"
-            options={countriesSelectData.data}
-            required={true}
+            name={`BusinessTypeID`}
+            optionLabel="BusinessTypeTitle"
+            optionValue="BusinessTypeID"
+            placeholder="Select a business type"
+            options={businessTypesSelectData.data}
+            required={required}
             disabled={mode === "view"}
-            focusOptions={() => method.setFocus("TehsilID")}
-            onChange={(e) => {
-              setCountryID(e.value)
-              method.resetField("TehsilID")
-            }}
+            focusOptions={() => method.setFocus("BusinessNatureID")}
           />
         </div>
       </FormColumn>
-      <FormColumn lg={3} xl={3} md={6}>
+      <FormColumn lg={col} xl={col} md={6}>
         <FormLabel>
-          Tehsil
-          <span className="text-danger fw-bold ">*</span>
+          Business Nature
+          {required && (
+            <>
+              <span className="text-danger fw-bold ">*</span>
+            </>
+          )}
         </FormLabel>
-        <div>
-          <CDropdown
+        <div style={{ width: "100%" }}>
+          <Controller
+            name="BusinessNatureID"
             control={method.control}
-            name={`TehsilID`}
-            optionLabel="TehsilTitle"
-            optionValue="TehsilID"
-            placeholder="Select a tehsil"
-            options={tehsilsSelectData.data}
-            required={true}
-            disabled={mode === "view"}
-            focusOptions={() => method.setFocus("BusinessTypeID")}
+            rules={{ required: required }}
+            render={({ field, fieldState }) => (
+              <>
+                <AutoComplete
+                  inputId={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  inputRef={field.ref}
+                  suggestions={items}
+                  completeMethod={search}
+                  disabled={mode === "view"}
+                  dropdown
+                  style={{ width: "100%" }}
+                  pt={{
+                    dropdownButton: {
+                      root: {
+                        style: {
+                          padding: "0 !important",
+                        },
+                      },
+                      icon: {
+                        style: {
+                          padding: "0",
+                        },
+                      },
+                    },
+                    input: {
+                      style: {
+                        width: "100%",
+                      },
+                    },
+                  }}
+                  className={classNames({ "p-invalid": fieldState.error })}
+                />
+              </>
+            )}
           />
         </div>
       </FormColumn>
     </>
   )
-})
+}

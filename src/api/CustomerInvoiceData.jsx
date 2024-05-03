@@ -24,6 +24,7 @@ export async function fetchAllCustomerInvoices(LoginUserID) {
       AccountTitle: item.AccountTitle,
       EntryDate: format(parseISO(item.EntryDate), "dd-MMM-yyyy"),
       TotalNetAmount: item.TotalNetAmount,
+      DocumentNo: item.DocumentNo,
     }
   })
   return newData ?? []
@@ -127,8 +128,8 @@ export async function addNewCustomerInvoice({
       SessionID: formData?.SessionID,
       InvoiceNo: formData?.VoucherNo,
       SessionBasedVoucherNo: formData?.SessionBasedVoucherNo,
-      InvoiceDate: formData?.InvoiceDate || new Date(),
-      InvoiceDueDate: formData?.DueDate || new Date(),
+      InvoiceDate: formData?.VoucherDate?.toLocaleDateString() || new Date(),
+      InvoiceDueDate: formData?.DueDate?.toLocaleDateString() || new Date(),
       CustomerID: formData?.Customer,
       AccountID: formData?.CustomerLedgers,
       BusinessUnitID: formData?.BusinessUnitID,

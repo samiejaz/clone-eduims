@@ -8,7 +8,7 @@ import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
-import { useForm, useFormContext } from "react-hook-form"
+import { FormProvider, useForm, useFormContext } from "react-hook-form"
 import ButtonToolBar from "../../components/ActionsToolbar"
 import {
   FormRow,
@@ -42,6 +42,12 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import {
+  ShowErrorToast,
+  preventFormByEnterKeySubmission,
+} from "../../utils/CommonFunctions"
+import { confirmDialog } from "primereact/confirmdialog"
+import { Dialog } from "primereact/dialog"
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -329,7 +335,7 @@ function FormComponent({ mode, userRights }) {
           </div>
           <form className="mt-4">
             <FormRow>
-              <FormColumn lg={3} xl={3} md={6}>
+              <FormColumn lg={6} xl={6} md={6}>
                 <FormLabel>
                   {pageTitles?.product || "Product"} Title
                   <span className="text-danger fw-bold ">*</span>
@@ -345,7 +351,7 @@ function FormComponent({ mode, userRights }) {
                   />
                 </div>
               </FormColumn>
-              <FormColumn lg={3} xl={3} md={6}>
+              <FormColumn lg={6} xl={6} md={6}>
                 <FormLabel>
                   {pageTitles?.product || "Product"} Category
                   <span className="text-danger fw-bold ">*</span>
@@ -368,7 +374,7 @@ function FormComponent({ mode, userRights }) {
               </FormColumn>
             </FormRow>
             <FormRow>
-              <FormColumn lg={3} xl={3} md={6}>
+              <FormColumn>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -380,7 +386,7 @@ function FormComponent({ mode, userRights }) {
               </FormColumn>
             </FormRow>
             <FormRow>
-              <FormColumn lg={3} xl={3} md={6}>
+              <FormColumn>
                 <DataTable
                   id="businessUnitTable"
                   value={BusinessUnitSelectData}
@@ -409,8 +415,8 @@ function FormComponent({ mode, userRights }) {
     </>
   )
 }
-
-export const ProductInfoFormFields = ({ mode }) => {
+const ProductInfoFormFields = ({ mode, ProductInfoID }) => {
+  console.log(ProductInfoID)
   const { control, setFocus } = useFormContext()
   const { pageTitles } = useAppConfigurataionProvider()
   const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
@@ -433,7 +439,7 @@ export const ProductInfoFormFields = ({ mode }) => {
     <>
       <form className="mt-4">
         <FormRow>
-          <FormColumn lg={3} xl={3} md={6}>
+          <FormColumn lg={6} xl={6} md={12}>
             <FormLabel>
               {pageTitles?.product || "Product"} Title
               <span className="text-danger fw-bold ">*</span>
@@ -449,7 +455,7 @@ export const ProductInfoFormFields = ({ mode }) => {
               />
             </div>
           </FormColumn>
-          <FormColumn lg={3} xl={3} md={6}>
+          <FormColumn lg={6} xl={6} md={12}>
             <FormLabel>
               {pageTitles?.product || "Product"} Category
               <span className="text-danger fw-bold ">*</span>
@@ -484,7 +490,7 @@ export const ProductInfoFormFields = ({ mode }) => {
           </FormColumn>
         </FormRow>
         <FormRow>
-          <FormColumn lg={3} xl={3} md={6}>
+          <FormColumn>
             <DataTable
               id="businessUnitTable"
               value={BusinessUnitSelectData}
@@ -505,6 +511,286 @@ export const ProductInfoFormFields = ({ mode }) => {
           </FormColumn>
         </FormRow>
       </form>
+    </>
+  )
+}
+
+const ProductInfoDetailTable = (props) => {
+  const queryClient = useQueryClient()
+  const [visible, setVisible] = useState(false)
+  const { isEnable, pageTitles, changePoductInfoID } = props
+  const [filters, setFilters] = useState({
+    ProductTitle: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  })
+  const method = useForm()
+  const user = useUserData()
+
+  const { data: Products } = useQuery({
+    queryKey: [queryKey],
+    queryFn: () => fetchAllProducts(user.userID),
+    initialData: [],
+  })
+
+  const mutation = useMutation({
+    mutationFn: addNewProductInfo,
+    onError: () => {
+      ShowErrorToast("Error while saving data!")
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteProductInfoByID,
+    onSuccess: (response) => {
+      if (response === true) {
+        queryClient.invalidateQueries({
+          queryKey: [queryKey],
+        })
+      }
+    },
+  })
+
+  function onSubmit(data) {
+    mutation.mutate(data)
+  }
+
+  function handleDelete(ProductID) {
+    deleteMutation.mutate({
+      ProductID: ProductID,
+      LoginUserID: user.userID,
+    })
+  }
+
+  const confirmDelete = (id) => {
+    confirmDialog({
+      message: "Are you sure you want to delete this record?",
+      header: "Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      position: "top",
+      accept: () => handleDelete(id),
+      reject: () => {},
+    })
+  }
+
+  return (
+    <>
+      <DataTable
+        className="mt-2"
+        showGridlines
+        value={Products || []}
+        dataKey="ProductID"
+        removableSort
+        emptyMessage={`No ${
+          pageTitles?.product?.toLowerCase() ?? "products"
+        } found!`}
+        filters={filters}
+        filterDisplay="row"
+        resizableColumns
+        size="small"
+        selectionMode="single"
+        tableStyle={{ minWidth: "50rem", height: "" }}
+      >
+        <Column
+          body={(rowData) => (
+            <>
+              <div className="flex align-items-center gap-2">
+                <Button
+                  icon="pi pi-eye"
+                  severity="secondary"
+                  size="small"
+                  className="rounded"
+                  style={{
+                    padding: "0.3rem .7rem",
+                    fontSize: ".8em",
+                    width: "30px",
+                  }}
+                  disabled={!isEnable}
+                  type="button"
+                  onClick={() => {
+                    changePoductInfoID(rowData?.ProductInfoID)
+                  }}
+                />
+                <Button
+                  icon="pi pi-pencil"
+                  severity="success"
+                  size="small"
+                  className="rounded"
+                  style={{
+                    padding: "0.3rem .7rem",
+                    fontSize: ".8em",
+                    width: "30px",
+                  }}
+                  disabled={!isEnable}
+                  type="button"
+                  onClick={() => {
+                    setVisible(true)
+                    method.setValue("ProductTitle", rowData?.ProductTitle)
+                    method.setValue("ProductID", rowData?.ProductID)
+                  }}
+                />
+                <Button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  size="small"
+                  className="rounded"
+                  style={{
+                    padding: "0.3rem .7rem",
+                    fontSize: ".8em",
+                    width: "30px",
+                  }}
+                  onClick={() => {
+                    confirmDelete(rowData?.ProductID)
+                  }}
+                />
+              </div>
+            </>
+          )}
+          header="Actions"
+          resizeable={false}
+          style={{
+            minWidth: "7rem",
+            maxWidth: "7rem",
+            width: "7rem",
+            textAlign: "center",
+          }}
+        ></Column>
+        <Column
+          field="ProductInfoTitle"
+          filter
+          filterPlaceholder={`Search by ${
+            pageTitles?.product?.toLowerCase() ?? "product"
+          }`}
+          sortable
+          header={`${pageTitles?.product || "Product"} Info`}
+          style={{ minWidth: "20rem" }}
+        ></Column>
+        <Column
+          field="ProductCategoryTitle"
+          filter
+          filterPlaceholder={`Search by ${
+            pageTitles?.product?.toLowerCase() ?? "product"
+          } type`}
+          sortable
+          header={`${pageTitles?.product || "Product"} Type`}
+          style={{ minWidth: "20rem" }}
+        ></Column>
+      </DataTable>
+
+      <form onKeyDown={preventFormByEnterKeySubmission}>
+        <div className="card flex justify-content-center">
+          <Dialog
+            header={`Edit ${pageTitles?.product || "Product"}`}
+            visible={visible}
+            onHide={() => {
+              setVisible(false)
+            }}
+            style={{ width: "70vw", height: "80vh" }}
+            footer={
+              <Button
+                severity="success"
+                className="rounded"
+                type="button"
+                label={mutation.isPending ? "Updating..." : "Update"}
+                loading={mutation.isPending}
+                loadingIcon="pi pi-spin pi-spinner"
+                onClick={() => {
+                  method.handleSubmit(onSubmit)()
+                }}
+              />
+            }
+          >
+            <input
+              type="text"
+              {...method.register("ProductID", {
+                valueAsNumber: true,
+              })}
+              className="visually-hidden "
+              style={{ display: "none" }}
+            />
+            <FormProvider {...method}>
+              <ProductInfoFormFields mode={"view"} />
+            </FormProvider>
+          </Dialog>
+        </div>
+      </form>
+    </>
+  )
+}
+
+const ProductInfoModalContent = () => {
+  const { pageTitles } = useAppConfigurataionProvider()
+  const user = useUserData()
+
+  const [ProductInfoID, setProductInfoID] = useState(null)
+  const ProductInfoData = useQuery({
+    queryKey: [queryKey, ProductInfoID],
+    queryFn: () => fetchProductInfoByID(ProductInfoID, user.userID),
+    initialData: [],
+  })
+
+  function changePoductInfoID(id) {
+    setProductInfoID(id)
+  }
+
+  return (
+    <>
+      <ProductInfoFormFields mode={"new"} ProductInfoID={ProductInfoID} />
+      <ProductInfoDetailTable
+        isEnable={true}
+        pageTitles={pageTitles}
+        changePoductInfoID={changePoductInfoID}
+      />
+    </>
+  )
+}
+const useProductInfoDialog = () => {
+  const [visible, setVisible] = useState(false)
+
+  return {
+    setVisible,
+    render: (
+      <Dialog
+        visible={visible}
+        onHide={() => setVisible(false)}
+        maximizable
+        header={"Add new Product"}
+        style={{ width: "80vw", height: "90vh" }}
+        pt={{
+          header: {
+            style: {
+              paddingBottom: 0,
+            },
+          },
+        }}
+      >
+        <ProductInfoModalContent />
+      </Dialog>
+    ),
+  }
+}
+
+export const ProductInfoDialog = () => {
+  const { setVisible, render } = useProductInfoDialog()
+
+  return (
+    <>
+      <Button
+        tooltip="Add new product"
+        icon="pi pi-plus"
+        severity="secondary"
+        size="small"
+        className="rounded-2"
+        type="button"
+        onClick={() => setVisible(true)}
+        style={{
+          padding: "1px 0px",
+          fontSize: "small",
+          width: "30px",
+          marginLeft: "10px",
+        }}
+      />
+      <div>{render}</div>
     </>
   )
 }

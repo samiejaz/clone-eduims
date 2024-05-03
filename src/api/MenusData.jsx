@@ -16,14 +16,14 @@ export async function GetAllMenus({ LoginUserID }) {
       const { data } = await axios.post(url)
       if (data.success) {
         const groupedRoutes = initAuthorizedMenus(data.dt)
-        return groupedRoutes
+        return { groupedRoutes, orignalRoutes: data.dt }
       }
     } else {
-      return []
+      return { groupedRoutes: [], orignalRoutes: [] }
     }
   } catch (e) {
     ShowErrorToast(e.message)
-    return []
+    return { groupedRoutes: [], orignalRoutes: [] }
   }
 }
 
