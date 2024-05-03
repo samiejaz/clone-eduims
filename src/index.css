@@ -769,3 +769,16 @@ a {
   -o-background-size: cover;
   background-size: cover;
 }
+
+.p-menuitem-link {
+  padding-bottom:0 !important ;
+}
+
+.bg-royal-blue {
+  background: white;
+}
+.bg-royal-blue:hover {
+  background: #059769;
+  cursor: pointer;
+  color: white;
+}

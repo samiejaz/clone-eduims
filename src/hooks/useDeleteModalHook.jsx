@@ -20,23 +20,24 @@ const useDeleteModal = (handleDelete) => {
     handleClose: reject,
     setIdToDelete,
     render: (
-      <ConfirmDialog
-        id="deleteDialog"
-        draggable={false}
-        style={{ width: "27vw" }}
-        pt={{
-          acceptButton: {
-            root: {
-              className: "rounded",
-            },
-          },
-          rejectButton: {
-            root: {
-              className: "rounded",
-            },
-          },
-        }}
-      />
+      // <ConfirmDialog
+      //   id="deleteDialog"
+      //   draggable={false}
+      //   style={{ width: "27vw" }}
+      //   pt={{
+      //     acceptButton: {
+      //       root: {
+      //         className: "rounded",
+      //       },
+      //     },
+      //     rejectButton: {
+      //       root: {
+      //         className: "rounded",
+      //       },
+      //     },
+      //   }}
+      // />
+      <></>
     ),
   }
 }

@@ -44,12 +44,10 @@ import { encryptID } from "../../utils/crypto"
 import {
   SingleFileUploadField,
   TextAreaField,
-  TextInput,
 } from "../../components/Forms/form"
 
 import { Dropdown } from "primereact/dropdown"
 import { checkForUserRightsAsync } from "../../api/MenusData"
-import LeadUserDashboard from "../Leads/LeadsDashboard/LeadsUserDashboard"
 import {
   FormColumn,
   FormLabel,
@@ -514,9 +512,9 @@ function LeadIntroductionForm({ mode, userRights }) {
       CountryID: null,
       TehsilID: null,
       BusinessTypeID: null,
+      BusinessNature: "",
       CompanyAddress: "",
       CompanyWebsite: "",
-      BusinessNature: "",
       ContactPersonName: "",
       ContactPersonMobileNo: "",
       ContactPersonWhatsAppNo: "",
@@ -547,6 +545,10 @@ function LeadIntroductionForm({ mode, userRights }) {
         LeadIntroductionData.data[0].BusinessTypeID
       )
       method.setValue(
+        "BusinessNatureID",
+        LeadIntroductionData.data[0].BusinessNature
+      )
+      method.setValue(
         "CompanyAddress",
         LeadIntroductionData.data[0].CompanyAddress
       )
@@ -554,10 +556,7 @@ function LeadIntroductionForm({ mode, userRights }) {
         "CompanyWebsite",
         LeadIntroductionData.data[0].CompanyWebsite
       )
-      method.setValue(
-        "BusinessNatureID",
-        LeadIntroductionData.data[0].BusinessNature
-      )
+
       method.setValue(
         "ContactPersonName",
         LeadIntroductionData.data[0].ContactPersonName
@@ -650,7 +649,7 @@ function LeadIntroductionForm({ mode, userRights }) {
           <div className="mt-4">
             <ButtonToolBar
               saveLoading={mutation.isPending}
-              handleGoBack={() => navigate(parentRoute)}
+              handleGoBack={() => navigate(-1)}
               handleEdit={() => handleEdit()}
               handleCancel={() => {
                 handleCancel()

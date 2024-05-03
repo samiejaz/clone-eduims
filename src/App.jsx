@@ -227,7 +227,7 @@ export default App
 
 export function InitMenuNames() {
   const user = useUserData()
-  const { setAuthorizedRoutes } = useRoutesData()
+  const { setAuthorizedRoutes, setOriginalRoutes } = useRoutesData()
 
   const { data: AllowedMenus } = useQuery({
     queryKey: ["allowRoutes", user?.userID],
@@ -239,7 +239,8 @@ export function InitMenuNames() {
 
   useEffect(() => {
     if (AllowedMenus) {
-      setAuthorizedRoutes(AllowedMenus)
+      setAuthorizedRoutes(AllowedMenus.groupedRoutes)
+      setOriginalRoutes(AllowedMenus.orignalRoutes)
     }
   }, [AllowedMenus])
 

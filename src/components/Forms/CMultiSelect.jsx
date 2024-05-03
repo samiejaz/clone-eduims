@@ -16,6 +16,7 @@ const CMultiSelect = ({
   placeholder = "",
   required = false,
   errorMessage = "This field is required!",
+  showClear = true,
 }) => {
   return (
     <Controller
@@ -35,7 +36,7 @@ const CMultiSelect = ({
             placeholder={placeholder}
             display="chip"
             filter={filter}
-            showClear
+            showClear={showClear}
             className={classNames({
               "p-invalid": fieldState.error,
             })}

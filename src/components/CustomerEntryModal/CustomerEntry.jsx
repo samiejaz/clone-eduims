@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
 import { fetchNewCustomerById } from "../../api/NewCustomerData"
@@ -6,21 +6,16 @@ import { AuthContext } from "../../context/AuthContext"
 import { FormRow, FormColumn, FormLabel } from "../Layout/LayoutComponents"
 import TextInput from "../Forms/TextInput"
 import CheckBox from "../Forms/CheckBox"
+import { CustomerAndLeadsInfo } from "../../hooks/ModalHooks/useLeadsIntroductionModalHook"
 
 function CustomerEntry(props) {
   const { CustomerID, isEnable = true } = props
   const { user } = useContext(AuthContext)
   const [CustomerData, setCustomerData] = useState()
   const [isLoading, setIsLoading] = useState(true)
+  const countryRef = useRef()
 
-  const {
-    register,
-    setValue,
-    control,
-    clearErrors,
-    reset,
-    formState: { errors },
-  } = useFormContext()
+  const { register, setValue, control, clearErrors } = useFormContext()
 
   useEffect(() => {
     async function fetchOldCustomer() {
@@ -38,10 +33,15 @@ function CustomerEntry(props) {
   useEffect(() => {
     if (CustomerID !== 0 && CustomerData?.data) {
       clearErrors()
+      setValue("CountryID", CustomerData.data[0].CountryID ?? null)
+      countryRef.current?.setCountryID(CustomerData.data[0].CountryID ?? null)
+      setValue("TehsilID", CustomerData.data[0].TehsilID)
+      setValue("BusinessTypeID", CustomerData.data[0].BusinessTypeID ?? null)
+      setValue("BusinessNatureID", CustomerData.data[0].BusinessNature ?? "")
       setValue("CustomerName", CustomerData?.data[0]?.CustomerName)
       setValue(
         "CustomerBusinessName",
-        CustomerData?.data[0]?.CustomerBusinessName
+        CustomerData?.data[0]?.CustomerBusinessName ?? ""
       )
       setValue(
         "CustomerBusinessAddress",
@@ -110,7 +110,14 @@ function CustomerEntry(props) {
             </div>
           </FormColumn>
         </FormRow>
-
+        <FormRow>
+          <CustomerAndLeadsInfo
+            mode={!isEnable ? "view" : "new"}
+            col={6}
+            required={false}
+            countryRef={countryRef}
+          />
+        </FormRow>
         <FormRow>
           <FormColumn lg={4} xl={4} md={6}>
             <FormLabel>Contact Name</FormLabel>

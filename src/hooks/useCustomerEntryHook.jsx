@@ -24,6 +24,10 @@ const customerEntryDefaultValues = {
   Description: "",
   InActive: false,
   Customers: null,
+  CountryID: null,
+  TehsilID: null,
+  BusinessTypeID: null,
+  BusinessNature: "",
 }
 
 const customerBranchDefaultValues = {
@@ -72,6 +76,10 @@ const useCustomerEntryHook = () => {
         Description: formData?.Description,
         InActive: formData?.InActive === false ? 0 : 1,
         EntryUserID: user.userID,
+        CountryID: formData.CountryID,
+        TehsilID: formData.TehsilID,
+        BusinessTypeID: formData.BusinessTypeID,
+        BusinessNature: formData.BusinessNatureID,
       }
 
       const { data } = await axios.post(
@@ -110,10 +118,6 @@ const useCustomerEntryHook = () => {
     customerEntryFrom.reset(customerEntryDefaultValues)
     customerBranchFrom.reset(customerBranchDefaultValues)
     customerAccountsForm.reset(customerAccountsForm)
-  }
-
-  function handleSetCustomerID(id) {
-    setCustomerID(id)
   }
 
   const dialogs = [
@@ -228,7 +232,7 @@ const useCustomerEntryHook = () => {
   function dialogHeight() {
     switch (dialogIndex) {
       case 0:
-        return "70vh"
+        return "90vh"
       case 1:
         return "80vh"
       default:
@@ -249,6 +253,13 @@ const useCustomerEntryHook = () => {
             setVisible(false)
             queryClient.invalidateQueries({ queryKey: ["Customers"] })
             queryClient.invalidateQueries({ queryKey: ["oldcustomers"] })
+          }}
+          pt={{
+            content: {
+              style: {
+                overflow: dialogIndex === 0 ? "hidden" : "auto",
+              },
+            },
           }}
           footer={footerContent}
         >

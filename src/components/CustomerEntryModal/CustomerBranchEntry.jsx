@@ -212,7 +212,7 @@ function CustomerBranchEntryHeader(props) {
               <CMultiSelectField
                 control={control}
                 name="CustomerAccounts"
-                disabled={createNewLedger}
+                disabled={createNewLedger || !isEnable}
                 options={CustomerAccounts}
                 optionLabel="AccountTitle"
                 optionValue="AccountID"
@@ -721,6 +721,7 @@ function CustomerBranchesDataTable(props) {
                       optionValue="AccountID"
                       placeholder="Select an account"
                       required={!createNewLedger}
+                      showClear={isEnable}
                     />
                   </FormColumn>
                   <FormColumn lg={4} xl={4} md={6}>
