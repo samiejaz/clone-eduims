@@ -140,7 +140,7 @@ function DetailComponent({ userRights }) {
   function handleView(id) {
     navigate(parentRoute + "/" + id)
   }
-
+  console.log(data)
   return (
     <>
       {isLoading || isFetching ? (
@@ -179,7 +179,6 @@ function DetailComponent({ userRights }) {
             resizableColumns
             size="small"
             selectionMode="single"
-            style={{ background: "red" }}
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
           >
@@ -221,6 +220,13 @@ function DetailComponent({ userRights }) {
               filterPlaceholder="Search by ref no"
               sortable
               header="Ref No"
+            ></Column>
+            <Column
+              field="DocumentNo"
+              filter
+              filterPlaceholder="Search by ref no"
+              sortable
+              header="Document No"
             ></Column>
 
             <Column

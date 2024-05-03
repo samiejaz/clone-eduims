@@ -164,7 +164,7 @@ export const MeetingDoneFields = ({
           </Form.Group>
           <Form.Group as={Col} controlId="MeetingTime">
             <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
-              Meeting Date
+              Meeting Date & Time
               <span className="text-danger fw-bold ">*</span>
             </Form.Label>
             <div>
@@ -173,6 +173,7 @@ export const MeetingDoneFields = ({
                 name={"MeetingTime"}
                 required={true}
                 disabled={!isEnable}
+                showTime={true}
               />
             </div>
           </Form.Group>

@@ -575,10 +575,7 @@ export function LeadsIntroductionFormComponent({
           {hideFieldsForDemo === false ? (
             <>
               <FormColumn lg={3} xl={3} md={6}>
-                <FormLabel>
-                  Where have you heard about us?
-                  <span className="text-danger fw-bold ">*</span>
-                </FormLabel>
+                <FormLabel>Where have you heard about us?</FormLabel>
                 <div>
                   <CDropdown
                     control={method.control}
@@ -587,7 +584,6 @@ export function LeadsIntroductionFormComponent({
                     optionValue="LeadSourceID"
                     placeholder="Select a lead source"
                     options={leadSourcesSelectData.data}
-                    required={true}
                     disabled={mode === "view"}
                   />
                 </div>
