@@ -16,7 +16,8 @@ import { FormColumn, FormRow } from "../Layout/LayoutComponents"
 import TextInput from "../Forms/TextInput"
 
 let pageTitles = {}
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../../public/COSTANTS"
+
 const AccountEntryContext = createContext()
 const AccountEntryProvider = ({ children }) => {
   const [createdAccountID, setCreatedAccountID] = useState(0)

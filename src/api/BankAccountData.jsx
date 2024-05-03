@@ -1,10 +1,7 @@
 import axios from "axios"
-import { toast } from "react-toastify"
-import { TOAST_CONTAINER_IDS } from "../utils/enums"
 import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 import { decryptID, encryptID } from "../utils/crypto"
-
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 const CONTROLLER = "EduIMS"
 const WHEREMETHOD = "GetBankAccountWhere"

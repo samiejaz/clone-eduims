@@ -8,6 +8,7 @@ import { useContext } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
 import { CheckCircle } from "lucide-react"
+import { apiUrl } from "../../public/COSTANTS"
 
 const SignUp = () => {
   const navigate = useNavigate()
@@ -20,8 +21,6 @@ const SignUp = () => {
       navigate("/", { replace: true })
     }
   }, [user, navigate])
-
-  const apiUrl = import.meta.env.VITE_APP_API_URL
 
   const mutation = useMutation({
     mutationFn: async (formData) => {

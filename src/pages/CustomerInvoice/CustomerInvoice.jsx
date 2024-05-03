@@ -60,17 +60,11 @@ import ButtonToolBar from "./CustomerInvoiceToolbar"
 import TextInput from "../../components/Forms/TextInput"
 import CDropdown from "../../components/Forms/CDropdown"
 import { QUERY_KEYS, ROUTE_URLS } from "../../utils/enums"
+import { apiUrl } from "../../../public/COSTANTS"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.CUSTOMER_INVOICE
-let editRoute = `${parentRoute}/edit/`
-let newRoute = `${parentRoute}/new`
-let cashDetailColor = "#22C55E"
-let onlineDetailColor = "#F59E0B"
-let chequeDetailColor = "#3B82F6"
-let ddDetailColor = "#8f48d2"
-let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+let queryKey = QUERY_KEYS.CUSTOMER_INVOICE_QUERY_KEY
 
 function CustomerInvoice() {
   const { pageTitles } = useContext(AppConfigurationContext)

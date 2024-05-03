@@ -3,7 +3,7 @@ import { format, parseISO } from "date-fns"
 import { decryptID, encryptID } from "../utils/crypto"
 import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 const CONTROLLER = "CustomerInvoice"
 const WHEREMETHOD = "GetCustomerInvoiceWhere"

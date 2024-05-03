@@ -2,7 +2,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { ShowErrorToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 export async function fetchAllNewCustomers(LoginUserID) {
   try {

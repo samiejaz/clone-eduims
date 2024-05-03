@@ -7,7 +7,7 @@ import {
 import { TOAST_CONTAINER_IDS } from "../utils/enums"
 import { decryptID, encryptID } from "../utils/crypto"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 const CONTROLLER = "EduIMS"
 const WHEREMETHOD = "GetAllUsers"

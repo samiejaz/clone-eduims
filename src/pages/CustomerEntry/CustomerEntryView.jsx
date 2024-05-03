@@ -12,11 +12,10 @@ import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "../../context/AuthContext"
 import { toast } from "react-toastify"
 import { BreadCrumb } from "primereact/breadcrumb"
-import Select from "react-select"
 import { fetchAllOldCustomersForSelect } from "../../api/SelectData"
 import { ROUTE_URLS } from "../../utils/enums"
 import { Dropdown } from "primereact/dropdown"
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../../public/COSTANTS"
 
 const items = [{ label: "Customer Detail" }]
 

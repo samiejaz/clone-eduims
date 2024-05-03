@@ -19,8 +19,7 @@ import {
 } from "../../utils/CommonFunctions"
 import axios from "axios"
 import { CustomSpinner } from "../../components/CustomSpinner"
-
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../../public/COSTANTS"
 
 export default function AccountLedgerReport() {
   document.title = "Account Ledger"

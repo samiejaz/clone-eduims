@@ -7,7 +7,7 @@ import {
 } from "../utils/crypto"
 import { ShowErrorToast } from "../utils/CommonFunctions"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 const CONTROLLER = "data_ReceiptVoucher"
 const WHEREMETHOD = "GetReceiptVoucherData"

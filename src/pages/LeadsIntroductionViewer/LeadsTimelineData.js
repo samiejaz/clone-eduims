@@ -1,8 +1,7 @@
 import axios from "axios"
 import { ShowErrorToast } from "../../utils/CommonFunctions"
 import { decryptID } from "../../utils/crypto"
-
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../../public/COSTANTS"
 
 export async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
   if (LeadIntroductionID !== undefined) {

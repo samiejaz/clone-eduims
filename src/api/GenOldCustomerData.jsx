@@ -2,7 +2,7 @@ import axios from "axios"
 import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 import { decryptID, encryptID } from "../utils/crypto"
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { apiUrl } from "../../public/COSTANTS"
 
 export async function fetchAllGenOldCustomers(LoginUserID) {
   try {
