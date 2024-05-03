@@ -1,20 +1,11 @@
 import { useEffect } from "react"
 import axios from "axios"
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-  Spinner,
-} from "react-bootstrap"
+import { Button, Card, Form, Row, Spinner } from "react-bootstrap"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { AuthContext } from "../context/AuthContext"
 import { useContext } from "react"
 import { useForm } from "react-hook-form"
-import Logo from "../images/logo.png"
 import { toast } from "react-toastify"
 import { CheckCircle } from "lucide-react"
 

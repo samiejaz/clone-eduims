@@ -38,7 +38,7 @@ function UserProfile({ showProfile, handleCloseProfile }) {
 
   const { user, setUser, updateUserName } = useAuthProvider()
   const { data: UserData } = useQuery({
-    queryKey: ["currentUser"],
+    queryKey: ["currentUser", user],
     queryFn: async () => {
       const { data } = await axios.post(
         `${apiUrl}/EduIMS/GetUserInfo?LoginUserID=${user.userID}`
