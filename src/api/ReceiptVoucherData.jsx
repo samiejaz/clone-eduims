@@ -5,7 +5,7 @@ import {
   encryptID,
   verifyAndReturnEncryptedIDForForms,
 } from "../utils/crypto"
-import { ShowErrorToast } from "../utils/CommonFunctions"
+import { ShowErrorToast, formatDateWithSymbol } from "../utils/CommonFunctions"
 
 import { apiUrl } from "../../public/COSTANTS"
 
@@ -45,7 +45,7 @@ export async function deleteReceiptVoucherByID({
   ReceiptVoucherID,
   LoginUserID,
 }) {
-  ReceiptVoucherID = verifyAndReturnEncryptedIDForForms(ReceiptVoucherID)
+  ReceiptVoucherID = decryptID(ReceiptVoucherID)
 
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/${DELETEMETHOD}?ReceiptVoucherID=${ReceiptVoucherID}&LoginUserID=${LoginUserID}`
@@ -94,7 +94,7 @@ export async function addNewReceiptVoucher({
         SessionID: formData.SessionID,
         BusinessUnitID: formData.BusinessUnitID,
         VoucherNo: formData.VoucherNo,
-        VoucherDate: formData.VoucherDate,
+        VoucherDate: formatDateWithSymbol(formData.VoucherDate),
         ReceiptMode: formData.ReceiptMode,
         DocumentNo: formData.DocumentNo,
         InstrumentType:

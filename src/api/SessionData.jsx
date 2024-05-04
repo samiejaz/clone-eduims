@@ -4,6 +4,7 @@ import { toast } from "react-toastify"
 import { decryptID, encryptID } from "../utils/crypto"
 
 import { apiUrl } from "../../public/COSTANTS"
+import { formatDateWithSymbol } from "../utils/CommonFunctions"
 
 const CONTROLLER = "EduIMS"
 const POSTMEHTOD = "SessionInsertUpdate"
@@ -66,8 +67,12 @@ export async function addNewSession({ formData, userID, SessionID = 0 }) {
   try {
     let DataToSend = {
       SessionTitle: formData.SessionTitle,
-      SessionOpeningDate: formData.SessionOpeningDate.toLocaleDateString(),
-      SessionClosingDate: formData.SessionClosingDate.toLocaleDateString(),
+      SessionOpeningDate:
+        formatDateWithSymbol(formData.SessionOpeningDate) ??
+        formatDateWithSymbol(new Date()),
+      SessionClosingDate:
+        formatDateWithSymbol(formData.SessionClosingDate) ??
+        formatDateWithSymbol(new Date()),
       InActive: formData.InActive === true ? 1 : 0,
       EntryUserID: userID,
     }
