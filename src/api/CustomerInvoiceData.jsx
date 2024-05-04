@@ -1,7 +1,11 @@
 import axios from "axios"
 import { format, parseISO } from "date-fns"
 import { decryptID, encryptID } from "../utils/crypto"
-import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
+import {
+  ShowErrorToast,
+  ShowSuccessToast,
+  formatDateWithSymbol,
+} from "../utils/CommonFunctions"
 
 import { apiUrl } from "../../public/COSTANTS"
 
@@ -118,7 +122,9 @@ export async function addNewCustomerInvoice({
       InstallmentDetail = formData?.installments?.map((item, index) => {
         return {
           InstallmentRowID: index + 1,
-          InstallmentDueDate: item.IDate ?? new Date(),
+          InstallmentDueDate:
+            formatDateWithSymbol(item.IDate) ??
+            formatDateWithSymbol(new Date()),
           InstallmentAmount: item.Amount,
         }
       })
@@ -128,8 +134,12 @@ export async function addNewCustomerInvoice({
       SessionID: formData?.SessionID,
       InvoiceNo: formData?.VoucherNo,
       SessionBasedVoucherNo: formData?.SessionBasedVoucherNo,
-      InvoiceDate: formData?.VoucherDate?.toLocaleDateString() || new Date(),
-      InvoiceDueDate: formData?.DueDate?.toLocaleDateString() || new Date(),
+      InvoiceDate:
+        formatDateWithSymbol(formData?.VoucherDate) ||
+        formatDateWithSymbol(new Date()),
+      InvoiceDueDate:
+        formatDateWithSymbol(formData?.VoucherDueDate) ||
+        formatDateWithSymbol(new Date()),
       CustomerID: formData?.Customer,
       AccountID: formData?.CustomerLedgers,
       BusinessUnitID: formData?.BusinessUnitID,

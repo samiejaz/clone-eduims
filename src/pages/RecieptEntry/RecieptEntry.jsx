@@ -449,10 +449,6 @@ function FormComponent({ mode, userRights }) {
           }
         })
       )
-    } else {
-      if (mode !== "new") {
-        navigate(parentRoute)
-      }
     }
   }, [ReceiptVoucherID, ReceiptVoucherData])
 

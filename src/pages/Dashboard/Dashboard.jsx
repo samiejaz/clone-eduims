@@ -5,21 +5,14 @@ import { MOVEABLE_COMPNENTS_NAMES } from "../../utils/enums"
 import { InfoCardsContainer } from "../Leads/LeadsDashboard/LeadsDashboard"
 import { FormColumn, FormRow } from "../../components/Layout/LayoutComponents"
 import { useRoutesData } from "../../context/RoutesContext"
-import {
-  CircleDollarSign,
-  LayoutDashboard,
-  Plus,
-  Receipt,
-  ReceiptText,
-  User,
-} from "lucide-react"
+
 import { Link } from "react-router-dom"
-// import CustomerIcon from "../../images/CustomerEntry"
-// import InoivceIcon from "../../images/Invoice"
-// import LeadsDashboardIcon from "../../images/LeadsDashboard"
-// import LedgerIcon from "../../images/Ledger"
-//import NewLeadEntryIcon from "../../images/"
-//import ReceiptIcon from "../../images/profilelog.png"
+import CustomerIcon from "../../assets/new.png"
+import InvoiceIcon from "../../assets/invoice.png"
+import LeadsDashboardIcon from "../../assets/speedometer.png"
+import LedgerIcon from "../../assets/payment.png"
+import NewLeadEntryIcon from "../../assets/leading.png"
+import ReceiptIcon from "../../assets/receipt.png"
 
 const componentMapping = {
   InfoCardsContainer,
@@ -64,19 +57,32 @@ function Dashboard() {
   )
 }
 
-const LinkCard = ({ item, icon }) => {
+const LinkCard = ({ item, icon, textColor, backGroundColor }) => {
   return (
     <>
       {item?.menuKey && (
         <>
           <Link to={item?.routeUrl}>
             <div
-              className="flex align-items-center justify-content-center flex-col p-5 rounded shadow bg-royal-blue"
-              style={{ minHeight: "10rem" }}
+              className="flex align-items-center justify-content-center flex-col p-5 rounded scaleOnHover"
+              style={{ minHeight: "10rem", background: backGroundColor }}
             >
               <div className="text-center">
-                {icon}
-                <p className="fw-bold" style={{ color: "inherit" }}>
+                <img
+                  src={icon}
+                  alt="Dashboard Cards"
+                  style={{
+                    width: "70px",
+                    height: "70px",
+                    objectFit: "contain",
+                  }}
+                />
+                <p
+                  className="fw-bold"
+                  style={{
+                    color: textColor,
+                  }}
+                >
                   {item?.menuName}
                 </p>
               </div>
@@ -100,7 +106,9 @@ const LinksContainer = () => {
               item={originalRoutes.find(
                 (item) => item.menuKey === "mnuCustomers"
               )}
-              icon={<User />}
+              icon={CustomerIcon}
+              backGroundColor={"#ECF2FF"}
+              textColor={"#5D87FF"}
             />
           </FormColumn>
         </>
@@ -113,7 +121,9 @@ const LinksContainer = () => {
               item={originalRoutes.find(
                 (item) => item.menuKey === "mnuNewCustomerInvoice"
               )}
-              icon={<Receipt />}
+              icon={InvoiceIcon}
+              backGroundColor={"#EAF6FF"}
+              textColor={"#49BEFF"}
             />
           </FormColumn>
         </>
@@ -126,7 +136,9 @@ const LinksContainer = () => {
               item={originalRoutes.find(
                 (item) => item.menuKey === "mnuLeadsDashboard"
               )}
-              icon={<LayoutDashboard />}
+              icon={LeadsDashboardIcon}
+              backGroundColor={"#FDEDE8"}
+              textColor={"#FA8B6E"}
             />
           </FormColumn>
         </>
@@ -139,7 +151,9 @@ const LinksContainer = () => {
               item={originalRoutes.find(
                 (item) => item.menuKey === "mnuLeadIntroduction"
               )}
-              icon={<Plus />}
+              icon={NewLeadEntryIcon}
+              backGroundColor={"#FEF5E5"}
+              textColor={"#FFAE1F"}
             />
           </FormColumn>
         </>
@@ -152,7 +166,9 @@ const LinksContainer = () => {
               item={originalRoutes.find(
                 (item) => item.menuKey === "mnuRecieptVoucher"
               )}
-              icon={<ReceiptText />}
+              icon={ReceiptIcon}
+              backGroundColor={"#C0C0B8"}
+              textColor={"#9c9c8f"}
             />
           </FormColumn>
         </>
@@ -165,7 +181,9 @@ const LinksContainer = () => {
               item={originalRoutes.find(
                 (item) => item.menuKey === "mnuAccountLedgerReport"
               )}
-              icon={<CircleDollarSign />}
+              icon={LedgerIcon}
+              backGroundColor={"#E6FFFA"}
+              textColor={"#13DEB9"}
             />
           </FormColumn>
         </>

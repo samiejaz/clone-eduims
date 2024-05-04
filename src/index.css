@@ -782,3 +782,16 @@ a {
   cursor: pointer;
   color: white;
 }
+
+.iconClass {
+  position: relative; /* or absolute, depending on your layout */
+  z-index: 10; /* Higher than the card's z-index */
+}
+
+.scaleOnHover {
+  transition: transform 0.3s ease-in-out; 
+}
+
+.scaleOnHover:hover {
+  transform: scale(1.1);
+}

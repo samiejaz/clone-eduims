@@ -1,6 +1,10 @@
 import axios from "axios"
 import { decryptID, encryptID } from "../utils/crypto"
-import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
+import {
+  ShowErrorToast,
+  ShowSuccessToast,
+  formatDateWithSymbol,
+} from "../utils/CommonFunctions"
 
 import { apiUrl } from "../../public/COSTANTS"
 
@@ -81,7 +85,9 @@ export async function addNewDebitNote({ formData, userID, DebitNoteID = 0 }) {
         SessionID: formData.SessionID,
         BusinessUnitID: formData.BusinessUnitID,
         VoucherNo: formData.VoucherNo,
-        VoucherDate: formData.VoucherDate,
+        VoucherDate:
+          formatDateWithSymbol(formData.VoucherDate) ??
+          formatDateWithSymbol(new Date()),
         ReceiptMode: formData.ReceiptMode,
         DocumentNo: formData.DocumentNo,
         CustomerID: formData.Customer,
