@@ -4,8 +4,7 @@ import {
   useAllTehsilsSelectData,
 } from "../../hooks/SelectData/useSelectData"
 import React, { useState } from "react"
-import { FormColumn } from "../Layout/LayoutComponents"
-import { FormLabel } from "react-bootstrap"
+import { FormColumn, FormLabel } from "../Layout/LayoutComponents"
 import CDropdown from "../Forms/CDropdown"
 
 const CountryDependentFields = React.forwardRef(

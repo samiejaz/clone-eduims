@@ -40,6 +40,7 @@ export default function ButtonToolBar({
   mode = "new",
   getPrintFromUrl = "",
   splitButtonItems = [],
+  showUtilityContent = false,
 }) {
   useKeyCombination(() => {
     if (mode === "edit" || mode === "new") {
@@ -224,7 +225,7 @@ export default function ButtonToolBar({
         ) : (
           <></>
         )}
-        {utilityContent}
+        {showUtilityContent && <>{utilityContent}</>}
       </div>
     </React.Fragment>
   )
@@ -299,7 +300,6 @@ const PrintRecordButton = ({
           <SplitButton
             label={mutation.isPending ? "Generating..." : "Print"}
             icon="pi pi-print"
-            className="rounded"
             type="button"
             severity="help"
             disabled={printDisable}
@@ -315,6 +315,15 @@ const PrintRecordButton = ({
             pt={{
               label: {
                 className: "hidden md:block lg:block",
+              },
+              button: {
+                className: "rounded",
+              },
+              menuButton: {
+                className: "rounded",
+              },
+              root: {
+                className: "rounded",
               },
             }}
           />

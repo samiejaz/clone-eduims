@@ -2,7 +2,7 @@ import { Row, Form, Col, Spinner, Table } from "react-bootstrap"
 import { DataTable } from "primereact/datatable"
 import { Button } from "primereact/button"
 import { Column } from "primereact/column"
-import { toast } from "react-toastify"
+
 import {
   useForm,
   useFieldArray,
@@ -23,14 +23,13 @@ import React, {
 } from "react"
 
 import { AuthContext } from "../../context/AuthContext"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import TextInput from "../../components/Forms/TextInput"
 import NumberInput from "../../components/Forms/NumberInput"
 
 import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
 import CDropdown from "../../components/Forms/CDropdown"
-import { DevTool } from "@hookform/devtools"
 import {
   addNewCustomerInvoice,
   deleteCustomerInvoiceByID,
@@ -67,11 +66,12 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 
 import { decryptID, encryptID } from "../../utils/crypto"
 import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields"
-import { TextAreaField } from "../../components/Forms/form"
+import { CheckBox, TextAreaField } from "../../components/Forms/form"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
 
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { Button as BootStrapButton } from "react-bootstrap"
+import { Checkbox } from "primereact/checkbox"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
 let editRoute = `${parentRoute}/edit/`
@@ -93,7 +93,9 @@ export default function CreditNotes() {
   )
 }
 
+let renderCount = 0
 function DetailComponent({ userRights }) {
+  renderCount++
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const menuRef = useRef()
@@ -141,8 +143,10 @@ function DetailComponent({ userRights }) {
   function handleView(id) {
     navigate(parentRoute + "/" + id)
   }
+  const refs = useRef([])
 
   function handlePrint({ id, report = "simple" }) {
+    let ShowParties = method.getValues("ShowParties_" + id)
     if (report !== "simple") {
       handlePrintReport({
         getPrintFromUrl:
@@ -164,6 +168,8 @@ function DetailComponent({ userRights }) {
       },
     },
   ]
+
+  const method = useForm()
 
   return (
     <>
@@ -236,12 +242,34 @@ function DetailComponent({ userRights }) {
                       >
                         <i className="pi pi-print"></i>
                       </BootStrapButton>
+                      <div className="ml-1">
+                        <Controller
+                          name={"ShowParties_" + rowData.CustomerInvoiceID}
+                          control={method.control}
+                          render={({ field }) => (
+                            <>
+                              <Checkbox
+                                inputId={field.name}
+                                checked={field.value}
+                                inputRef={field.ref}
+                                onChange={(e) => {
+                                  field.onChange(e.checked)
+                                }}
+                                defaultChecked={false}
+                                defaultValue={false}
+                                tooltip="Show Parties"
+                              />
+                            </>
+                          )}
+                        />
+                      </div>
                     </>
                   ),
                 })
               }
               header="Actions"
               resizeable={false}
+              //    style={{ minWidth: "15rem" }}
             ></Column>
             <Column
               field="SessionBasedVoucherNo"
@@ -505,41 +533,23 @@ function FormComponent({ mode, userRights }) {
       ) : (
         <>
           <CustomerBranchDataProvider>
-            <div className="mt-4">
-              <ButtonToolBar
-                mode={mode}
-                handleGoBack={() => navigate(parentRoute)}
-                handleEdit={() => handleEdit()}
-                handleCancel={() => {
-                  handleCancel()
-                }}
-                handleAddNew={() => {
-                  handleAddNew()
-                }}
-                handleSave={() => method.handleSubmit(onSubmit)()}
-                GoBackLabel="CustomerInvoices"
-                saveLoading={CustomerInvoiceMutation.isPending}
-                handleDelete={handleDelete}
-                showPrint={userRights[0]?.RolePrint}
-                printDisable={mode !== "view"}
-                showAddNewButton={userRights[0]?.RoleNew}
-                showEditButton={userRights[0]?.RoleEdit}
-                showDelete={userRights[0]?.RoleDelete}
-                getPrintFromUrl={
-                  mode !== "new" &&
-                  `InvoicePrint?CustomerInvoiceID=${decryptID(
-                    CustomerInvoiceID
-                  )}`
-                }
-                splitButtonItems={[
-                  {
-                    label: "Previous Balance Report",
-                    icon: "pi pi-step-backward",
-                    reportType: "PreviousBalance",
-                  },
-                ]}
-              />
-            </div>
+            <CustomerInvoiceToolbar
+              mode={mode}
+              handleGoBack={() => navigate(parentRoute)}
+              handleCancel={() => {
+                handleCancel()
+              }}
+              handleEdit={() => handleEdit()}
+              handleAddNew={() => {
+                handleAddNew()
+              }}
+              method={method}
+              handleSave={() => method.handleSubmit(onSubmit)()}
+              saveLoading={CustomerInvoiceMutation.isPending}
+              handleDelete={handleDelete}
+              userRights={userRights}
+              CustomerInvoiceID={CustomerInvoiceID}
+            />
             <form id="CustomerInvoice" className="mt-4">
               <FormProvider {...method}>
                 <Row>
@@ -700,6 +710,77 @@ function FormComponent({ mode, userRights }) {
         </>
       )}
     </>
+  )
+}
+
+function CustomerInvoiceToolbar({
+  mode,
+  handleGoBack,
+  handleCancel,
+  handleAddNew,
+  handleSave,
+  method,
+  saveLoaing,
+  handleDelete,
+  userRights,
+  CustomerInvoiceID,
+  handleEdit,
+}) {
+  const [printQueryParams, setPrintQueryParams] = useState(
+    `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}`
+  )
+
+  return (
+    <div className="mt-4">
+      <ButtonToolBar
+        mode={mode}
+        handleGoBack={handleGoBack}
+        handleEdit={handleEdit}
+        handleCancel={handleCancel}
+        handleAddNew={handleAddNew}
+        handleSave={handleSave}
+        GoBackLabel="CustomerInvoices"
+        saveLoading={saveLoaing}
+        handleDelete={handleDelete}
+        showAddNewButton={userRights[0]?.RoleNew}
+        showEditButton={userRights[0]?.RoleEdit}
+        showDelete={userRights[0]?.RoleDelete}
+        showPrint={mode === "view" && userRights[0]?.RolePrint}
+        printDisable={mode !== "view"}
+        getPrintFromUrl={mode !== "new" && printQueryParams}
+        splitButtonItems={[
+          {
+            label: "Previous Balance Report",
+            icon: "pi pi-step-backward",
+            reportType: "PreviousBalance",
+          },
+        ]}
+        showUtilityContent={mode === "view"}
+        utilityContent={
+          <>
+            <div>
+              <CheckBox
+                control={method.control}
+                ID={"ShowParties"}
+                Label={"Show Parties"}
+                isEnable={mode === "view"}
+                onChange={(e) => {
+                  if (e.checked) {
+                    setPrintQueryParams(
+                      `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}&ShowPartyBalance=true`
+                    )
+                  } else {
+                    setPrintQueryParams(
+                      `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}`
+                    )
+                  }
+                }}
+              />
+            </div>
+          </>
+        }
+      />
+    </div>
   )
 }
 

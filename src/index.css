@@ -795,3 +795,10 @@ a {
 .scaleOnHover:hover {
   transform: scale(1.1);
 }
+
+.p-tieredmenu-root-list {
+  margin: 0;
+}
+.p-tieredmenu.p-component.p-tieredmenu-overlay.p-ripple-disabled.p-connected-overlay-enter-done {
+  padding-bottom: .9rem;
+}

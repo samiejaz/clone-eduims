@@ -6,7 +6,6 @@ import { Button } from "primereact/button"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { Col, Form, Row } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form"
 import NumberInput from "../../components/Forms/NumberInput"
 import CDropdown from "../../components/Forms/CDropdown"
@@ -28,9 +27,17 @@ import { RevertBackFields } from "../../components/Modals/RevertBackModal"
 import { decryptID, encryptID } from "../../utils/crypto"
 import { ShowErrorToast } from "../../utils/CommonFunctions"
 import { useUserData } from "../../context/AuthContext"
-import { FormColumn, FormLabel } from "../../components/Layout/LayoutComponents"
-import { SingleFileUploadField } from "../../components/Forms/form"
+import {
+  FormRow,
+  FormColumn,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents"
+import {
+  SingleFileUploadField,
+  TextAreaField,
+} from "../../components/Forms/form"
 import useLeadsFileViewerHook from "./useLeadsFileViewerHook"
+import { apiUrl } from "../../../public/COSTANTS"
 
 let queryKey = "key"
 
@@ -381,27 +388,15 @@ function ForwardedFieldsContainer({
     }
   }, [data])
 
-  let filePath =
-    data[0]?.FileName === null
-      ? null
-      : "http://192.168.9.110:90/api/data_LeadIntroduction/DownloadLeadProposal?filename=" +
-        data[0]?.FileName
-  let fileType = data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
-
-  const { fileData } = useQuery({
-    queryKey: ["leadsFile"],
-    queryFn: () => getLeadsFile(data[0].FileName),
-  })
-
   // Forward Fields
   const ForwardFields = (
     <>
-      <Row>
-        <Form.Group as={Col} controlId="DepartmentID">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+      <FormRow>
+        <FormColumn lg={6} xl={6} md={6}>
+          <FormLabel>
             Department
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -415,12 +410,12 @@ function ForwardedFieldsContainer({
               disabled={!isEnable}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="UserID">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+        <FormColumn lg={6} xl={6} md={6}>
+          <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
             User
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -434,14 +429,14 @@ function ForwardedFieldsContainer({
               disabled={!isEnable}
             />
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col} controlId="MeetingPlace">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
             Meeting Medium
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -457,12 +452,12 @@ function ForwardedFieldsContainer({
               disabled={!isEnable}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="MeetingTime">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>
             Meeting Date & Time
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <Controller
               name="MeetingTime"
@@ -486,12 +481,12 @@ function ForwardedFieldsContainer({
               )}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="ProductInfoID">
-          <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>
             Recomended Product
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
           <div>
             <CDropdown
               control={method.control}
@@ -505,24 +500,19 @@ function ForwardedFieldsContainer({
               disabled={!isEnable}
             />
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col} className="col-12">
-          <Form.Label>Instructions</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
-            {...method.register("Description")}
+        </FormColumn>
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={12} xl={12} md={12} className="col-12">
+          <FormLabel>Instructions</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
             disabled={!isEnable}
           />
-        </Form.Group>
-      </Row>
+        </FormColumn>
+      </FormRow>
     </>
   )
 
@@ -558,7 +548,7 @@ function ForwardedFieldsContainer({
       />
       {ForwardFields}
 
-      {filePath !== null && fileType !== "" ? (
+      {/* {filePath !== null && fileType !== "" ? (
         <>
           <FormColumn lg={12} xl={12} md={12}>
             <FormLabel>File</FormLabel>
@@ -576,7 +566,7 @@ function ForwardedFieldsContainer({
         </>
       ) : (
         <></>
-      )}
+      )} */}
     </>
   )
 }
@@ -587,7 +577,6 @@ function QuotedFieldsContainer({
   Type,
 }) {
   const method = useForm()
-  const fileInputRef = useRef()
   const [isEnable, setIsEnable] = useState(false)
 
   const user = useUserData()
@@ -617,8 +606,6 @@ function QuotedFieldsContainer({
     if (data.length > 0) {
       method.setValue("Amount", data[0].Amount)
       method.setValue("Description", data[0].Description)
-      //   data[0]?.FileType === null ? null : data[0]?.FileType.slice(1)
-      // );
     }
   }, [data])
 
@@ -629,9 +616,9 @@ function QuotedFieldsContainer({
 
   const QuotedFields = (
     <>
-      <Row>
-        <Form.Group className="col-xl-3" as={Col} controlId="Amount">
-          <Form.Label>Amount</Form.Label>
+      <FormRow>
+        <FormColumn lg={3} xl={3} md={12}>
+          <FormLabel>Amount</FormLabel>
           <div>
             <NumberInput
               control={method.control}
@@ -640,23 +627,18 @@ function QuotedFieldsContainer({
               disabled={!isEnable}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="Description" className="col-9">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
+        </FormColumn>
+        <FormColumn lg={9} xl={9} md={12}>
+          <FormLabel>Description</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
             disabled={!isEnable}
-            {...method.register("Description")}
           />
-        </Form.Group>
+        </FormColumn>
         {render}
-      </Row>
+      </FormRow>
     </>
   )
 
@@ -727,9 +709,9 @@ function ClosedFieldContainer({
 
   const ClosedFields = (
     <>
-      <Row>
-        <Form.Group className="col-xl-3" as={Col} controlId="Amount">
-          <Form.Label>Expected Amount</Form.Label>
+      <FormRow>
+        <FormColumn lg={3} xl={3} md={12}>
+          <FormLabel>Expected Amount</FormLabel>
           <div>
             <NumberInput
               control={method.control}
@@ -738,22 +720,17 @@ function ClosedFieldContainer({
               disabled={!isEnable}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col} controlId="Description" className="col-9">
-          <Form.Label>Reason</Form.Label>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
-            className="form-control"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-            }}
+        </FormColumn>
+        <FormColumn lg={9} xl={9} md={12}>
+          <FormLabel>Instructions</FormLabel>
+          <TextAreaField
+            control={method.control}
+            name={"Description"}
+            autoResize={true}
             disabled={!isEnable}
-            {...method.register("Description")}
           />
-        </Form.Group>
-      </Row>
+        </FormColumn>
+      </FormRow>
     </>
   )
 

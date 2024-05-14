@@ -1,10 +1,8 @@
 import { Outlet } from "react-router-dom"
-import { Navbar } from "react-bootstrap"
-import Logo from "../images/logo.png"
-import User from "../images/profilelogo.png"
+
 import CSidebar from "./Sidebar/CSidebar"
 import { useRef } from "react"
-import NotificationOverlay from "../components/OverlayPanel/NotificationOverlay"
+
 import useKeyCombination from "../hooks/useKeyCombinationHook"
 import useUserProfile from "../hooks/useUserProfile"
 
@@ -63,7 +61,7 @@ function RootLayout() {
 }
 
 function Header({ toggleSidebar }) {
-  const { handleCloseProfile, handleShowProfile, render } = useUserProfile()
+  const { handleShowProfile, render } = useUserProfile()
 
   return (
     <>
@@ -88,60 +86,8 @@ function Header({ toggleSidebar }) {
             handleShowProfile()
           }}
         ></i>
-        {/* <NotificationOverlay /> */}
       </div>
       {render}
-    </>
-  )
-}
-
-function LogoImage() {
-  return (
-    <>
-      <Navbar.Brand>
-        <img
-          alt="EDU IMS Logo"
-          src={Logo}
-          width="130"
-          height="30"
-          className="d-inline-block align-top"
-        />
-      </Navbar.Brand>
-    </>
-  )
-}
-
-function UserImage() {
-  const user = JSON.parse(localStorage.getItem("user"))
-
-  return (
-    <>
-      {user ? (
-        <>
-          {/* <Avatar
-            image={"data:image/png;base64," + user.image}
-            size="large"
-            shape="circle"
-          /> */}
-          {/* <img  
-            alt="User Profile"
-            src={"data:image/png;base64," + user.image}
-            width="40"
-            height="40"
-            className="d-inline-block align-top rounded-5"
-          /> */}
-        </>
-      ) : (
-        <>
-          <img
-            alt="User Profile"
-            src={User}
-            width="40"
-            height="40"
-            className="d-inline-block align-top rounded-5"
-          />
-        </>
-      )}
     </>
   )
 }

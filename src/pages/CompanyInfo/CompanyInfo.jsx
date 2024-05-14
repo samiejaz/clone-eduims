@@ -11,13 +11,13 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import { TextInput, TextAreaField } from "../../components/Forms/form"
-import { Tooltip } from "react-bootstrap"
 import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
 import { useKeyCombinationHook } from "../../hooks/hooks"
 import SingleFileUpload from "../../components/Forms/SingleFileUpload"
 import { SingleFormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { MENU_KEYS } from "../../utils/enums"
 import { apiUrl } from "../../../public/COSTANTS"
+import { Tooltip } from "primereact/tooltip"
 
 const defaultValues = {
   CompanyName: "",

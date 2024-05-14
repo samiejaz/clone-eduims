@@ -12,8 +12,7 @@ import {
   convertBase64StringToFile,
 } from "../../utils/CommonFunctions"
 import { useNavigate } from "react-router-dom"
-import { FormColumn, FormRow } from "../Layout/LayoutComponents"
-import { FormLabel } from "react-bootstrap"
+import { FormColumn, FormRow, FormLabel } from "../Layout/LayoutComponents"
 import { Image } from "primereact/image"
 import { apiUrl } from "../../../public/COSTANTS"
 

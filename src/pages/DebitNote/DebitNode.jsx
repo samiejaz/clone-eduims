@@ -1,4 +1,3 @@
-import { Row, Form, Col, Spinner } from "react-bootstrap"
 import { DataTable } from "primereact/datatable"
 import { Button } from "primereact/button"
 import { Column } from "primereact/column"
@@ -12,14 +11,15 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import ActionButtons from "../../components/ActionButtons"
 import { FilterMatchMode } from "primereact/api"
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
-import { AuthContext, useUserData } from "../../context/AuthContext"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useUserData } from "../../context/AuthContext"
+import { useNavigate, useParams } from "react-router-dom"
 
 import TextInput from "../../components/Forms/TextInput"
-import NumberInput from "../../components/Forms/NumberInput"
+import { TextAreaField } from "../../components/Forms/form"
 
+import NumberInput from "../../components/Forms/NumberInput"
 import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
 import CDropdown from "../../components/Forms/CDropdown"
 import { DevTool } from "@hookform/devtools"
@@ -48,10 +48,13 @@ import CDatePicker from "../../components/Forms/CDatePicker"
 import CNumberInput from "../../components/Forms/CNumberInput"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
-import AccessDeniedPage from "../../components/AccessDeniedPage"
 import { encryptID } from "../../utils/crypto"
-import { checkForUserRightsAsync } from "../../api/MenusData"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import {
+  FormColumn,
+  FormRow,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -352,14 +355,7 @@ function DebitNoteEntryForm({ mode, userRights }) {
     <>
       {isLoading ? (
         <>
-          <div className="d-flex align-content-center justify-content-center h-100 w-100 m-auto">
-            <Spinner
-              animation="border"
-              size="lg"
-              role="status"
-              aria-hidden="true"
-            />
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
@@ -385,11 +381,11 @@ function DebitNoteEntryForm({ mode, userRights }) {
           </div>
           <form id="DebitNote" className="mt-4">
             <FormProvider {...method}>
-              <Row>
+              <FormRow>
                 <SessionSelect mode={mode} />
                 <BusinessUnitDependantFields mode={mode} />
-                <Form.Group as={Col}>
-                  <Form.Label>Date</Form.Label>
+                <FormColumn lg={2} xl={2} md={6}>
+                  <FormLabel>Date</FormLabel>
                   <div>
                     <CDatePicker
                       control={method.control}
@@ -397,37 +393,28 @@ function DebitNoteEntryForm({ mode, userRights }) {
                       disabled={mode === "view"}
                     />
                   </div>
-                </Form.Group>
-              </Row>
-              <Row>
+                </FormColumn>
+              </FormRow>
+              <FormRow>
                 <CustomerDependentFields
                   mode={mode}
                   removeAllRows={detailTableRef.current?.removeAllRows}
                   ref={customerCompRef}
                 />
-                {/* <DebitNoteModeDependantFields
-                  mode={mode}
-                  removeAllRows={detailTableRef.current?.removeAllRows}
-                /> */}
-              </Row>
+              </FormRow>
             </FormProvider>
 
-            <Row>
-              <Form.Group as={Col} controlId="Description" className="col-9">
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                  as={"textarea"}
-                  rows={1}
+            <FormRow>
+              <FormColumn lg={12} xl={12}>
+                <FormLabel>Description</FormLabel>
+                <TextAreaField
+                  control={method.control}
+                  name={"Description"}
+                  autoResize={false}
                   disabled={mode === "view"}
-                  className="form-control"
-                  style={{
-                    padding: "0.3rem 0.4rem",
-                    fontSize: "0.8em",
-                  }}
-                  {...method.register("Description")}
                 />
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
 
           {mode !== "view" && (
@@ -451,15 +438,17 @@ function DebitNoteEntryForm({ mode, userRights }) {
           <FormProvider {...method}>
             <DebitNoteDetailTotal />
           </FormProvider>
-          <Form.Group as={Col} style={{ marginBottom: "1rem" }}>
-            <Form.Label>Total</Form.Label>
+          <FormColumn style={{ marginBottom: "1rem" }}>
+            <FormLabel>Total</FormLabel>
 
-            <Form.Control
-              type="number"
-              {...method.register("TotalNetAmount")}
-              disabled
-            />
-          </Form.Group>
+            <div>
+              <NumberInput
+                control={method.control}
+                id={"TotalNetAmount"}
+                disabled={true}
+              />
+            </div>
+          </FormColumn>
         </>
       )}
     </>
@@ -484,11 +473,11 @@ function SessionSelect({ mode }) {
 
   return (
     <>
-      <Form.Group className="col-xl-2" as={Col}>
-        <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+      <FormColumn lg={2} xl={2} md={6}>
+        <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
           Session
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
         <div>
           <CDropdown
             control={method.control}
@@ -503,7 +492,7 @@ function SessionSelect({ mode }) {
             focusOptions={() => method.setFocus("BusinessUnitID")}
           />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 }
@@ -532,11 +521,11 @@ const CustomerDependentFields = React.forwardRef(
 
     return (
       <>
-        <Form.Group as={Col}>
-          <Form.Label>
+        <FormColumn lg={6} xl={6} md={6}>
+          <FormLabel>
             Customer Name
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
 
           <div>
             <CDropdown
@@ -556,12 +545,12 @@ const CustomerDependentFields = React.forwardRef(
               focusOptions={() => method.setFocus("CustomerLedgers")}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>
+        </FormColumn>
+        <FormColumn lg={6} xl={6} md={6}>
+          <FormLabel>
             Customer Ledgers
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
 
           <div>
             <CDropdown
@@ -580,7 +569,7 @@ const CustomerDependentFields = React.forwardRef(
               focusOptions={() => method.setFocus("Description")}
             />
           </div>
-        </Form.Group>
+        </FormColumn>
       </>
     )
   }
@@ -625,11 +614,11 @@ function BusinessUnitDependantFields({ mode }) {
 
   return (
     <>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      <FormColumn lg={2} xl={2} md={6}>
+        <FormLabel>
           Business Unit
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CDropdown
@@ -647,9 +636,9 @@ function BusinessUnitDependantFields({ mode }) {
             }}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-sm-2">
-        <Form.Label>Debit Note No(Monthly)</Form.Label>
+      </FormColumn>
+      <FormColumn lg={2} xl={2} md={6}>
+        <FormLabel>Debit Note No(Monthly)</FormLabel>
 
         <div>
           <TextInput
@@ -658,9 +647,9 @@ function BusinessUnitDependantFields({ mode }) {
             isEnable={false}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-sm-2">
-        <Form.Label>Debit Note No(Yearly)</Form.Label>
+      </FormColumn>
+      <FormColumn lg={2} xl={2} md={6}>
+        <FormLabel>Debit Note No(Yearly)</FormLabel>
 
         <div>
           <TextInput
@@ -669,9 +658,9 @@ function BusinessUnitDependantFields({ mode }) {
             isEnable={false}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col}>
-        <Form.Label>Document No</Form.Label>
+      </FormColumn>
+      <FormColumn lg={2} xl={2} md={6}>
+        <FormLabel>Document No</FormLabel>
 
         <div>
           <TextInput
@@ -680,67 +669,7 @@ function BusinessUnitDependantFields({ mode }) {
             isEnable={mode !== "view"}
           />
         </div>
-      </Form.Group>
-    </>
-  )
-}
-
-const MasterBankFields = ({
-  mode,
-  FromBankTitle = "From Bank",
-  ReceivedInBankTitle = "Receieved In Bank",
-  TranstactionIDTitle = "TransactionID",
-}) => {
-  const { data } = useQuery({
-    queryKey: [SELECT_QUERY_KEYS.BANKS_SELECT_QUERY_KEY],
-    queryFn: fetchAllBankAccountsForSelect,
-    initialData: [],
-  })
-
-  const method = useFormContext()
-
-  return (
-    <>
-      <Form.Group as={Col}>
-        <Form.Label>{FromBankTitle}</Form.Label>
-        <div>
-          <TextInput
-            ID={"FromBank"}
-            control={method.control}
-            required={true}
-            focusOptions={() => method.setFocus("ReceivedInBankID")}
-            isEnable={mode !== "view"}
-          />
-        </div>
-      </Form.Group>
-      <Form.Group as={Col}>
-        <Form.Label>{ReceivedInBankTitle}</Form.Label>
-        <div>
-          <CDropdown
-            control={method.control}
-            options={data}
-            optionValue="BankAccountID"
-            optionLabel="BankAccountTitle"
-            name="ReceivedInBankID"
-            placeholder="Select a bank"
-            required={true}
-            disabled={mode === "view"}
-            focusOptions={() => method.setFocus("TransactionID")}
-          />
-        </div>
-      </Form.Group>
-      <Form.Group as={Col}>
-        <Form.Label>{TranstactionIDTitle}</Form.Label>
-        <div>
-          <TextInput
-            control={method.control}
-            ID={"TransactionID"}
-            required={true}
-            isEnable={mode !== "view"}
-            focusOptions={() => method.setFocus("IntrumentDate")}
-          />
-        </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 }
@@ -763,34 +692,28 @@ function DebitNoteDetailHeaderForm({ appendSingleRow }) {
   return (
     <>
       <form>
-        <Row>
+        <FormRow>
           <FormProvider {...method}>
             <DetailHeaderBusinessUnitDependents />
           </FormProvider>
-        </Row>
-        <Row>
-          <Form.Group as={Col} controlId="Description" className="col-9">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as={"textarea"}
-              rows={1}
-              className="form-control"
-              style={{
-                padding: "0.3rem 0.4rem",
-                fontSize: "0.8em",
-              }}
-              {...method.register("Description")}
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={9} xl={9}>
+            <FormLabel>Description</FormLabel>
+            <TextAreaField
+              control={method.control}
+              name={"Description"}
+              autoResize={true}
             />
-          </Form.Group>
-          <Form.Group className="col-xl-3" as={Col} controlId="Actions">
-            <Form.Label></Form.Label>
+          </FormColumn>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel></FormLabel>
             <DetailHeaderActionButtons
               handleAdd={() => method.handleSubmit(onSubmit)()}
               handleClear={() => method.reset()}
             />
-          </Form.Group>
-        </Row>
-        <DevTool control={method.control} />
+          </FormColumn>
+        </FormRow>
       </form>
     </>
   )
@@ -807,11 +730,11 @@ function DetailHeaderBusinessUnitDependents() {
 
   return (
     <>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      <FormColumn lg={3} xl={3} md={6} className="col-3">
+        <FormLabel>
           Business Unit
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CDropdown
@@ -822,15 +745,15 @@ function DetailHeaderBusinessUnitDependents() {
             placeholder="Select a business unit"
             options={BusinessUnitSelectData}
             required={true}
-            focusOptions={() => method.setFocus("Customer")}
+            focusOptions={() => method.setFocus("Amount")}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      </FormColumn>
+      <FormColumn lg={3} xl={3} md={6}>
+        <FormLabel>
           Balance
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CNumberInput
@@ -839,17 +762,17 @@ function DetailHeaderBusinessUnitDependents() {
             disabled={true}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      </FormColumn>
+      <FormColumn lg={3} xl={3} md={6}>
+        <FormLabel>
           Amount
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <NumberInput control={method.control} id={"Amount"} required={true} />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 }
@@ -1002,15 +925,11 @@ function DebitNoteDetailTableRow({
         </td>
 
         <td>
-          <Form.Control
-            as={"textarea"}
-            rows={1}
+          <TextAreaField
+            control={method.control}
+            name={`DebitNoteDetail.${index}.Description`}
+            autoResize={false}
             disabled={disable}
-            className="form-control"
-            {...method.register(`DebitNoteDetail.${index}.Description`)}
-            style={{
-              fontSize: "0.8em",
-            }}
           />
         </td>
         <td>

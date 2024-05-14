@@ -1,6 +1,5 @@
 import { useState, useContext } from "react"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
-import { Form, ButtonGroup } from "react-bootstrap"
 import { Button } from "primereact/button"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -248,7 +247,7 @@ function AllCustomersBranchDetailTable(props) {
         <Column
           body={(rowData) => (
             <>
-              <ButtonGroup className="gap-2">
+              <div className="flex aling-items-center gap-2">
                 <Button
                   icon="pi pi-pencil"
                   severity="success"
@@ -281,7 +280,7 @@ function AllCustomersBranchDetailTable(props) {
                     confirmDelete(rowData?.BranchID)
                   }}
                 />
-              </ButtonGroup>
+              </div>
             </>
           )}
           header="Actions"

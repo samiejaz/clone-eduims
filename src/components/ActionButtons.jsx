@@ -15,7 +15,7 @@ function ActionButtons({
   children,
 }) {
   return (
-    <>
+    <div className="flex align-items-center">
       {viewBtnRoute && showViewButton ? (
         <>
           <Link to={viewBtnRoute} className="btn btn-outline-success btn-sm">
@@ -117,7 +117,7 @@ function ActionButtons({
         </>
       )}
       {children}
-    </>
+    </div>
   )
 }
 

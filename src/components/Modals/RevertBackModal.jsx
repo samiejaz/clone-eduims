@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react"
-import { Row, Form, Col } from "react-bootstrap"
 import { useForm } from "react-hook-form"
 import { Dialog } from "primereact/dialog"
 import { Button } from "primereact/button"
 import { addLeadIntroductionOnAction } from "../../api/LeadIntroductionData"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useUserData } from "../../context/AuthContext"
-import { toast } from "react-toastify"
 import { LeadsViewerButtonToolBar } from "../../pages/LeadsIntroductionViewer/LeadsIntroductionViewer"
 import { QUERY_KEYS } from "../../utils/enums"
 import { getLeadsTimelineDetail } from "../../pages/LeadsIntroductionViewer/LeadsTimelineData"
+import { FormColumn, FormRow, FormLabel } from "../Layout/LayoutComponents"
+import { ShowSuccessToast } from "../../utils/CommonFunctions"
+import { TextAreaField } from "../Forms/form"
 
 const defaultValues = {
   Description: "",
@@ -93,7 +94,7 @@ export const RevertBackFields = ({
     mutationFn: addLeadIntroductionOnAction,
     onSuccess: ({ success }) => {
       if (success) {
-        toast.success("Retruned successfully!")
+        ShowSuccessToast("Retruned successfully!")
         if (ResetFields) {
           method.reset()
 
@@ -136,22 +137,17 @@ export const RevertBackFields = ({
           </>
         )}
 
-        <Row>
-          <Form.Group as={Col} controlId="Description" className="col-12">
-            <Form.Label>Reason</Form.Label>
-            <Form.Control
-              as={"textarea"}
-              rows={1}
-              className="form-control"
-              style={{
-                padding: "0.3rem 0.4rem",
-                fontSize: "0.8em",
-              }}
-              {...method.register("Description")}
+        <FormRow>
+          <FormColumn lg={12} xl={12}>
+            <FormLabel>Description</FormLabel>
+            <TextAreaField
+              control={method.control}
+              name={"Description"}
+              autoResize={true}
               disabled={!isEnable}
             />
-          </Form.Group>
-        </Row>
+          </FormColumn>
+        </FormRow>
         <div
           style={{
             marginTop: "1rem",

@@ -5,11 +5,9 @@ import {
   ShowSuccessToast,
   preventFormByEnterKeySubmission,
 } from "../../utils/CommonFunctions"
-import { ButtonGroup } from "react-bootstrap"
 import { Button } from "primereact/button"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
-import { toast } from "react-toastify"
 import { fetchCustomerBranchesByCustomerID } from "./CustomerEntryAPI"
 import {
   fetchAllCustomerAccountsForSelect,
@@ -556,7 +554,7 @@ function CustomerBranchesDataTable(props) {
           <Column
             body={(rowData) => (
               <>
-                <ButtonGroup className="gap-1">
+                <div className="flex align-items-center gap-1">
                   <Button
                     icon="pi pi-eye"
                     severity="secondary"
@@ -604,7 +602,7 @@ function CustomerBranchesDataTable(props) {
                       handleDeleteShow(rowData?.CustomerBranchID)
                     }}
                   />
-                </ButtonGroup>
+                </div>
               </>
             )}
             header="Actions"

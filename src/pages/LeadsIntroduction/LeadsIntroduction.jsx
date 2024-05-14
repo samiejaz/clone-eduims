@@ -9,7 +9,6 @@ import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
 import { useForm, FormProvider, Controller } from "react-hook-form"
 import ButtonToolBar from "../../components/ActionsToolbar"
-import { Col, Form, Row } from "react-bootstrap"
 
 import { AuthContext, useUserData } from "../../context/AuthContext"
 import {
@@ -761,7 +760,7 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
   )
   const dialogConent = (
     <>
-      <Row>
+      <FormRow>
         <FormColumn lg={6} xl={6} md={6}>
           <FormLabel>
             Department
@@ -798,8 +797,8 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
             />
           </div>
         </FormColumn>
-      </Row>
-      <Row>
+      </FormRow>
+      <FormRow>
         <FormColumn lg={4} xl={4} md={6}>
           <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
             Meeting Medium
@@ -866,9 +865,9 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
             />
           </div>
         </FormColumn>
-      </Row>
-      <Row>
-        <FormColumn lg={12} xl={12} md={12} className="col-12">
+      </FormRow>
+      <FormRow>
+        <FormColumn lg={12} xl={12} md={12}>
           <FormLabel>Instructions</FormLabel>
           <TextAreaField
             control={method.control}
@@ -876,7 +875,7 @@ function ForwardDialog({ visible = true, setVisible, LeadIntroductionID }) {
             autoResize={true}
           />
         </FormColumn>
-      </Row>
+      </FormRow>
     </>
   )
 
@@ -978,7 +977,7 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
   const headerContent = <></>
   const dialogConent = (
     <>
-      <Row>
+      <FormRow>
         <FormColumn lg={12} xl={12} md={6}>
           <FormLabel>
             File
@@ -988,8 +987,8 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
             <SingleFileUploadField ref={fileRef} background="bg-primary" />
           </div>
         </FormColumn>
-      </Row>
-      <Row>
+      </FormRow>
+      <FormRow>
         <FormColumn lg={3} xl={3} md={6}>
           <FormLabel>Amount</FormLabel>
           <div>
@@ -1008,7 +1007,7 @@ function QuoteDialog({ visible = true, setVisible, LeadIntroductionID }) {
             autoResize={true}
           />
         </FormColumn>
-      </Row>
+      </FormRow>
     </>
   )
   const mutation = useMutation({
@@ -1136,7 +1135,7 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
   )
   const dialogConent = (
     <>
-      <Row>
+      <FormRow>
         <FormColumn lg={12} xl={12} md={6}>
           <FormLabel>
             File
@@ -1146,8 +1145,8 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
             <SingleFileUploadField ref={fileRef} background="bg-primary" />
           </div>
         </FormColumn>
-      </Row>
-      <Row>
+      </FormRow>
+      <FormRow>
         <FormColumn lg={3} xl={3} md={6}>
           <FormLabel>Amount</FormLabel>
           <div>
@@ -1166,7 +1165,7 @@ function FinalizedDialog({ visible = true, setVisible, LeadIntroductionID }) {
             autoResize={true}
           />
         </FormColumn>
-      </Row>
+      </FormRow>
     </>
   )
 
@@ -1296,6 +1295,7 @@ function ClosedDialog({ visible = true, setVisible, LeadIntroductionID }) {
             control={method.control}
             name={"Description"}
             autoResize={true}
+            required={true}
           />
         </FormColumn>
         <FormColumn lg={3} xl={3} md={6}>
