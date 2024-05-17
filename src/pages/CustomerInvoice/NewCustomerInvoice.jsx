@@ -1,8 +1,7 @@
-import { Row, Form, Col, Spinner, Table } from "react-bootstrap"
+import { Table } from "react-bootstrap"
 import { DataTable } from "primereact/datatable"
 import { Button } from "primereact/button"
 import { Column } from "primereact/column"
-import { toast } from "react-toastify"
 import {
   useForm,
   useFieldArray,
@@ -23,14 +22,13 @@ import React, {
 } from "react"
 
 import { AuthContext } from "../../context/AuthContext"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import TextInput from "../../components/Forms/TextInput"
 import NumberInput from "../../components/Forms/NumberInput"
 
 import DetailHeaderActionButtons from "../../components/DetailHeaderActionButtons"
 import CDropdown from "../../components/Forms/CDropdown"
-import { DevTool } from "@hookform/devtools"
 import {
   addNewCustomerInvoice,
   deleteCustomerInvoiceByID,
@@ -67,11 +65,16 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 
 import { decryptID, encryptID } from "../../utils/crypto"
 import { CustomerInvoiceDetailTableRowComponent } from "./CustomerInvoiceDetailTable/BusinessUnitDependantRowFields"
-import { TextAreaField } from "../../components/Forms/form"
+import { CheckBox, TextAreaField } from "../../components/Forms/form"
 import { usePrintReportAsPDF } from "../../hooks/CommonHooks/commonhooks"
 
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
-import { Button as BootStrapButton } from "react-bootstrap"
+import { Checkbox } from "primereact/checkbox"
+import {
+  FormColumn,
+  FormRow,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
 let editRoute = `${parentRoute}/edit/`
@@ -141,8 +144,10 @@ function DetailComponent({ userRights }) {
   function handleView(id) {
     navigate(parentRoute + "/" + id)
   }
+  const refs = useRef([])
 
   function handlePrint({ id, report = "simple" }) {
+    let ShowParties = method.getValues("ShowParties_" + id)
     if (report !== "simple") {
       handlePrintReport({
         getPrintFromUrl:
@@ -164,6 +169,8 @@ function DetailComponent({ userRights }) {
       },
     },
   ]
+
+  const method = useForm()
 
   return (
     <>
@@ -224,7 +231,7 @@ function DetailComponent({ userRights }) {
                     handlePrint({ id: rowData.CustomerInvoiceID }),
                   children: (
                     <>
-                      <BootStrapButton
+                      {/* <BootStrapButton
                         size="sm"
                         variant="outline-warning"
                         onClick={() =>
@@ -235,13 +242,54 @@ function DetailComponent({ userRights }) {
                         }
                       >
                         <i className="pi pi-print"></i>
-                      </BootStrapButton>
+                      </BootStrapButton> */}
+                      <Button
+                        icon="pi pi-print"
+                        severity="warning"
+                        size="small"
+                        className="rounded"
+                        style={{
+                          padding: "0.3rem .7rem",
+                          fontSize: ".8em",
+                          width: "30px",
+                        }}
+                        type="button"
+                        onClick={() =>
+                          handlePrint({
+                            id: rowData.CustomerInvoiceID,
+                            report: "PreviousBalance",
+                          })
+                        }
+                        tooltip="Balance Invoice"
+                      />
+                      <div className="ml-1">
+                        <Controller
+                          name={"ShowParties_" + rowData.CustomerInvoiceID}
+                          control={method.control}
+                          render={({ field }) => (
+                            <>
+                              <Checkbox
+                                inputId={field.name}
+                                checked={field.value}
+                                inputRef={field.ref}
+                                onChange={(e) => {
+                                  field.onChange(e.checked)
+                                }}
+                                defaultChecked={false}
+                                defaultValue={false}
+                                tooltip="Show Parties"
+                              />
+                            </>
+                          )}
+                        />
+                      </div>
                     </>
                   ),
                 })
               }
               header="Actions"
               resizeable={false}
+              //    style={{ minWidth: "15rem" }}
             ></Column>
             <Column
               field="SessionBasedVoucherNo"
@@ -493,62 +541,37 @@ function FormComponent({ mode, userRights }) {
     <>
       {isLoading ? (
         <>
-          <div className="d-flex align-content-center justify-content-center h-100 w-100 m-auto">
-            <Spinner
-              animation="border"
-              size="lg"
-              role="status"
-              aria-hidden="true"
-            />
-          </div>
+          <CustomSpinner />
         </>
       ) : (
         <>
           <CustomerBranchDataProvider>
-            <div className="mt-4">
-              <ButtonToolBar
-                mode={mode}
-                handleGoBack={() => navigate(parentRoute)}
-                handleEdit={() => handleEdit()}
-                handleCancel={() => {
-                  handleCancel()
-                }}
-                handleAddNew={() => {
-                  handleAddNew()
-                }}
-                handleSave={() => method.handleSubmit(onSubmit)()}
-                GoBackLabel="CustomerInvoices"
-                saveLoading={CustomerInvoiceMutation.isPending}
-                handleDelete={handleDelete}
-                showPrint={userRights[0]?.RolePrint}
-                printDisable={mode !== "view"}
-                showAddNewButton={userRights[0]?.RoleNew}
-                showEditButton={userRights[0]?.RoleEdit}
-                showDelete={userRights[0]?.RoleDelete}
-                getPrintFromUrl={
-                  mode !== "new" &&
-                  `InvoicePrint?CustomerInvoiceID=${decryptID(
-                    CustomerInvoiceID
-                  )}`
-                }
-                splitButtonItems={[
-                  {
-                    label: "Previous Balance Report",
-                    icon: "pi pi-step-backward",
-                    reportType: "PreviousBalance",
-                  },
-                ]}
-              />
-            </div>
+            <CustomerInvoiceToolbar
+              mode={mode}
+              handleGoBack={() => navigate(parentRoute)}
+              handleCancel={() => {
+                handleCancel()
+              }}
+              handleEdit={() => handleEdit()}
+              handleAddNew={() => {
+                handleAddNew()
+              }}
+              method={method}
+              handleSave={() => method.handleSubmit(onSubmit)()}
+              saveLoading={CustomerInvoiceMutation.isPending}
+              handleDelete={handleDelete}
+              userRights={userRights}
+              CustomerInvoiceID={CustomerInvoiceID}
+            />
             <form id="CustomerInvoice" className="mt-4">
               <FormProvider {...method}>
-                <Row>
+                <FormRow>
                   <SessionSelect mode={mode} />
                   <BusinessUnitDependantFields mode={mode} />
-                </Row>
-                <Row>
-                  <Form.Group as={Col} className="col-2">
-                    <Form.Label>Invoice Date</Form.Label>
+                </FormRow>
+                <FormRow>
+                  <FormColumn lg={2} xl={2} md={6}>
+                    <FormLabel>Invoice Date</FormLabel>
                     <div>
                       <CDatePicker
                         control={method.control}
@@ -556,9 +579,9 @@ function FormComponent({ mode, userRights }) {
                         disabled={mode === "view"}
                       />
                     </div>
-                  </Form.Group>
-                  <Form.Group as={Col} className="col-2">
-                    <Form.Label>
+                  </FormColumn>
+                  <FormColumn lg={2} xl={2} md={6}>
+                    <FormLabel>
                       Invoice Due Date
                       <Button
                         tooltip="Installments"
@@ -577,7 +600,7 @@ function FormComponent({ mode, userRights }) {
                           marginLeft: "10px",
                         }}
                       />
-                    </Form.Label>
+                    </FormLabel>
                     <div>
                       <CDatePicker
                         control={method.control}
@@ -585,17 +608,17 @@ function FormComponent({ mode, userRights }) {
                         disabled={mode === "view"}
                       />
                     </div>
-                  </Form.Group>
+                  </FormColumn>
 
                   <CustomerDependentFields
                     mode={mode}
                     removeAllRows={detailTableRef.current?.removeAllRows}
                     ref={customerCompRef}
                   />
-                </Row>
-                <Row>
-                  <Form.Group as={Col} controlId="InvoiceTitle">
-                    <Form.Label>Invoice Title</Form.Label>
+                </FormRow>
+                <FormRow>
+                  <FormColumn lg={3} xl={3} md={6}>
+                    <FormLabel>Invoice Title</FormLabel>
                     <div>
                       <TextInput
                         control={method.control}
@@ -604,29 +627,20 @@ function FormComponent({ mode, userRights }) {
                         focusOptions={() => method.setFocus("Description")}
                       />
                     </div>
-                  </Form.Group>
+                  </FormColumn>
 
-                  <Form.Group
-                    as={Col}
-                    controlId="Description"
-                    className="col-9"
-                  >
-                    <Form.Label>Description</Form.Label>
+                  <FormColumn lg={9} xl={9} md={6}>
+                    <FormLabel>Description</FormLabel>
                     <div>
-                      <textarea
-                        rows={"1"}
+                      <TextAreaField
+                        control={method.control}
+                        name={"Description"}
+                        autoResize={true}
                         disabled={mode === "view"}
-                        className="p-inputtext"
-                        style={{
-                          padding: "0.3rem 0.4rem",
-                          fontSize: "0.8em",
-                          width: "100%",
-                        }}
-                        {...method.register("Description")}
                       />
                     </div>
-                  </Form.Group>
-                </Row>
+                  </FormColumn>
+                </FormRow>
               </FormProvider>
             </form>
             <NullBranchContext ref={nullBranchRef} />
@@ -652,44 +666,51 @@ function FormComponent({ mode, userRights }) {
             <FormProvider {...method}>
               <CustomerInvoiceDetailTotal />
             </FormProvider>
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>Total Amount</Form.Label>
+            <FormRow>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Total Amount</FormLabel>
 
-                <Form.Control
-                  type="number"
-                  {...method.register("TotalRate")}
-                  disabled
-                />
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Total CGS</Form.Label>
+                <div>
+                  <NumberInput
+                    control={method.control}
+                    id={"TotalRate"}
+                    disabled={true}
+                  />
+                </div>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Total CGS</FormLabel>
+                <div>
+                  <NumberInput
+                    control={method.control}
+                    id={"TotalAmount"}
+                    disabled={true}
+                  />
+                </div>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Total Discount</FormLabel>
 
-                <Form.Control
-                  type="number"
-                  {...method.register("TotalAmount")}
-                  disabled
-                />
-              </Form.Group>{" "}
-              <Form.Group as={Col}>
-                <Form.Label>Total Discount</Form.Label>
+                <div>
+                  <NumberInput
+                    control={method.control}
+                    id={"TotalDiscount"}
+                    disabled={true}
+                  />
+                </div>
+              </FormColumn>
+              <FormColumn lg={3} xl={3} md={6}>
+                <FormLabel>Total Net Amount</FormLabel>
 
-                <Form.Control
-                  type="number"
-                  {...method.register("TotalDiscount")}
-                  disabled
-                />
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>Total Net Amount</Form.Label>
-
-                <Form.Control
-                  type="number"
-                  {...method.register("TotalNetAmount")}
-                  disabled
-                />
-              </Form.Group>
-            </Row>
+                <div>
+                  <NumberInput
+                    control={method.control}
+                    id={"TotalNetAmount"}
+                    disabled={true}
+                  />
+                </div>
+              </FormColumn>
+            </FormRow>
             <FormProvider {...method}>
               <NewCustomerInvoiceIntallmentsModal
                 mode={mode}
@@ -700,6 +721,77 @@ function FormComponent({ mode, userRights }) {
         </>
       )}
     </>
+  )
+}
+
+function CustomerInvoiceToolbar({
+  mode,
+  handleGoBack,
+  handleCancel,
+  handleAddNew,
+  handleSave,
+  method,
+  saveLoaing,
+  handleDelete,
+  userRights,
+  CustomerInvoiceID,
+  handleEdit,
+}) {
+  const [printQueryParams, setPrintQueryParams] = useState(
+    `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}`
+  )
+
+  return (
+    <div className="mt-4">
+      <ButtonToolBar
+        mode={mode}
+        handleGoBack={handleGoBack}
+        handleEdit={handleEdit}
+        handleCancel={handleCancel}
+        handleAddNew={handleAddNew}
+        handleSave={handleSave}
+        GoBackLabel="CustomerInvoices"
+        saveLoading={saveLoaing}
+        handleDelete={handleDelete}
+        showAddNewButton={userRights[0]?.RoleNew}
+        showEditButton={userRights[0]?.RoleEdit}
+        showDelete={userRights[0]?.RoleDelete}
+        showPrint={mode === "view" && userRights[0]?.RolePrint}
+        printDisable={mode !== "view"}
+        getPrintFromUrl={mode !== "new" && printQueryParams}
+        splitButtonItems={[
+          {
+            label: "Previous Balance Report",
+            icon: "pi pi-step-backward",
+            reportType: "PreviousBalance",
+          },
+        ]}
+        showUtilityContent={mode === "view"}
+        utilityContent={
+          <>
+            <div>
+              <CheckBox
+                control={method.control}
+                ID={"ShowParties"}
+                Label={"Show Parties"}
+                isEnable={mode === "view"}
+                onChange={(e) => {
+                  if (e.checked) {
+                    setPrintQueryParams(
+                      `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}&ShowPartyBalance=true`
+                    )
+                  } else {
+                    setPrintQueryParams(
+                      `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}`
+                    )
+                  }
+                }}
+              />
+            </div>
+          </>
+        }
+      />
+    </div>
   )
 }
 
@@ -724,11 +816,11 @@ function SessionSelect({ mode }) {
 
   return (
     <>
-      <Form.Group className="col-xl-3" as={Col}>
-        <Form.Label style={{ fontSize: "14px", fontWeight: "bold" }}>
+      <FormColumn className="col-xl-3" lg={3} xl={3} md={6}>
+        <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
           Session
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
         <div>
           <CDropdown
             control={method.control}
@@ -743,7 +835,7 @@ function SessionSelect({ mode }) {
             focusOptions={() => method.setFocus("BusinessUnitID")}
           />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 }
@@ -777,8 +869,8 @@ const CustomerDependentFields = React.forwardRef(
 
     return (
       <>
-        <Form.Group as={Col}>
-          <Form.Label>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>
             Customer Name
             <span className="text-danger fw-bold ">*</span>
             {mode !== "view" && (
@@ -786,7 +878,7 @@ const CustomerDependentFields = React.forwardRef(
                 <CustomerEntryForm IconButton={true} />
               </>
             )}
-          </Form.Label>
+          </FormLabel>
 
           <div>
             <CDropdown
@@ -806,12 +898,12 @@ const CustomerDependentFields = React.forwardRef(
               focusOptions={() => method.setFocus("CustomerLedgers")}
             />
           </div>
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>
+        </FormColumn>
+        <FormColumn lg={4} xl={4} md={6}>
+          <FormLabel>
             Customer Ledgers
             <span className="text-danger fw-bold ">*</span>
-          </Form.Label>
+          </FormLabel>
 
           <div>
             <CDropdown
@@ -831,7 +923,7 @@ const CustomerDependentFields = React.forwardRef(
               focusOptions={() => method.setFocus("CustomerInvoiceMode")}
             />
           </div>
-        </Form.Group>
+        </FormColumn>
       </>
     )
   }
@@ -876,11 +968,11 @@ function BusinessUnitDependantFields({ mode }) {
 
   return (
     <>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      <FormColumn lg={3} xl={3} md={6} className="col-3">
+        <FormLabel>
           Business Unit
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CDropdown
@@ -898,9 +990,9 @@ function BusinessUnitDependantFields({ mode }) {
             }}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-2">
-        <Form.Label>Customer Invoice No(Monthly)</Form.Label>
+      </FormColumn>
+      <FormColumn lg={2} xl={2} md={6} className="col-2">
+        <FormLabel>Customer Invoice No(Monthly)</FormLabel>
 
         <div>
           <TextInput
@@ -909,9 +1001,9 @@ function BusinessUnitDependantFields({ mode }) {
             isEnable={false}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-2">
-        <Form.Label>Customer Invoice No(Yearly)</Form.Label>
+      </FormColumn>
+      <FormColumn lg={2} xl={2} md={6} className="col-2">
+        <FormLabel>Customer Invoice No(Yearly)</FormLabel>
 
         <div>
           <TextInput
@@ -920,9 +1012,9 @@ function BusinessUnitDependantFields({ mode }) {
             isEnable={false}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-2">
-        <Form.Label>Document No</Form.Label>
+      </FormColumn>
+      <FormColumn lg={2} xl={2} md={6} className="col-2">
+        <FormLabel>Document No</FormLabel>
         <div>
           <TextInput
             control={method.control}
@@ -930,7 +1022,7 @@ function BusinessUnitDependantFields({ mode }) {
             isEnable={mode !== "view"}
           />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 }
@@ -980,9 +1072,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
   return (
     <>
       <form>
-        <Row>
-          <Form.Group as={Col} controlId="InvoiceType">
-            <Form.Label>Invoice Type</Form.Label>
+        <FormRow>
+          <FormColumn lg={3} xl={3} md={6}>
+            <FormLabel>Invoice Type</FormLabel>
             <span className="text-danger fw-bold ">*</span>
 
             <div>
@@ -998,17 +1090,17 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
                 }}
               />
             </div>
-          </Form.Group>
+          </FormColumn>
           <FormProvider {...method}>
             <DetailHeaderBusinessUnitDependents ref={invoiceTypeRef} />
           </FormProvider>
-        </Row>
-        <Row>
+        </FormRow>
+        <FormRow>
           <FormProvider {...method}>
             <BranchSelectField />
           </FormProvider>
-          <Form.Group as={Col} className="col-1">
-            <Form.Label>Qty</Form.Label>
+          <FormColumn lg={1} xl={1} md={6}>
+            <FormLabel>Qty</FormLabel>
             <NumberInput
               id={"Qty"}
               control={method.control}
@@ -1023,9 +1115,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               useGrouping={false}
               enterKeyOptions={() => method.setFocus("Rate")}
             />
-          </Form.Group>
-          <Form.Group as={Col} className="col-2">
-            <Form.Label>Rate</Form.Label>
+          </FormColumn>
+          <FormColumn lg={2} xl={2} md={6}>
+            <FormLabel>Rate</FormLabel>
             <NumberInput
               id={"Rate"}
               control={method.control}
@@ -1042,9 +1134,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               disabled={method.watch("IsFree")}
               enterKeyOptions={() => method.setFocus("CGS")}
             />
-          </Form.Group>
-          <Form.Group as={Col} className="col-1">
-            <Form.Label>CGS</Form.Label>
+          </FormColumn>
+          <FormColumn lg={1} xl={1} md={6}>
+            <FormLabel>CGS</FormLabel>
             <NumberInput
               id={"CGS"}
               control={method.control}
@@ -1054,9 +1146,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               useGrouping={false}
               enterKeyOptions={() => method.setFocus("Discount")}
             />
-          </Form.Group>
-          <Form.Group as={Col} controlId="Amount" className="col-2">
-            <Form.Label>Amount</Form.Label>
+          </FormColumn>
+          <FormColumn lg={2} xl={2} md={6}>
+            <FormLabel>Amount</FormLabel>
             <NumberInput
               id={"Amount"}
               control={method.control}
@@ -1066,9 +1158,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               useGrouping={false}
               disabled={true}
             />
-          </Form.Group>
-          <Form.Group as={Col} className="col-1">
-            <Form.Label>Discount</Form.Label>
+          </FormColumn>
+          <FormColumn lg={1} xl={1} md={6}>
+            <FormLabel>Discount</FormLabel>
             <NumberInput
               id={"Discount"}
               control={method.control}
@@ -1083,9 +1175,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               disabled={method.watch("IsFree")}
               enterKeyOptions={() => method.setFocus("DetailDescription")}
             />
-          </Form.Group>
-          <Form.Group as={Col} className="col-2">
-            <Form.Label>Net Amount</Form.Label>
+          </FormColumn>
+          <FormColumn lg={2} xl={2} md={6}>
+            <FormLabel>Net Amount</FormLabel>
             <NumberInput
               id={"NetAmount"}
               control={method.control}
@@ -1095,28 +1187,18 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
               useGrouping={false}
               disabled={true}
             />
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} className="col-9">
-            <Form.Label>Description</Form.Label>
-            {/* <Form.Control
-              as={"textarea"}
-              rows={1}
-              className="form-control"
-              style={{
-                padding: "0.3rem 0.4rem",
-                fontSize: "0.8em",
-              }}
-              {...method.register("DetailDescription")}
-            /> */}
+          </FormColumn>
+        </FormRow>
+        <FormRow>
+          <FormColumn lg={9} xl={9} md={12}>
+            <FormLabel>Description</FormLabel>
             <TextAreaField
               control={method.control}
               name={"DetailDescription"}
             />
-          </Form.Group>
-          <Form.Group as={Col} className="col-1">
-            <Form.Label>Is Free</Form.Label>
+          </FormColumn>
+          <FormColumn lg={1} xl={1} md={6}>
+            <FormLabel>Is Free</FormLabel>
             <div>
               <CSwitchInput
                 control={method.control}
@@ -1131,16 +1213,16 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
                 }}
               />
             </div>
-          </Form.Group>
+          </FormColumn>
 
-          <Form.Group className="col-2" as={Col} controlId="Actions">
-            <Form.Label></Form.Label>
+          <FormColumn lg={2} xl={2} md={6}>
+            <FormLabel></FormLabel>
             <DetailHeaderActionButtons
               handleAdd={() => method.handleSubmit(onSubmit)()}
               handleClear={() => method.reset()}
             />
-          </Form.Group>
-        </Row>
+          </FormColumn>
+        </FormRow>
       </form>
     </>
   )
@@ -1185,11 +1267,11 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
 
   return (
     <>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      <FormColumn lg={3} xl={3} md={6} className="col-3">
+        <FormLabel>
           Business Unit
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CDropdown
@@ -1208,14 +1290,14 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             }}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      </FormColumn>
+      <FormColumn lg={3} xl={3} md={6} className="col-3">
+        <FormLabel>
           {pageTitles?.product || "Product"}
           <span className="text-danger fw-bold ">*</span>
 
           {/* <ProductInfoDialog /> */}
-        </Form.Label>
+        </FormLabel>
         <div>
           <CDropdown
             control={method.control}
@@ -1231,13 +1313,13 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             focusOptions={() => method.setFocus("ServiceInfo")}
           />
         </div>
-      </Form.Group>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      </FormColumn>
+      <FormColumn lg={3} xl={3} md={6} className="col-3">
+        <FormLabel>
           {InvoiceType === "Product"
             ? `${pageTitles?.product || "Product"} to Invoice`
             : "Service to Invoice"}{" "}
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CDropdown
@@ -1253,7 +1335,7 @@ const DetailHeaderBusinessUnitDependents = React.forwardRef((props, ref) => {
             focusOptions={() => method.setFocus("Qty")}
           />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 })
@@ -1289,7 +1371,7 @@ const CustomerInvoiceDetailTable = React.forwardRef(
     return (
       <>
         <Table
-          responsive
+        responsive
           className="table  table-responsive mt-2"
           style={{ width: "1500px" }}
         >
@@ -1402,11 +1484,11 @@ const BranchSelectField = () => {
 
   return (
     <>
-      <Form.Group as={Col} className="col-3">
-        <Form.Label>
+      <FormColumn lg={3} xl={3} md={6} className="col-3">
+        <FormLabel>
           {pageTitles?.branch || "Customer Branch"}
           <span className="text-danger fw-bold ">*</span>
-        </Form.Label>
+        </FormLabel>
 
         <div>
           <CDropdown
@@ -1422,7 +1504,7 @@ const BranchSelectField = () => {
             focusOptions={() => method.setFocus("ProductInfo")}
           />
         </div>
-      </Form.Group>
+      </FormColumn>
     </>
   )
 }

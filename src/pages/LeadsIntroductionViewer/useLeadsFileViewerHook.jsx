@@ -2,8 +2,7 @@ import React, { useEffect, useRef } from "react"
 import { SingleFileUploadField } from "../../components/Forms/form"
 import { useQuery } from "@tanstack/react-query"
 import { getLeadsFile } from "../../api/LeadIntroductionData"
-import { FormColumn } from "../../components/Layout/LayoutComponents"
-import { FormLabel } from "react-bootstrap"
+import { FormColumn, FormLabel } from "../../components/Layout/LayoutComponents"
 
 const useLeadsFileViewerHook = ({ fileName, fileType = "", mode = "view" }) => {
   const fileRef = useRef()

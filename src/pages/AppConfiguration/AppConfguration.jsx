@@ -18,7 +18,7 @@ import { useKeyCombinationHook } from "../../hooks/hooks"
 import SimpleToolbar from "../../components/Toolbars/SimpleToolbar"
 import { SingleFormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { MENU_KEYS } from "../../utils/enums"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 let defaultValues = {
   ProductName: "Product",

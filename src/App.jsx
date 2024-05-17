@@ -42,6 +42,7 @@ import { GetAllMenus } from "./api/MenusData"
 import { useRoutesData } from "./context/RoutesContext"
 import Reports from "./pages/Reports/reports"
 import LeadsDashboardWrapper from "./pages/Leads/LeadsDashboard/LeadsDashboardWrapper"
+import AdminPages from "./pages/Admin/AdminPages"
 const App = () => {
   useEffect(() => {
     signalRConnectionManager.startConnection()
@@ -165,6 +166,9 @@ const App = () => {
 
           {/* Reports */}
           <Route path={`/reports/*`} element={<Reports />} />
+
+          {/* Admin */}
+          <Route path={`/admin/*`} element={<AdminPages />} />
 
           {/* Reports End */}
         </Route>

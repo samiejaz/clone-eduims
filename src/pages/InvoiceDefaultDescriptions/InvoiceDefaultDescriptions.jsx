@@ -26,7 +26,7 @@
 //   fetchInvoiceDeafultDescriptionById,
 // } from "../../api/InvoiceDefaultDescriptions";
 // import { AppConfigurationContext } from "../../context/AppConfigurationContext";
-// import { apiUrl } from "../../public/COSTANTS"
+// const apiUrl = import.meta.env.VITE_APP_API_URL
 // const defaultValues = {
 //   InvoiceType: [],
 //   Description: "",

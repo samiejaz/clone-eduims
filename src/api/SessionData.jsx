@@ -3,7 +3,7 @@ import { format, parseISO } from "date-fns"
 import { toast } from "react-toastify"
 import { decryptID, encryptID } from "../utils/crypto"
 
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 import { formatDateWithSymbol } from "../utils/CommonFunctions"
 
 const CONTROLLER = "EduIMS"

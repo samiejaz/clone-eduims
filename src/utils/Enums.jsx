@@ -51,6 +51,11 @@ export const ROUTE_URLS = {
   },
   REPORTS: {
     ACCOUNT_LEDGER_REPORT_ROUTE: "/reports/accountledger",
+    BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_ROUTE:
+      "/reports/businessunitandbalancewiseledger",
+  },
+  ADMIN: {
+    SYNC_ROUTES: "/admin/syncroutes",
   },
 }
 
@@ -167,6 +172,8 @@ export const MENU_KEYS = {
     GROUP_NAME: "Reports",
     GROUP_KEY: "mnuReports",
     ACCOUNT_LEDGER_REPORT_FORM_KEY: "mnuAccountLedgerReport",
+    BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_FORM_KEY:
+      "mnuBusinessUnitAndBalanceReport",
   },
 }
 

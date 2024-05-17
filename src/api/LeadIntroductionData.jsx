@@ -3,7 +3,7 @@ import { toast } from "react-toastify"
 import { decryptID, encryptID } from "../utils/crypto"
 import { ShowErrorToast, ShowSuccessToast } from "../utils/CommonFunctions"
 
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const CONTROLLER = "data_LeadIntroduction"
 const WHEREMETHOD = "GetLeadIntroductionWhere"

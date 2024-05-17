@@ -3,6 +3,7 @@ import {
   HttpTransportType,
   LogLevel,
 } from "@microsoft/signalr"
+const apiUrl = import.meta.env.VITE_APP_API_URL_FOR_SIGNALR
 
 class SignalRConnectionManager {
   constructor() {
@@ -12,7 +13,7 @@ class SignalRConnectionManager {
   startConnection = async () => {
     if (!this.connection) {
       this.connection = new HubConnectionBuilder()
-        .withUrl("http://192.168.9.110:90/Notification", {
+        .withUrl(`${apiUrl}/Notification`, {
           skipNegotiation: true,
           transport: HttpTransportType.WebSockets,
         })

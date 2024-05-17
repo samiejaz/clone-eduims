@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
-
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useContext, useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
@@ -10,7 +9,11 @@ import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
 import { useForm } from "react-hook-form"
 import ButtonToolBar from "../../components/ActionsToolbar"
-import { Col, Form, Row } from "react-bootstrap"
+import {
+  FormColumn,
+  FormRow,
+  FormLabel,
+} from "../../components/Layout/LayoutComponents"
 import TextInput from "../../components/Forms/TextInput"
 import CheckBox from "../../components/Forms/CheckBox"
 import {
@@ -304,12 +307,12 @@ function FormComponent({ mode, userRights }) {
             />
           </div>
           <form className="mt-4">
-            <Row>
-              <Form.Group as={Col}>
-                <Form.Label>
+            <FormRow>
+              <FormColumn lg={6} xl={6}>
+                <FormLabel>
                   {pageTitles?.product || "Product"} Category
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <TextInput
@@ -320,12 +323,12 @@ function FormComponent({ mode, userRights }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-              <Form.Group as={Col}>
-                <Form.Label>
+              </FormColumn>
+              <FormColumn lg={6} xl={6}>
+                <FormLabel>
                   {pageTitles?.product || "Product"} Type
                   <span className="text-danger fw-bold ">*</span>
-                </Form.Label>
+                </FormLabel>
 
                 <div>
                   <CDropdown
@@ -339,10 +342,10 @@ function FormComponent({ mode, userRights }) {
                     filter={false}
                   />
                 </div>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col}>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn lg={6} xl={6}>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -351,8 +354,8 @@ function FormComponent({ mode, userRights }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
-              </Form.Group>
-            </Row>
+              </FormColumn>
+            </FormRow>
           </form>
         </>
       )}

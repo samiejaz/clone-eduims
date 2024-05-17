@@ -1,7 +1,6 @@
 import { useContext, useState } from "react"
 import { Button } from "primereact/button"
 import { Dialog } from "primereact/dialog"
-import { ButtonGroup } from "react-bootstrap"
 import CustomerEntry from "../components/CustomerEntryModal/CustomerEntry"
 import CustomerBranchEntry from "../components/CustomerEntryModal/CustomerBranchEntry"
 
@@ -13,7 +12,7 @@ import { AuthContext } from "../context/AuthContext"
 import { AppConfigurationContext } from "../context/AppConfigurationContext"
 import { Dropdown } from "primereact/dropdown"
 import { useOldCustomerSelectData } from "./SelectData/useSelectData"
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const customerEntryDefaultValues = {
   CustomerName: "",
@@ -181,7 +180,7 @@ const useCustomerEntryHook = () => {
   ]
 
   const footerContent = (
-    <ButtonGroup className="gap-1">
+    <div className="flex align-items-center justify-content-between gap-1">
       <Button
         label="Cancel"
         icon="pi pi-times"
@@ -226,7 +225,7 @@ const useCustomerEntryHook = () => {
           />
         </>
       )}
-    </ButtonGroup>
+    </div>
   )
 
   function dialogHeight() {

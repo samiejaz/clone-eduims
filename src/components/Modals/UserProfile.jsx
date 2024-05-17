@@ -12,10 +12,9 @@ import {
   convertBase64StringToFile,
 } from "../../utils/CommonFunctions"
 import { useNavigate } from "react-router-dom"
-import { FormColumn, FormRow } from "../Layout/LayoutComponents"
-import { FormLabel } from "react-bootstrap"
+import { FormColumn, FormRow, FormLabel } from "../Layout/LayoutComponents"
 import { Image } from "primereact/image"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 function UserProfile({ showProfile, handleCloseProfile }) {
   const [isEnable, setIsEnable] = useState(true)

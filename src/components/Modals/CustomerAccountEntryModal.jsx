@@ -3,7 +3,6 @@ import { useState } from "react"
 import CustomerAccountEntry from "../CustomerEntryModal/CustomerAccountsEntry"
 import { Button } from "primereact/button"
 import { useQueryClient } from "@tanstack/react-query"
-import { FormProvider, useForm } from "react-hook-form"
 
 export function useCustomerAccountEntryModal(CustomerID) {
   const queryClient = useQueryClient()

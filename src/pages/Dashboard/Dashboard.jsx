@@ -65,26 +65,36 @@ const LinkCard = ({ item, icon, textColor, backGroundColor }) => {
           <Link to={item?.routeUrl}>
             <div
               className="flex align-items-center justify-content-center flex-col p-5 rounded scaleOnHover"
-              style={{ minHeight: "10rem", background: backGroundColor }}
+              style={{
+                minHeight: "10rem",
+                maxHeight: "10rem",
+                background: backGroundColor,
+              }}
             >
-              <div className="text-center">
-                <img
-                  src={icon}
-                  alt="Dashboard Cards"
-                  style={{
-                    width: "70px",
-                    height: "70px",
-                    objectFit: "contain",
-                  }}
-                />
-                <p
-                  className="fw-bold"
-                  style={{
-                    color: textColor,
-                  }}
-                >
-                  {item?.menuName}
-                </p>
+              <div className="text-center flex align-items-center flex-column  gap-3 ">
+                <div>
+                  <img
+                    src={icon}
+                    alt="Dashboard Cards"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+                <div>
+                  <p
+                    className="fw-bold"
+                    style={{
+                      color: textColor,
+                      padding: 0,
+                      margin: 0,
+                    }}
+                  >
+                    {item?.menuName}
+                  </p>
+                </div>
               </div>
             </div>
           </Link>
@@ -167,8 +177,8 @@ const LinksContainer = () => {
                 (item) => item.menuKey === "mnuRecieptVoucher"
               )}
               icon={ReceiptIcon}
-              backGroundColor={"#C0C0B8"}
-              textColor={"#9c9c8f"}
+              backGroundColor={"#fce1c7"}
+              textColor={"#E67E22"}
             />
           </FormColumn>
         </>

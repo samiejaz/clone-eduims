@@ -4,7 +4,7 @@ import CustomerEntry from "../../components/CustomerEntryModal/CustomerEntry"
 import CustomerAccountEntry from "../../components/CustomerEntryModal/CustomerAccountsEntry"
 import CustomerBranchEntry from "../../components/CustomerEntryModal/CustomerBranchEntry"
 import { TabView, TabPanel } from "primereact/tabview"
-import { ButtonGroup, Form, Col, Row } from "react-bootstrap"
+
 import { Button } from "primereact/button"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
@@ -15,7 +15,8 @@ import { BreadCrumb } from "primereact/breadcrumb"
 import { fetchAllOldCustomersForSelect } from "../../api/SelectData"
 import { ROUTE_URLS } from "../../utils/enums"
 import { Dropdown } from "primereact/dropdown"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
+import { FormColumn, FormRow } from "../../components/Layout/LayoutComponents"
 
 const items = [{ label: "Customer Detail" }]
 
@@ -120,32 +121,11 @@ export default function GenNewCustomerView() {
           )}
         </div>
         <div className="d-flex text-dark p-3 mb-4 ">
-          <Row className="w-100">
-            <Form.Group as={Col}>
+          <FormRow className="w-full">
+            <FormColumn lg={6} xl={6}>
               <h2 className="text-start my-auto">Customer Detail</h2>
-            </Form.Group>
-            <Form.Group as={Col}>
-              {/* <Controller
-                control={control}
-                name="Customers"
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    options={data}
-                    getOptionValue={(option) => option.CustomerID}
-                    getOptionLabel={(option) => option.CustomerName}
-                    value={value}
-                    onChange={(selectedOption) => {
-                      onChange(selectedOption)
-                      setCustomerID(
-                        selectedOption?.CustomerID ?? params?.CustomerID
-                      )
-                    }}
-                    placeholder="Select a customer"
-                    noOptionsMessage={() => "No customers found!"}
-                    isClearable
-                  />
-                )}
-              /> */}
+            </FormColumn>
+            <FormColumn lg={6} xl={6}>
               <Controller
                 name="Customers"
                 control={control}
@@ -172,8 +152,8 @@ export default function GenNewCustomerView() {
                   />
                 )}
               />
-            </Form.Group>
-          </Row>
+            </FormColumn>
+          </FormRow>
         </div>
         <div className="card">
           <TabView>
@@ -183,7 +163,7 @@ export default function GenNewCustomerView() {
                   CustomerID={CustomerID}
                   isEnable={isGloballyEnable}
                 />
-                <ButtonGroup className="mt-3 w-100">
+                <div>
                   <Button
                     type="button"
                     severity="success"
@@ -194,7 +174,7 @@ export default function GenNewCustomerView() {
                     }}
                     disabled={!isGloballyEnable}
                   ></Button>
-                </ButtonGroup>
+                </div>
               </FormProvider>
             </TabPanel>
             <TabPanel header="Customer Branches">

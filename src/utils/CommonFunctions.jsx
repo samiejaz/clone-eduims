@@ -1,6 +1,6 @@
 import axios from "axios"
 import { toast } from "react-toastify"
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export function FormatDate(dateString) {
   const formattedDate = `${dateString.slice(0, 4)}-${dateString.slice(

@@ -1,6 +1,5 @@
 import { useState, useContext } from "react"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
-import { Form, ButtonGroup } from "react-bootstrap"
 import { Button } from "primereact/button"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -19,7 +18,7 @@ import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents"
 import TextInput from "../Forms/TextInput"
 import CheckBox from "../Forms/CheckBox"
 import { confirmDialog } from "primereact/confirmdialog"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 function AllCustomersBranchEntry(props) {
   const { CustomerID, isEnable = true } = props
@@ -248,7 +247,7 @@ function AllCustomersBranchDetailTable(props) {
         <Column
           body={(rowData) => (
             <>
-              <ButtonGroup className="gap-2">
+              <div className="flex aling-items-center gap-2">
                 <Button
                   icon="pi pi-pencil"
                   severity="success"
@@ -281,7 +280,7 @@ function AllCustomersBranchDetailTable(props) {
                     confirmDelete(rowData?.BranchID)
                   }}
                 />
-              </ButtonGroup>
+              </div>
             </>
           )}
           header="Actions"

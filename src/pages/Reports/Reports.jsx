@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom"
 import AccountLedgerReport from "./AccountLedgerReport"
 import { ReportRightsWrapper } from "../../components/Wrappers/wrappers"
 import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums"
+import BusinessUnitAndBalanceWiseAccountLedgers from "./BusinessUnitAndBalanceWiseAccountLedgers"
 
 const Reports = () => {
   return (
@@ -18,6 +19,13 @@ const Reports = () => {
             ReportComponent={AccountLedgerReport}
           />
         }
+      />
+      <Route
+        path={ROUTE_URLS.REPORTS.BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_ROUTE.replaceAll(
+          "/reports",
+          ""
+        )}
+        element={<BusinessUnitAndBalanceWiseAccountLedgers />}
       />
     </Routes>
   )

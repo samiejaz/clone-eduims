@@ -8,7 +8,7 @@ import { useContext } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
 import { CheckCircle } from "lucide-react"
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const SignUp = () => {
   const navigate = useNavigate()

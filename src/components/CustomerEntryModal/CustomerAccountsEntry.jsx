@@ -1,6 +1,5 @@
 import { createContext, useState, useContext } from "react"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
-import { Form, Row, Col, FormLabel } from "react-bootstrap"
 import { Button } from "primereact/button"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -12,11 +11,11 @@ import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { FilterMatchMode } from "primereact/api"
 import { Dialog } from "primereact/dialog"
-import { FormColumn, FormRow } from "../Layout/LayoutComponents"
+import { FormColumn, FormRow, FormLabel } from "../Layout/LayoutComponents"
 import TextInput from "../Forms/TextInput"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 let pageTitles = {}
-import { apiUrl } from "../../../public/COSTANTS"
 
 const AccountEntryContext = createContext()
 const AccountEntryProvider = ({ children }) => {

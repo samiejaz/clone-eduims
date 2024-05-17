@@ -7,7 +7,7 @@ import {
   formatDateWithSymbol,
 } from "../utils/CommonFunctions"
 
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const CONTROLLER = "CustomerInvoice"
 const WHEREMETHOD = "GetCustomerInvoiceWhere"
