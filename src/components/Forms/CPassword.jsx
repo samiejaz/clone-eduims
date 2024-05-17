@@ -13,6 +13,10 @@ function CPassword({
   onChange,
   toggleMask = true,
   errorMessage = "This field is required!",
+  className = "",
+  placeHolder = "",
+  feedback = true,
+  showErrorMessage = true,
   ...options
 }) {
   return (
@@ -51,6 +55,7 @@ function CPassword({
                 input: {
                   style: {
                     width: "100%",
+                    padding: "0.5rem",
                   },
                 },
               }}
@@ -61,16 +66,22 @@ function CPassword({
                   }
                 }
               }}
-              className={classNames({
+              placeholder={placeHolder}
+              className={classNames(className, {
                 "p-invalid": fieldState.error,
               })}
               autoComplete="off"
               {...options}
               toggleMask={toggleMask}
+              feedback={feedback}
             />
-            <span className="text-danger text-sm">
-              {fieldState.error ? errorMessage : ""}
-            </span>
+            {showErrorMessage && (
+              <>
+                <span className="text-danger text-sm">
+                  {fieldState.error ? errorMessage : ""}
+                </span>
+              </>
+            )}
           </span>
         </>
       )}

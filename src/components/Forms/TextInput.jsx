@@ -12,6 +12,7 @@ function TextInput({
   floatLabel = false,
   onChange,
   type = "text",
+  placeHolder = "",
 
   errorMessage = "This field is required!",
   showErrorMessage = true,
@@ -58,6 +59,7 @@ function TextInput({
               autoComplete="off"
               type={type}
               {...options}
+              placeholder={placeHolder}
             />
             {showErrorMessage && (
               <>

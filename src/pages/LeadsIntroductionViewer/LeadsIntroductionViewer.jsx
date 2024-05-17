@@ -37,7 +37,7 @@ import {
   TextAreaField,
 } from "../../components/Forms/form"
 import useLeadsFileViewerHook from "./useLeadsFileViewerHook"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 let queryKey = "key"
 

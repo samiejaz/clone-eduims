@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export async function fetchAllUsers(LoginUserID) {
   try {

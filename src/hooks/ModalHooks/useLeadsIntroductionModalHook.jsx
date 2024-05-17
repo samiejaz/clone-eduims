@@ -8,9 +8,7 @@ import {
 import {
   useAllBusinessNatureSelectData,
   useAllBusinessTypesSelectData,
-  useAllCountiesSelectData,
   useAllLeadsSouceSelectData,
-  useAllTehsilsSelectData,
 } from "../SelectData/useSelectData"
 import CDropdown from "../../components/Forms/CDropdown"
 import CheckBox from "../../components/Forms/CheckBox"
@@ -24,7 +22,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { QUERY_KEYS } from "../../utils/enums"
 import { useUserData } from "../../context/AuthContext"
 import { Dropdown } from "primereact/dropdown"
-import { CMaskInputField } from "../../components/Forms/form"
 import {
   FormRow,
   FormColumn,

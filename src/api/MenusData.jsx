@@ -4,10 +4,11 @@ import {
   convertRouteGroupsToSingleRoutes,
   convertToSingleRoutesWithUserRights,
   initAuthorizedMenus,
+  routes,
 } from "../utils/routes"
 import { decryptID, encryptID } from "../utils/crypto"
 
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export async function GetAllMenus({ LoginUserID }) {
   try {
@@ -27,20 +28,21 @@ export async function GetAllMenus({ LoginUserID }) {
   }
 }
 
-export async function AddMenus({ LoginUserID, rotuesData }) {
+export async function AddMenus({ LoginUserID }) {
   try {
-    let DetailTable = convertRouteGroupsToSingleRoutes(rotuesData)
+    let DetailTable = convertRouteGroupsToSingleRoutes(routes)
 
     let DataToSend = {
       EntryUserID: LoginUserID,
       MenusDetail: JSON.stringify(DetailTable),
     }
 
-    let url = apiUrl + `/data_Menus/GetAllMenus?LoginUserID=${LoginUserID}`
+    let url =
+      apiUrl + `/data_Menus/MenusInsertUpdate?LoginUserID=${LoginUserID}`
     const { data } = await axios.post(url, JSON.stringify(DataToSend))
 
     if (data.success) {
-      ShowSuccessToast("Inserted Routes Sucessfully!")
+      ShowSuccessToast("Routes Syncronized Sucessfully!")
       return { sucess: true }
     } else {
       return { sucess: false }

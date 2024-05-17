@@ -1,18 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import "./ksearchbar.css"
-import { Star, X } from "lucide-react"
+import { X } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
-import {
-  useClickOutside,
-  useCtrlKeyDown,
-  useKeydown,
-  useLocalStorageListener,
-} from "./KsearchBarHooks"
-import { convertBackToOriginal } from "../../utils/routes"
-
-const routes = convertBackToOriginal()
+import { useClickOutside, useCtrlKeyDown, useKeydown } from "./KsearchBarHooks"
+import { useRoutesData } from "../../context/RoutesContext"
 
 const KesearchBar = () => {
+  const { originalRoutes: routes } = useRoutesData()
   const [searchQuery, setSearchQuery] = useState("")
   const [ids, setIds] = useState([])
   const [items, setItems] = useState({
@@ -23,7 +17,7 @@ const KesearchBar = () => {
   const listContainerRef = useRef()
   const divRef = useRef()
 
-  useCtrlKeyDown(() => setVisible(true), "k")
+  useCtrlKeyDown(() => setVisible(true), "l")
   useKeydown(() => setVisible(false), "Escape")
   useClickOutside(() => {
     setVisible(false)

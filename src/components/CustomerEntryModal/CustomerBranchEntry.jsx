@@ -33,7 +33,7 @@ import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents"
 
 const BranchEntryContext = createContext()
 
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const BranchEntryProiver = ({ children }) => {
   const [createdBranchID, setCreatedBranchID] = useState(0)

@@ -7,7 +7,7 @@ import {
 } from "../../../api/SelectData"
 import { useQuery } from "@tanstack/react-query"
 import { SELECT_QUERY_KEYS } from "../../../utils/enums"
-import { NumberInput } from "../../../components/Forms/form"
+import { NumberInput, TextAreaField } from "../../../components/Forms/form"
 import { InputSwitch } from "primereact/inputswitch"
 import { classNames } from "primereact/utils"
 import { Button } from "primereact/button"
@@ -234,19 +234,10 @@ export const CustomerInvoiceDetailTableRowComponent = ({
           />
         </td>
         <td style={{ minWidth: "400px" }}>
-          <textarea
-            as={"textarea"}
-            rows={"1"}
+          <TextAreaField
+            control={method.control}
+            name={`CustomerInvoiceDetail.${index}.DetailDescription`}
             disabled={disable}
-            className="p-inputtext"
-            style={{
-              padding: "0.3rem 0.4rem",
-              fontSize: "0.8em",
-              width: "100%",
-            }}
-            {...method.register(
-              `CustomerInvoiceDetail.${index}.DetailDescription`
-            )}
           />
         </td>
         <td>

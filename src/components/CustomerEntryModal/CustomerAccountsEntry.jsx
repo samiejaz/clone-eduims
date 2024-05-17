@@ -13,7 +13,7 @@ import { FilterMatchMode } from "primereact/api"
 import { Dialog } from "primereact/dialog"
 import { FormColumn, FormRow, FormLabel } from "../Layout/LayoutComponents"
 import TextInput from "../Forms/TextInput"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 let pageTitles = {}
 

@@ -16,7 +16,7 @@ import { useKeyCombinationHook } from "../../hooks/hooks"
 import SingleFileUpload from "../../components/Forms/SingleFileUpload"
 import { SingleFormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { MENU_KEYS } from "../../utils/enums"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 import { Tooltip } from "primereact/tooltip"
 
 const defaultValues = {

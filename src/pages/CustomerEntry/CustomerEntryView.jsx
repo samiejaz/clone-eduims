@@ -15,7 +15,7 @@ import { BreadCrumb } from "primereact/breadcrumb"
 import { fetchAllOldCustomersForSelect } from "../../api/SelectData"
 import { ROUTE_URLS } from "../../utils/enums"
 import { Dropdown } from "primereact/dropdown"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 import { FormColumn, FormRow } from "../../components/Layout/LayoutComponents"
 
 const items = [{ label: "Customer Detail" }]

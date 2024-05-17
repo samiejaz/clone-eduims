@@ -18,7 +18,7 @@ import { FormColumn, FormLabel, FormRow } from "../Layout/LayoutComponents"
 import TextInput from "../Forms/TextInput"
 import CheckBox from "../Forms/CheckBox"
 import { confirmDialog } from "primereact/confirmdialog"
-import { apiUrl } from "../../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 function AllCustomersBranchEntry(props) {
   const { CustomerID, isEnable = true } = props

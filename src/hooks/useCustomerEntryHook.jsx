@@ -12,7 +12,7 @@ import { AuthContext } from "../context/AuthContext"
 import { AppConfigurationContext } from "../context/AppConfigurationContext"
 import { Dropdown } from "primereact/dropdown"
 import { useOldCustomerSelectData } from "./SelectData/useSelectData"
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const customerEntryDefaultValues = {
   CustomerName: "",

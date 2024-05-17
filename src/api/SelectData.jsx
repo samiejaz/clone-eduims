@@ -1,7 +1,7 @@
 import axios from "axios"
 import { ShowErrorToast } from "../utils/CommonFunctions"
 
-import { apiUrl } from "../../public/COSTANTS"
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 export async function fetchAllBusinessUnitsForSelect() {
   const { data } = await axios.post(apiUrl + "/Select/SelectBusinessUnit")
