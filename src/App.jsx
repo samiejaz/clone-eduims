@@ -50,7 +50,6 @@ const App = () => {
 
   return (
     <>
-      {/* <KSearchBar /> */}
       <InitMenuNames />
       <Routes>
         <Route path="auth" element={<SignUp />} />

@@ -39,7 +39,7 @@ export async function AddMenus({ LoginUserID }) {
 
     let url =
       apiUrl + `/data_Menus/MenusInsertUpdate?LoginUserID=${LoginUserID}`
-    const { data } = await axios.post(url, JSON.stringify(DataToSend))
+    const { data } = await axios.post(url, DataToSend)
 
     if (data.success) {
       ShowSuccessToast("Routes Syncronized Sucessfully!")

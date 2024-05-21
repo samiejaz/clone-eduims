@@ -35,6 +35,7 @@ export async function fetchAllCustomerAccountsForSelect(CustomerID) {
   const { data } = await axios.post(
     apiUrl + "/Select/GetCustomerAccounts?CustomerID=" + CustomerID
   )
+
   return data.data || []
 }
 export async function fetchAllProductsForSelect(

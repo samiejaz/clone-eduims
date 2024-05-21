@@ -37,7 +37,7 @@ export const AuthProvier = ({ children }) => {
         const userData = localStorage.getItem("user")
         if (userData !== null) {
           setUser(JSON.parse(userData))
-          navigate(location.pathname, { replace: true })
+          navigate(location.pathname + location.search)
         } else {
           setUser(null)
           navigate("/auth")
@@ -55,7 +55,6 @@ export const AuthProvier = ({ children }) => {
     </AuthContext.Provider>
   )
 }
-
 export function useUserData() {
   const { user } = useContext(AuthContext)
   return user

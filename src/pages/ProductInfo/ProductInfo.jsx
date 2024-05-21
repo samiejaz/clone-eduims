@@ -416,7 +416,6 @@ function FormComponent({ mode, userRights }) {
   )
 }
 const ProductInfoFormFields = ({ mode, ProductInfoID }) => {
-  console.log(ProductInfoID)
   const { control, setFocus } = useFormContext()
   const { pageTitles } = useAppConfigurataionProvider()
   const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
