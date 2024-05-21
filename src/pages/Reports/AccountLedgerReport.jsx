@@ -1,5 +1,9 @@
-import { FormProvider, set, useForm, useFormContext } from "react-hook-form"
-import { CDatePicker, CDropDownField } from "../../components/Forms/form"
+import { FormProvider, useForm, useFormContext } from "react-hook-form"
+import {
+  CDatePicker,
+  CDropDownField,
+  CMultiSelectField,
+} from "../../components/Forms/form"
 import {
   FormRow,
   FormColumn,
@@ -17,17 +21,24 @@ import {
   formatDateWithSymbol,
   preventFormByEnterKeySubmission,
 } from "../../utils/CommonFunctions"
-import axios from "axios"
-import { CustomSpinner } from "../../components/CustomSpinner"
-const apiUrl = import.meta.env.VITE_APP_API_URL
+import { useReportViewerHook } from "../../hooks/CommonHooks/commonhooks"
+import { useBusinessUnitsSelectData } from "../../hooks/SelectData/useSelectData"
 
 export default function AccountLedgerReport() {
   document.title = "Account Ledger"
   const method = useForm()
-  const { generateReport, render } = useReportViewer()
+  const { generateReport, render } = useReportViewerHook({
+    controllerName: "/Reports/CustomerLedgerReport",
+  })
 
   function onSubmit(formData) {
-    let queryParams = `?AccountID=${formData.AccountID}&DateFrom=${formatDateWithSymbol(formData.DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(formData.DateTo ?? new Date())}&Export=p`
+    let BusinessUnitStr =
+      formData.BusinessUnitID.length > 0
+        ? formData.BusinessUnitID.join(",")
+        : ""
+    let AccountStr =
+      formData.AccountID.length > 0 ? formData.BusinessUnitID.join(",") : ""
+    let queryParams = `?&usinessUnitID=${BusinessUnitStr}&AccountID=${AccountStr}&DateFrom=${formatDateWithSymbol(formData.DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(formData.DateTo ?? new Date())}&Export=p`
     generateReport(queryParams)
   }
 
@@ -39,6 +50,7 @@ export default function AccountLedgerReport() {
       <form onKeyDown={preventFormByEnterKeySubmission}>
         <FormRow>
           <FormProvider {...method}>
+            <MultiSelectBusinessUnitField />
             <CustomerDependentFields />
           </FormProvider>
           <FormColumn lg={2} xl={2} md={6}>
@@ -79,74 +91,6 @@ export default function AccountLedgerReport() {
       </form>
     </>
   )
-}
-
-const useReportViewer = () => {
-  const [queryParams, setQueryParams] = useState(null)
-
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["accountLedgerReport", queryParams],
-    queryFn: async () => {
-      const { data: base64String } = await axios.post(
-        apiUrl + "/Reports/CustomerLedgerReport" + queryParams
-      )
-
-      return base64String
-    },
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    retry: false,
-    enabled: queryParams !== null,
-  })
-
-  // useEffect(() => {
-  //   async function fetchReport() {
-  //     try {
-  //       setIsLoading(true)
-  //       const { data: base64String } = await axios.post(
-  //         apiUrl + "/Reports/CustomerLedgerReport" + queryParams
-  //       )
-  //       setData(base64String)
-  //       setIsLoading(false)
-  //     } catch (err) {
-  //       ShowErrorToast(err.message)
-  //       setIsLoading(false)
-  //     }
-  //   }
-  //   if (queryParams) {
-  //     fetchReport()
-  //   }
-  // }, [queryParams])
-
-  function generateReport(querParams) {
-    setQueryParams(querParams)
-  }
-
-  return {
-    generateReport,
-    render: (
-      <>
-        {(isLoading || isFetching) && (
-          <>
-            <CustomSpinner message="Generating report..." />
-          </>
-        )}
-        {data && (
-          <>
-            <div className="w-full h-full">
-              <embed
-                width="100%"
-                height="100%"
-                src={`data:application/pdf;base64,${data}`}
-                type="application/pdf"
-              />
-            </div>
-          </>
-        )}
-      </>
-    ),
-  }
 }
 
 const CustomerDependentFields = () => {
@@ -196,17 +140,36 @@ const CustomerDependentFields = () => {
           <span className="text-danger fw-bold ">*</span>
         </FormLabel>
         <div>
-          <CDropDownField
+          <CMultiSelectField
             control={method.control}
             name={`AccountID`}
             optionLabel="AccountTitle"
             optionValue="AccountID"
             placeholder="Select an account"
             options={CustomerAccounts}
-            required={true}
-            focusOptions={() => method.setFocus("DateFrom")}
           />
         </div>
+      </FormColumn>
+    </>
+  )
+}
+
+const MultiSelectBusinessUnitField = ({ col = 3 }) => {
+  const businessUnitSelectData = useBusinessUnitsSelectData()
+  const method = useFormContext()
+
+  return (
+    <>
+      <FormColumn lg={col} xl={col} md={12}>
+        <FormLabel>Business Unit</FormLabel>
+        <CMultiSelectField
+          control={method.control}
+          name="BusinessUnitID"
+          options={businessUnitSelectData.data}
+          optionLabel="BusinessUnitName"
+          optionValue="BusinessUnitID"
+          placeholder="Select a business unit"
+        />
       </FormColumn>
     </>
   )

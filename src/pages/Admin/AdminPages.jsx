@@ -22,10 +22,6 @@ const AdminPageWrapper = ({ children }) => {
     }
   }
 
-  useEffect(() => {
-    ShowErrorToast("Something went wrong!")
-  }, [])
-
   useKeyCombinationHook(handlePasswordSubmit, "g", true)
   useKeyCombinationHook(() => setShowField(true), "s", true)
 

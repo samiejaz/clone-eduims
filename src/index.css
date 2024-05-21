@@ -577,7 +577,7 @@ a {
   color: #fff;
   font-size: 15px;
   padding: 5px 0;
-  white-space: nowrap;
+  white-space: pre-wrap;
   opacity: 0.6;
   transition: all 0.3s ease;
 }
@@ -595,12 +595,16 @@ a {
   display: block;
   pointer-events: none;
   transition: 0s;
+
 }
 .c-sidebar.c-close .c-nav-links li:hover .c-sub-menu {
   top: 0;
   opacity: 1;
   pointer-events: auto;
   transition: all 0.4s ease;
+}
+.c-sidebar.c-close .c-nav-links li:hover .c-sub-menu a{
+  text-wrap: nowrap;
 }
 .c-sidebar .c-nav-links li .c-sub-menu .c-link_name {
   display: none;
@@ -801,4 +805,11 @@ a {
 }
 .p-tieredmenu.p-component.p-tieredmenu-overlay.p-ripple-disabled.p-connected-overlay-enter-done {
   padding-bottom: .9rem;
+}
+
+.h-royalblue:hover {
+  background: #10B981;
+}
+.h-royalblue:focus {
+  background: #10B981;
 }

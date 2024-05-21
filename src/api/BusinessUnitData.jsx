@@ -76,7 +76,7 @@ export async function addNewBusinessUnit({
     newFormData.append("EntryUserID", userID)
     newFormData.append("Inactive", formData.InActive === false ? 0 : 1)
     newFormData.append("image", formData.Logo)
-    console.log(formData)
+
     newFormData.append("image2", formData.secondLogo)
 
     if (formData.PrimaryColor) {

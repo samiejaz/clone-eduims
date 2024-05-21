@@ -87,16 +87,17 @@ export async function PrintReportInNewTabWithLoadingToast({
   toastLoadingMessage = "Generating report...",
   toastSuccessMessage = "Report generated successfully",
 }) {
+  let id = crypto.randomUUID()
   try {
     toast.loading(toastLoadingMessage, {
-      toastId: "printReportLoading",
+      toastId: "printReportLoading_" + id,
       position: "top-right",
     })
 
     let url =
       fullUrl !== "" ? fullUrl : `${apiUrl}/Reports/${controllerName}&Export=p`
     const { data } = await axios.post(url)
-
+    console.log(url)
     const win = window.open("")
     let html = ""
 
@@ -111,12 +112,12 @@ export async function PrintReportInNewTabWithLoadingToast({
     setTimeout(() => {
       win.document.write(html)
     }, 0)
-    toast.dismiss("printReportLoading")
+    toast.dismiss("printReportLoading_" + id)
     toast.success(toastSuccessMessage, {
       position: "top-right",
     })
   } catch (e) {
-    toast.dismiss("printReportLoading")
+    toast.dismiss("printReportLoading_" + id)
     toast.error("Error generating report: " + e.message)
   }
 }
@@ -173,4 +174,10 @@ export function formatDateWithSymbol(dateInput, symbol = "-") {
   const formattedDate = `${date}${symbol}${month}${symbol}${year}`
 
   return formattedDate
+}
+
+export function getSumOfPropertyInObjectStartingWith(object, property) {
+  return Object.keys(object)
+    .filter((key) => key.startsWith(property))
+    .reduce((sum, key) => sum + object[key], 0)
 }

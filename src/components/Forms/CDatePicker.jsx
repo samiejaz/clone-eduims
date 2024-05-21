@@ -11,6 +11,7 @@ const CDatePicker = ({
   showTime = false,
   showIcon = false,
   dateFormat = "dd-M-yy",
+  onChange = () => null,
 }) => {
   return (
     <Controller
@@ -22,7 +23,12 @@ const CDatePicker = ({
           <Calendar
             inputId={field.name}
             value={field.value || new Date()}
-            onChange={field.onChange}
+            onChange={(e) => {
+              field.onChange(e)
+              if (onChange) {
+                onChange(e)
+              }
+            }}
             dateFormat={dateFormat}
             style={{ width: "100%" }}
             className={classNames({ "p-invalid": fieldState.error })}

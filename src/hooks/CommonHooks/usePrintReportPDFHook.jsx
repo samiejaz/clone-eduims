@@ -3,7 +3,6 @@ import React from "react"
 import { PrintReportInNewTabWithLoadingToast } from "../../utils/CommonFunctions"
 import { Button } from "primereact/button"
 import { CustomSpinner } from "../../components/CustomSpinner"
-import { toast } from "react-toastify"
 
 const usePrintReportPDFHook = () => {
   const mutation = useMutation({

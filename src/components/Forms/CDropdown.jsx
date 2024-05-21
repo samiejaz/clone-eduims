@@ -7,7 +7,7 @@ const CDropdown = ({
   control,
   name,
   onChange,
-  focusOptions,
+  focusOptions = () => null,
   options = [],
   placeholder = "",
   optionLabel = "label",
@@ -18,6 +18,7 @@ const CDropdown = ({
   filter = true,
   disabled = false,
   errorMessage = "This field is required!",
+  value,
   ...moreOptions
 }) => {
   return (
@@ -79,8 +80,6 @@ const CDropdown = ({
               filter={filter}
               style={{
                 width: "100%",
-                backgroundColor: disabled === true ? "#dee2e6" : "white",
-                color: "black",
               }}
               pt={{
                 input: {
