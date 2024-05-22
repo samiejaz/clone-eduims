@@ -29,6 +29,7 @@ import { useAuthProvider } from "../../context/AuthContext"
 import { useReportViewerHook } from "../../hooks/CommonHooks/commonhooks"
 
 const BusinessUnitAndBalanceWiseAccountLedgers = () => {
+  document.title = "Customer Detail Ledger"
   const [searchParams, setSearchParams] = useSearchParams()
   const queryParams = new URLSearchParams(searchParams)
   const [reportQueryParams, setReportQueryParams] = useState(null)
@@ -81,7 +82,7 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
             <h1 className="text-3xl">Customer Detail Ledger</h1>
           </div>
           <FormRow>
-            <FormColumn lg={9} xl={9} md={12}>
+            <FormColumn lg={6} xl={6} md={12}>
               <FormLabel>Customer</FormLabel>
               <CDropDownField
                 control={method.control}
@@ -102,8 +103,8 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
               cols={3}
               onChangeDateFrom={generateReportQueryParams}
               onChangeDateTo={generateReportQueryParams}
-              dateToLabel="As On Date"
-              showDateFrom={false}
+              // dateToLabel="As On Date"
+              // showDateFrom={false}
             />
           </FormRow>
         </div>
@@ -111,7 +112,8 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
         <div>
           <AccountsGrid
             headers={BusinessUnitSelectData.data}
-            accountsData={CustomerAccountsData}
+            accountsData={CustomerAccountsData?.data}
+            grandTotal={CustomerAccountsData?.grandTotal}
           />
         </div>
       </FormProvider>
@@ -121,7 +123,7 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
 
 export default BusinessUnitAndBalanceWiseAccountLedgers
 
-const AccountsGrid = ({ headers = [], accountsData = [] }) => {
+const AccountsGrid = ({ headers = [], accountsData = [], grandTotal = 0 }) => {
   const [selectedCell, setSelectedCell] = useState(null)
 
   const { generateReport } = useReportViewerHook({
@@ -160,10 +162,16 @@ const AccountsGrid = ({ headers = [], accountsData = [] }) => {
   const isCellSelectable = (event) => event.data.field !== "AccountTitle"
 
   const totalTemplate = (rowData) => {
-    let sumOfCurrentRowBalances = getSumOfPropertyInObjectStartingWith(
-      rowData,
-      "BusinessUnit_"
-    )
+    let sumOfCurrentRowBalances = 0
+    if (rowData.AccountID === "Total") {
+      sumOfCurrentRowBalances = grandTotal
+    } else {
+      sumOfCurrentRowBalances = getSumOfPropertyInObjectStartingWith(
+        rowData,
+        "BusinessUnit_"
+      )
+    }
+
     return <>{sumOfCurrentRowBalances}</>
   }
 

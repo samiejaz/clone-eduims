@@ -19,16 +19,17 @@ export async function fetchAllAccountsDataBusinessUnitWiseForReport(
               )
             : []
 
-        let totalsRow = calculateAndReturnTotalsRow(transformedData)
-        transformedData.push(totalsRow)
+        let { summary, grandTotal } =
+          calculateAndReturnTotalsRow(transformedData)
+        transformedData.push(summary)
 
-        return transformedData ?? []
+        return { data: transformedData, grandTotal }
       } else {
         ShowErrorToast(data.Message)
-        return []
+        return { data: [], grandTotal: 0 }
       }
     } else {
-      return []
+      return { data: [], grandTotal: 0 }
     }
   } catch (error) {
     ShowErrorToast("FetchAll::" + error.message)
@@ -80,9 +81,11 @@ function calculateAndReturnTotalsRow(accounts) {
     AccountID: "Total",
     AccountTitle: "",
   }
+  let grandTotal = 0
   Object.keys(totals).forEach((key) => {
     summary[key] = totals[key]
+    grandTotal += totals[key]
   })
 
-  return summary
+  return { summary, grandTotal }
 }

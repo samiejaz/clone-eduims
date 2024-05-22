@@ -287,7 +287,11 @@ const PrintRecordButton = ({
             disabled={printDisable}
             loading={mutation.isPending}
             loadingIcon="pi pi-spin pi-print"
-            onClick={() => mutation.mutateAsync()}
+            onClick={() =>
+              mutation.mutateAsync({
+                controllerName: getPrintFromUrl || fullUrl,
+              })
+            }
             pt={{
               label: {
                 className: "hidden md:block lg:block",
