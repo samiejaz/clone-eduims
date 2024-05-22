@@ -26,19 +26,30 @@ import { useBusinessUnitsSelectData } from "../../hooks/SelectData/useSelectData
 
 export default function AccountLedgerReport() {
   document.title = "Account Ledger"
-  const method = useForm()
+  const method = useForm({
+    defaultValues: {
+      AccountID: [],
+      BusinessUnitID: [],
+      CustomerID: null,
+    },
+  })
   const { generateReport, render } = useReportViewerHook({
     controllerName: "/Reports/CustomerLedgerReport",
   })
 
   function onSubmit(formData) {
+    debugger
     let BusinessUnitStr =
       formData.BusinessUnitID.length > 0
         ? formData.BusinessUnitID.join(",")
         : ""
     let AccountStr =
-      formData.AccountID.length > 0 ? formData.BusinessUnitID.join(",") : ""
-    let queryParams = `?&usinessUnitID=${BusinessUnitStr}&AccountID=${AccountStr}&DateFrom=${formatDateWithSymbol(formData.DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(formData.DateTo ?? new Date())}&Export=p`
+      formData.AccountID.length > 0 ? formData.AccountID.join(",") : ""
+    let businessUnitQueryParam =
+      BusinessUnitStr !== "" ? "&BusinessUnitID=" + BusinessUnitStr : ""
+    let AccountIDQueryParam =
+      AccountStr !== "" ? "&AccountID=" + AccountStr : ""
+    let queryParams = `?CustomerID=${formData.CustomerID}${businessUnitQueryParam}${AccountIDQueryParam}&DateFrom=${formatDateWithSymbol(formData.DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(formData.DateTo ?? new Date())}&Export=p`
     generateReport(queryParams)
   }
 
@@ -50,7 +61,7 @@ export default function AccountLedgerReport() {
       <form onKeyDown={preventFormByEnterKeySubmission}>
         <FormRow>
           <FormProvider {...method}>
-            <MultiSelectBusinessUnitField />
+            <MultiSelectBusinessUnitField col={4} />
             <CustomerDependentFields />
           </FormProvider>
           <FormColumn lg={2} xl={2} md={6}>
@@ -71,7 +82,7 @@ export default function AccountLedgerReport() {
               <CDatePicker control={method.control} name={"DateTo"} />
             </div>
           </FormColumn>
-          <div className="ml-2">
+          <div className="ml-2 mb-2" style={{ alignSelf: "end" }}>
             <Button
               label="View"
               severity="primary"
@@ -118,6 +129,7 @@ const CustomerDependentFields = () => {
       <FormColumn lg={4} xl={4} md={12}>
         <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
           Customer
+          <span className="text-danger fw-bold ">*</span>
         </FormLabel>
         <div>
           <CDropDownField
@@ -128,6 +140,7 @@ const CustomerDependentFields = () => {
             placeholder="Select a customer"
             options={customerSelectData}
             focusOptions={() => method.setFocus("AccountID")}
+            required={true}
             onChange={(e) => {
               setCustomerID(e.value)
             }}
@@ -135,10 +148,7 @@ const CustomerDependentFields = () => {
         </div>
       </FormColumn>
       <FormColumn lg={4} xl={4} md={12}>
-        <FormLabel>
-          Ledger
-          <span className="text-danger fw-bold ">*</span>
-        </FormLabel>
+        <FormLabel>Ledger</FormLabel>
         <div>
           <CMultiSelectField
             control={method.control}

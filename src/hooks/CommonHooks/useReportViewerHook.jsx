@@ -24,12 +24,12 @@ const useReportViewer = ({ controllerName, ShowPrintInNewTab = false }) => {
     enabled: queryParams !== null,
   })
 
-  function generateReport(querParams) {
+  function generateReport(reportQueyrParams) {
     if (!ShowPrintInNewTab) {
-      setQueryParams(querParams)
+      setQueryParams(reportQueyrParams)
     } else {
       PrintReportInNewTabWithLoadingToast({
-        fullUrl: apiUrl + controllerName + queryParams,
+        fullUrl: apiUrl + controllerName + reportQueyrParams,
       })
     }
   }

@@ -69,7 +69,6 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
     let CustomerID = method.getValues("CustomerID")
     let DateFrom = method.getValues("DateFrom")
     let DateTo = method.getValues("DateTo")
-
     let newQuerParams = `?LoginUserID=${user.userID}&CustomerID=${CustomerID === null ? 0 : CustomerID}&DateFrom=${formatDateWithSymbol(DateFrom)}&DateTo=${formatDateWithSymbol(DateTo)}`
     setReportQueryParams(newQuerParams)
   }
@@ -79,10 +78,10 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
       <FormProvider {...method}>
         <div className="">
           <div>
-            <h1 className="text-3xl">Businesss Unit Wise Ledger</h1>
+            <h1 className="text-3xl">Customer Detail Ledger</h1>
           </div>
           <FormRow>
-            <FormColumn lg={6} xl={6} md={6}>
+            <FormColumn lg={9} xl={9} md={12}>
               <FormLabel>Customer</FormLabel>
               <CDropDownField
                 control={method.control}
@@ -103,6 +102,8 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
               cols={3}
               onChangeDateFrom={generateReportQueryParams}
               onChangeDateTo={generateReportQueryParams}
+              dateToLabel="As On Date"
+              showDateFrom={false}
             />
           </FormRow>
         </div>
@@ -125,6 +126,7 @@ const AccountsGrid = ({ headers = [], accountsData = [] }) => {
 
   const { generateReport } = useReportViewerHook({
     controllerName: "/Reports/CustomerLedgerReport",
+    ShowPrintInNewTab: true,
   })
   const method = useFormContext()
 
@@ -137,11 +139,21 @@ const AccountsGrid = ({ headers = [], accountsData = [] }) => {
     let DateTo = method.getValues("DateTo")
 
     let reportQueryParams = null
-    if (BusinessUnitTitle === "Total") {
-    } else {
-      reportQueryParams = `?BusinessUnitID=${BusinessUnitID}&CustomerID=${CustomerID}&AccountID=${AccountID}&DateFrom=${formatDateWithSymbol(DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(DateTo ?? new Date())}&Export=p`
+    if (AccountID === "Total") {
+      let businiessUnitStr =
+        BusinessUnitTitle !== "Total" ? `&BusinessUnitID=${BusinessUnitID}` : ""
+      reportQueryParams = `?CustomerID=${CustomerID}${businiessUnitStr}&DateFrom=${formatDateWithSymbol(DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(DateTo ?? new Date())}&Export=p`
       generateReport(reportQueryParams)
+    } else {
+      if (BusinessUnitTitle === "Total") {
+        reportQueryParams = `?CustomerID=${CustomerID}&AccountID=${AccountID}&DateFrom=${formatDateWithSymbol(DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(DateTo ?? new Date())}&Export=p`
+        generateReport(reportQueryParams)
+      } else {
+        reportQueryParams = `?BusinessUnitID=${BusinessUnitID}&CustomerID=${CustomerID}&AccountID=${AccountID}&DateFrom=${formatDateWithSymbol(DateFrom ?? new Date())}&DateTo=${formatDateWithSymbol(DateTo ?? new Date())}&Export=p`
+        generateReport(reportQueryParams)
+      }
     }
+
     setSelectedCell(e.value)
   }
 

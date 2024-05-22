@@ -262,7 +262,7 @@ function DetailComponent({ userRights }) {
                         }
                         tooltip="Balance Invoice"
                       />
-                      <div className="ml-1">
+                      {/* <div className="ml-1">
                         <Controller
                           name={"ShowParties_" + rowData.CustomerInvoiceID}
                           control={method.control}
@@ -282,7 +282,7 @@ function DetailComponent({ userRights }) {
                             </>
                           )}
                         />
-                      </div>
+                      </div> */}
                     </>
                   ),
                 })
@@ -767,29 +767,29 @@ function CustomerInvoiceToolbar({
           },
         ]}
         showUtilityContent={mode === "view"}
-        utilityContent={
-          <>
-            <div>
-              <CheckBox
-                control={method.control}
-                ID={"ShowParties"}
-                Label={"Show Parties"}
-                isEnable={mode === "view"}
-                onChange={(e) => {
-                  if (e.checked) {
-                    setPrintQueryParams(
-                      `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}&ShowPartyBalance=true`
-                    )
-                  } else {
-                    setPrintQueryParams(
-                      `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}`
-                    )
-                  }
-                }}
-              />
-            </div>
-          </>
-        }
+        // utilityContent={
+        //   <>
+        //     <div>
+        //       <CheckBox
+        //         control={method.control}
+        //         ID={"ShowParties"}
+        //         Label={"Show Parties"}
+        //         isEnable={mode === "view"}
+        //         onChange={(e) => {
+        //           if (e.checked) {
+        //             setPrintQueryParams(
+        //               `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}&ShowPartyBalance=true`
+        //             )
+        //           } else {
+        //             setPrintQueryParams(
+        //               `InvoicePrint?CustomerInvoiceID=${decryptID(CustomerInvoiceID)}`
+        //             )
+        //           }
+        //         }}
+        //       />
+        //     </div>
+        //   </>
+        // }
       />
     </div>
   )
@@ -1371,7 +1371,7 @@ const CustomerInvoiceDetailTable = React.forwardRef(
     return (
       <>
         <Table
-        responsive
+          responsive
           className="table  table-responsive mt-2"
           style={{ width: "1500px" }}
         >
