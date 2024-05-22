@@ -18,6 +18,10 @@ export async function fetchAllAccountsDataBusinessUnitWiseForReport(
                 data.data
               )
             : []
+
+        let totalsRow = calculateAndReturnTotalsRow(transformedData)
+        transformedData.push(totalsRow)
+
         return transformedData ?? []
       } else {
         ShowErrorToast(data.Message)
@@ -57,4 +61,28 @@ function getTransformedDataForCustomerAccountLedgerBusinessUnitWise(data) {
   })
 
   return result
+}
+
+function calculateAndReturnTotalsRow(accounts) {
+  const totals = {}
+  accounts.forEach((account) => {
+    Object.keys(account).forEach((key) => {
+      if (key.startsWith("BusinessUnit_") && typeof account[key] === "number") {
+        if (!totals[key]) {
+          totals[key] = 0
+        }
+        totals[key] += account[key]
+      }
+    })
+  })
+
+  const summary = {
+    AccountID: "Total",
+    AccountTitle: "",
+  }
+  Object.keys(totals).forEach((key) => {
+    summary[key] = totals[key]
+  })
+
+  return summary
 }

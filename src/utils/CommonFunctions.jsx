@@ -97,7 +97,7 @@ export async function PrintReportInNewTabWithLoadingToast({
     let url =
       fullUrl !== "" ? fullUrl : `${apiUrl}/Reports/${controllerName}&Export=p`
     const { data } = await axios.post(url)
-    console.log(url)
+
     const win = window.open("")
     let html = ""
 
