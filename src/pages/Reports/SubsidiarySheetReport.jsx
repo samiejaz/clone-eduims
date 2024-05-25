@@ -1,5 +1,9 @@
 import { useForm } from "react-hook-form"
-import { CDatePicker, CheckBox } from "../../components/Forms/form"
+import {
+  CDatePicker,
+  CDropDownField,
+  CheckBox,
+} from "../../components/Forms/form"
 import {
   FormRow,
   FormColumn,
@@ -18,6 +22,7 @@ export default function SubsidiarySheetReport() {
     defaultValues: {
       DateTo: new Date(),
       ShowZeroBalances: false,
+      ReportType: "Summary",
     },
   })
   const { generateReport, render } = useReportViewerHook({
@@ -25,7 +30,7 @@ export default function SubsidiarySheetReport() {
   })
 
   function onSubmit(formData) {
-    let queryParams = `?DateTo=${formatDateWithSymbol(formData.DateTo ?? new Date())}&ShowZeroBalances=${formData.ShowZeroBalances ? 1 : 0}`
+    let queryParams = `?DateTo=${formatDateWithSymbol(formData.DateTo ?? new Date())}&ShowZeroBalances=${formData.ShowZeroBalances ? 1 : 0}&ReportType=${formData.ReportType}`
     generateReport(queryParams)
   }
 
@@ -45,6 +50,21 @@ export default function SubsidiarySheetReport() {
               <CDatePicker control={method.control} name={"DateTo"} />
             </div>
           </FormColumn>
+          <FormColumn className="col-xl-3" lg={3} xl={3} md={6}>
+            <FormLabel style={{ fontSize: "14px", fontWeight: "bold" }}>
+              Report Type
+            </FormLabel>
+            <div>
+              <CDropDownField
+                control={method.control}
+                name={"ReportType"}
+                options={[
+                  { label: "Summary", value: "Summary" },
+                  { label: "Detail", value: "Detail" },
+                ]}
+              />
+            </div>
+          </FormColumn>
           <FormColumn lg={2} xl={2} md={6} className="flex">
             <CheckBox
               control={method.control}
@@ -54,6 +74,7 @@ export default function SubsidiarySheetReport() {
               isEnable={true}
             />
           </FormColumn>
+
           <div className="ml-2 mb-2" style={{ alignSelf: "end" }}>
             <Button
               label="View"
