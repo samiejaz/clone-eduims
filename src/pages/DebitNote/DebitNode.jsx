@@ -191,7 +191,14 @@ function DebitNoteEntrySearch({ userRights }) {
               sortable
               header="Voucher No"
             ></Column>
-
+            <Column field="VoucherDate" sortable header="Voucher Date"></Column>
+            <Column
+              field="TotalNetAmount"
+              sortable
+              header="Total Reciept Amount"
+              filter
+              filterPlaceholder="Search by DebitNote amount"
+            ></Column>
             <Column
               field="CustomerName"
               sortable
@@ -205,13 +212,6 @@ function DebitNoteEntrySearch({ userRights }) {
               header="Ledger"
               filter
               filterPlaceholder="Search by ledger"
-            ></Column>
-            <Column
-              field="TotalNetAmount"
-              sortable
-              header="Total Reciept Amount"
-              filter
-              filterPlaceholder="Search by DebitNote amount"
             ></Column>
           </DataTable>
         </>

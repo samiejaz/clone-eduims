@@ -26,7 +26,7 @@ export async function fetchAllCustomerInvoices(LoginUserID) {
       InvoiceTitle: item.InvoiceTitle,
       CustomerName: item.CustomerName,
       AccountTitle: item.AccountTitle,
-      EntryDate: format(parseISO(item.EntryDate), "dd-MMM-yyyy"),
+      InvoiceDate: format(parseISO(item.InvoiceDate), "dd-MMM-yyyy"),
       TotalNetAmount: item.TotalNetAmount,
       DocumentNo: item.DocumentNo,
     }

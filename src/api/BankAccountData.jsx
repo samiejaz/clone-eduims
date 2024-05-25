@@ -24,7 +24,7 @@ export async function fetchBankAccountById(BankAccountID, LoginUserID) {
       const { data } = await axios.post(
         `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?BankAccountID=${BankAccountID}&LoginUserID=${LoginUserID}`
       )
-      return data.data
+      return data
     } else {
       return []
     }
@@ -55,8 +55,18 @@ export async function addNewBankAccount({
   formData,
   userID,
   BankAccountID = 0,
+  selectedBusinessUnits = [],
 }) {
   try {
+    let selectedBusinessUnitIDs
+    if (selectedBusinessUnits?.length === 0) {
+      selectedBusinessUnitIDs = null
+    } else {
+      selectedBusinessUnitIDs = selectedBusinessUnits?.map((b, i) => {
+        return { RowID: i + 1, BusinessUnitID: b.BusinessUnitID }
+      })
+    }
+
     let DataToSend = {
       BankAccountTitle: formData.BankAccountTitle,
       BankTitle: formData.BankTitle,
@@ -65,7 +75,12 @@ export async function addNewBankAccount({
       AccountNo: formData.AccountNo || "",
       IbanNo: formData.IbanNo || "",
       InActive: formData.InActive ? 1 : 0,
+      ShowOnInvoicePrint: formData.ShowOnInvoicePrint ? 1 : 0,
       EntryUserID: userID,
+      BusinessUnitIDs:
+        selectedBusinessUnitIDs === null
+          ? null
+          : JSON.stringify(selectedBusinessUnitIDs),
     }
 
     BankAccountID = BankAccountID === 0 ? 0 : decryptID(BankAccountID)
