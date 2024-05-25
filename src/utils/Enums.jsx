@@ -53,6 +53,7 @@ export const ROUTE_URLS = {
     ACCOUNT_LEDGER_REPORT_ROUTE: "/reports/accountledger",
     BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_ROUTE:
       "/reports/businessunitandbalancewiseledger",
+    SUBSIDIARY_SHEET_REPORT_ROUTE: "/reports/subsidiarysheet",
   },
   ADMIN: {
     SYNC_ROUTES: "/admin/syncroutes",
@@ -109,6 +110,7 @@ export const SELECT_QUERY_KEYS = {
 
 export const REPORTS_QUERY_KEYS = {
   ACCOUNT_LEDGER_QUERY_KEY: "accountLedgerReport",
+  SUBSIDIARY_SHEET_QUERY_KEY: "subsidiarySheetReport",
 }
 
 export const TOAST_CONTAINER_IDS = {
@@ -174,6 +176,7 @@ export const MENU_KEYS = {
     ACCOUNT_LEDGER_REPORT_FORM_KEY: "mnuAccountLedgerReport",
     BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_FORM_KEY:
       "mnuBusinessUnitAndBalanceReport",
+    SUBSIDIARY_REPORT_FORM_KEY: "mnuSubsidarySheetReport",
   },
 }
 

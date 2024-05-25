@@ -183,6 +183,11 @@ export const routes = [
           MENU_KEYS.REPORTS.BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_FORM_KEY,
         route: ROUTE_URLS.REPORTS.BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_ROUTE,
       },
+      {
+        name: "Subsidary Sheet",
+        menuKey: MENU_KEYS.REPORTS.SUBSIDIARY_REPORT_FORM_KEY,
+        route: ROUTE_URLS.REPORTS.SUBSIDIARY_SHEET_REPORT_ROUTE,
+      },
     ],
   },
 ]

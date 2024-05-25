@@ -1,9 +1,12 @@
 import React from "react"
 import { Route, Routes } from "react-router-dom"
-import AccountLedgerReport from "./AccountLedgerReport"
 import { ReportRightsWrapper } from "../../components/Wrappers/wrappers"
 import { MENU_KEYS, ROUTE_URLS } from "../../utils/enums"
-import BusinessUnitAndBalanceWiseAccountLedgers from "./BusinessUnitAndBalanceWiseAccountLedgers"
+import {
+  BusinessUnitAndBalanceWiseAccountLedgersReprot,
+  AccountLedgerReport,
+  SubsidiarySheetReport,
+} from "./index"
 
 const Reports = () => {
   return (
@@ -25,7 +28,26 @@ const Reports = () => {
           "/reports",
           ""
         )}
-        element={<BusinessUnitAndBalanceWiseAccountLedgers />}
+        element={
+          <ReportRightsWrapper
+            menuKey={
+              MENU_KEYS.REPORTS.BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_FORM_KEY
+            }
+            ReportComponent={BusinessUnitAndBalanceWiseAccountLedgersReprot}
+          />
+        }
+      />
+      <Route
+        path={ROUTE_URLS.REPORTS.SUBSIDIARY_SHEET_REPORT_ROUTE.replaceAll(
+          "/reports",
+          ""
+        )}
+        element={
+          <ReportRightsWrapper
+            menuKey={MENU_KEYS.REPORTS.SUBSIDIARY_REPORT_FORM_KEY}
+            ReportComponent={SubsidiarySheetReport}
+          />
+        }
       />
     </Routes>
   )

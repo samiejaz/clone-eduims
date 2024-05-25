@@ -2,14 +2,21 @@ import { Checkbox } from "primereact/checkbox"
 import React from "react"
 import { Controller } from "react-hook-form"
 
-const CheckBox = ({ ID, Label, isEnable, control, onChange }) => {
+const CheckBox = ({
+  ID,
+  Label,
+  isEnable,
+  control,
+  onChange,
+  containerClassName = "",
+}) => {
   return (
     <Controller
       name={ID}
       control={control}
       render={({ field }) => (
         <>
-          <div className="d-flex align-items-center">
+          <div className={`flex align-items-center ` + containerClassName}>
             <Checkbox
               disabled={!isEnable}
               inputId={field.name}
