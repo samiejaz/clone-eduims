@@ -17,7 +17,7 @@ export async function fetchAllDebitNotees(LoginUserID) {
   const { data } = await axios.post(
     `${apiUrl}/${CONTROLLER}/GetDebitNoteData?LoginUserID=${LoginUserID}`
   )
-
+  console.log(data.data)
   return data.data ?? []
 }
 

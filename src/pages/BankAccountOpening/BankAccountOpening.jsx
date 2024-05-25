@@ -28,6 +28,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { useBusinessUnitsSelectData } from "../../hooks/SelectData/useSelectData"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING
 let editRoute = `${parentRoute}/edit/`
@@ -70,6 +71,7 @@ function BankAccountDetail({ userRights }) {
     queryKey: [queryKey],
     queryFn: () => fetchAllBankAccounts(user.userID),
     initialData: [],
+    refetchOnWindowFocus: false,
   })
 
   const deleteMutation = useMutation({
@@ -198,6 +200,7 @@ function BankAccountForm({ mode, userRights }) {
   const navigate = useNavigate()
   const user = useUserData()
   const { BankAccountID } = useParams()
+  const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       BankAccountTitle: "",
@@ -208,9 +211,11 @@ function BankAccountForm({ mode, userRights }) {
       AccountNo: "",
       IbanNo: "",
       InActive: false,
+      ShowOnInvoicePrint: false,
     },
   })
 
+  const BusinessUnitSelectData = useBusinessUnitsSelectData()
   const BankAccountData = useQuery({
     queryKey: [queryKey, +BankAccountID],
     queryFn: () => fetchBankAccountById(BankAccountID, user.userID),
@@ -219,14 +224,23 @@ function BankAccountForm({ mode, userRights }) {
   })
 
   useEffect(() => {
-    if (BankAccountID !== undefined && BankAccountData.data.length > 0) {
-      setValue("BankAccountTitle", BankAccountData?.data[0]?.BankAccountTitle)
-      setValue("BranchName", BankAccountData?.data[0]?.BranchName)
-      setValue("BranchCode", BankAccountData?.data[0]?.BranchCode)
-      setValue("AccountNo", BankAccountData?.data[0]?.AccountNo)
-      setValue("IbanNo", BankAccountData?.data[0]?.IbanNo)
-      setValue("BankTitle", BankAccountData?.data[0]?.BankTitle)
-      setValue("InActive", BankAccountData?.data[0]?.InActive)
+    if (BankAccountID !== undefined && BankAccountData.data.data?.length > 0) {
+      setValue(
+        "BankAccountTitle",
+        BankAccountData?.data.data[0]?.BankAccountTitle
+      )
+      setValue("BranchName", BankAccountData?.data.data[0]?.BranchName)
+      setValue("BranchCode", BankAccountData?.data.data[0]?.BranchCode)
+      setValue("AccountNo", BankAccountData?.data.data[0]?.AccountNo)
+      setValue("IbanNo", BankAccountData?.data.data[0]?.IbanNo)
+      setValue("BankTitle", BankAccountData?.data.data[0]?.BankTitle)
+      setValue("InActive", BankAccountData?.data.data[0]?.InActive)
+      setValue(
+        "ShowOnInvoicePrint",
+        BankAccountData?.data.data[0]?.ShowOnInvoicePrint
+      )
+
+      setSelectedBusinessUnits(BankAccountData.data.Detail)
     }
   }, [BankAccountID, BankAccountData.data])
 
@@ -254,7 +268,9 @@ function BankAccountForm({ mode, userRights }) {
       LoginUserID: user.userID,
     })
   }
-
+  const isRowSelectable = (event) => {
+    return mode !== "view" ? true : false
+  }
   function handleAddNew() {
     reset()
     navigate(newRoute)
@@ -270,10 +286,12 @@ function BankAccountForm({ mode, userRights }) {
     navigate(editRoute + BankAccountID)
   }
   function onSubmit(data) {
+    console.log(data)
     mutation.mutate({
       formData: data,
       userID: user.userID,
       BankAccountID: BankAccountID,
+      selectedBusinessUnits: selectedBusinessUnits,
     })
   }
 
@@ -391,7 +409,7 @@ function BankAccountForm({ mode, userRights }) {
               </FormColumn>
             </FormRow>
             <FormRow>
-              <FormColumn lg={6} xl={6} md={6}>
+              <FormColumn lg={4} xl={4} md={4}>
                 <div className="mt-2">
                   <CheckBox
                     control={control}
@@ -400,6 +418,40 @@ function BankAccountForm({ mode, userRights }) {
                     isEnable={mode !== "view"}
                   />
                 </div>
+              </FormColumn>
+              <FormColumn lg={6} xl={6} md={6}>
+                <div className="mt-2">
+                  <CheckBox
+                    control={control}
+                    ID={"ShowOnInvoicePrint"}
+                    Label={"Show On Invoice Print"}
+                    isEnable={mode !== "view"}
+                  />
+                </div>
+              </FormColumn>
+            </FormRow>
+            <FormRow>
+              <FormColumn>
+                <DataTable
+                  id="businessUnitTable"
+                  value={BusinessUnitSelectData.data}
+                  selectionMode={"checkbox"}
+                  selection={selectedBusinessUnits}
+                  onSelectionChange={(e) => setSelectedBusinessUnits(e.value)}
+                  dataKey="BusinessUnitID"
+                  tableStyle={{ minWidth: "50rem" }}
+                  size="sm"
+                  isDataSelectable={isRowSelectable}
+                >
+                  <Column
+                    selectionMode="multiple"
+                    headerStyle={{ width: "3rem" }}
+                  ></Column>
+                  <Column
+                    field="BusinessUnitName"
+                    header="Business Unit"
+                  ></Column>
+                </DataTable>
               </FormColumn>
             </FormRow>
           </form>

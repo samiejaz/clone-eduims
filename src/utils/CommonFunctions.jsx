@@ -87,7 +87,7 @@ export async function PrintReportInNewTabWithLoadingToast({
   toastLoadingMessage = "Generating report...",
   toastSuccessMessage = "Report generated successfully",
 }) {
-  let id = crypto.randomUUID()
+  let id = new Date().getMilliseconds().toString()
   try {
     toast.loading(toastLoadingMessage, {
       toastId: "printReportLoading_" + id,

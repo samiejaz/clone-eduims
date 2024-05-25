@@ -103,8 +103,6 @@ const BusinessUnitAndBalanceWiseAccountLedgers = () => {
               cols={3}
               onChangeDateFrom={generateReportQueryParams}
               onChangeDateTo={generateReportQueryParams}
-              // dateToLabel="As On Date"
-              // showDateFrom={false}
             />
           </FormRow>
         </div>

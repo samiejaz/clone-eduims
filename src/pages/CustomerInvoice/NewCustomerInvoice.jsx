@@ -305,13 +305,15 @@ function DetailComponent({ userRights }) {
               sortable
               header="Ref No"
             ></Column>
+            <Column field="InvoiceDate" sortable header="Voucher Date"></Column>
             <Column
-              field="DocumentNo"
+              field="TotalNetAmount"
               filter
-              filterPlaceholder="Search by document no"
+              filterPlaceholder="Search by net amount"
               sortable
-              header="Document No"
+              header="Total Net Amount"
             ></Column>
+
             <Column
               field="CustomerName"
               filter
@@ -326,13 +328,12 @@ function DetailComponent({ userRights }) {
               sortable
               header="Ledger"
             ></Column>
-            <Column field="EntryDate" sortable header="Entry Date"></Column>
             <Column
-              field="TotalNetAmount"
+              field="DocumentNo"
               filter
-              filterPlaceholder="Search by net amount"
+              filterPlaceholder="Search by document no"
               sortable
-              header="Total Net Amount"
+              header="Document No"
             ></Column>
           </DataTable>
         </>
