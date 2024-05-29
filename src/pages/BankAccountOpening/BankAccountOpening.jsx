@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
-import { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
@@ -28,7 +28,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
-import { useBusinessUnitsSelectData } from "../../hooks/SelectData/useSelectData"
+import { CommonBusinessUnitCheckBoxDatatable } from "../../components/CommonFormFields"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING
 let editRoute = `${parentRoute}/edit/`
@@ -200,7 +200,7 @@ function BankAccountForm({ mode, userRights }) {
   const navigate = useNavigate()
   const user = useUserData()
   const { BankAccountID } = useParams()
-  const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
+  const businessUnitsRef = useRef()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       BankAccountTitle: "",
@@ -215,7 +215,6 @@ function BankAccountForm({ mode, userRights }) {
     },
   })
 
-  const BusinessUnitSelectData = useBusinessUnitsSelectData()
   const BankAccountData = useQuery({
     queryKey: [queryKey, +BankAccountID],
     queryFn: () => fetchBankAccountById(BankAccountID, user.userID),
@@ -240,7 +239,7 @@ function BankAccountForm({ mode, userRights }) {
         BankAccountData?.data.data[0]?.ShowOnInvoicePrint
       )
 
-      setSelectedBusinessUnits(BankAccountData.data.Detail)
+      businessUnitsRef.current?.setBusinessUnits(BankAccountData.data.Detail)
     }
   }, [BankAccountID, BankAccountData.data])
 
@@ -268,9 +267,7 @@ function BankAccountForm({ mode, userRights }) {
       LoginUserID: user.userID,
     })
   }
-  const isRowSelectable = (event) => {
-    return mode !== "view" ? true : false
-  }
+
   function handleAddNew() {
     reset()
     navigate(newRoute)
@@ -286,12 +283,12 @@ function BankAccountForm({ mode, userRights }) {
     navigate(editRoute + BankAccountID)
   }
   function onSubmit(data) {
-    console.log(data)
     mutation.mutate({
       formData: data,
       userID: user.userID,
       BankAccountID: BankAccountID,
-      selectedBusinessUnits: selectedBusinessUnits,
+      selectedBusinessUnits:
+        businessUnitsRef.current?.getSelectedBusinessUnits(),
     })
   }
 
@@ -432,26 +429,10 @@ function BankAccountForm({ mode, userRights }) {
             </FormRow>
             <FormRow>
               <FormColumn>
-                <DataTable
-                  id="businessUnitTable"
-                  value={BusinessUnitSelectData.data}
-                  selectionMode={"checkbox"}
-                  selection={selectedBusinessUnits}
-                  onSelectionChange={(e) => setSelectedBusinessUnits(e.value)}
-                  dataKey="BusinessUnitID"
-                  tableStyle={{ minWidth: "50rem" }}
-                  size="sm"
-                  isDataSelectable={isRowSelectable}
-                >
-                  <Column
-                    selectionMode="multiple"
-                    headerStyle={{ width: "3rem" }}
-                  ></Column>
-                  <Column
-                    field="BusinessUnitName"
-                    header="Business Unit"
-                  ></Column>
-                </DataTable>
+                <CommonBusinessUnitCheckBoxDatatable
+                  ref={businessUnitsRef}
+                  isRowSelectable={mode !== "view"}
+                />
               </FormColumn>
             </FormRow>
           </form>

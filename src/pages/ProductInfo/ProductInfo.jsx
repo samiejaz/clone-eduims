@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useRef } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
@@ -48,6 +48,7 @@ import {
 } from "../../utils/CommonFunctions"
 import { confirmDialog } from "primereact/confirmdialog"
 import { Dialog } from "primereact/dialog"
+import { CommonBusinessUnitCheckBoxDatatable } from "../../components/CommonFormFields"
 let parentRoute = ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -209,7 +210,7 @@ function FormComponent({ mode, userRights }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { ProductInfoID } = useParams()
-  const [selectedBusinessUnits, setSelectedBusinessUnits] = useState()
+  const businessUnitsRef = useRef()
   const { control, handleSubmit, setFocus, setValue, reset } = useForm({
     defaultValues: {
       ProductInfoTitle: "",
@@ -225,11 +226,6 @@ function FormComponent({ mode, userRights }) {
     initialData: [],
   })
 
-  const { data: BusinessUnitSelectData } = useQuery({
-    queryKey: [SELECT_QUERY_KEYS.BUSINESS_UNIT_SELECT_QUERY_KEY],
-    queryFn: fetchAllBusinessUnitsForSelect,
-    initialData: [],
-  })
   const { data: ProductCategoriesSelectData } = useQuery({
     queryKey: [SELECT_QUERY_KEYS.PRODUCT_CATEGORIES_SELECT_QUERY_KEY],
     queryFn: fetchAllProductCategoriesForSelect,
@@ -249,7 +245,7 @@ function FormComponent({ mode, userRights }) {
         ProductInfoData?.data.data[0]?.ProductInfoTitle
       )
       setValue("InActive", ProductInfoData?.data.data[0]?.InActive)
-      setSelectedBusinessUnits(ProductInfoData.data.Detail)
+      businessUnitsRef.current?.setBusinessUnits(ProductInfoData.data.Detail)
     }
   }, [ProductInfoID, ProductInfoData.data])
 
@@ -297,12 +293,9 @@ function FormComponent({ mode, userRights }) {
       formData: data,
       userID: user.userID,
       ProductInfoID: ProductInfoID,
-      selectedBusinessUnits: selectedBusinessUnits,
+      selectedBusinessUnits:
+        businessUnitsRef.current?.getSelectedBusinessUnits(),
     })
-  }
-
-  const isRowSelectable = (event) => {
-    return mode !== "view" ? true : false
   }
 
   return (
@@ -387,26 +380,10 @@ function FormComponent({ mode, userRights }) {
             </FormRow>
             <FormRow>
               <FormColumn>
-                <DataTable
-                  id="businessUnitTable"
-                  value={BusinessUnitSelectData}
-                  selectionMode={"checkbox"}
-                  selection={selectedBusinessUnits}
-                  onSelectionChange={(e) => setSelectedBusinessUnits(e.value)}
-                  dataKey="BusinessUnitID"
-                  tableStyle={{ minWidth: "50rem" }}
-                  size="sm"
-                  isDataSelectable={isRowSelectable}
-                >
-                  <Column
-                    selectionMode="multiple"
-                    headerStyle={{ width: "3rem" }}
-                  ></Column>
-                  <Column
-                    field="BusinessUnitName"
-                    header="Business Unit"
-                  ></Column>
-                </DataTable>
+                <CommonBusinessUnitCheckBoxDatatable
+                  ref={businessUnitsRef}
+                  isRowSelectable={mode !== "view"}
+                />
               </FormColumn>
             </FormRow>
           </form>

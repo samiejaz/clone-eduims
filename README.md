@@ -11,6 +11,7 @@ Replace the 'apiurl' with API URL for eduims.
 
 ```sh
 VITE_APP_API_URL='apiurl'
+VITE_APP_API_URL_FOR_SIGNALR='apiurl'
 ```
 
 ## Installation
