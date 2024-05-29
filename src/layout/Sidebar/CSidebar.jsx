@@ -9,34 +9,48 @@ import { confirmDialog } from "primereact/confirmdialog"
 import { InputText } from "primereact/inputtext"
 
 import { useRoutesData } from "../../context/RoutesContext"
+import { useCheckDeviceHook } from "../../hooks/hooks"
 
 const CSidebar = ({ sideBarRef, searchInputRef }) => {
   const user = JSON.parse(localStorage.getItem("user"))
   const toastRef = useRef(null)
 
-  useEffect(() => {
-    async function configurationSetup() {
-      let isSidebarOpen = localStorage.getItem("isSidebarOpen")
-      if (isSidebarOpen) {
-        sideBarRef.current.className = "c-sidebar"
-      }
-    }
-    configurationSetup()
+  const { isMobileScreen } = useCheckDeviceHook()
 
-    return () => {
-      localStorage.removeItem("isSidebarOpen")
+  // useEffect(() => {
+  //   async function configurationSetup() {
+  //     let isSidebarOpen = localStorage.getItem("isSidebarOpen")
+  //     if (isSidebarOpen) {
+  //       sideBarRef.current.className = "c-sidebar"
+  //     }
+  //   }
+  //   configurationSetup()
+
+  //   return () => {
+  //     localStorage.removeItem("isSidebarOpen")
+  //   }
+  // }, [])
+
+  function closeMobieSidebar() {
+    if (isMobileScreen) {
+      sideBarRef.current?.classList.add("hidden")
     }
-  }, [])
+  }
 
   return (
     <>
-      <div ref={sideBarRef} className={`c-sidebar c-close`}>
-        <div className="c-logo-details">
+      <div
+        ref={sideBarRef}
+        className={`${isMobileScreen ? "hidden" : "c-sidebar c-close"}`}
+      >
+        <div className="c-logo-details flex align-items-center justify-content-between">
           <span className="c-logo_name" style={{ marginLeft: "30px" }}>
             EDUIMS
           </span>
+          <span className="c-logo_name block lg:hidden md:hidden xl:hidden">
+            <i className="pi pi-times" onClick={closeMobieSidebar}></i>
+          </span>
         </div>
-
         <SearchBar searchInputRef={searchInputRef} />
 
         <ul className="c-nav-links">
@@ -54,7 +68,7 @@ const CSidebar = ({ sideBarRef, searchInputRef }) => {
             </ul>
           </li>
 
-          <SubSidebar />
+          <SubSidebar closeMobieSidebar={closeMobieSidebar} />
 
           <li>
             <div className="c-profile-details">
@@ -148,7 +162,7 @@ export const SignOut = () => {
   )
 }
 
-const SubSidebar = () => {
+const SubSidebar = ({ closeMobieSidebar }) => {
   const { filteredRoutes } = useRoutesData()
   return (
     <>
@@ -160,6 +174,7 @@ const SubSidebar = () => {
             subItems={route.subItems}
             icon={route.icon}
             hideMenuGroup={!route?.hideMenuGroup}
+            closeMobieSidebar={closeMobieSidebar}
           />
         ))}
     </>
@@ -171,6 +186,7 @@ const MenuGroup = ({
   subItems,
   icon,
   hideMenuGroup = false,
+  closeMobieSidebar,
 }) => {
   function toggleSubmenu(e) {
     let parent = e.target.parentNode.parentNode
@@ -205,6 +221,7 @@ const MenuGroup = ({
                   showDividerOnTop={item?.showDividerOnTop}
                   hideMenuItem={item.ShowForm}
                   showForm={item.ShowForm}
+                  closeMobieSidebar={closeMobieSidebar}
                 />
               ))}
           </ul>
@@ -220,6 +237,7 @@ const MenuItem = ({
   showDividerOnTop = false,
   hideMenuItem = true,
   showForm = true,
+  closeMobieSidebar,
 }) => {
   return (
     <>
@@ -228,13 +246,13 @@ const MenuItem = ({
           {showDividerOnTop ? (
             <>
               <hr style={{ color: "white", padding: "0", margin: "0" }} />
-              <li>
+              <li onClick={closeMobieSidebar}>
                 <Link to={route}>{name}</Link>
               </li>
             </>
           ) : (
             <>
-              <li>
+              <li onClick={closeMobieSidebar}>
                 <Link to={route}>{name}</Link>
               </li>
             </>

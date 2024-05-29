@@ -125,7 +125,7 @@ const useCustomerEntryHook = () => {
       content: (
         <>
           <div className="d-flex align-items-center justify-content-between">
-            <div>
+            <div className="hidden lg:block xl:block md:block">
               <h6>
                 {CustomerID === 0
                   ? "Add New Customer"
@@ -154,7 +154,7 @@ const useCustomerEntryHook = () => {
                       setCustomerID(e.value)
                     }
                   }}
-                  style={{ width: "49.2%" }}
+                  className="w-full lg:w-5 xl:w-5 md:w-5"
                   filter
                   showClear
                 />
@@ -255,9 +255,7 @@ const useCustomerEntryHook = () => {
           }}
           pt={{
             content: {
-              style: {
-                overflow: dialogIndex === 0 ? "hidden" : "auto",
-              },
+              className: `${dialogIndex === 0 ? "overflow-auto lg:overflow-hidden xl:overflow-hidden" : "overflow-auto"}`,
             },
           }}
           footer={footerContent}

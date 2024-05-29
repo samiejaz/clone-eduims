@@ -243,6 +243,9 @@ export default function ButtonToolBar({
               border: "none",
             },
           },
+          center: {
+            className: "mx-auto",
+          },
         }}
       />
     </>

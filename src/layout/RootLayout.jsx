@@ -5,10 +5,13 @@ import { useRef } from "react"
 
 import useKeyCombination from "../hooks/useKeyCombinationHook"
 import useUserProfile from "../hooks/useUserProfile"
+import { useCheckDeviceHook } from "../hooks/hooks"
 
 function RootLayout() {
   const sidebarRef = useRef()
   const searchInputRef = useRef()
+
+  const { isMobileScreen } = useCheckDeviceHook()
 
   useKeyCombination(
     () => {
@@ -39,6 +42,10 @@ function RootLayout() {
     }
   }
 
+  function handleMobileToggleSidebar() {
+    sidebarRef.current.className = "c-sidebar a-sidebar"
+  }
+
   return (
     <>
       <div>
@@ -47,9 +54,12 @@ function RootLayout() {
           searchInputRef={searchInputRef}
         ></CSidebar>
 
-        <section className="c-home-section">
+        <section className={`${isMobileScreen ? "w-full" : "c-home-section"}`}>
           <div className="c-home-content">
-            <Header toggleSidebar={toggleSideBar} />
+            <Header
+              toggleSidebar={toggleSideBar}
+              handleMobileToggleSidebar={handleMobileToggleSidebar}
+            />
           </div>
           <div className="px-3 mt-4">
             <Outlet />
@@ -60,7 +70,8 @@ function RootLayout() {
   )
 }
 
-function Header({ toggleSidebar }) {
+function Header({ toggleSidebar, handleMobileToggleSidebar }) {
+  const { isMobileScreen } = useCheckDeviceHook()
   const { handleShowProfile, render } = useUserProfile()
 
   return (
@@ -72,14 +83,26 @@ function Header({ toggleSidebar }) {
           justifyContent: "space-between",
           width: "100%",
         }}
-        className="mt-4"
+        className="mt-4 px-4 lg:px-0 xl:px-0 md:px-0"
       >
-        <i
-          className="pi pi-bars hoverIcon"
-          onClick={() => {
-            toggleSidebar()
-          }}
-        ></i>
+        {!isMobileScreen ? (
+          <>
+            <i
+              className="pi pi-bars hoverIcon"
+              onClick={() => {
+                toggleSidebar()
+              }}
+            ></i>
+          </>
+        ) : (
+          <i
+            className="pi pi-bars hoverIcon"
+            onClick={() => {
+              handleMobileToggleSidebar()
+            }}
+          ></i>
+        )}
+
         <i
           className="pi pi-user hoverIcon"
           onClick={() => {

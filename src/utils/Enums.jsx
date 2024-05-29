@@ -54,6 +54,7 @@ export const ROUTE_URLS = {
     BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_ROUTE:
       "/reports/businessunitandbalancewiseledger",
     SUBSIDIARY_SHEET_REPORT_ROUTE: "/reports/subsidiarysheet",
+    SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE: "/reports/subsidiarysheetsummary",
   },
   ADMIN: {
     SYNC_ROUTES: "/admin/syncroutes",
@@ -177,6 +178,7 @@ export const MENU_KEYS = {
     BUSINESS_UNIT_AND_BALANCE_LEDGER_REPORT_FORM_KEY:
       "mnuBusinessUnitAndBalanceReport",
     SUBSIDIARY_REPORT_FORM_KEY: "mnuSubsidarySheetReport",
+    SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE: "mnuSubsidarySheetReportSummary",
   },
 }
 

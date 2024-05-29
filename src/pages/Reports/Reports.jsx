@@ -50,6 +50,18 @@ const Reports = () => {
           />
         }
       />
+      <Route
+        path={ROUTE_URLS.REPORTS.SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE.replaceAll(
+          "/reports",
+          ""
+        )}
+        element={
+          <ReportRightsWrapper
+            menuKey={MENU_KEYS.REPORTS.SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE}
+            ReportComponent={SubsidiarySheetSummary}
+          />
+        }
+      />
     </Routes>
   )
 }

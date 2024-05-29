@@ -207,7 +207,12 @@ function UserProfile({ showProfile, handleCloseProfile }) {
         visible={showProfile}
         draggable={false}
         position="right"
-        style={{ width: "40vw", height: "100vh" }}
+        style={{ height: "100vh" }}
+        pt={{
+          root: {
+            className: "w-full lg:w-5 xl:w-5",
+          },
+        }}
         onHide={() => {
           handleCloseProfile()
           setIsEnable(true)

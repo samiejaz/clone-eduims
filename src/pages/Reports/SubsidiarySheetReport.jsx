@@ -15,6 +15,8 @@ import {
   preventFormByEnterKeySubmission,
 } from "../../utils/CommonFunctions"
 import { useReportViewerHook } from "../../hooks/CommonHooks/commonhooks"
+import { Link } from "react-router-dom"
+import { ROUTE_URLS } from "../../utils/enums"
 
 export default function SubsidiarySheetReport() {
   document.title = "Subsidiary Sheet"
@@ -36,9 +38,25 @@ export default function SubsidiarySheetReport() {
 
   return (
     <>
-      <div className="flex align-items-center justify-content-center ">
-        <h1 className="text-3xl">Subsidiary Sheet</h1>
+      <div className="flex align-items-center justify-content-between w-full">
+        <div>
+          <h1 className="text-3xl">Subsidiary Sheet</h1>
+        </div>
+        <div style={{ justifySelf: "end" }}>
+          <Link to={ROUTE_URLS.REPORTS.SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE}>
+            <Button
+              label="Table View"
+              severity="secondary"
+              type="button"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              link
+              text
+            />
+          </Link>
+        </div>
       </div>
+      <hr className="m-0 mb-2" />
       <form onKeyDown={preventFormByEnterKeySubmission}>
         <FormRow>
           <FormColumn lg={2} xl={2} md={6}>
@@ -75,7 +93,10 @@ export default function SubsidiarySheetReport() {
             />
           </FormColumn>
 
-          <div className="ml-2 mb-2" style={{ alignSelf: "end" }}>
+          <div
+            className="ml-2 mb-2 flex align-items-center gap-2"
+            style={{ alignSelf: "end" }}
+          >
             <Button
               label="View"
               severity="primary"

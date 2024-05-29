@@ -144,7 +144,6 @@ const customizedMarker = (item) => {
 
 const LeadsIntroductionViewer = () => {
   const { LeadIntroductionID } = useParams()
-  const navigate = useNavigate()
   const user = useUserData()
 
   const { data } = useQuery({
@@ -781,17 +780,21 @@ export function LeadsViewerButtonToolBar({
           "/" +
           LeadIntroductionID
         }
-        className="p-button"
-        style={{
-          color: "white",
-          fontWeight: 700,
-        }}
       >
-        <span
-          className="pi pi-arrow-left"
-          style={{ marginRight: ".5rem" }}
-        ></span>{" "}
-        Back To Timeline
+        <Button
+          label={"Back To Timeline"}
+          icon="pi pi-arrow-left"
+          type="button"
+          severity="success"
+          className="p-button-success rounded"
+          pt={{
+            label: {
+              className: "hidden lg:block xl:block md:block",
+            },
+          }}
+          link
+          text
+        />
       </Link>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <Button
@@ -802,6 +805,11 @@ export function LeadsViewerButtonToolBar({
           severity="secondary"
           onClick={handleCancel}
           disabled={!isEnable}
+          pt={{
+            label: {
+              className: "hidden lg:block xl:block md:block",
+            },
+          }}
         />
         <Button
           label={"Edit"}
@@ -811,6 +819,11 @@ export function LeadsViewerButtonToolBar({
           className="p-button-success rounded"
           onClick={handleEdit}
           disabled={isEnable}
+          pt={{
+            label: {
+              className: "hidden lg:block xl:block md:block",
+            },
+          }}
         />
         <Button
           label={"Update"}
@@ -822,6 +835,11 @@ export function LeadsViewerButtonToolBar({
           loading={isLoading}
           loadingIcon="pi pi-spin pi-cog"
           disabled={!isEnable}
+          pt={{
+            label: {
+              className: "hidden lg:block xl:block md:block",
+            },
+          }}
         />
       </div>
     </div>

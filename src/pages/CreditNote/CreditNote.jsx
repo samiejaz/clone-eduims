@@ -55,6 +55,8 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
 
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { TextAreaField } from "../../components/Forms/form"
+import { Table } from "react-bootstrap"
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -804,7 +806,7 @@ const CreditNoteDetailTable = React.forwardRef(
 
     return (
       <>
-        <table className="table table-responsive mt-2">
+        <Table responsive className="table table-responsive mt-2">
           <thead>
             <tr>
               <th
@@ -864,7 +866,7 @@ const CreditNoteDetailTable = React.forwardRef(
               })}
             </FormProvider>
           </tbody>
-        </table>
+        </Table>
       </>
     )
   }

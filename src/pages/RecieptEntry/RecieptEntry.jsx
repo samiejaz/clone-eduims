@@ -61,6 +61,7 @@ import {
   FormLabel,
   FormRow,
 } from "../../components/Layout/LayoutComponents"
+import { Table } from "react-bootstrap"
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -1134,7 +1135,7 @@ const ReceiptDetailTable = React.forwardRef(
 
     return (
       <>
-        <table className="table table-responsive mt-2">
+        <Table responsive className="table table-responsive mt-2">
           <thead>
             <tr>
               <th
@@ -1197,7 +1198,7 @@ const ReceiptDetailTable = React.forwardRef(
               })}
             </FormProvider>
           </tbody>
-        </table>
+        </Table>
       </>
     )
   }

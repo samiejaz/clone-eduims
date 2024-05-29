@@ -55,6 +55,7 @@ import {
   FormRow,
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
+import { Table } from "react-bootstrap"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -800,7 +801,7 @@ const DebitNoteDetailTable = React.forwardRef(
 
     return (
       <>
-        <table className="table table-responsive mt-2">
+        <Table responsive className="table table-responsive mt-2">
           <thead>
             <tr>
               <th
@@ -860,7 +861,7 @@ const DebitNoteDetailTable = React.forwardRef(
               })}
             </FormProvider>
           </tbody>
-        </table>
+        </Table>
       </>
     )
   }

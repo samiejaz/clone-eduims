@@ -175,7 +175,7 @@ const App = () => {
       <ConfirmDialog
         id="EditDeleteDialog"
         draggable={false}
-        style={{ width: "30vw" }}
+        style={{ minWidth: "30vw" }}
         pt={{
           acceptButton: {
             root: {
