@@ -17,7 +17,7 @@ import {
   SELECT_QUERY_KEYS,
 } from "../../utils/enums"
 import { useNavigate, useParams } from "react-router-dom"
-import { Button } from "primereact/button"
+
 import ButtonToolBar from "../../components/ActionsToolbar"
 import { preventFormByEnterKeySubmission } from "../../utils/CommonFunctions"
 import {
@@ -28,7 +28,6 @@ import {
 import { TextInput } from "../../components/Forms/form"
 import {
   addNewUserRole,
-  checkForUserRightsAsync,
   deleteUserRoleByID,
   fetchAllUserRoless,
   fetchUserRolesById,
@@ -36,6 +35,7 @@ import {
 import ActionButtons from "../../components/ActionButtons"
 import { initAuthorizedMenus } from "../../utils/routes"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.CONFIGURATION.USER_RIGHTS_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -237,6 +237,10 @@ function DetailComponent({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.RoleID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -245,22 +249,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Roles</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Role"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="User Roles"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Add New User Role"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -277,6 +271,7 @@ function DetailComponent({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

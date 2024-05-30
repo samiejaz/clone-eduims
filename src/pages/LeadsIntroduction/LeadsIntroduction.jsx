@@ -52,6 +52,7 @@ import {
   FormLabel,
   FormRow,
 } from "../../components/Layout/LayoutComponents"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -367,9 +368,9 @@ export function LeadIntroductionDetail({
       <Calendar
         value={options.value}
         onChange={(e) => options.filterCallback(e.value, options.index)}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
+        dateFormat="dd-M-yy"
+        placeholder="dd-M-yy"
+        mask="99--9999"
       />
     )
   }
@@ -387,6 +388,10 @@ export function LeadIntroductionDetail({
     })
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.LeadIntroductionID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -397,25 +402,12 @@ export function LeadIntroductionDetail({
         <>
           {ShowMetaDeta && (
             <>
-              <div className="d-flex text-dark  mb-4 ">
-                <h2 className="text-center my-auto">Lead Introductions</h2>
-                <div
-                  className="text-end my-auto"
-                  style={{ marginLeft: "10px" }}
-                >
-                  {userRights[0]?.RoleNew && (
-                    <>
-                      <Button
-                        label="Add New Lead Introduction"
-                        icon="pi pi-plus"
-                        type="button"
-                        className="rounded"
-                        onClick={() => navigate(newRoute)}
-                      />
-                    </>
-                  )}
-                </div>
-              </div>
+              <DetailPageTilteAndActionsComponent
+                title="Lead Introductions"
+                onAddNewClick={() => navigate(newRoute)}
+                showAddNewButton={userRights[0]?.RoleNew}
+                buttonLabel="Add New Lead"
+              />
             </>
           )}
           <DataTable
@@ -432,6 +424,7 @@ export function LeadIntroductionDetail({
             size="small"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={leftActionBodyTemplate}

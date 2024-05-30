@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
-import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
@@ -34,6 +33,7 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.GENERAL.SESSION_INFO
 let editRoute = `${parentRoute}/edit/`
@@ -98,6 +98,10 @@ function DetailComponent({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.SessionID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -106,22 +110,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Session Info</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Session Info"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Session Info"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Add New Session Info"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -137,6 +131,7 @@ function DetailComponent({ userRights }) {
             size="small"
             selectionMode="single"
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

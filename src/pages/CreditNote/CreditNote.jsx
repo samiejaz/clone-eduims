@@ -57,6 +57,7 @@ import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { TextAreaField } from "../../components/Forms/form"
 import { Table } from "react-bootstrap"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 let parentRoute = ROUTE_URLS.ACCOUNTS.CREDIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -127,6 +128,10 @@ function DetailComponent({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.CreditNoteID))
+  }
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -135,22 +140,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Credit Notes</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Credit Note"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Credit Notes"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Add New Credit Note"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -167,6 +162,7 @@ function DetailComponent({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

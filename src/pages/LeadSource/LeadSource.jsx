@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Route, Routes, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
 import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
@@ -27,6 +27,7 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 let parentRoute = ROUTE_URLS.LEED_SOURCE_ROUTE
 let editRoute = `${parentRoute}/edit/`
 let newRoute = `${parentRoute}/new`
@@ -91,6 +92,10 @@ function DetailComponent({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.LeadSourceID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -101,22 +106,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Lead Sources</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Lead Source"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Lead Sources"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Add New Lead Source"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -133,6 +128,7 @@ function DetailComponent({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

@@ -48,11 +48,39 @@ export const routes = [
         route: ROUTE_URLS.GENERAL.SESSION_INFO,
         showDividerOnTop: true,
       },
+      {
+        name: "Product Category",
+        menuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
+        route: ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE,
+      },
+      {
+        name: "Product Info",
+        menuKey: MENU_KEYS.UTILITIES.PRODUCT_INFO_FORM_KEY,
+        route: ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE,
+      },
+    ],
+  },
+  {
+    menuGroupName: "Customers",
+    icon: "pi pi-users",
+    menuGroupKey: MENU_KEYS.CUSTOMERS.GROUP_KEY,
+    subItems: [
+      {
+        name: "Customer Entry",
+        menuKey: MENU_KEYS.CUSTOMERS.CUSTOMERS_FORM_KEY,
+        route: ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY,
+        showDividerOnTop: true,
+      },
+      {
+        name: "Old Customer Entry",
+        menuKey: MENU_KEYS.CUSTOMERS.OLD_CUSTOMERS_FORM_KEY,
+        route: ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY,
+      },
     ],
   },
   {
     menuGroupName: "Users",
-    icon: "pi pi-users",
+    icon: "pi pi-user",
     menuGroupKey: MENU_KEYS.USERS.GROUP_KEY,
     subItems: [
       {
@@ -64,17 +92,6 @@ export const routes = [
         name: "Departments",
         menuKey: MENU_KEYS.USERS.DEPARTMENTS_FORM_KEY,
         route: ROUTE_URLS.DEPARTMENT,
-      },
-      {
-        name: "Customer Entry",
-        menuKey: MENU_KEYS.USERS.CUSTOMERS_FORM_KEY,
-        route: ROUTE_URLS.CUSTOMERS.CUSTOMER_ENTRY,
-        showDividerOnTop: true,
-      },
-      {
-        name: "Old Customer Entry",
-        menuKey: MENU_KEYS.USERS.OLD_CUSTOMERS_FORM_KEY,
-        route: ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY,
       },
     ],
   },
@@ -123,16 +140,7 @@ export const routes = [
         menuKey: MENU_KEYS.UTILITIES.APP_CONFIGURATION_FORM_KEY,
         route: ROUTE_URLS.GENERAL.APP_CONFIGURATION_ROUTE,
       },
-      {
-        name: "Product Category",
-        menuKey: MENU_KEYS.UTILITIES.PRODUCT_CATEGORIES_FORM_KEY,
-        route: ROUTE_URLS.UTILITIES.PRODUCT_CATEGORY_ROUTE,
-      },
-      {
-        name: "Product Info",
-        menuKey: MENU_KEYS.UTILITIES.PRODUCT_INFO_FORM_KEY,
-        route: ROUTE_URLS.UTILITIES.PRODUCT_INFO_ROUTE,
-      },
+
       {
         name: "User Rights",
         menuKey: MENU_KEYS.CONFIGURATION.USER_RIGHTS_ROUTE,
@@ -278,12 +286,13 @@ export const initRoutesWithUserRights = (routes) => {
 
 export const initAuthorizedMenus = (allForms, areRoleAvailables = false) => {
   const menuGroupIcons = {
-    Users: "pi pi-users",
+    Users: "pi pi-user",
     Accounts: "pi pi-dollar",
     General: "pi pi-home",
     Utilities: "pi pi-cog",
     Leads: "pi pi-phone",
     Reports: "pi pi-file-pdf",
+    Customers: "pi pi-users",
   }
 
   const groupedForms = allForms.reduce((acc, form) => {

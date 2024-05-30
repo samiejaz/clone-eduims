@@ -56,6 +56,7 @@ import {
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
 import { Table } from "react-bootstrap"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.DEBIT_NODE_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -126,6 +127,10 @@ function DebitNoteEntrySearch({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.DebitNoteID))
+  }
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -134,22 +139,12 @@ function DebitNoteEntrySearch({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Debit Notes</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Debit Note"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Debit Notes"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Create New Debit Note"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -166,6 +161,7 @@ function DebitNoteEntrySearch({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

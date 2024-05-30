@@ -129,6 +129,10 @@ export function GenCustomerEntry({ userRights }) {
     navigate(viewRoute + CustomerID + "?viewMode=view")
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + e?.data?.CustomerID)
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -163,6 +167,7 @@ export function GenCustomerEntry({ userRights }) {
             size="small"
             selectionMode="single"
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

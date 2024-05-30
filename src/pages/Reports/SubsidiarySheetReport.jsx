@@ -42,7 +42,7 @@ export default function SubsidiarySheetReport() {
         <div>
           <h1 className="text-3xl">Subsidiary Sheet</h1>
         </div>
-        <div style={{ justifySelf: "end" }}>
+        {/* <div style={{ justifySelf: "end" }}>
           <Link to={ROUTE_URLS.REPORTS.SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE}>
             <Button
               label="Table View"
@@ -54,7 +54,7 @@ export default function SubsidiarySheetReport() {
               text
             />
           </Link>
-        </div>
+        </div> */}
       </div>
       <hr className="m-0 mb-2" />
       <form onKeyDown={preventFormByEnterKeySubmission}>

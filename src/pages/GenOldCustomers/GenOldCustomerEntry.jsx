@@ -32,6 +32,7 @@ import {
 } from "../../components/Layout/LayoutComponents"
 import { checkForUserRightsAsync } from "../../api/MenusData"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.CUSTOMERS.OLD_CUSTOMER_ENTRY
 let editRoute = `${parentRoute}/edit/`
@@ -180,6 +181,10 @@ export function GenOldCustomerDetail({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.CustomerID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -188,18 +193,12 @@ export function GenOldCustomerDetail({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Old Customers</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              <Button
-                label="Add New"
-                icon="pi pi-plus"
-                type="button"
-                className="rounded"
-                onClick={() => navigate(newRoute)}
-              />
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Old Customers"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Add New"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -215,6 +214,7 @@ export function GenOldCustomerDetail({ userRights }) {
             size="small"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

@@ -62,6 +62,7 @@ import {
   FormRow,
 } from "../../components/Layout/LayoutComponents"
 import { Table } from "react-bootstrap"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 const receiptModeOptions = [
   { label: "Cash", value: "Cash" },
@@ -196,6 +197,10 @@ function DetailComponent({ userRights }) {
     }
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.ReceiptVoucherID))
+  }
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -204,22 +209,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Receipt Vouchers</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Voucher"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Receipt Vouchers"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Create New Receipt"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -236,6 +231,7 @@ function DetailComponent({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

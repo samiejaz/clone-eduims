@@ -16,7 +16,12 @@ const CheckBox = ({
       control={control}
       render={({ field }) => (
         <>
-          <div className={`flex align-items-center ` + containerClassName}>
+          <div
+            className={
+              `flex align-items-center justify-content-start ` +
+              containerClassName
+            }
+          >
             <Checkbox
               disabled={!isEnable}
               inputId={field.name}

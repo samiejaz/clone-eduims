@@ -310,7 +310,6 @@ const PrintRecordButton = ({
             type="button"
             severity="help"
             disabled={printDisable}
-            dis
             loading={mutation.isPending}
             loadingIcon="pi pi-spin pi-print"
             onClick={() =>

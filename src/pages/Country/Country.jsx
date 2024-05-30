@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom"
 import { FilterMatchMode } from "primereact/api"
 import { useContext, useEffect, useState } from "react"
 import { CustomSpinner } from "../../components/CustomSpinner"
-import { Button } from "primereact/button"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import ActionButtons from "../../components/ActionButtons"
@@ -27,6 +26,7 @@ import {
 import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.COUNTRY_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -67,6 +67,7 @@ function DetailComponent({ userRights }) {
     queryKey: [queryKey],
     queryFn: () => fetchAllCountries(user.userID),
     initialData: [],
+    refetchOnWindowFocus: false,
   })
 
   const deleteMutation = useMutation({
@@ -88,6 +89,10 @@ function DetailComponent({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.CountryID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -96,22 +101,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Countries</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Country"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Countries"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Add New Country"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -128,6 +123,7 @@ function DetailComponent({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>
@@ -279,9 +275,14 @@ function FormComponent({ mode, userRights }) {
                   />
                 </div>
               </FormColumn>
-              <FormColumn lg={3} xl={3} md={6}>
+              <FormColumn
+                lg={3}
+                xl={3}
+                md={6}
+                className="flex justify-content-start align-items-end mb-1"
+              >
                 <label htmlFor="InActive"></label>
-                <div className="mt-1">
+                <div>
                   <CheckBox
                     control={control}
                     ID={"InActive"}

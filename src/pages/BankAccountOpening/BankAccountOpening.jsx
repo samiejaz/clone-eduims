@@ -29,6 +29,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import { encryptID } from "../../utils/crypto"
 import { FormRightsWrapper } from "../../components/Wrappers/wrappers"
 import { CommonBusinessUnitCheckBoxDatatable } from "../../components/CommonFormFields"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.BANK_ACCOUNT_OPENING
 let editRoute = `${parentRoute}/edit/`
@@ -97,6 +98,10 @@ function BankAccountDetail({ userRights }) {
     navigate(parentRoute + "/" + id)
   }
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.BankAccountID))
+  }
+
   return (
     <div className="mt-4">
       {isLoading || isFetching ? (
@@ -105,22 +110,12 @@ function BankAccountDetail({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Bank Accounts</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Add New Bank Account"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Bank Accounts"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Create New Account"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -137,6 +132,7 @@ function BankAccountDetail({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>

@@ -180,6 +180,12 @@ export const MENU_KEYS = {
     SUBSIDIARY_REPORT_FORM_KEY: "mnuSubsidarySheetReport",
     SUBSIDIARY_SHEET_SUMMARY_REPORT_ROUTE: "mnuSubsidarySheetReportSummary",
   },
+  CUSTOMERS: {
+    GROUP_NAME: "Customers",
+    GROUP_KEY: "mnuCustomers",
+    CUSTOMERS_FORM_KEY: "mnuCustomers",
+    OLD_CUSTOMERS_FORM_KEY: "mnuOldCustomers",
+  },
 }
 
 export const MOVEABLE_COMPNENTS_NAMES = {

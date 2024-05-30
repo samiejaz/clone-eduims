@@ -75,6 +75,7 @@ import {
   FormRow,
   FormLabel,
 } from "../../components/Layout/LayoutComponents"
+import { DetailPageTilteAndActionsComponent } from "../../components"
 
 let parentRoute = ROUTE_URLS.ACCOUNTS.NEW_CUSTOMER_INVOICE
 let editRoute = `${parentRoute}/edit/`
@@ -172,6 +173,10 @@ function DetailComponent({ userRights }) {
 
   const method = useForm()
 
+  const onRowClick = (e) => {
+    navigate(viewRoute + encryptID(e?.data?.CustomerInvoiceID))
+  }
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -180,22 +185,12 @@ function DetailComponent({ userRights }) {
         </>
       ) : (
         <>
-          <div className="d-flex text-dark  mb-4 ">
-            <h2 className="text-center my-auto">Customer Invoices</h2>
-            <div className="text-end my-auto" style={{ marginLeft: "10px" }}>
-              {userRights[0]?.RoleNew && (
-                <>
-                  <Button
-                    label="Create New Invoice"
-                    icon="pi pi-plus"
-                    type="button"
-                    className="rounded"
-                    onClick={() => navigate(newRoute)}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <DetailPageTilteAndActionsComponent
+            title="Customer Invoices"
+            onAddNewClick={() => navigate(newRoute)}
+            showAddNewButton={userRights[0]?.RoleNew}
+            buttonLabel="Create New Invoice"
+          />
           <DataTable
             showGridlines
             value={data}
@@ -212,6 +207,7 @@ function DetailComponent({ userRights }) {
             selectionMode="single"
             className={"thead"}
             tableStyle={{ minWidth: "50rem" }}
+            onRowClick={onRowClick}
           >
             <Column
               body={(rowData) =>
