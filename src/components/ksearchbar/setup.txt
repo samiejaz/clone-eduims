@@ -1,0 +1,26 @@
+import React from "react";
+import { KesearchBar } from "./spikes";
+import { Route, Routes } from "react-router-dom";
+
+const routes = [
+  { id: 1, name: "Item 1", path: "/item/1" },
+  { id: 2, name: "Item 2", path: "/item/2" },
+  { id: 3, name: "Item 3", path: "/item/3" },
+  { id: 4, name: "Item 4", path: "/item/4" },
+  { id: 5, name: "Item 5", path: "/item/5" },
+  { id: 6, name: "Item 6", path: "/item/6" },
+  { id: 7, name: "Item 7", path: "/item/7" },
+  { id: 8, name: "Item 8", path: "/item/8" },
+  { id: 9, name: "Item 9", path: "/item/9" },
+  { id: 10, name: "Item 10", path: "/item/10" },
+];
+
+const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<KesearchBar routes={routes} />} />
+    </Routes>
+  );
+};
+
+export default App;

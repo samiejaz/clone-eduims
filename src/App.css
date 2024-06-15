@@ -1,0 +1,137 @@
+:root {
+  --s-primary-color: "#007BFF"; 
+  --s-secondary-color: "#6C757D"; 
+  --s-success-color: "#28A745"; 
+  --s-info-color: "#0EA5E9";
+  --s-warning-color: "#FFC107"; 
+  --s-help-color: "#6610F2"; 
+  --s-danger-color: "#DC3545"; 
+}
+.login-input {
+  border: 1px solid #e4dfe3;
+}
+  
+  .login-input:focus {
+    outline: 1px solid #10B981;
+  }
+
+  .login-input.invalid {
+    outline: 1px solid red;
+  }
+
+.login-container__body {
+    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1124&q=100');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.login-container {
+    backdrop-filter: blur(7px) saturate(180%);
+    -webkit-backdrop-filter: blur(7px) saturate(180%);
+    background-color: rgba(17, 25, 40, 0.69);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.125);
+}
+
+
+
+#content {
+  overflow: hidden;
+  transition: height 0.5s ease-in-out;
+  height: 0; 
+}
+
+#content.collapsed {
+  height: 0;
+}
+
+#content.expanded {
+  height: auto; 
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.lead-timeline-shadow {
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+}
+
+
+.s-text-primary {
+  color: var(--s-primary-color) !important;
+}
+
+.s-text-secondary {
+  color: var(--s-secondary-color) !important;
+}
+
+.s-text-success {
+  color: var(--s-success-color) !important;
+}
+
+.s-text-info {
+  color: var(--s-info-color) !important;
+}
+
+.s-text-warning {
+  color: var(--s-warning-color) !important;
+}
+
+.s-text-help {
+  color: var(--s-help-color) !important;
+}
+
+.s-text-red-700 {
+  color: var(--s-danger-color) !important;
+}
+
+.s-bg-primary {
+  background: var(--s-primary-color) !important;
+}
+
+.s-bg-secondary {
+  background: var(--s-secondary-color) !important;
+}
+
+.s-bg-success {
+  background: var(--s-success-color) !important;
+}
+
+.s-bg-info {
+  background: var(--s-info-color) !important;
+}
+
+.s-bg-warning {
+  background: var(--s-warning-color) !important;
+}
+
+.s-bg-help {
+  background: var(--s-help-color) !important;
+}
+
+.s-bg-danger {
+  background: var(--s-danger-color) !important;
+}
+
+.lead-card__container {
+  padding: 1rem 1.5rem;
+  display: flex;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: #fff;
+  width: 100%;
+}
+
+.lead-card__container.dark {
+  background: #111827;
+  color:white;
+  border: 1px solid #424B57;
+}
