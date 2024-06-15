@@ -197,7 +197,7 @@ export const MeetingDoneFields = ({
             alignItems: "center",
           }}
         >
-          {!ShowToolBar && (
+          {ShowToolBar && (
             <>
               <Button
                 label="Save"

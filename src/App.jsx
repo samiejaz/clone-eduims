@@ -175,19 +175,7 @@ const App = () => {
       <ConfirmDialog
         id="EditDeleteDialog"
         draggable={false}
-        style={{ minWidth: "30vw" }}
-        pt={{
-          acceptButton: {
-            root: {
-              className: "rounded",
-            },
-          },
-          rejectButton: {
-            root: {
-              className: "rounded p-button-secondary",
-            },
-          },
-        }}
+        // style={{ minWidth: "30vw" }}
       />
       <ToastContainer
         position="top-center"

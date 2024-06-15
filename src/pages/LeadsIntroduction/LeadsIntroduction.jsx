@@ -37,6 +37,7 @@ import useConfirmationModal from "../../hooks/useConfirmationModalHook"
 import AccessDeniedPage from "../../components/AccessDeniedPage"
 import LeadsIntroductionViewer, {
   LeadsIntroductionViewerDetail,
+  LeadsViewerDetailOnLeadsForm,
 } from "../LeadsIntroductionViewer/LeadsIntroductionViewer"
 import LeadsComments from "./LeadsComments"
 import { encryptID } from "../../utils/crypto"
@@ -53,6 +54,9 @@ import {
   FormRow,
 } from "../../components/Layout/LayoutComponents"
 import { DetailPageTilteAndActionsComponent } from "../../components"
+import { formatDateWithSymbol } from "../../utils/CommonFunctions"
+import { Filter, SortAsc, SortDesc } from "lucide-react"
+import { useAppConfigurataionProvider } from "../../context/AppConfigurationContext"
 
 let parentRoute = ROUTE_URLS.LEAD_INTRODUCTION_ROUTE
 let editRoute = `${parentRoute}/edit/`
@@ -348,6 +352,14 @@ export function LeadIntroductionDetail({
     "Forwarded",
   ])
 
+  const formatDate = (value) => {
+    return value.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+  }
+
   const statusRowFilterTemplate = (options) => {
     return (
       <Dropdown
@@ -367,29 +379,21 @@ export function LeadIntroductionDetail({
     return (
       <Calendar
         value={options.value}
-        onChange={(e) => options.filterCallback(e.value, options.index)}
-        dateFormat="dd-M-yy"
-        placeholder="dd-M-yy"
-        mask="99--9999"
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index)
+        }}
+        dateFormat="d-M-yy"
+        placeholder="Filter by date"
       />
     )
   }
 
-  const dateBodyTemplate = (rowData) => {
-    return formatDate(rowData.VoucherDate)
-  }
-
-  const formatDate = (value) => {
-    value = new Date(value)
-    return value.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    })
-  }
-
   const onRowClick = (e) => {
     navigate(viewRoute + encryptID(e?.data?.LeadIntroductionID))
+  }
+
+  const dateBodyTemplate = (rowData) => {
+    return formatDateWithSymbol(rowData.VoucherDate)
   }
 
   return (
@@ -414,15 +418,16 @@ export function LeadIntroductionDetail({
             value={data}
             dataKey="LeadIntroductionID"
             paginator
-            rows={Rows}
+            rows={10}
+            showGridlines
             rowsPerPageOptions={[5, 10, 25, 50]}
             removableSort
             emptyMessage="No LeadIntroductions found!"
             filters={filters}
-            filterDisplay="row"
+            filterDisplay="menu"
             resizableColumns
             size="small"
-            className={"thead"}
+            className={"thead-cell"}
             tableStyle={{ minWidth: "50rem" }}
             onRowClick={onRowClick}
           >
@@ -437,7 +442,6 @@ export function LeadIntroductionDetail({
               filterPlaceholder="Search by status"
               sortable
               header="Current Status"
-              showFilterMenu={false}
               filterMenuStyle={{ width: "14rem" }}
               style={{ minWidth: "12rem" }}
               body={statusBodyTemplate}
@@ -450,8 +454,8 @@ export function LeadIntroductionDetail({
               filterField="VoucherDate"
               dataType="date"
               style={{ minWidth: "10rem" }}
-              body={dateBodyTemplate}
               filter
+              body={dateBodyTemplate}
               filterElement={dateFilterTemplate}
               sortable
             ></Column>
@@ -492,6 +496,7 @@ function LeadIntroductionForm({ mode, userRights }) {
 
   const queryClient = useQueryClient()
   const { user } = useContext(AuthContext)
+  const { pageTitles } = useAppConfigurataionProvider()
 
   const countryRef = useRef()
 
@@ -665,6 +670,14 @@ function LeadIntroductionForm({ mode, userRights }) {
                 countryRef={countryRef}
               />
             </FormProvider>
+            {mode === "view" && (
+              <>
+                <LeadsViewerDetailOnLeadsForm
+                  LeadIntroductionID={LeadIntroductionID}
+                  LoginUserID={user.userID}
+                />
+              </>
+            )}
           </div>
         </>
       )}

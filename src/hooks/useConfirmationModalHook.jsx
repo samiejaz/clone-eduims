@@ -1,30 +1,28 @@
 import { confirmDialog } from "primereact/confirmdialog"
+import { displayYesNoDialog } from "../utils/helpers"
+import { SEVERITIES } from "../utils/CONSTANTS"
 
 const useConfirmationModal = ({ handleDelete, handleEdit }) => {
   const reject = () => {}
 
   const confirmEdit = (id) => {
-    confirmDialog({
+    displayYesNoDialog({
       message: "Do you want to edit this record?",
       header: "Edit Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "accept",
-      acceptClassName: "p-button-primary",
-      position: "top",
       accept: () => handleEdit(id),
-      reject,
+      icon: <i className="pi pi-info-circle text-5xl"></i>,
+      severity: SEVERITIES.PRIMARY,
+      defaultFocus: "accept",
     })
   }
   const confirmDelete = (id) => {
-    confirmDialog({
+    displayYesNoDialog({
       message: "Do you want to delete this record?",
       header: "Delete Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      position: "top",
       accept: () => handleDelete(id),
-      reject,
+      icon: <i className="pi pi-info-circle text-5xl"></i>,
+      severity: SEVERITIES.DANGER,
+      defaultFocus: "reject",
     })
   }
 

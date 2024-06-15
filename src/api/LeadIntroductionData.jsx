@@ -17,7 +17,14 @@ export async function fetchAllLeadIntroductions(LoginUserID) {
       `${apiUrl}/${CONTROLLER}/${WHEREMETHOD}?LoginUserID=${LoginUserID}`
     )
 
-    return data.data ?? []
+    const updatedData = data.data.map((item) => {
+      return {
+        ...item,
+        VoucherDate: new Date(item.VoucherDate),
+      }
+    })
+
+    return updatedData ?? []
   } catch (err) {
     ShowErrorToast(err.message)
     return []

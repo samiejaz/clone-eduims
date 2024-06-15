@@ -1,20 +1,30 @@
 import { useEffect } from "react"
 import axios from "axios"
-import { Button, Card, Form, Row, Spinner } from "react-bootstrap"
+
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { AuthContext } from "../context/AuthContext"
 import { useContext } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "react-toastify"
 import { CheckCircle } from "lucide-react"
+import { Button } from "primereact/button"
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const SignUp = () => {
+  document.title = "Login"
   const navigate = useNavigate()
   const { user, loginUser } = useContext(AuthContext)
-  const { register, handleSubmit, formState } = useForm()
-  const { errors } = formState
+  const {
+    handleSubmit,
+    formState: { errors },
+    register,
+  } = useForm({
+    defaultValues: {
+      LoginName: "",
+      Password: "",
+    },
+  })
 
   useEffect(() => {
     if (user !== null) {
@@ -66,7 +76,7 @@ const SignUp = () => {
 
   return (
     <>
-      <div
+      {/* <div
         id="login-container"
         className="flex justify-content-end min-h-screen mx-5"
       >
@@ -157,6 +167,79 @@ const SignUp = () => {
             </form>
           </Card.Body>
         </Card>
+      </div> */}
+      <div className="w-full min-h-screen flex align-items-center justify-content-center login-container__body text-white">
+        <div className="w-full lg:w-5 xl:2-5 p-4 rounded shadow flex flex-column gap-5 login-container">
+          <div className="w-full text-center">
+            <h1>
+              edu
+              <span style={{ color: "#0CAB77", padding: 0, margin: 0 }}>
+                IMS
+              </span>
+            </h1>
+          </div>
+          <div className="w-full">
+            <form
+              className="flex flex-column gap-3"
+              onSubmit={handleSubmit(onSubmit)}
+              method="post"
+            >
+              <div className="w-full">
+                <label htmlFor="Username" className="font-bold">
+                  Username
+                </label>
+
+                <input
+                  {...register("LoginName", {
+                    required: true,
+                  })}
+                  className={`w-full p-2 text-lg rounded login-input ${errors.LoginName ? "invalid" : ""} `}
+                  placeholder="Username"
+                />
+              </div>
+              <div className="w-full">
+                <label htmlFor="Password" className="font-bold">
+                  Password
+                </label>
+
+                <input
+                  {...register("Password", {
+                    required: true,
+                  })}
+                  className={`w-full p-2 text-lg rounded login-input ${errors.Password ? "invalid" : ""} `}
+                  type="password"
+                  placeholder="Password"
+                />
+              </div>
+              <div className="w-full">
+                <Button
+                  label="Login"
+                  pt={{
+                    root: {
+                      className: "w-full rounded",
+                    },
+                  }}
+                  loading={mutation.isPending}
+                  loadingIcon="pi pi-spin pi-spinner"
+                />
+              </div>
+              <div className="text-center">
+                <p>
+                  Developed at{" "}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="http://www.edusoftsolutions.com"
+                    className="text-center"
+                    style={{ color: "#0CAB77", textDecoration: "underline" }}
+                  >
+                    Edusoft System Solutions
+                  </a>
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </>
   )

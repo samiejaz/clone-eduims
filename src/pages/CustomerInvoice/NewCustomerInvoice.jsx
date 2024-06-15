@@ -1037,7 +1037,7 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
       ServiceInfoID: "",
       BalanceAmount: "",
       Amount: 0,
-      Qty: 0,
+      Qty: 1,
       Rate: 0,
       IsFree: false,
       CGS: 0,
@@ -1050,8 +1050,6 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
 
   function onSubmit(data) {
     appendSingleRow(data)
-    method.resetField("ProductInfoID")
-    method.resetField("ServiceInfoID")
     method.resetField("Qty")
     method.resetField("Rate")
     method.resetField("CGS")
@@ -1064,6 +1062,8 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
   const typesOptions = [
     { label: `${pageTitles?.product || "Product"}`, value: "Product" },
     { label: "Service", value: "Service" },
+    { label: "Software", value: "Software" },
+    { label: "Hardware", value: "Hardware" },
   ]
 
   return (
@@ -1084,6 +1084,9 @@ function CustomerInvoiceDetailHeaderForm({ appendSingleRow }) {
                 focusOptions={() => method.setFocus("BusinessUnit")}
                 onChange={(e) => {
                   invoiceTypeRef.current?.setInvoiceType(e.value)
+                  if (e.value === "Product") {
+                    method.resetField("ServiceInfoID")
+                  }
                 }}
               />
             </div>

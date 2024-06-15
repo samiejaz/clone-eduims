@@ -21,6 +21,8 @@ export const AppConfigurationProivder = ({ children }) => {
         setPageTitles({
           product: data?.data[0]?.ProductTitle,
           branch: data?.data[0]?.CustomerBranchTitle,
+          ShowTimelineInsideLeadsForm:
+            data?.data[0]?.ShowTimelineInsideLeadsForm,
         })
       }
     }

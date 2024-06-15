@@ -10,6 +10,9 @@ import { InputText } from "primereact/inputtext"
 
 import { useRoutesData } from "../../context/RoutesContext"
 import { useCheckDeviceHook } from "../../hooks/hooks"
+import { displayYesNoDialog } from "../../utils/helpers"
+import { LayoutDashboard } from "lucide-react"
+import { SEVERITIES } from "../../utils/CONSTANTS"
 
 const CSidebar = ({ sideBarRef, searchInputRef }) => {
   const user = JSON.parse(localStorage.getItem("user"))
@@ -54,9 +57,11 @@ const CSidebar = ({ sideBarRef, searchInputRef }) => {
         <SearchBar searchInputRef={searchInputRef} />
 
         <ul className="c-nav-links">
-          <li>
+          <li className="flex justify-content-start gap-5">
             <Link to={"/"}>
-              <i className="pi pi-home"></i>
+              <i>
+                <LayoutDashboard className="text-white " />
+              </i>
               <span className="c-link_name">Dashboard</span>
             </Link>
             <ul className="c-sub-menu c-blank">
@@ -139,15 +144,13 @@ export const SignOut = () => {
   const { logoutUser } = useContext(AuthContext)
 
   const confirmLogout = () => {
-    confirmDialog({
+    displayYesNoDialog({
       message: "Are you sure you want to logout?",
       header: "Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      position: "top",
       accept: () => logoutUser(),
-      reject: () => {},
+      reject: () => null,
+      icon: <i className="pi pi-info-circle text-5xl"></i>,
+      severity: SEVERITIES.DANGER,
     })
   }
 

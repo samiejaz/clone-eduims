@@ -37,11 +37,13 @@ import {
   TextAreaField,
 } from "../../components/Forms/form"
 import useLeadsFileViewerHook from "./useLeadsFileViewerHook"
+import { Plus } from "lucide-react"
 const apiUrl = import.meta.env.VITE_APP_API_URL
 
 let queryKey = "key"
 
 async function getLeadsTimeline({ LeadIntroductionID, LoginUserID }) {
+  debugger
   try {
     if (LeadIntroductionID !== undefined) {
       LeadIntroductionID = decryptID(LeadIntroductionID)
@@ -123,6 +125,66 @@ function getIconColor(status) {
       return "#DFCFBE"
   }
 }
+function getGradientIconColor(status) {
+  switch (status?.toLowerCase().replaceAll(" ", "")) {
+    case "newlead":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)",
+        iconColor: "red",
+      }
+    case "closed":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(128, 0, 0, 1) 100%)",
+        iconColor: "red",
+      }
+    case "quoted":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(34,197,94,1) 0%, rgba(19,120,56,1) 84%)",
+        iconColor: "#22C55E",
+      }
+
+    case "finalized":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(179,93,247,1) 0%, rgba(87,51,116,1) 84%)",
+        iconColor: "#B35DF7",
+      }
+
+    case "forwarded":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(158,187,249,1) 0%, rgba(134,154,198,1) 84%)",
+        iconColor: "#9EBBF9",
+      }
+    case "acknowledge":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(252,179,130,1) 0%, rgba(207,137,90,1) 84%)",
+        iconColor: "#FCB382",
+      }
+    case "acknowledged":
+      return {
+        iconBgColor:
+          " linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(252,179,130,1) 0%, rgba(207,137,90,1) 84%)",
+        iconColor: "#FCB382",
+      }
+    case "meetingdone":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(255,111,97,1) 0%, rgba(159,60,51,1) 84%)",
+        iconColor: "#FF6F61",
+      }
+    case "pending":
+      return {
+        iconBgColor:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(223,207,190,1) 0%, rgba(172,155,136,1) 84%)",
+        iconColor: "#DFCFBE",
+      }
+  }
+}
 
 const customizedMarker = (item) => {
   return (
@@ -142,16 +204,21 @@ const customizedMarker = (item) => {
   )
 }
 
-const LeadsIntroductionViewer = () => {
+const LeadsIntroductionViewer = ({ FormLeadIntroductionID }) => {
   const { LeadIntroductionID } = useParams()
   const user = useUserData()
 
+  let NewLeadIntroductionID = FormLeadIntroductionID ?? LeadIntroductionID
+
   const { data } = useQuery({
-    queryKey: [queryKey, LeadIntroductionID],
+    queryKey: [queryKey, NewLeadIntroductionID],
     queryFn: async () =>
-      getLeadsTimeline({ LeadIntroductionID, LoginUserID: user.userID }),
+      getLeadsTimeline({
+        LeadIntroductionID: NewLeadIntroductionID,
+        LoginUserID: user.userID,
+      }),
     initialData: [],
-    enabled: LeadIntroductionID !== undefined,
+    enabled: NewLeadIntroductionID !== undefined,
   })
 
   let newEvents = data.map((item) => {
@@ -174,7 +241,7 @@ const LeadsIntroductionViewer = () => {
             <Link
               to={`${
                 ROUTE_URLS.GENERAL.LEADS_INTROUDCTION_DETAIL_VIEWER_ROUTE
-              }/${LeadIntroductionID}/${
+              }/${NewLeadIntroductionID}/${
                 item.Status === "Meeting Done"
                   ? encryptID("MeetingDone")
                   : encryptID(item.Status)
@@ -191,20 +258,25 @@ const LeadsIntroductionViewer = () => {
 
   return (
     <div className="mt-5">
-      <Link
-        to={ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}
-        className="p-button"
-        style={{
-          color: "white",
-          fontWeight: 700,
-        }}
-      >
-        <span
-          className="pi pi-arrow-left"
-          style={{ marginRight: ".5rem" }}
-        ></span>
-        Back To Leads
-      </Link>
+      {!FormLeadIntroductionID && (
+        <>
+          <Link
+            to={ROUTE_URLS.LEAD_INTRODUCTION_ROUTE}
+            className="p-button"
+            style={{
+              color: "white",
+              fontWeight: 700,
+            }}
+          >
+            <span
+              className="pi pi-arrow-left"
+              style={{ marginRight: ".5rem" }}
+            ></span>
+            Back To Leads
+          </Link>
+        </>
+      )}
+
       <div style={{ marginBottom: "1rem" }}>
         {newEvents && newEvents.length > 0 ? (
           <>
@@ -275,16 +347,28 @@ function formatDate(data) {
   return formattedDate
 }
 let queryKey2 = "key2"
-export const LeadsIntroductionViewerDetail = () => {
+export const LeadsIntroductionViewerDetail = ({
+  FormType,
+  FormLeadIntroductionID,
+  FormLeadIntroductionDetailID,
+}) => {
   const { LeadIntroductionID, LeadIntroductionDetailID, Type } = useParams()
-  const TimelineType = decryptID(Type)
+
+  let newLeadIntroductionID = FormLeadIntroductionID ?? LeadIntroductionID
+  let newLeadIntroductionDetailID =
+    FormLeadIntroductionDetailID ?? LeadIntroductionDetailID
+  let newType = FormType ?? Type
+
+  const TimelineType = decryptID(newType)
+
   return (
     <div className="mt-5">
       {TimelineType === "Forwarded" ? (
         <>
           <ForwardedFieldsContainer
-            LeadIntroductionDetailID={LeadIntroductionDetailID}
-            LeadIntroductionID={LeadIntroductionID}
+            LeadIntroductionDetailID={newLeadIntroductionDetailID}
+            LeadIntroductionID={newLeadIntroductionID}
+            showToolbar={false}
           />
         </>
       ) : (
@@ -293,9 +377,10 @@ export const LeadsIntroductionViewerDetail = () => {
       {TimelineType === "Quoted" || TimelineType === "Finalized" ? (
         <>
           <QuotedFieldsContainer
-            LeadIntroductionDetailID={LeadIntroductionDetailID}
-            LeadIntroductionID={LeadIntroductionID}
+            LeadIntroductionDetailID={newLeadIntroductionDetailID}
+            LeadIntroductionID={newLeadIntroductionID}
             Type={TimelineType}
+            showToolbar={false}
           />
         </>
       ) : (
@@ -304,8 +389,9 @@ export const LeadsIntroductionViewerDetail = () => {
       {TimelineType === "Closed" ? (
         <>
           <ClosedFieldContainer
-            LeadIntroductionDetailID={LeadIntroductionDetailID}
-            LeadIntroductionID={LeadIntroductionID}
+            LeadIntroductionDetailID={newLeadIntroductionDetailID}
+            LeadIntroductionID={newLeadIntroductionID}
+            showToolbar={false}
           />
         </>
       ) : (
@@ -314,9 +400,9 @@ export const LeadsIntroductionViewerDetail = () => {
       {TimelineType === "MeetingDone" ? (
         <>
           <MeetingDoneFields
-            LeadIntroductionID={LeadIntroductionID}
-            LeadIntroductionDetailID={LeadIntroductionDetailID}
-            ShowToolBar={true}
+            LeadIntroductionID={newLeadIntroductionID}
+            LeadIntroductionDetailID={newLeadIntroductionDetailID}
+            ShowToolBar={!FormLeadIntroductionID && true}
             ResetFields={false}
             AreFieldsEnable={false}
           />
@@ -327,9 +413,9 @@ export const LeadsIntroductionViewerDetail = () => {
       {TimelineType === "Pending" ? (
         <>
           <RevertBackFields
-            LeadIntroductionID={LeadIntroductionID}
-            LeadIntroductionDetailID={LeadIntroductionDetailID}
-            ShowToolBar={true}
+            LeadIntroductionID={newLeadIntroductionID}
+            LeadIntroductionDetailID={newLeadIntroductionDetailID}
+            ShowToolBar={!FormLeadIntroductionID && true}
             ResetFields={false}
             AreFieldsEnable={false}
           />
@@ -344,6 +430,7 @@ export const LeadsIntroductionViewerDetail = () => {
 function ForwardedFieldsContainer({
   LeadIntroductionDetailID,
   LeadIntroductionID,
+  showToolbar,
 }) {
   const [isEnable, setIsEnable] = useState(false)
 
@@ -537,14 +624,19 @@ function ForwardedFieldsContainer({
 
   return (
     <>
-      <LeadsViewerButtonToolBar
-        LeadIntroductionID={LeadIntroductionID}
-        handleCancel={() => setIsEnable(false)}
-        handleEdit={() => setIsEnable(true)}
-        handleSave={() => method.handleSubmit(onSubmit)()}
-        isLoading={mutation.isPending}
-        isEnable={isEnable}
-      />
+      {showToolbar && (
+        <>
+          <LeadsViewerButtonToolBar
+            LeadIntroductionID={LeadIntroductionID}
+            handleCancel={() => setIsEnable(false)}
+            handleEdit={() => setIsEnable(true)}
+            handleSave={() => method.handleSubmit(onSubmit)()}
+            isLoading={mutation.isPending}
+            isEnable={isEnable}
+          />
+        </>
+      )}
+
       {ForwardFields}
 
       {/* {filePath !== null && fileType !== "" ? (
@@ -574,6 +666,7 @@ function QuotedFieldsContainer({
   LeadIntroductionDetailID,
   LeadIntroductionID,
   Type,
+  showToolbar = true,
 }) {
   const method = useForm()
   const [isEnable, setIsEnable] = useState(false)
@@ -658,14 +751,19 @@ function QuotedFieldsContainer({
 
   return (
     <>
-      <LeadsViewerButtonToolBar
-        LeadIntroductionID={LeadIntroductionID}
-        handleCancel={() => setIsEnable(false)}
-        handleEdit={() => setIsEnable(true)}
-        handleSave={() => method.handleSubmit(onSubmit)()}
-        isLoading={mutation.isPending}
-        isEnable={isEnable}
-      />
+      {showToolbar && (
+        <>
+          <LeadsViewerButtonToolBar
+            LeadIntroductionID={LeadIntroductionID}
+            handleCancel={() => setIsEnable(false)}
+            handleEdit={() => setIsEnable(true)}
+            handleSave={() => method.handleSubmit(onSubmit)()}
+            isLoading={mutation.isPending}
+            isEnable={isEnable}
+          />
+        </>
+      )}
+
       {QuotedFields}
     </>
   )
@@ -674,6 +772,7 @@ function QuotedFieldsContainer({
 function ClosedFieldContainer({
   LeadIntroductionDetailID,
   LeadIntroductionID,
+  showToolbar = true,
 }) {
   const [isEnable, setIsEnable] = useState(false)
   const user = useUserData()
@@ -745,14 +844,19 @@ function ClosedFieldContainer({
 
   return (
     <>
-      <LeadsViewerButtonToolBar
-        LeadIntroductionID={LeadIntroductionID}
-        handleCancel={() => setIsEnable(false)}
-        handleEdit={() => setIsEnable(true)}
-        handleSave={() => method.handleSubmit(onSubmit)()}
-        isLoading={mutation.isPending}
-        isEnable={isEnable}
-      />
+      {showToolbar && (
+        <>
+          <LeadsViewerButtonToolBar
+            LeadIntroductionID={LeadIntroductionID}
+            handleCancel={() => setIsEnable(false)}
+            handleEdit={() => setIsEnable(true)}
+            handleSave={() => method.handleSubmit(onSubmit)()}
+            isLoading={mutation.isPending}
+            isEnable={isEnable}
+          />
+        </>
+      )}
+
       {ClosedFields}
     </>
   )
@@ -855,4 +959,129 @@ function getFileType(fileType) {
     default:
       return fileType
   }
+}
+
+export function LeadsViewerDetailOnLeadsForm({
+  LeadIntroductionID,
+  LoginUserID,
+}) {
+  const { data, isLoading } = useQuery({
+    queryKey: [queryKey, LeadIntroductionID],
+    queryFn: async () =>
+      getLeadsTimeline({
+        LeadIntroductionID: LeadIntroductionID,
+        LoginUserID: LoginUserID,
+      }),
+    initialData: [],
+    enabled: LeadIntroductionID !== undefined,
+  })
+
+  return (
+    <>
+      {isLoading ? (
+        <CustomSpinner />
+      ) : (
+        <>
+          <div className="flex flex-column mt-5 gap-5 w-full">
+            {data.map((item) => (
+              <div
+                key={item.LeadIntroductionDetailID}
+                className="w-full lead-timeline-shadow rounded"
+              >
+                <LeadsViewerDetailOnLeads
+                  item={item}
+                  LeadIntroductionID={LeadIntroductionID}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </>
+  )
+}
+
+const LeadsViewerDetailOnLeads = ({ item, LeadIntroductionID }) => {
+  const containerRef = useRef()
+  const iconRef = useRef()
+
+  const onCollapse = () => {
+    if (containerRef.current?.className.includes("expanded")) {
+      containerRef.current.className = "px-2 collapsed"
+      iconRef.current.className = "pi pi-plus"
+    } else {
+      containerRef.current.className = "px-2 expanded"
+      iconRef.current.className = "pi pi-minus"
+    }
+  }
+
+  return (
+    <>
+      <LeadsViewerDetailOnLeadsFormHeader
+        key={item.LeadIntroductionDetailID}
+        status={item.Status}
+        date={item.EntryDate}
+        description={item.Detail}
+        icon={"send"}
+        onCollapse={onCollapse}
+        iconRef={iconRef}
+      />
+      <div className="px-2 expanded" id="content" ref={containerRef}>
+        <LeadsIntroductionViewerDetail
+          FormLeadIntroductionID={LeadIntroductionID}
+          FormLeadIntroductionDetailID={encryptID(
+            item.LeadIntroductionDetailID
+          )}
+          FormType={`${
+            item.Status === "Meeting Done"
+              ? encryptID("MeetingDone")
+              : encryptID(item.Status)
+          }`}
+        />
+      </div>
+    </>
+  )
+}
+
+const LeadsViewerDetailOnLeadsFormHeader = ({
+  status,
+  icon,
+  date,
+  description,
+  onCollapse,
+  iconRef,
+}) => {
+  const { iconBgColor, iconColor } = getGradientIconColor(status)
+  return (
+    <>
+      <div
+        className="w-full px-4 py-2"
+        style={{ background: iconBgColor, color: "white" }}
+      >
+        <div className="w-full flex align-items-center justify-content-between">
+          <div>
+            <div className="flex align-items-center justify-content-start gap-4">
+              <i
+                className={`${getStatusIcon(status)} p-3 bg-white rounded`}
+                style={{
+                  color: iconColor,
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                }}
+              ></i>
+              <h1 className="p-0 m-0">{status}</h1>
+              <span>{formatDate(date)}</span>
+            </div>
+            <div className="flex align-items-center justify-content-start gap-4 mt-1">
+              <p className="font-bold p-0 m-0">Detail: </p>
+              <p className="p-0 m-0">{description}</p>
+            </div>
+          </div>
+          <div>
+            <i className="pi pi-minus" ref={iconRef} onClick={onCollapse}></i>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }

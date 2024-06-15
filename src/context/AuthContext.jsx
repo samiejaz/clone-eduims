@@ -4,7 +4,6 @@ import { createContext } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 export const AuthContext = createContext()
-
 export const AuthProvier = ({ children }) => {
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
